@@ -1,0 +1,16 @@
+body {
+  background-color: black;
+  color: #00FF00;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  padding: 20px;
+}
+
+.cursor {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0 }
+  50% { opacity: 1 }
+}
