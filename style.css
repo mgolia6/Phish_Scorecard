@@ -1,114 +1,44 @@
-/* style.css */
-
-/* Global terminal look */
 body {
-  background-color: #000000;
-  color: #00ff00;
+  background-color: #000;
+  color: #0f0;
   font-family: 'Courier New', Courier, monospace;
   margin: 0;
   padding: 20px;
 }
 
-/* Splash screen */
-#splash-screen {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  border: 2px solid #00ff00;
-  box-shadow: 0 0 10px #00ff00;
-  white-space: pre-wrap;
-}
-
-/* Blinking cursor */
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-.blink {
-  animation: blink 1s step-start infinite;
-}
-
-/* Terminal container */
 .terminal {
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
+  border: 2px solid #0f0;
   padding: 20px;
-  border: 2px solid #00ff00;
-  box-shadow: 0 0 10px #00ff00;
+  background-color: #111;
 }
 
-/* Headings */
 h1 {
-  font-size: 2em;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  border-bottom: 1px solid #00ff00;
-  padding-bottom: 5px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-/* Inputs and buttons */
-input[type="text"] {
-  background-color: #000;
-  color: #00ff00;
-  border: 1px solid #00ff00;
-  padding: 5px;
-  width: 200px;
-  font-family: inherit;
+.terminal-section {
+  margin-bottom: 30px;
 }
 
-button {
-  background-color: #000;
-  color: #00ff00;
-  border: 1px solid #00ff00;
-  padding: 5px 10px;
+table {
+  width: 100%;
+  border-collapse: collapse;
   margin-top: 10px;
-  cursor: pointer;
-  font-family: inherit;
 }
 
-button:hover {
-  background-color: #00ff00;
-  color: #000;
+th, td {
+  border: 1px solid #0f0;
+  padding: 8px;
+  text-align: left;
 }
 
-/* Setlist display */
-#setlist-container {
-  margin-top: 20px;
-}
-
-#setlist-container div {
-  margin-bottom: 10px;
-  padding: 5px;
-  border-bottom: 1px dashed #00ff00;
-}
-
-/* Typewriter animation for song names */
-.typewriter {
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 2px solid #00ff00;
-  animation: typing 2s steps(40, end), blink 1s step-start infinite;
-}
-
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
-
-/* Rating dropdown */
-select.rating-select {
+select, textarea {
   background-color: #000;
-  color: #00ff00;
-  border: 1px solid #00ff00;
+  color: #0f0;
+  border: 1px solid #0f0;
   font-family: inherit;
-  padding: 3px;
-}
-
-/* Rating summary */
-#rating-summary {
-  margin-top: 20px;
-  padding: 10px;
-  border-top: 1px solid #00ff00;
+  width: 100%;
 }
