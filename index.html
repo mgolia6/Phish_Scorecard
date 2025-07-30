@@ -2,16 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Test Button</title>
+  <title>Phish Show Rater</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 20px;
+    }
+    .terminal {
+      max-width: 1000px;
+      margin: auto;
+      border: 2px solid #0f0;
+      padding: 20px;
+      background-color: #111;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .terminal-section {
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #0f0;
+      padding: 8px;
+      text-align: left;
+    }
+    select, textarea, input {
+      background-color: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      font-family: inherit;
+      width: 100%;
+    }
+    button {
+      background-color: #000;
+      color: #0f0;
+      border: 2px solid #0f0;
+      padding: 10px 20px;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Phish Show Rater</h1>
-  <button onclick="loadSetlist()">Load Setlist</button>
-  <div id="output"></div>
+  <div class="terminal">
+    <h1>🎵 Phish Show Rater</h1>
+
+    <label for="showdate">Enter Show Date (YYYY-MM-DD):</label>
+    <input type="text" id="showdate" placeholder="2023-07-28" />
+    <button onclick="loadShow()">Load Show</button>
+
+    <div id="show-details" class="terminal-section"></div>
+    <div id="show-notes" class="terminal-section"></div>
+    <div id="rating-guide" class="terminal-section"></div>
+    <div id="setlist-table" class="terminal-section"></div>
+  </div>
 
   <script>
-    function loadSetlist() {
-      document.getElementById("output").innerText = "Button works!";
+    const apiKey = "10645D7F59011FFA82A";
+
+    async function loadShow() {
+      const date = document.getElementById("showdate").value.trim();
+      if (!date) return alert("Please enter a valid date.");
+
+      const url = `https://api.phish.net/v3/setlists?apikey=${apiKey}&showdate=${date}`;
+
+      try {
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (!result.data || result.data.length === 0) {
+          document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
+          return;
+        }
+
+        const show = result.data[0];
+        const setlistdata = show.setlistdata || [];
+
+        // Show Details
+        document.getElementById("show-details").innerHTML = `
+          <h2>📅 Show Details</h2>
+          <p><strong>Date:</strong> ${show.showdate}</p>
+          <p><strong>Venue:</strong> ${show.venue}</p>
+          <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
+          <p><strong>Song Count:</strong> ${setlistdata.length}</p>
+        `;
+
+        // Show Notes
+        document.getElementById("show-notes").innerHTML = `
+          <h2>📝 Show Notes</h2>
+          <p>${show.setlistnotes || "No notes available."}</p>
+        `;
+
+        // Rating Guide
+        document.getElementById("rating-guide").innerHTML = `
+          <h2>🎚️ Rating Guide</h2>
+          <ul>
+            <li><strong>5:</strong> Legendary performance</li>
+            <li><strong>4:</strong> Must-hear version</li>
+            <li><strong>3:</strong> Solid, above average</li>
+            <li><strong>2:</strong> Standard, nothing special</li>
+            <li><strong>1:</strong> Below average or flubbed</li>
+          </ul>
+        `;
+
+        // Setlist Table
+        let tableHTML = `
+          <h2>🎶 Setlist Ratings</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Set</th>
+                <th>Song</th>
+                <th>Position</th>
+                <th>Jam Chart</th>
+                <th>Gap</th>
+                <th>Rating</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        setlistdata.forEach((song, index) => {
+          tableHTML += `
+            <tr>
+              <td>${song.set}</td>
+              <td>${song.song}</td>
+              <td>${song.position}</td>
+              <td>${song.jamchartflag ? "✅" : ""}</td>
+              <td>${song.gap}</td>
+              <td>
+                <select id="rating-${index}">
+                  <option value="">--</option>
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                  <option value="1">1</option>
+                </select>
+              </td>
+              <td><textarea id="notes-${index}" rows="1"></textarea></td>
+            </tr>
+          `;
+        });
+
+        tableHTML += `</tbody></table>`;
+        document.getElementById("setlist-table").innerHTML = tableHTML;
+
+      } catch (error) {
+        console.error("Error fetching show:", error);
+        alert("Failed to load show data.");
+      }
     }
   </script>
 </body>
