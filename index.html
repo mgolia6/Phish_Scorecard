@@ -154,7 +154,8 @@
 
     try {
       console.log('Loading show for date:', date);
-      const apiUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
+      // Changed API endpoint to get detailed setlist
+      const apiUrl = `https://api.phish.net/v5/setlist/get?showdate=${date}&apikey=${apiKey}`;
       console.log('API URL:', apiUrl);
       
       const response = await fetch(apiUrl);
@@ -176,10 +177,6 @@
   
       const show = result.data[0];
       console.log('Show data:', show);
-  
-      if (!show) {
-        throw new Error('Show data is undefined or null');
-      }
   
       // Show Details
       document.getElementById("show-details").innerHTML = `
@@ -206,7 +203,7 @@
             <tr>
               <th>Set</th>
               <th>Song</th>
-              <th>Jh>Jam Chart</th>
+              <th>Jam Chart</th>
               <th>Gap</th>
               <th>Rating (1-5)</th>
               <th>Notes</th>
@@ -215,23 +212,23 @@
           <tbody>
       `;
   
-      // Parse setlist data
-      const songs = show.setlistdata ? show.setlistdata.split(', ') : [];
+      // Parse setlist data differently
+      const longlist = show.longlist ? show.longlist.split(', ') : [];
       const sets = show.setlist ? show.setlist.split(', ') : [];
   
-      console.log('Songs:', songs);
+      console.log('Longlist:', longlist);
       console.log('Sets:', sets);
   
-      if (songs.length === 0) {
+      if (longlist.length === 0) {
         setlistHTML += '<tr><td colspan="6">No setlist data available for this show.</td></tr>';
       } else {
-        songs.forEach((song, index) => {
+        longlist.forEach((song, index) => {
           setlistHTML += `
             <tr>
               <td>${sets[index] || ''}</td>
               <td>${song}</td>
-              <td>${show.isjamchart ? '✓' : ''}</td>
-              <td>${show.gap || 'N/A'}</td>
+              <td>${'N/A'}</td>
+              <td>${'N/A'}</td>
               <td>
                 <select style="width: 60px;">
                   <option value="">--</option>
@@ -247,28 +244,27 @@
           `;
         });
       }
-
-    setlistHTML += `
-      </tbody>
-    </table>
-    <div style="margin-top: 20px; text-align: right;">
-      <button onclick="calculateAverage()">Calculate Show Rating</button>
-      <span id="show-rating" style="margin-left: 10px;"></span>
-    </div>
-    `;
-
-    document.getElementById("setlist-table").innerHTML = setlistHTML;
-    console.log('Setlist table generated');
-
-  } catch (error) {
-    console.error('Error details:', error);
-    alert('Error loading show data: ' + error.message);
-    document.getElementById("show-details").innerHTML = "<p>Error loading show details.</p>";
-    document.getElementById("show-notes").innerHTML = "";
-    document.getElementById("setlist-table").innerHTML = "";
+  
+      setlistHTML += `
+        </tbody>
+      </table>
+      <div style="margin-top: 20px; text-align: right;">
+        <button onclick="calculateAverage()">Calculate Show Rating</button>
+        <span id="show-rating" style="margin-left: 10px;"></span>
+      </div>
+      `;
+  
+      document.getElementById("setlist-table").innerHTML = setlistHTML;
+      console.log('Setlist table generated');
+  
+    } catch (error) {
+      console.error('Error details:', error);
+      alert('Error loading show data: ' + error.message);
+      document.getElementById("show-details").innerHTML = "<p>Error loading show details.</p>";
+      document.getElementById("show-notes").innerHTML = "";
+      document.getElementById("setlist-table").innerHTML = "";
   }
 }
-
     function calculateAverage() {
       const ratings = document.querySelectorAll('#setlist-table select');
       let sum = 0;
