@@ -116,7 +116,7 @@
 </head>
 <body>
   <div class="terminal">
-    <h1>Phishow Scorecard v3.2</h1>
+    <h1>Phishow Scorecard v3.21</h1>
     <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
 
     <!-- Tab Buttons -->
@@ -180,13 +180,15 @@
     async function fetchShows() {
       try {
         console.log('Fetching shows...');
-        // Changed the endpoint back to the one we know works
         const response = await fetch(`https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`);
         const data = await response.json();
         
-        console.log('API Response:', data); // Added to debug
+        console.log('API Response received:', data.data.length, 'shows');
     
-        const showSelect = document.getElemententById('showdate');
+        const showSelect = document.getElementById('showdate');
+        if (!showSelect) {
+          throw new Error('Show select element not found');
+        }
         showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
     
         if (data.data && Array.isArray(data.data)) {
@@ -207,10 +209,12 @@
         }
       } catch (error) {
         console.error('Error fetching shows:', error);
-        document.getElementById('showdate').innerHTML = 
-          '<option value="">Error loading shows</option>';
-      }
+        const showSelect = document.getElementById('showdate');
+        if (showSelect) {
+          showSelect.innerHTML = '<option value="">Error loading shows</option>';
     }
+  }
+}
 
 
     async function loadShow() {
