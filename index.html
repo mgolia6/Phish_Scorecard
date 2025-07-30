@@ -5,67 +5,97 @@
   <title>Phishow Scorecard v1</title>
   <style>
     body {
-      background-color: #000;
-      color: #0f0;
+      background-color: #0a0a0a;
+      color: #33ff33;
       font-family: 'Courier New', Courier, monospace;
       margin: 0;
       padding: 20px;
-    }
-    .terminal {
+  }
+  
+  .terminal {
       max-width: 1000px;
       margin: auto;
-      border: 2px solid #0f0;
+      border: 2px solid #33ff33;
       padding: 20px;
       background-color: #111;
-    }
-    h1 {
+      box-shadow: 0 0 10px #33ff33;
+  }
+  
+  h1 {
       text-align: center;
       margin-bottom: 5px;
-      color: #fff;  /* White title */
-    }
-    h2 {
+      color: #ff6600;
+      text-shadow: 0 0 5px #ff6600;
+  }
+  
+  h2 {
       text-align: center;
       margin-bottom: 5px;
-      color: #fff;  /* White headers */
-    }
-    .sys-msg {
-      color: #f00;  /* Red system message */
-    }
-    select, button {
-      background-color: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
+      color: #00ccff;
+      border-bottom: 1px solid #00ccff;
+      padding-bottom: 5px;
+  }
+  
+  .sys-msg {
+      color: #ff3333;
+      font-weight: bold;
+  }
+  
+  select, button, input[type="text"] {
+      background-color: #222;
+      color: #33ff33;
+      border: 1px solid #33ff33;
       padding: 5px;
       margin-top: 10px;
       font-family: inherit;
-    }
-    .instructions {
-      border: 1px dashed #0f0;
+  }
+  
+  button:hover {
+      background-color: #33ff33;
+      color: #0a0a0a;
+      cursor: pointer;
+  }
+  
+  .instructions {
+      border: 1px dashed #ff6600;
       padding: 10px;
       margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    #show-details, #show-notes, #setlist-table {
-      margin-top: 20px;
-    }
-    table {
+      background-color: #1a1a1a;
+  }
+  
+  table {
       border-collapse: collapse;
       margin-top: 20px;
       width: 100%;
-    }
-    th, td {
-      border: 1px solid #0f0;
+  }
+  
+  th {
+      background-color: #00ccff;
+      color: #0a0a0a;
+  }
+  
+  th, td {
+      border: 1px solid #33ff33;
       padding: 8px;
       text-align: left;
-    }
-    .show-notes {
+  }
+  
+  tr:nth-child(even) {
+      background-color: #1a1a1a;
+  }
+  
+  .show-notes {
       margin: 20px 0;
       padding: 10px;
-      border: 1px solid #0f0;
+      border: 1px solid #ff6600;
+      background-color: #1a1a1a;
+  }
   
+  #show-rating {
+      font-size: 1.2em;
+      color: #ff6600;
+  }
+
     }
     input[type="text"], select {
       background-color: #000;
@@ -77,7 +107,7 @@
 </head>
 <body>
   <div class="terminal">
-    <h1>Phishow Scorecard v2</h1>
+    <h1>Phishow Scorecard v3</h1>
     <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
 
     <div class="instructions">
