@@ -154,8 +154,8 @@
 
     try {
       console.log('Loading show for date:', date);
-      // Changed API endpoint to get detailed setlist
-      const apiUrl = `https://api.phish.net/v5/setlist/get?showdate=${date}&apikey=${apiKey}`;
+      // Changed to the correct API endpoint format
+      const apiUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
       console.log('API URL:', apiUrl);
       
       const response = await fetch(apiUrl);
@@ -195,6 +195,15 @@
       `;
       document.getElementById("show-notes").innerHTML = notesHTML;
   
+      // Get the individual songs from the long-form setlist
+      const setlistData = show.setlistdata || '';
+      const songs = setlistData.split(', ').filter(song => song.length > 0);
+      const setlistRaw = show.setlist || '';
+      const sets = setlistRaw.split(', ').filter(set => set.length > 0);
+  
+      console.log('Songs:', songs);
+      console.log('Sets:', sets);
+  
       // Setlist & Scorecard
       let setlistHTML = `
         <h2>Setlist & Ratings</h2>
@@ -212,17 +221,10 @@
           <tbody>
       `;
   
-      // Parse setlist data differently
-      const longlist = show.longlist ? show.longlist.split(', ') : [];
-      const sets = show.setlist ? show.setlist.split(', ') : [];
-  
-      console.log('Longlist:', longlist);
-      console.log('Sets:', sets);
-  
-      if (longlist.length === 0) {
+      if (songs.length === 0) {
         setlistHTML += '<tr><td colspan="6">No setlist data available for this show.</td></tr>';
       } else {
-        longlist.forEach((song, index) => {
+        songs.forEach((song, index) => {
           setlistHTML += `
             <tr>
               <td>${sets[index] || ''}</td>
