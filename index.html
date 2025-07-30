@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Phishow Scorecard v1</title>
   <style>
     body {
@@ -9,12 +9,11 @@
       background-color: #000;
       color: #0f0;
       padding: 20px;
-  
     }
     h1, h2 {
       color: #0ff;
     }
-    select, button, input {
+    select, button, input, textarea {
       font-family: inherit;
       font-size: 1em;
       background-color: #111;
@@ -39,11 +38,27 @@
     .section {
       margin-top: 30px;
     }
+    .instructions {
+      border: 1px dashed #0f0;
+      padding: 10px;
+      margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
   <h1>PHISHOW SCORECARD v1</h1>
-  <p>:: Don't Suck at Phish ::</p>
+  <p><strong>[SYS_MSG]</strong> Don't Suck at Phish</p>
+
+  <div class="instructions">
+    <h2>📋 Instructions</h2>
+    <ol>
+      <li>Select a show from the dropdown.</li>
+      <li>Click <strong>Load Setlist</strong> to fetch real data.</li>
+      <li>Rate each song using the dropdown (1–5).</li>
+      <li>Add personal notes for standout moments.</li>
+      <li>Reflect, revise, and remember: Don’t Suck at Phish.</li>
+    </ol>
+  </div>
 
   <label for="showSelect">Choose a show:</label>
   <select id="showSelect">
