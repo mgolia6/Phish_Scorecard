@@ -64,7 +64,7 @@ table {
 }
 
 th {
-  background-color: #00ccff;
+  background-color: #0 #00ccff;
   color: #0a0a0a;
 }
 
@@ -132,7 +132,38 @@ label {
   margin-top: 10px;
 }
 
-/* Add spacing for sections */
 #show-details, #show-notes, #setlist-table {
   margin-top: 20px;
+}
+
+/* Additional button styling */
+button {
+  margin: 10px 0;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+}
+
+/* Input and select styling */
+input[type="text"], select {
+  background-color: #111;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Table cell padding */
+td, th {
+  padding: 10px;
+}
+
+/* Instructions list styling */
+.instructions ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin: 5px 0;
 }
