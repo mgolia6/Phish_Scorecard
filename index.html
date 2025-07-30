@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Phishow Scorecard v1</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
   <div class="terminal">
@@ -19,7 +19,27 @@
 
     <!-- Scorecard Tab -->
     <div id="scorecard" class="tab-content active">
-      <!-- Your existing scorecard content -->
+      <div class="instructions">
+        <h2>📋 Instructions</h2>
+        <ol>
+          <li>Select a show date from the dropdown.</li>
+          <li>Click <strong>Generate Setlist & Scorecard</strong> to fetch real data.</li>
+          <li>Rate each song using the dropdown (1–5).</li>
+          <li>Add personal notes for standout moments.</li>
+          <li>Reflect, revise, and remember: Don't Suck at Phish.</li>
+        </ol>
+      </div>
+
+      <label for="showdate">Select a Show Date:</label>
+      <select id="showdate" name="showdate">
+        <option value="">Loading shows...</option>
+      </select>
+      <button onclick="loadShow()">Generate Setlist & Scorecard</button>
+
+      <div id="show-details"></div>
+      <div id="show-notes"></div>
+      <div id="setlist-table"></div>
+      <button onclick="submitRatings()">Submit Ratings</button>
     </div>
 
     <!-- Song Rankings Tab -->
@@ -35,6 +55,7 @@
     </div>
   </div>
 
+  <!-- Scripts - Order matters! -->
   <script src="api.js"></script>
   <script src="storage.js"></script>
   <script src="ui.js"></script>
