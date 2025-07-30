@@ -150,112 +150,118 @@
 
 
     async function loadShow() {
-      const date = document.getElementById("showdate").value;
-      if (!date) return alert("Please select a show date.");
-
-      try {
-        const apiUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
-        console.log('API URL:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-           }
-        
-        const result = await response.json();
-        console.log('API Response:', result);
-
-        if (!result.data || result.data.length === 0) {
-          document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
-          document.getElementById("show-notes").innerHTML = "";
-          document.getElementById("setlist-table").innerHTML = "";
-          return;
-        }
-
-        const show = result.data[0];
-
-        // Show Details
-        document.getElementById("show-details").innerHTML = `
-          <h2>Show Details</h2>
-          <p><strong>Date:</strong> ${show.showdate}</p>
-          <p><strong>Venue:</strong> ${show.venue}</p>
-          <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
-        `;
-
-        // Show Notes
-        let notesHTML = `
-          <div class="show-notes">
-            <h2>Show Notes</h2>
-            <p>${show.setlistnotes || "No notes available for this show."}</p>
-          </div>
-        `;
-        document.getElementById("show-notes").innerHTML = notesHTML;
-
-        // Setlist & Scorecard
-        let setlistHTML = `
-          <h2>Setlist & Ratings</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Set</th>
-                <th>Song</th>
-                <th>Jam Chart</th>
-                <th>Gap</th>
-                <th>Rating (1-5)</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-
-        // Parse setlist data
-        const songs = show.setlistdata ? show.setlistdata.split(', ') : [];
-        const sets = show.setlist ? show.setlist.split(', ') : [];
-
-        songs.forEach((song, index) => {
-          setlistHTML += `
-            <tr>
-              <td>${sets[index] || ''}</td>
-              <td>${song}</td>
-              <td>${show.isjamchart ? '✓' : ''}</td>
-              <td>${show.gap || 'N/A'}</td>
-              <td>
-                <select style="width: 60px;">
-                  <option value="">--</option>
-                  <option value="5">5</option>
-                  <option value="4">4</option>
-                  <option value="3">3</option>
-                  <option value="2">2</option>
-                  <option value="1">1</option>
-                </select>
-              </td>
-              <td><input type="text" style="width: 100%;" placeholder="Add notes..."></td>
-            </tr>
-          `;
-        });
-
-        setlistHTML += `
-          </tbody>
-        </table>
-        <div style="margin-top: 20px; text-align: right;">
-          <button onclick="calculateAverage()">Calculate Show Rating</button>
-          <span id="show-rating" style="margin-left: 10px;"></span>
-        </div>
-        `;
-
-        document.getElementById("setlist-table").innerHTML = setlistHTML;
-
-      } catch (error) {
-        console.error('Error details:', error);
-        alert('Error loading show data. Please check the console and try again.');
+    const date = document.getElementById("showdate").value;
+    if (!date) return alert("Please select a show date.");
+  
+    try {
+      console.log('Loading show for date:', date);
+      const apiUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
+      console.log('API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const result = await response.json();
+      console.log('API Response:', result);
+  
+      if (result.error) {
+        throw new Error(`API Error: ${result.error_message}`);
+      }
+  
+      if (!result.data || result.data.length === 0) {
+        throw new Error('No show data found for this date.');
+      }
+  
+      const show = result.data[0];
+      console.log('Show data:', show);
+  
+      // Show Details
+      document.getElementById("show-details").innerHTML = `
+        <h2>Show Details</h2>
+        <p><strong>Date:</strong> ${shoshow.showdate}</p>
+        <p><strong>Venue:</strong> ${show.venue}</p>
+        <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
+      `;
+  
+      // Show Notes
+      let notesHTML = `
+        <div class="show-notes">
+          <h2>Show Notes</h2>
+          <p>${show.setlistnotes || "No notes available for this show."}</p>
+        </div>
+      `;
+      document.getElementById("show-notes").innerHTML = notesHTML;
+  
+      // Setlist & Scorecard
+      let setlistHTML = `
+        <h2>Setlist & Ratings</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Set</th>
+              <th>Song</th>
+              <th>Jam Chart</th>
+              <th>Gap</th>
+              <th>Rating (1-5)</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+  
+      // Parse setlist data
+      const songs = show.setlistdata ? show.setlistdata.split(', ') : [];
+      const sets = show.setlist ? show.setlist.split(', ') : [];
+  
+      console.log('Songs:', songs);
+      console.log('Sets:', sets);
+  
+      songs.forEach((song, index) => {
+        setlistHTML += `
+          <tr>
+            <td>${sets[index] || ''}</td>
+            <td>${song}</td>
+            <td>${show.isjamchart ? '✓' : ''}</td>
+            <td>${show.gap || 'N/A'}</td>
+            <td>
+              <select style="width: 60px;">
+                <option value="">--</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+              </select>
+            </td>
+            <td><input type="text" style="width: 100%;" placeholder="Add notes..."></td>
+          </tr>
+        `;
+      });
+  
+      setlistHTML += `
+        </tbody>
+      </table>
+      <div style="margin-top: 20px; text-align: right;">
+        <button onclick="calculateAverage()">Calculate Show Rating</button>
+        <span id="show-rating" style="margin-left: 10px;"></span>
+      </div>
+      `;
+  
+      document.getElementById("setlist-table").innerHTML = setlistHTML;
+      console.log('Setlist table generated');
+  
+    } catch (error) {
+      console.error('Error details:', error);
+      alert('Error loading show data: ' + error.message);
+      document.getElementById("show-details").innerHTML = "<p>Error loading show details.</p>";
+      document.getElementById("show-notes").innerHTML = "";
+      document.getElementById("setlist-table").innerHTML = "";
     }
+  }
+
 
     function calculateAverage() {
       const ratings = document.querySelectorAll('#setlist-table select');
