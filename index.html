@@ -105,47 +105,46 @@
     const apiKey = "10645D7F59011FFA82A";
     console.log('API Key:', apiKey);
 
-     async function fetchShows() {
-      try {
-        console.log('Fetching shows...');
-        const apiUrl = `https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}&order_by=showdate_desc`;
-        console.log('API URL:', apiUrl);
-    
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        console.log('Raw API Response:', data);
-    
-        if (data.error) {
-          throw new Error(`API Error: ${data.error_message}`);
-        }
-    
-        if (!data.data || !Array.isArray(data.data)) {
-          console.log('Unexpected data structure:', data);
-          throw new Error('Unexpected data structure from API');
-        }
-    
-        console.log(`Number of shows in response: ${data.data.length}`);
-    
-        const showSelect = document.getElementById('showdate');
-        showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
-    
-        data.data.forEach(show => {
-          console.log('Processing show:', show);
-          const option = document.createElement('option');
-          option.value = show.showdate;
-          option.textContent = `${show.showdate} - ${show.venue}`;
-          showSelect.appendChild(option);
-        });
-    
-        console.log(`Added ${data.data.length} shows to dropdown`);
-      } catch (error) {
-        console.error('Error fetching shows:', error);
-        document.getElementById('showdate').innerHTML = 
-          '<option value="">Error loading shows: ' + error.message + '</option>';
+  async function fetchShows() {
+    try {
+      console.log('Fetching shows...');
+      const apiUrl = `https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`;
+      console.log('API URL:', apiUrl);
+  
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Raw API Response:', data);
+  
+      if (data.error) {
+        throw new Error(`API Error: ${data.error_message}`);
+      }
+  
+      if (!data.data || !Array.isArray(data.data)) {
+        console.log('Unexpected data structure:', data);
+        throw new Error('Unexpected data structure from API');
+      }
+  
+      console.log(`Number of shows in response: ${data.data.length}`);
+  
+      const showSelect = document.getElementById('showdate');
+      showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
+  
+      data.data.forEach(show => {
+        const option = document.createElement('option');
+        option.value = show.showdate;
+        option.textContent = `${show.showdate} - ${show.venue}`;
+        showSelect.appendChild(option);
+      });
+  
+      console.log(`Added ${data.data.length} shows to dropdown`);
+    } catch (error) {
+      console.error('Error fetching shows:', error);
+      document.getElementById('showdate').innerHTML = 
+        '<option value="">Error loading shows: ' + error.message + '</option>';
   }
 }
 
