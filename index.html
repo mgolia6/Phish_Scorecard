@@ -1,10 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- ... [Your existing head content] ... -->
+  <meta charset="UTF-8">
+  <title>Phishow Scorecard v1</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #000;
+      color: #0f0;
+      padding: 20px;
+  
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    select, button, input {
+      font-family: inherit;
+      font-size: 1em;
+      background-color: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 5px;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #0f0;
+      padding: 5px;
+      text-align: left;
+    }
+    th {
+      background-color: #111;
+    }
+    .section {
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
-  <!-- ... [Your existing body content] ... -->
+  <h1>PHISHOW SCORECARD v1</h1>
+  <p>:: Don't Suck at Phish ::</p>
+
+  <label for="showSelect">Choose a show:</label>
+  <select id="showSelect">
+    <option value="">Loading shows...</option>
+  </select>
+  <button onclick="loadShow()">Load Setlist & Ratings</button>
+
+  <div id="showDetails" class="section"></div>
+  <div id="showNotes" class="section"></div>
+  <div id="ratingGuide" class="section">
+    <h2>Rating Guide</h2>
+    <ul>
+      <li>1 – Poorly played, many flubs, band felt disconnected</li>
+      <li>2 – Standard bad version, played with moderate proficiency but little energy</li>
+      <li>3 – Standard version, the band did their job</li>
+      <li>4 – Standard great version, great energy, well played</li>
+      <li>5 – THE BEST VERSION EVER</li>
+    </ul>
+  </div>
+  <div id="setlistRatings" class="section"></div>
 
   <script>
     const apiKey = 10645D7F59011FFA82A; // Replace with your actual Phish.net API key
@@ -85,7 +144,14 @@
           `;
         });
 
-        tableHTML += '</table>';
+        tableHTML += `
+          </table>
+          <div style="margin-top: 20px;">
+            <button onclick="calculateAverage()">Calculate Show Rating</button>
+            <span id="showRating" style="margin-left: 20px;"></span>
+          </div>
+        `;
+        
         setlistRatings.innerHTML = tableHTML;
 
       } catch (error) {
@@ -94,6 +160,22 @@
         showNotes.innerHTML = '';
         setlistRatings.innerHTML = '';
       }
+    }
+
+    function calculateAverage() {
+      const ratings = document.querySelectorAll('#setlistRatings input[type="number"]');
+      let sum = 0;
+      let count = 0;
+      
+      ratings.forEach(input => {
+        if (input.value) {
+          sum += parseInt(input.value);
+          count++;
+        }
+      });
+
+      const average = count > 0 ? (sum / count).toFixed(2) : 'No ratings yet';
+      document.getElementById('showRating').innerHTML = `<strong>Show Rating:</strong> ${average}`;
     }
 
     fetchShows();
