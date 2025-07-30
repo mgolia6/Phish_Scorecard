@@ -9,6 +9,27 @@ body {
   padding: 20px;
 }
 
+/* Splash screen */
+#splash-screen {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #00ff00;
+  box-shadow: 0 0 10px #00ff00;
+  white-space: pre-wrap;
+}
+
+/* Blinking cursor */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.blink {
+  animation: blink 1s step-start infinite;
+}
+
 /* Terminal container */
 .terminal {
   max-width: 800px;
@@ -61,6 +82,19 @@ button:hover {
   margin-bottom: 10px;
   padding: 5px;
   border-bottom: 1px dashed #00ff00;
+}
+
+/* Typewriter animation for song names */
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #00ff00;
+  animation: typing 2s steps(40, end), blink 1s step-start infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
 }
 
 /* Rating dropdown */
