@@ -74,13 +74,19 @@
         <li>Click <strong>Load Setlist</strong> to fetch real data.</li>
         <li>Rate each song using the dropdown (1–5).</li>
         <li>Add personal notes for standout moments.</li>
-        <li>Reflect, revise, and remember: Don't Suck at Phish.</li>
+        <li>Reflect, revise, and remember: Don’t Suck at Phish.</li>
       </ol>
     </div>
 
     <label for="showdate">Select a Show Date:</label>
     <select id="showdate">
-      <option value="">Loading shows...</option>
+      <option value="">-- Choose a date --</option>
+      <option value="2023-07-28">2023-07-28 – MSG</option>
+      <option value="2022-08-05">2022-08-05 – Atlantic City</option>
+      <option value="2015-08-22">2015-08-22 – Magnaball</option>
+      <option value="1997-12-11">1997-12-11 – Rochester</option>
+      <option value="1994-06-17">1994-06-17 – Milwaukee</option>
+      <option value="1993-08-13">1993-08-13 – Indianapolis</option>
     </select>
     <button onclick="loadShow()">Load Setlist</button>
 
@@ -91,54 +97,28 @@
   </div>
 
   <script>
-    const apiKey = 10645D7F59011FFA82A; // Replace with your API key
-
-    // Fetch all shows when page loads
-    async function fetchShows() {
-      try {
-        const response = await fetch(`https://api.phish.net/v5/shows/all?apikey=${apiKey}`);
-        const data = await response.json();
-        
-        if (data.error) {
-          throw new Error(data.error_message || 'Failed to load shows');
-        }
-
-        const showSelect = document.getElementById('showdate');
-        showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
-
-        // Sort shows by date descending
-        const shows = data.data.sort((a, b) => b.showdate.localeCompare(a.showdate));
-        
-        shows.forEach(show => {
-          const option = document.createElement('option');
-          option.value = show.showdate;
-          option.textContent = `${show.showdate} - ${show.venue}`;
-          showSelect.appendChild(option);
-        });
-      } catch (error) {
-        console.error('Error fetching shows:', error);
-        document.getElementById('showdate').innerHTML = 
-          '<option value="">Error loading shows</option>';
-      }
-    }
+    const apiKey = "10645D7F59011FFA82A";
 
     async function loadShow() {
       const date = document.getElementById("showdate").value;
       if (!date) return alert("Please select a show date.");
 
+      const url = `https://api.phish.net/v3/setlists?apikey=${apiKey}&showdate=${date}`;
+
       try {
-        const response = await fetch(`https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`);
+        const response = await fetch(url);
         const result = await response.json();
 
         if (!result.data || result.data.length === 0) {
           document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
-          document.gt.getElementById("show-notes").innerHTML = "";
+          document.getElementById("show-notes").innerHTML = "";
           document.getElementById("rating-guide").innerHTML = "";
           document.getElementById("setlist-table").innerHTML = "";
           return;
         }
 
         const show = result.data[0];
+        const setlistdata = show.setlistdata || [];
 
         // Show Details
         document.getElementById("show-details").innerHTML = `
@@ -146,6 +126,7 @@
           <p><strong>Date:</strong> ${show.showdate}</p>
           <p><strong>Venue:</strong> ${show.venue}</p>
           <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
+          <p><strong>Song Count:</strong> ${setlistdata.length}</p>
         `;
 
         // Show Notes
@@ -166,10 +147,6 @@
           </ul>
         `;
 
-        // Parse setlist data
-        const songs = show.setlistdata ? show.setlistdata.split(', ') : [];
-        const sets = show.setlist ? show.setlist.split(', ') : [];
-
         // Setlist Table
         let tableHTML = `
           <h2>🎶 Setlist Ratings</h2>
@@ -178,6 +155,9 @@
               <tr>
                 <th>Set</th>
                 <th>Song</th>
+                <th>Position</th>
+                <th>Jam Chart</th>
+                <th>Gap</th>
                 <th>Rating</th>
                 <th>Notes</th>
               </tr>
@@ -185,11 +165,14 @@
             <tbody>
         `;
 
-        songs.forEach((song, index) => {
+        setlistdata.forEach((song, index) => {
           tableHTML += `
             <tr>
-              <td>${sets[index] || ''}</td>
-              <td>${song}</td>
+              <td>${song.set}</td>
+              <td>${song.song}</td>
+              <td>${song.position}</td>
+              <td>${song.jamchartflag ? "✅" : ""}</td>
+              <td>${song.gap}</td>
               <td>
                 <select id="rating-${index}">
                   <option value="">--</option>
@@ -200,26 +183,4 @@
                   <option value="1">1</option>
                 </select>
               </td>
-              <td><textarea id="notes-${index}" rows="1"></textarea></td>
-            </tr>
-          `;
-        });
-
-        tableHTML += `
-            </tbody>
-          </table>
-        `;
-
-        document.getElementById("setlist-table").innerHTML = tableHTML;
-
-      } catch (error) {
-        console.error('Error loading show:', error);
-        alert('Error loading show data. Please try again.');
-      }
-    }
-
-    // Initialize by fetching shows
-    fetchShows();
-  </script>
-</body>
-</html>
+              <td><textarea id="notes-${index}" rows="1"></textarea
