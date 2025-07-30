@@ -7,30 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Boot-up splash screen -->
-  <div id="splash-screen">
-    <pre>
-Initializing PhishOS v1.0...
-Loading modules: [████████████████████] 100%
-Authenticating with Phish.net API...
-System ready. Press any key to continue<span class="blink">_</span>
-    </pre>
+  <div class="terminal">
+    <h1>🎵 Phish Show Rater</h1>
+
+    <div id="show-details" class="terminal-section"></div>
+    <div id="show-notes" class="terminal-section"></div>
+    <div id="rating-guide" class="terminal-section"></div>
+    <div id="setlist-table" class="terminal-section"></div>
   </div>
 
-  <!-- Main UI (hidden until splash dismissed) -->
-  <div class="terminal" id="main-ui" style="display:none;">
-    <h1>Phish Show Rater</h1>
-    <p>Enter a show date (YYYY-MM-DD):</p>
-    <input type="text" id="show-date" placeholder="e.g. 2023-07-28" />
-    <button onclick="loadShow()">Load Setlist</button>
-
-    <div id="setlist-container"></div>
-
-    <button onclick="submitRatings()">Submit Ratings</button>
-    <div id="rating-summary"></div>
-  </div>
-
-  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
