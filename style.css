@@ -1,16 +1,80 @@
+/* style.css */
+
+/* Global terminal look */
 body {
-  background-color: black;
-  color: #00FF00;
-  font-family: 'VT323', monospace;
-  font-size: 18px;
+  background-color: #000000;
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
   padding: 20px;
 }
 
-.cursor {
-  animation: blink 1s step-end infinite;
+/* Terminal container */
+.terminal {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #00ff00;
+  box-shadow: 0 0 10px #00ff00;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 0 }
-  50% { opacity: 1 }
+/* Headings */
+h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #00ff00;
+  padding-bottom: 5px;
+}
+
+/* Inputs and buttons */
+input[type="text"] {
+  background-color: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 5px;
+  width: 200px;
+  font-family: inherit;
+}
+
+button {
+  background-color: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 5px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: #00ff00;
+  color: #000;
+}
+
+/* Setlist display */
+#setlist-container {
+  margin-top: 20px;
+}
+
+#setlist-container div {
+  margin-bottom: 10px;
+  padding: 5px;
+  border-bottom: 1px dashed #00ff00;
+}
+
+/* Rating dropdown */
+select.rating-select {
+  background-color: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  font-family: inherit;
+  padding: 3px;
+}
+
+/* Rating summary */
+#rating-summary {
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid #00ff00;
 }
