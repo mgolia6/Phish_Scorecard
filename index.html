@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Phishow Scorecard v1</title>
   <style>
     body {
@@ -13,7 +13,7 @@
     h1, h2 {
       color: #0ff;
     }
-    select, button, input, textarea {
+    select, button, input {
       font-family: inherit;
       font-size: 1em;
       background-color: #111;
@@ -38,27 +38,11 @@
     .section {
       margin-top: 30px;
     }
-    .instructions {
-      border: 1px dashed #0f0;
-      padding: 10px;
-      margin-bottom: 30px;
-    }
   </style>
 </head>
 <body>
   <h1>PHISHOW SCORECARD v1</h1>
-  <p><strong>[SYS_MSG]</strong> Don't Suck at Phish</p>
-
-  <div class="instructions">
-    <h2>📋 Instructions</h2>
-    <ol>
-      <li>Select a show from the dropdown.</li>
-      <li>Click <strong>Load Setlist</strong> to fetch real data.</li>
-      <li>Rate each song using the dropdown (1–5).</li>
-      <li>Add personal notes for standout moments.</li>
-      <li>Reflect, revise, and remember: Don’t Suck at Phish.</li>
-    </ol>
-  </div>
+  <p>:: Don't Suck at Phish ::</p>
 
   <label for="showSelect">Choose a show:</label>
   <select id="showSelect">
@@ -86,42 +70,26 @@
     const showDetails = document.getElementById('showDetails');
     const showNotes = document.getElementById('showNotes');
     const setlistRatings = document.getElementById('setlistRatings');
-    let allShows = [];
 
-    async function fetchShows(year = 'all', page = 1) {
+    async function fetchShows(year = 'all') {
       try {
-        const response = await fetch(`https://api.phish.net/v5/shows/query?year=${year}&order=DESC&page=${page}&apikey=${apiKey}`);
+        const response = await fetch(`https://api.phish.net/v5/shows/query?year=${year}&order=ASC&apikey=${apiKey}`);
         const data = await response.json();
-        
-        if (data.data && data.data.length > 0) {
-          allShows = allShows.concat(data.data);
-          
-          if (data.data.length === 50) { // If we got a full page, there might be more
-            await fetchShows(year, page + 1);
-          } else {
-            populateShowSelect();
-          }
-        } else {
-          populateShowSelect();
-        }
+        showSelect.innerHTML = '<option value="">Select a show</option>';
+        data.data.forEach(show => {
+          const option = document.createElement('option');
+          option.value = show.showdate;
+          option.textContent = `${show.showdate} – ${show.venue}`;
+          showSelect.appendChild(option);
+        });
       } catch (error) {
         console.error('Error fetching shows:', error);
         showSelect.innerHTML = '<option value="">Failed to load shows</option>';
       }
     }
 
-    function populateShowSelect() {
-      showSelect.innerHTML = '<option value="">Select a show</option>';
-      allShows.forEach(show => {
-        const option = document.createElement('option');
-        option.value = show.showdate;
-        option.textContent = `${show.showdate} – ${show.venue}`;
-        showSelect.appendChild(option);
-      });
-    }
-
     async function loadShow() {
-         const showDate = showSelect.value;
+      const showDate = showSelect.value;
       if (!showDate) return;
 
       try {
@@ -153,6 +121,7 @@
             <tr>
               <th>Set</th>
               <th>Song</th>
+              <th>Position</th>
               <th>Jam Chart</th>
               <th>Gap</th>
               <th>Rating (1-5)</th>
@@ -160,14 +129,12 @@
             </tr>
         `;
 
-        // Check if 'songs' exists, if not, use the entire show object
-        const setlist = show.songs || [show];
-
-        setlist.forEach((song, index) => {
+        show.songs.forEach((song, index) => {
           tableHTML += `
             <tr>
-              <td>${song.set || ''}</td>
-              <td>${song.song || ''}</td>
+              <td>${song.set}</td>
+              <td>${song.song}</td>
+              <td>${song.position}</td>
               <td>${song.isjamchart ? 'Yes' : 'No'}</td>
               <td>${song.gap || 'N/A'}</td>
               <td><input type="number" min="1" max="5" style="width: 50px;"></td>
