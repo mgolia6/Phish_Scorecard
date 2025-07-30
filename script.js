@@ -1,18 +1,43 @@
 // script.js
 
-// 1. Fetch setlist from Phish.net
+// Dismiss splash screen on any keypress
+document.addEventListener('keydown', () => {
+  const splash = document.getElementById('splash-screen');
+  const mainUI = document.getElementById('main-ui');
+  if (splash.style.display !== 'none') {
+    splash.style.display = 'none';
+    mainUI.style.display = 'block';
+  }
+});
+
+// Load show when button is clicked
+function loadShow() {
+  const showDate = document.getElementById('show-date').value;
+  if (!showDate) {
+    alert('Please enter a show date in YYYY-MM-DD format.');
+    return;
+  }
+  fetchSetlist(showDate);
+}
+
+// Fetch setlist from Phish.net API
 async function fetchSetlist(showDate) {
-  const url = `https://api.phish.net/v5/setlists?apikey=YOUR_API_KEY&showdate=${showDate}`;
+  const url = `https://api.phish.net/v5/setlists?apikey=${API_KEY}&showdate=${showDate}`;
   try {
     const response = await fetch(url);
     const data = await response.json();
+    if (data.error || !data.setlist || data.setlist.length === 0) {
+      document.getElementById('setlist-container').innerHTML = `<p>No setlist found for ${showDate}</p>`;
+      return;
+    }
     displaySetlist(data);
   } catch (error) {
     console.error('Error fetching setlist:', error);
+    document.getElementById('setlist-container').innerHTML = `<p>Error loading setlist.</p>`;
   }
 }
 
-// 2. Display setlist and rating inputs
+// Display setlist with rating inputs
 function displaySetlist(data) {
   const container = document.getElementById('setlist-container');
   container.innerHTML = '';
@@ -20,7 +45,7 @@ function displaySetlist(data) {
   data.setlist.forEach((song, index) => {
     const songDiv = document.createElement('div');
     songDiv.innerHTML = `
-      <p>${song.song}</p>
+      <p class="typewriter">${song.song}</p>
       <label>Rating:
         <select data-song="${song.song}" class="rating-select">
           <option value="">--</option>
@@ -36,7 +61,7 @@ function displaySetlist(data) {
   });
 }
 
-// 3. Submit ratings and calculate average
+// Submit ratings and calculate average
 function submitRatings() {
   const selects = document.querySelectorAll('.rating-select');
   let total = 0;
@@ -53,14 +78,9 @@ function submitRatings() {
     }
   });
 
-  const average = (total / count).toFixed(2);
+  const average = count > 0 ? (total / count).toFixed(2) : 'N/A';
   document.getElementById('rating-summary').innerHTML = `
     <p>Average Show Rating: ${average}</p>
     <pre>${JSON.stringify(songRatings, null, 2)}</pre>
   `;
 }
-
-// 4. Optional: Trigger fetch on page load or button click
-document.addEventListener('DOMContentLoaded', () => {
-  fetchSetlist('2023-07-28'); // Replace with desired show date
-});
