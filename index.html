@@ -28,11 +28,19 @@
       border: 1px solid #0f0;
       padding: 5px;
       margin-top: 10px;
+      font-family: inherit;
     }
     .instructions {
       border: 1px dashed #0f0;
       padding: 10px;
       margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    #show-details, #setlist-table {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -54,7 +62,7 @@
 
     <label for="showdate">Select a Show Date:</label>
     <select id="showdate" name="showdate">
-    <option value="">Loading shows...</option>
+      <option value="">Loading shows...</option>
     </select>
     <button onclick="loadShow()">Load Setlist</button>
 
@@ -63,56 +71,34 @@
   </div>
 
   <script>
-    const apiKey = "10645D7F59011FFA82A"; // Replace with your actual API key
+    const apiKey = "10645D7F59011FFA82A"; // API key in quotes
 
     async function fetchShows() {
-    try {
-      console.log('Fetching shows...');
-      const response = await fetch(`https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`);
-      const data = await response.json();
-      
-      console.log('API Response:', data);
-  
-      if (data.error) {
-        throw new Error(data.error_message || 'Failed to load shows');
-      }
-  
-      const showSelect = document.getElementById('showdate');
-      if (!showSelect) {
-        throw new Error('Could not find showdate select element');
-      }
-  
-      showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
-  
-      // Check if data exists and is an array
-      if (data.data && Array.isArray(data.data)) {
-        // Sort shows by date descending (most recent first)
-        const shows = data.data.sort((a, b) => b.showdate.localeCompare(a.showdate));
+      try {
+        console.log('Fetching shows...');
+        const response = await fetch(`https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`);
+        const data = await response.json();
         
-        shows.forEach(show => {
-          const option = document.createElement('option');
-          option.value = show.showdate;
-          option.textContent = `${show.showdate} - ${show.venue}`;
-          showSelect.appendChild(option);
-        });
-  
-        console.log(`Loaded ${shows.length} shows`);
-      } else {
-        throw new Error('No show data received');
-      }
-  
-    } catch (error) {
-      console.error('Error fetching shows:', error);
-      const showSelect = document.getElementById('showdate');
-      if (showSelect) {
-        showSelect.innerHTML = '<option value="">Error loading shows</option>';
+        console.log('API Response received');
+
+        const showSelect = document.getElementById('showdate');
+        showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
+
+        if (data.data && Array.isArray(data.data)) {
+          data.data.forEach(show => {
+            const option = document.createElement('option');
+            option.value = show.showdate;
+            option.textContent = `${show.showdate} - ${show.venue}`;
+            showSelect.appendChild(option);
+          });
+          console.log(`Added ${data.data.length} shows to dropdown`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('showdate').innerHTML = 
+          '<option value="">Error loading shows</option>';
       }
     }
-  }
-  
-  // Call fetchShows and log any errors
-  fetchShows().catch(error => console.error('Unhandled error in fetchShows:', error));
-
 
     async function loadShow() {
       const date = document.getElementById("showdate").value;
@@ -130,7 +116,6 @@
 
         const show = result.data[0];
 
-        // Display show details
         document.getElementById("show-details").innerHTML = `
           <h2>Show Details</h2>
           <p><strong>Date:</strong> ${show.showdate}</p>
@@ -138,14 +123,13 @@
           <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
         `;
 
-        // Display setlist (we'll expand on this later)
         document.getElementById("setlist-table").innerHTML = `
           <h2>Setlist</h2>
           <p>${show.setlistdata || "No setlist available."}</p>
         `;
 
       } catch (error) {
-        console.error('Error loading show:', error);
+        console.error('Error:', error);
         alert('Error loading show data. Please try again.');
       }
     }
