@@ -1,10 +1,14 @@
-const terminal = document.getElementById("terminal");
+// script.js
+const API_KEY = 10645D7F59011FFA82A; // or import from config.js if secure
+const BASE_URL = 'https://api.phish.net/v5/setlists';
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    const line = document.createElement("div");
-    line.textContent = "> Loading Phish setlist...";
-    terminal.appendChild(line);
-    // Later: add fetch call to Phish.net API here!
+async function fetchSetlist(showDate) {
+  const url = `${BASE_URL}?apikey=${API_KEY}&showdate=${showDate}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    displaySetlist(data);
+  } catch (error) {
+    console.error('Error fetching setlist:', error);
   }
-});
+}
