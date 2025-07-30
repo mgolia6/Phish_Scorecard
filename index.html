@@ -4,6 +4,177 @@
   <meta charset="UTF-8" />
   <title>Phishow Scorecard v1</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    body {
+  background-color: #0a0a0a;
+  color: #33ff33;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+  padding: 20px;
+}
+
+.terminal {
+  max-width: 1000px;
+  margin: auto;
+  border: 2px solid #33ff33;
+  padding: 20px;
+  background-color: #111;
+  box-shadow: 0 0 10px #33ff33;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #ff6600;
+  text-shadow: 0 0 5px #ff6600;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #00ccff;
+  border-bottom: 1px solid #00ccff;
+  padding-bottom: 5px;
+}
+
+.sys-msg {
+  color: #ff3333;
+  font-weight: bold;
+}
+
+select, button, input[type="text"] {
+  background-color: #222;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 5px;
+  margin-top: 10px;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: #33ff33;
+  color: #0a0a0a;
+  cursor: pointer;
+}
+
+.instructions {
+  border: 1px dashed #ff6600;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #1a1a1a;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 20px;
+  width: 100%;
+}
+
+th {
+  background-color: #0 #00ccff;
+  color: #0a0a0a;
+}
+
+th, td {
+  border: 1px solid #33ff33;
+  padding: 8px;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #1a1a1a;
+}
+
+.show-notes {
+  margin: 20px 0;
+  padding: 10px;
+  border: 1px solid #ff6600;
+  background-color: #1a1a1a;
+}
+
+#show-rating {
+  font-size: 1.2em;
+  color: #ff6600;
+}
+
+.tab-container {
+  margin-top: 20px;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #33ff33;
+}
+
+.tab-button {
+  background-color: #111;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.tab-button.active {
+  background-color: #33ff33;
+  color: #111;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+#hidden-data {
+  display: none;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+#show-details, #show-notes, #setlist-table {
+  margin-top: 20px;
+}
+
+/* Additional button styling */
+button {
+  margin: 10px 0;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+}
+
+/* Input and select styling */
+input[type="text"], select {
+  background-color: #111;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Table cell padding */
+td, th {
+  padding: 10px;
+}
+
+/* Instructions list styling */
+.instructions ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin: 5px 0;
+}
+  </style>
 </head>
 <body>
   <div class="terminal">
