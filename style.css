@@ -1,6 +1,6 @@
 body {
-  background-color: #000;
-  color: #0f0;
+  background-color: #0a0a0a;
+  color: #33ff33;
   font-family: 'Courier New', Courier, monospace;
   margin: 0;
   padding: 20px;
@@ -9,36 +9,130 @@ body {
 .terminal {
   max-width: 1000px;
   margin: auto;
-  border: 2px solid #0f0;
+  border: 2px solid #33ff33;
   padding: 20px;
   background-color: #111;
+  box-shadow: 0 0 10px #33ff33;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
+  color: #ff6600;
+  text-shadow: 0 0 5px #ff6600;
 }
 
-.terminal-section {
-  margin-bottom: 30px;
+h2 {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #00ccff;
+  border-bottom: 1px solid #00ccff;
+  padding-bottom: 5px;
+}
+
+.sys-msg {
+  color: #ff3333;
+  font-weight: bold;
+}
+
+select, button, input[type="text"] {
+  background-color: #222;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 5px;
+  margin-top: 10px;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: #33ff33;
+  color: #0a0a0a;
+  cursor: pointer;
+}
+
+.instructions {
+  border: 1px dashed #ff6600;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #1a1a1a;
 }
 
 table {
-  width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+th {
+  background-color: #00ccff;
+  color: #0a0a0a;
 }
 
 th, td {
-  border: 1px solid #0f0;
+  border: 1px solid #33ff33;
   padding: 8px;
   text-align: left;
 }
 
-select, textarea {
-  background-color: #000;
-  color: #0f0;
-  border: 1px solid #0f0;
-  font-family: inherit;
-  width: 100%;
+tr:nth-child(even) {
+  background-color: #1a1a1a;
+}
+
+.show-notes {
+  margin: 20px 0;
+  padding: 10px;
+  border: 1px solid #ff6600;
+  background-color: #1a1a1a;
+}
+
+#show-rating {
+  font-size: 1.2em;
+  color: #ff6600;
+}
+
+.tab-container {
+  margin-top: 20px;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #33ff33;
+}
+
+.tab-button {
+  background-color: #111;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.tab-button.active {
+  background-color: #33ff33;
+  color: #111;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+#hidden-data {
+  display: none;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+/* Add spacing for sections */
+#show-details, #show-notes, #setlist-table {
+  margin-top: 20px;
 }
