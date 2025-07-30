@@ -51,6 +51,10 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -58,8 +62,8 @@
     <h1>🎵 Phish Show Rater</h1>
 
     <label for="showdate">Enter Show Date (YYYY-MM-DD):</label>
-    <input type="text" id="showdate" placeholder="2023-07-28" />
-    <button onclick="loadShow()">Load Show</button>
+    <input type="text" id="showdate" placeholder="e.g. 2023-07-28" />
+    <button onclick="loadShow()">Load Setlist</button>
 
     <div id="show-details" class="terminal-section"></div>
     <div id="show-notes" class="terminal-section"></div>
@@ -82,6 +86,9 @@
 
         if (!result.data || result.data.length === 0) {
           document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
+          document.getElementById("show-notes").innerHTML = "";
+          document.getElementById("rating-guide").innerHTML = "";
+          document.getElementById("setlist-table").innerHTML = "";
           return;
         }
 
