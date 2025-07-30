@@ -22,15 +22,23 @@ function loadShow() {
 
 // Fetch setlist from Phish.net API
 async function fetchSetlist(showDate) {
-  const url = `https://api.phish.net/v5/setlists?apikey=${API_KEY}&showdate=${showDate}`;
+  const url = `https://api.phish.net/v5/shows/showdate/${showDate}.json?apikey=${API_KEY}`;
   try {
     const response = await fetch(url);
     const data = await response.json();
-    if (data.error || !data.setlist || data.setlist.length === 0) {
+
+    if (!data || !data.data || !data.data[0] || !data.data[0].setlistdata) {
       document.getElementById('setlist-container').innerHTML = `<p>No setlist found for ${showDate}</p>`;
       return;
     }
-    displaySetlist(data);
+
+    const rawSetlist = data.data[0].setlistdata;
+    const songs = rawSetlist
+      .split(/,|\n|>/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    
+    displaySetlist(songs);
   } catch (error) {
     console.error('Error fetching setlist:', error);
     document.getElementById('setlist-container').innerHTML = `<p>Error loading setlist.</p>`;
@@ -38,16 +46,16 @@ async function fetchSetlist(showDate) {
 }
 
 // Display setlist with rating inputs
-function displaySetlist(data) {
+function displaySetlist(songs) {
   const container = document.getElementById('setlist-container');
   container.innerHTML = '';
 
-  data.setlist.forEach((song, index) => {
+  songs.forEach(song => {
     const songDiv = document.createElement('div');
     songDiv.innerHTML = `
-      <p class="typewriter">${song.song}</p>
+      <p class="typewriter">${song}</p>
       <label>Rating:
-        <select data-song="${song.song}" class="rating-select">
+        <select data-song="${song}" class="rating-select">
           <option value="">--</option>
           <option value="1">1 - Meh</option>
           <option value="2">2 - Decent</option>
