@@ -48,7 +48,35 @@
   </div>
 
   <script>
-    const apiKey = "YOUR_API_KEY"; // Replace with your actual API key
+    const apiKey = 10645D7F59011FFA82A; // Replace with your actual API key
+
+    async function fetchShows() {
+      try {
+        const response = await fetch(`https://api.phish.net/v5/shows/all?apikey=${apiKey}`);
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error_message || 'Failed to load shows');
+        }
+
+        const showSelect = document.getElementById('showdate');
+        showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
+
+        // Sort shows by date descending (most recent first)
+        const shows = data.data.sort((a, b) => b.showdate.localeCompare(a.showdate));
+        
+        shows.forEach(show => {
+          const option = document.createElement('option');
+          option.value = show.showdate;
+          option.textContent = `${show.showdate} - ${show.venue}`;
+          showSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error fetching shows:', error);
+        document.getElementById('showdate').innerHTML = 
+          '<option value="">Error loading shows</option>';
+      }
+    }
 
     async function loadShow() {
       const date = document.getElementById("showdate").value;
@@ -85,6 +113,9 @@
         alert('Error loading show data. Please try again.');
       }
     }
+
+    // Initialize by fetching shows
+    fetchShows();
   </script>
 </body>
 </html>
