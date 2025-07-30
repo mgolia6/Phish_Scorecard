@@ -128,7 +128,7 @@
     
       try {
         // Use the correct endpoint for detailed setlist information
-        const response = await it fetch(`https://api.phish.net/v5/setlists/get?showdate=${date}&apikey=${apiKey}`);
+        const response = await fetch(`https://api.phish.net/v5/setlists/get?showdate=${date}&apikey=${apiKey}`);
         const result = await response.json();
     
         console.log('API Response:', result); // For debugging
