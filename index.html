@@ -99,26 +99,52 @@
   <script>
     const apiKey = "10645D7F59011FFA82A";
 
+     // Fetch all shows when page loads
+    async function fetchShows() {
+      try {
+        const response = await fetch(`https://api.phish.net/v5/shows/all?apikey=${apiKey}`);
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error_message || 'Failed to load shows');
+        }
+
+        const showSelect = document.getElementById('showdate');
+        showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
+
+        // Sort shows by date descending
+        const shows = data.data.sort((a, b) => b.showdate.localeCompare(a.showdate));
+        
+        shows.forEach(show => {
+          const option = document.createElement('option');
+          option.value = show.showdate;
+          option.textContent = `${show.showdate} - ${show.venue}`;
+          showSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error fetching shows:', error);
+        document.getElementById('showdate').innerHTML = 
+          '<option value="">Error loading shows</option>';
+      }
+    }
+
     async function loadShow() {
       const date = document.getElementById("showdate").value;
       if (!date) return alert("Please select a show date.");
 
-      const url = `https://api.phish.net/v3/setlists?apikey=${apiKey}&showdate=${date}`;
-
       try {
-        const response = await fetch(url);
+        const response = await fetch(`https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`);
         const result = await response.json();
 
         if (!result.data || result.data.length === 0) {
           document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
-          document.getElementById("show-notes").innerHTML = "";
+          document.gt.getElementById("show-notes").innerHTML = "";
           document.getElementById("rating-guide").innerHTML = "";
           document.getElementById("setlist-table").innerHTML = "";
           return;
         }
 
         const show = result.data[0];
-        const setlistdata = show.setlistdata || [];
 
         // Show Details
         document.getElementById("show-details").innerHTML = `
@@ -126,8 +152,8 @@
           <p><strong>Date:</strong> ${show.showdate}</p>
           <p><strong>Venue:</strong> ${show.venue}</p>
           <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
-          <p><strong>Song Count:</strong> ${setlistdata.length}</p>
         `;
+
 
         // Show Notes
         document.getElementById("show-notes").innerHTML = `
