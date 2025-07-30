@@ -151,55 +151,57 @@
     async function loadShow() {
     const date = document.getElementById("showdate").value;
     if (!date) return alert("Please select a show date.");
-
+  
     try {
       console.log('Loading show for date:', date);
-      // Changed to the correct API endpoint format
-      const apiUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
-      console.log('API URL:', apiUrl);
       
-      const response = await fetch(apiUrl);
+      // First API call for show details
+      const detailsUrl = `https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`;
+      const detailsResponse = await fetch(detailsUrl);
+      const detailsData = await detailsResponse.json();
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // Find the specific show from the list
+      const showDetails = detailsData.data.find(show => show.showdate === date);
       
-      const result = await response.json();
-      console.log('API Response:', result);
-  
-      if (result.error) {
-        throw new Error(`API Error: ${result.error_message}`);
+      if (!showDetails) {
+        throw new Error('Show details not found');
       }
   
-      if (!result.data || result.data.length === 0) {
-        throw new Error('No show data found for this date.');
+      // Second API call for setlist
+      const setlistUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
+      console.log('Setlist URL:', setlistUrl);
+      
+      const setlistResponse = await fetch(setlistUrl);
+      const setlistResult = await setlistResponse.json();
+      
+      console.log('Setlist Response:', setlistResult);
+  
+      if (!setlistResult.data || setlistResult.data.length === 0) {
+        throw new Error('No setlist data found for this date.');
       }
   
-      const show = result.data[0];
-      console.log('Show data:', show);
+      const setlistData = setlistResult.data[0];
   
       // Show Details
       document.getElementById("show-details").innerHTML = `
         <h2>Show Details</h2>
-        <p><strong>Date:</strong> ${show.showdate || 'N/A'}</p>
-        <p><strong>Venue:</strong> ${show.venue || 'N/A'}</p>
-        <p><strong>Location:</strong> ${show.city || 'N/A'}, ${show.state || 'N/A'}, ${show.country || 'N/A'}</p>
+        <p><strong>Date:</strong> ${showDetails.showdate || 'N/A'}</p>
+        <p><strong>Venue:</strong> ${showDetails.venue || 'N/A'}</p>
+        <p><strong>Location:</strong> ${showDetails.city || 'N/A'}, ${showDetails.state || 'N/A'}, ${showDetails.country || 'N/A'}</p>
       `;
   
       // Show Notes
       let notesHTML = `
         <div class="show-notes">
           <h2>Show Notes</h2>
-          <p>${show.setlistnotes || "No notes available for this show."}</p>
+          <p>${setlistData.setlistnotes || "No notes available for this show."}</p>
         </div>
       `;
       document.getElementById("show-notes").innerHTML = notesHTML;
   
-      // Get the individual songs from the long-form setlist
-      const setlistData = show.setlistdata || '';
-      const songs = setlistData.split(', ').filter(song => song.length > 0);
-      const setlistRaw = show.setlist || '';
-      const sets = setlistRaw.split(', ').filter(set => set.length > 0);
+      // Parse setlist data
+      const songs = setlistData.setlistdata ? setlistData.setlistdata.split(', ') : [];
+      const sets = setlistData.setlist ? setlistData.setlist.split(', ') : [];
   
       console.log('Songs:', songs);
       console.log('Sets:', sets);
