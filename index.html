@@ -39,21 +39,42 @@
       display: block;
       margin-top: 10px;
     }
-    #show-details, #setlist-table {
+    #show-details, #show-notes, #setlist-table {
       margin-top: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #0f0;
+      padding: 8px;
+      text-align: left;
+    }
+    .show-notes {
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #0f0;
+    }
+    input[type="text"], select {
+      background-color: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 5px;
     }
   </style>
 </head>
 <body>
   <div class="terminal">
-    <h1>Phishow Scorecard v1</h1>
+    <h1>Phish Show Rater</h1>
     <p><strong>[SYS_MSG]</strong> Don't Suck at Phish</p>
 
     <div class="instructions">
       <h2>📋 Instructions</h2>
       <ol>
         <li>Select a show date from the dropdown.</li>
-        <li>Click <strong>Load Setlist</strong> to fetch real data.</li>
+        <li>Click <strong>Generate Setlist & Scorecard</strong> to fetch real data.</li>
         <li>Rate each song using the dropdown (1–5).</li>
         <li>Add personal notes for standout moments.</li>
         <li>Reflect, revise, and remember: Don't Suck at Phish.</li>
@@ -64,14 +85,15 @@
     <select id="showdate" name="showdate">
       <option value="">Loading shows...</option>
     </select>
-    <button onclick="loadShow()">Load Setlist</button>
+    <button onclick="loadShow()">Generate Setlist & Scorecard</button>
 
     <div id="show-details"></div>
+    <div id="show-notes"></div>
     <div id="setlist-table"></div>
   </div>
 
   <script>
-    const apiKey = "10645D7F59011FFA82A"; // API key in quotes
+    const apiKey = "10645D7F59011FFA82A";
 
     async function fetchShows() {
       try {
@@ -110,12 +132,14 @@
 
         if (!result.data || result.data.length === 0) {
           document.getElementById("show-details").innerHTML = "<p>No show found for that date.</p>";
+          document.getElementById("show-notes").innerHTML = "";
           document.getElementById("setlist-table").innerHTML = "";
           return;
         }
 
         const show = result.data[0];
 
+        // Show Details
         document.getElementById("show-details").innerHTML = `
           <h2>Show Details</h2>
           <p><strong>Date:</strong> ${show.showdate}</p>
@@ -123,15 +147,89 @@
           <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
         `;
 
-        document.getElementById("setlist-table").innerHTML = `
-          <h2>Setlist</h2>
-          <p>${show.setlistdata || "No setlist available."}</p>
+        // Show Notes
+        let notesHTML = `
+          <div class="show-notes">
+            <h2>Show Notes</h2>
+            <p>${show.setlistnotes || "No notes available for this show."}</p>
+          </div>
         `;
+        document.getElementById("show-notes").innerHTML = notesHTML;
+
+        // Setlist & Scorecard
+        let setlistHTML = `
+          <h2>Setlist & Ratings</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Set</th>
+                <th>Song</th>
+                <th>Jam Chart</th>
+                <th>Gap</th>
+                <th>Rating (1-5)</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        // Parse setlist data
+        const songs = show.setlistdata ? show.setlistdata.split(', ') : [];
+        const sets = show.setlist ? show.setlist.split(', ') : [];
+
+        songs.forEach((song, index) => {
+          setlistHTML += `
+            <tr>
+              <td>${sets[index] || ''}</td>
+              <td>${song}</td>
+              <td>${show.isjamchart ? '✓' : ''}</td>
+              <td>${show.gap || 'N/A'}</td>
+              <td>
+                <select style="width: 60px;">
+                  <option value="">--</option>
+                  <option value="5">5</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                  <option value="1">1</option>
+                </select>
+              </td>
+              <td><input type="text" style="width: 100%;" placeholder="Add notes..."></td>
+            </tr>
+          `;
+        });
+
+        setlistHTML += `
+          </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: right;">
+          <button onclick="calculateAverage()">Calculate Show Rating</button>
+          <span id="show-rating" style="margin-left: 10px;"></span>
+        </div>
+        `;
+
+        document.getElementById("setlist-table").innerHTML = setlistHTML;
 
       } catch (error) {
         console.error('Error:', error);
         alert('Error loading show data. Please try again.');
       }
+    }
+
+    function calculateAverage() {
+      const ratings = document.querySelectorAll('#setlist-table select');
+      let sum = 0;
+      let count = 0;
+
+      ratings.forEach(select => {
+        if (select.value) {
+          sum += parseInt(select.value);
+          count++;
+        }
+      });
+
+      const average = count > 0 ? (sum / count).toFixed(2) : 'No ratings yet';
+      document.getElementById('show-rating').innerHTML = `<strong>Show Rating:</strong> ${average}`;
     }
 
     // Initialize by fetching shows
