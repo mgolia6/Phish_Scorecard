@@ -77,7 +77,7 @@
 </head>
 <body>
   <div class="terminal">
-    <h1>Phishow Scorecard v1</h1>
+    <h1>Phishow Scorecard v2</h1>
     <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
 
     <div class="instructions">
@@ -155,19 +155,6 @@
     try {
       console.log('Loading show for date:', date);
       
-      // First API call for show details
-      const detailsUrl = `https://api.phish.net/v5/shows/artist/phish.json?apikey=${apiKey}`;
-      const detailsResponse = await fetch(detailsUrl);
-      const detailsData = await detailsResponse.json();
-      
-      // Find the specific show from the list
-      const showDetails = detailsData.data.find(show => show.showdate === date);
-      
-      if (!showDetails) {
-        throw new Error('Show details not found');
-      }
-  
-      // Second API call for setlist
       const setlistUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
       console.log('Setlist URL:', setlistUrl);
       
@@ -180,31 +167,30 @@
         throw new Error('No setlist data found for this date.');
       }
   
-      const setlistData = setlistResult.data[0];
+      // Get the first show data entry
+      const showData = setlistResult.data[0];
+      console.log('Show Data:', showData);
   
       // Show Details
       document.getElementById("show-details").innerHTML = `
         <h2>Show Details</h2>
-        <p><strong>Date:</strong> ${showDetails.showdate || 'N/A'}</p>
-        <p><strong>Venue:</strong> ${showDetails.venue || 'N/A'}</p>
-        <p><strong>Location:</strong> ${showDetails.city || 'N/A'}, ${showDetails.state || 'N/A'}, ${showDetails.country || 'N/A'}</p>
+        <p><strong>Date:</strong> ${showData.showdate || 'N/A'}</p>
+        <p><strong>Venue:</strong> ${showData.venue || 'N/A'}</p>
+        <p><strong>Location:</strong> ${showData.city || 'N/A'}, ${showData.state || 'N/A'}, ${showData.country || 'N/A'}</p>
       `;
   
       // Show Notes
       let notesHTML = `
         <div class="show-notes">
           <h2>Show Notes</h2>
-          <p>${setlistData.setlistnotes || "No notes available for this show."}</p>
+          <p>${showData.setlistnotes || "No notes available for this show."}</p>
         </div>
       `;
       document.getElementById("show-notes").innerHTML = notesHTML;
   
-      // Parse setlist data
-      const songs = setlistData.setlistdata ? setlistData.setlistdata.split(', ') : [];
-      const sets = setlistData.setlist ? setlistData.setlist.split(', ') : [];
-  
-      console.log('Songs:', songs);
-      console.log('Sets:', sets);
+      // Get the setlist data - parse it like the Power Query
+      const setlistEntries = setlistResult.data;
+      console.log('Setlist Entries:', setlistEntries);
   
       // Setlist & Scorecard
       let setlistHTML = `
@@ -223,16 +209,18 @@
           <tbody>
       `;
   
-      if (songs.length === 0) {
+      if (setlistEntries.length <= 1) {
         setlistHTML += '<tr><td colspan="6">No setlist data available for this show.</td></tr>';
       } else {
-        songs.forEach((song, index) => {
+        // Skip the first entry as it's the show info
+        for (let i = 1; i < setlistEntries.length; i++) {
+          const entry = setlistEntries[i];
           setlistHTML += `
             <tr>
-              <td>${sets[index] || ''}</td>
-              <td>${song}</td>
-              <td>${'N/A'}</td>
-              <td>${'N/A'}</td>
+              <td>${entry.set || ''}</td>
+              <td>${entry.song || ''}</td>
+              <td>${entry.jamchart ? '✓' : ''}</td>
+              <td>${entry.gap || 'N/A'}</td>
               <td>
                 <select style="width: 60px;">
                   <option value="">--</option>
@@ -246,7 +234,7 @@
               <td><input type="text" style="width: 100%;" placeholder="Add notes..."></td>
             </tr>
           `;
-        });
+        }
       }
   
       setlistHTML += `
