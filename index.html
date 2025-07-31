@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phishow Scorecard v7</title>
+    <title>Phishow Scorecard v1</title>
     <style>
     body {
         background-color: #0a0a0a;
@@ -38,11 +38,29 @@
         max-width: 900px;
         border-radius: 5px;
     }
-    .sys-msg {
+    /* Scrolling system message */
+    .sys-msg-container {
+        width: 100%;
+        overflow: hidden;
+        background: transparent;
+        margin-bottom: 10px;
+    }
+    .sys-msg-scroll {
+        display: inline-block;
+        white-space: nowrap;
         color: #ff3333;
-        text-align: center;
         font-weight: bold;
-        
+        font-size: 1.1em;
+        animation: scroll-sysmsg 18s linear infinite;
+        padding-left: 100%;
+    }
+    @keyframes scroll-sysmsg {
+        0% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
     }
     select, button, input[type="text"], input[type="search"], input[type="email"], input[type="password"] {
         background-color: #222;
@@ -233,11 +251,15 @@
 </head>
 <body>
     <div class="terminal">
-        <h1>Phishow Scorecard v7.13</h1>
-          <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
+        <h1>Phishow Scorecard v7.1</h1>
         <p class="shoutout">
-          While this site is indebted to the kind folks at Phish.net and Phishows.com, it is in no way affiliated with those sites.</p>
-      
+          While this site is indebted to the kind folks at Phish.net and Phishows.com, it is in no way affiliated with those sites.
+        </p>
+        <div class="sys-msg-container">
+          <span class="sys-msg-scroll">
+            [SYS_MSG] Don't Suck at Phish
+          </span>
+        </div>
 
         <!-- Supabase Auth UI -->
         <div id="auth-area">
@@ -303,8 +325,8 @@
     <script>
       // --- 1. Initialize Supabase ---
       // Replace with your own Supabase project details!
-      const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibW5iY3Z1cWhmdXRlaG1jZXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mjg2MTMsImV4cCI6MjA2OTUwNDYxM30.4Jq5BWqBftnUK05AzP1y9rSzRKpiRTL3XRcfm7aj_VM';
+      const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+      const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       // --- 2. Auth Logic ---
