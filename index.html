@@ -38,7 +38,6 @@
         max-width: 900px;
         border-radius: 5px;
     }
-    /* Scrolling system message */
     .sys-msg-container {
         width: 100%;
         overflow: hidden;
@@ -225,7 +224,6 @@
         text-align: left;
         border-bottom: 1px solid #33ff33;
     }
-    /* Auth area overrides for max-width etc. */
     #auth-area {
         max-width: 400px;
         margin: 20px auto 30px auto;
@@ -239,7 +237,7 @@
         color: #00ccff;
         margin-bottom: 10px;
     }
-    #auth-area input[type="email"], #auth-area input[type="password"] {
+    #auth-area input[type="email"], #auth-area input[type="password"], #auth-area input[type="text"] {
         margin-bottom: 10px;
     }
     #auth-message {
@@ -264,6 +262,9 @@
         <!-- Supabase Auth UI -->
         <div id="auth-area">
           <h3>Login / Signup</h3>
+          <input type="text" id="first-name" placeholder="First Name" />
+          <input type="text" id="last-name" placeholder="Last Name" />
+          <input type="text" id="username" placeholder="Username" />
           <input type="email" id="auth-email" placeholder="Email" />
           <input type="password" id="auth-password" placeholder="Password" />
           <div style="display:flex;gap:10px;justify-content:center;">
@@ -321,7 +322,7 @@
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Supabase Auth Logic -->
+    <!-- Supabase Auth/Profile Logic -->
     <script>
       // --- 1. Initialize Supabase ---
       // Replace with your own Supabase project details!
@@ -329,16 +330,35 @@
       const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // --- 2. Auth Logic ---
+      // --- 2. Profile Functions ---
+      async function fetchUserProfile(userId) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        if (error) {
+          return null;
+        }
+        return data;
+      }
+
+      // --- 3. Auth Logic ---
       async function updateUIForAuth() {
         const { data: { user } } = await supabase.auth.getUser();
         document.getElementById('logout-btn').style.display = user ? 'inline-block' : 'none';
         document.getElementById('login-btn').style.display = user ? 'none' : 'inline-block';
         document.getElementById('signup-btn').style.display = user ? 'none' : 'inline-block';
-        // Optionally hide/show auth form fields based on login status
+
         if (user) {
-          document.getElementById('auth-message').style.color = '#33ff33';
-          document.getElementById('auth-message').textContent = 'Logged in as: ' + (user.email || '');
+          const profile = await fetchUserProfile(user.id);
+          if (profile) {
+            document.getElementById('auth-message').style.color = '#33ff33';
+            document.getElementById('auth-message').textContent = `Logged in as: ${profile.username} (${user.email})`;
+          } else {
+            document.getElementById('auth-message').style.color = '#ff3333';
+            document.getElementById('auth-message').textContent = `Logged in as: ${user.email} (profile not set)`;
+          }
         } else {
           document.getElementById('auth-message').style.color = '#ff3333';
           document.getElementById('auth-message').textContent = '';
@@ -349,16 +369,44 @@
         const email = document.getElementById('auth-email').value;
         const password = document.getElementById('auth-password').value;
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        document.getElementById('auth-message').textContent = error ? error.message : 'Logged in!';
-        updateUIForAuth();
+        if (error) {
+          document.getElementById('auth-message').textContent = error.message;
+        }
+        await updateUIForAuth();
       };
 
       document.getElementById('signup-btn').onclick = async () => {
         const email = document.getElementById('auth-email').value;
         const password = document.getElementById('auth-password').value;
-        const { error } = await supabase.auth.signUp({ email, password });
-        document.getElementById('auth-message').textContent = error ? error.message : 'Check your email to confirm sign up!';
-        updateUIForAuth();
+        const firstName = document.getElementById('first-name').value;
+        const lastName = document.getElementById('last-name').value;
+        const username = document.getElementById('username').value;
+
+        const { data, error } = await supabase.auth.signUp({ email, password });
+
+        if (error) {
+          document.getElementById('auth-message').textContent = error.message;
+          return;
+        }
+
+        document.getElementById('auth-message').textContent = 'Check your email to confirm sign up!';
+
+        // If immediate user object available (email not requiring confirmation), insert profile:
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: data.user.id,
+                first_name: firstName,
+                last_name: lastName,
+                username: username,
+              }
+            ]);
+          if (profileError) {
+            document.getElementById('auth-message').textContent = profileError.message;
+          }
+        }
       };
 
       document.getElementById('logout-btn').onclick = async () => {
