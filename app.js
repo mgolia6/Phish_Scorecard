@@ -1,101 +1,110 @@
 async function init() {
     try {
-        const shows = await fetchShows();
-        const sortedShows = shows.sort((a, b) => new Date(b.showdate) - new Date(a.showdate));
-        populateShowDropdown(sortedShows);
+        await loadAllShows(); // Load shows into memory for search
+        initializeShowSearch();
     } catch (error) {
         console.error('Initialization error:', error);
+        alert('Error initializing application. Please refresh the page.');
     }
 }
 
-async function loadShow() {
-    const date = document.getElementById("showdate").value;
-    if (!date) return alert("Please select a show date.");
+async function loadAllShows() {
+    try {
+        const shows = await fetchShows();
+        window.allShows = shows.sort((a, b) => new Date(b.showdate) - new Date(a.showdate));
+        return window.allShows;
+    } catch (error) {
+        console.error('Error loading shows:', error);
+        throw error;
+    }
+}
+
+async function loadShow(date) {
+    const showDate = date || document.getElementById("show-search").value;
+    if (!showDate) {
+        alert("Please select or enter a show date.");
+        return;
+    }
 
     try {
-        const setlistData = await fetchSetlist(date);
-        if (setlistData && setlistData.length > 0) {
-            const showData = setlistData[0];
-            displayShowDetails(showData);
-            displayShowNotes(showData.setlistnotes);
-            displaySetlist(setlistData);
-            addCalculateButton(); // Add this line to ensure the calculate button is added
-        } else {
-            throw new Error('No show data found');
+        // Show loading state
+        document.getElementById("setlist-table").innerHTML = '<div class="loading">Loading show data...</div>';
+        
+        const setlistData = await fetchSetlist(showDate);
+        
+        if (!setlistData || !setlistData.data || setlistData.data.length === 0) {
+            document.getElementById("setlist-table").innerHTML = '<div class="error">No setlist found for this date.</div>';
+            return;
         }
+
+        const showData = setlistData.data[0];
+        
+        // Display show components
+        displayShowDetails(showData);
+        displayShowNotes(showData.setlistnotes);
+        displaySetlist(setlistData.data);
+
+        // Load any existing ratings
+        loadExistingRatings(showDate);
+
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error loading show data. Please try again.');
+        console.error('Error loading show:', error);
+        document.getElementById("setlist-table").innerHTML = 
+            '<div class="error">Error loading show data. Please try again.</div>';
     }
 }
 
-function addCalculateButton() {
-    const setlistTable = document.getElementById('setlist-table');
-    if (setlistTable) {
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.marginTop = '20px';
-        buttonContainer.style.textAlign = 'right';
-        
-        const calculateButton = document.createElement('button');
-        calculateButton.textContent = 'Calculate Show Rating';
-        calculateButton.onclick = calculateAverage;
-        
-        const ratingSpan = document.createElement('span');
-        ratingSpan.id = 'show-rating';
-        ratingSpan.style.marginLeft = '10px';
-        
-        buttonContainer.appendChild(calculateButton);
-        buttonContainer.appendChild(ratingSpan);
-        setlistTable.appendChild(buttonContainer);
-    }
-}
+function loadExistingRatings(showDate) {
+    const existingRatings = storage.getRatings(showDate);
+    if (!existingRatings) return;
 
-function calculateAverage() {
-    const ratings = document.querySelectorAll('#setlist-table select');
-    let sum = 0;
-    let count = 0;
-
-    ratings.forEach(select => {
-        if (select.value) {
-            sum += parseInt(select.value);
-            count++;
+    // Populate existing ratings and notes
+    existingRatings.forEach(rating => {
+        const songRow = Array.from(document.querySelectorAll('.song-row'))
+            .find(row => row.querySelector('.song-name').textContent === rating.song);
+        
+        if (songRow) {
+            const ratingSelect = songRow.querySelector('.rating-select');
+            const notesInput = songRow.querySelector('.notes-input');
+            
+            if (ratingSelect && rating.rating) {
+                ratingSelect.value = rating.rating;
+            }
+            if (notesInput && rating.notes) {
+                notesInput.value = rating.notes;
+            }
         }
     });
 
-    const average = count > 0 ? (sum / count).toFixed(2) : 'No ratings yet';
-    const showRatingElement = document.getElementById('show-rating');
-    if (showRatingElement) {
-        showRatingElement.innerHTML = `<strong>Show Rating:</strong> ${average}`;
-    } else {
-        console.error('Show rating element not found');
-    }
+    // Recalculate ratings
+    calculateShowRating();
 }
 
 function submitRatings() {
-    const showDate = document.getElementById("showdate").value;
+    const showDate = document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select a show first.");
         return;
     }
 
     const ratings = [];
-    const rows = document.querySelectorAll('#setlist-table tbody tr');
     let hasRatings = false;
 
-    rows.forEach((row, index) => {
-        const ratingSelect = row.querySelector('select');
-        const notesInput = row.querySelector('input[type="text"]');
+    document.querySelectorAll('.song-row').forEach(row => {
+        const songName = row.querySelector('.song-name').textContent;
+        const ratingSelect = row.querySelector('.rating-select');
+        const notesInput = row.querySelector('.notes-input');
+        const setHeader = row.closest('.set-section').querySelector('.set-header').textContent;
         
-        if (ratingSelect && (ratingSelect.value || notesInput.value)) {
+        if (ratingSelect.value || notesInput.value) {
             hasRatings = true;
             ratings.push({
-                song: row.cells[1].textContent,
-                set: row.cells[0].textContent,
+                song: songName,
+                set: setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1],
                 rating: ratingSelect.value ? parseInt(ratingSelect.value) : null,
-                notes: notesInput.value || '',
-                position: row.cells[2].textContent,
-                isJamChart: row.cells[2].textContent.includes('✓'),
-                gap: row.cells[3].textContent,
+                notes: notesInput.value,
+                jamChart: row.querySelector('.jam-chart').textContent.includes('✓'),
+                gap: row.querySelector('.gap').textContent,
                 date: showDate,
                 timestamp: new Date().toISOString()
             });
@@ -108,18 +117,17 @@ function submitRatings() {
     }
 
     try {
-        // Save to local storage (assuming storage object is defined elsewhere)
+        // Save ratings
         storage.saveRatings(showDate, ratings);
 
-        // Calculate and save show average
-        let ratedSongs = ratings.filter(r => r.rating !== null);
-        let showAverage = ratedSongs.length > 0 
-            ? ratedSongs.reduce((sum, r) => sum + r.rating, 0) / ratedSongs.length
-            : null;
-
-        if (showAverage !== null) {
-            storage.saveShowRating(showDate, showAverage);
-        }
+        // Calculate and save show rating
+        const setRatings = calculateSetRatings();
+        const showRating = {
+            average: Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length,
+            setRatings: setRatings,
+            timestamp: new Date().toISOString()
+        };
+        storage.saveShowRating(showDate, showRating);
 
         // Update song statistics
         ratings.forEach(rating => {
@@ -129,9 +137,8 @@ function submitRatings() {
         });
 
         alert('Ratings submitted successfully!');
+        updateDisplayedStats();
         
-        // Update displayed average
-        calculateAverage();
     } catch (error) {
         console.error('Error saving ratings:', error);
         alert('Error saving ratings. Please try again.');
@@ -139,19 +146,92 @@ function submitRatings() {
 }
 
 function updateDisplayedStats() {
-    // Implementation for updating displayed statistics
-    // This can be expanded as needed
+    // Update song rankings if that tab is active
+    if (document.querySelector('#song-rankings.active')) {
+        displaySongRankings();
+    }
+    
+    // Update show ratings if that tab is active
+    if (document.querySelector('#show-ratings.active')) {
+        displayShowRatings();
+    }
 }
 
-// Add event listeners when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-    
-    const submitButton = document.querySelector('button[onclick="submitRatings()"]');
-    if (submitButton) {
-        submitButton.addEventListener('click', submitRatings);
-    }
-});
+function displaySongRankings() {
+    const songStats = storage.getAllSongStats();
+    const sortedSongs = Object.entries(songStats)
+        .map(([song, stats]) => ({
+            song,
+            averageRating: stats.totalRating / stats.count,
+            count: stats.count,
+            jamChartCount: stats.jamChartCount || 0
+        }))
+        .sort((a, b) => b.averageRating - a.averageRating);
 
-// Initialize the app
-init();
+    const html = `
+        <table class="rankings-table">
+            <thead>
+                <tr>
+                    <th>Song</th>
+                    <th>Average Rating</th>
+                    <th>Times Rated</th>
+                    <th>Jam Charts</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${sortedSongs.map(song => `
+                    <tr>
+                        <td>${song.song}</td>
+                        <td>${song.averageRating.toFixed(2)}</td>
+                        <td>${song.count}</td>
+                        <td>${song.jamChartCount}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('song-rankings-table').innerHTML = html;
+}
+
+function displayShowRatings() {
+    const showRatings = storage.getAllShowRatings();
+    const sortedShows = Object.entries(showRatings)
+        .map(([date, rating]) => ({
+            date,
+            rating: rating.average,
+            setRatings: rating.setRatings,
+            timestamp: new Date(rating.timestamp)
+        }))
+        .sort((a, b) => b.rating - a.rating);
+
+    const html = `
+        <table class="rankings-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Average Rating</th>
+                    <th>Set Details</th>
+                    <th>Rated On</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${sortedShows.map(show => `
+                    <tr>
+                        <td>${show.date}</td>
+                        <td>${show.rating.toFixed(2)}</td>
+                        <td>${Object.entries(show.setRatings)
+                            .map(([set, rating]) => `${set}: ${rating.toFixed(2)}`)
+                            .join(', ')}</td>
+                        <td>${show.timestamp.toLocaleDateString()}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('show-ratings-table').innerHTML = html;
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', init);
