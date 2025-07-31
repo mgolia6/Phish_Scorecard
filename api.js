@@ -13,13 +13,9 @@ async function fetchShows() {
 }
 
 async function fetchSetlist(date) {
-  try {
-    const setlistUrl = `https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`;
-    const response = await fetch(setlistUrl);
-    const result = await response.json();
-    return result.data;
-  } catch (error) {
-    console.error('Error fetching setlist:', error);
-    throw error;
-  }
+    console.log("Fetching setlist for date:", date); // Add this line
+    const response = await fetch(`https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`);
+    const data = await response.json();
+    console.log("API response:", data); // Add this line
+    return data.data; // Make sure we're returning data.data
 }
