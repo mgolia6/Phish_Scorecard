@@ -268,14 +268,19 @@ function displayShowRatings() {
     document.getElementById('show-ratings-table').innerHTML = html;
 }
 
-function initializeShowSearch() {
+function initializlizeShowSearch() {
     const searchInput = document.getElementById('show-search');
     const resultsContainer = document.getElementById('search-results');
     
-    if (!searchInput || !resultsContainer) return;
+    if (!searchInput || !resultsContainer) {
+        console.error('Search input or results container not found');
+        return;
+    }
     
     searchInput.addEventListener('input', debounce(async (e) => {
         const searchTerm = e.target.value;
+        console.log('Search term:', searchTerm); // Debug log
+        
         if (searchTerm.length < 2) {
             resultsContainer.innerHTML = '';
             return;
@@ -283,10 +288,14 @@ function initializeShowSearch() {
 
         try {
             const shows = await fetchShows();
+            console.log('Fetched shows:', shows.length); // Debug log
+            
             const filteredShows = shows.filter(show => 
                 show.showdate.includes(searchTerm) ||
                 show.venue.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10);
+            ).slice(0, 10); // Limit to 10 results
+
+            console.log('Filtered shows:', filteredShows.length); // Debug log
 
             resultsContainer.innerHTML = filteredShows.map(show => `
                 <div class="search-result" onclick="selectShow('${show.showdate}')">
@@ -301,25 +310,16 @@ function initializeShowSearch() {
     }, 300));
 }
 
+// Make sure this function is defined
 function selectShow(date) {
+    console.log('Selected show:', date); // Debug log
     document.getElementById('show-search').value = date;
     document.getElementById('search-results').innerHTML = '';
     loadShow(date);
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
 // Initialize when the document is ready
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing show search'); // Debug log
     initializeShowSearch();
 });
