@@ -213,3 +213,120 @@ function debounce(func, wait) {
 document.addEventListener('DOMContentLoaded', () => {
     initializeShowSearch();
 });
+function showTab(tabId) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show selected tab
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+    // Update content based on which tab is selected
+    if (tabId === 'song-rankings') {
+        displaySongRankinkings();
+    } else if (tabId === 'show-ratings') {
+        displayShowRatings();
+    }
+}
+
+function displaySongRankings() {
+ {
+    const songStats = storage.getAllSongStats();
+    const sortedSongs = Object.entries(songStats)
+        .map(([song, s, stats]) => ({
+            song,
+            averageRating: stats.totalRating / stats.count,
+            count: stats.count
+        }))
+        .sort((a, b) => b.averageRating - a.averageRating);
+
+    let html = `
+        <table class="rankings-table">
+            <thead>
+                <tr>
+                    <th>Song</th>
+                    <th>Average Rating</th>
+                    <th>Times Rated</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (sortedSongs.length === 0) {
+        html += `
+            <tr>
+                <td colspan="3" style="text-align: center;">No ratings yet</td>
+            </tr>
+        `;
+    } else {
+        sortedSongs.forEach(song => {
+            html += `
+                <tr>
+                    <td>${song.song}</td>
+                    <td>${song.averageRating.toFixed(2)}</td>
+                    <td>${song.count}</td>
+                </tr>
+            `;
+        });
+    }
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('song-rankings-table').innerHTML = html;
+}
+
+function displayShowRatings() {
+    const showRatings = storage.getAllShowRatings();
+    const sortedShows = Object.entries(showRatings)
+        .map(([date, rating]) => ({
+            date,
+            rating: typeof rating === 'number' ? rating : rating.average || rating,
+            timestamp: new Date().toISOString()
+        }))
+        .sort((a, b) => b.rating - a.rating);
+
+    let html = `
+        <table class="rankings-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Rating</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (sortedShows.length === 0) {
+        html += `
+            <tr>
+                <td colspan="3" style="text-align: center;">No shows rated yet</td>
+            </tr>
+        `;
+    } else {
+        sortedShows.forEach(show => {
+            html += `
+                <tr>
+                    <td>${show.date}</td>
+                    <td>${show.rating.toFixed(2)}</td>
+                    <td>${new Date(show.timestamp).toLocaleDateString()}</td>
+                </tr>
+            `;
+        });
+    }
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('show-ratings-table').innerHTML = html;
+}
