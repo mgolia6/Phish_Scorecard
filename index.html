@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phishow Scorecard v7</title>
-   <style>
+    <style>
     body {
         background-color: #0a0a0a;
         color: #33ff33;
@@ -27,11 +27,22 @@
         color: #ff6600;
         text-shadow: 0 0 5px #ff6600;
     }
+    .shoutout {
+        color: #00ccff;
+        background: #1a1a1a;
+        border: 1px dashed #00ccff;
+        padding: 8px 15px;
+        margin: 12px auto 20px auto;
+        text-align: center;
+        font-size: 1.06em;
+        max-width: 900px;
+        border-radius: 5px;
+    }
     .sys-msg {
         color: #ff3333;
         font-weight: bold;
     }
-    select, button, input[type="text"], input[type="search"] {
+    select, button, input[type="text"], input[type="search"], input[type="email"], input[type="password"] {
         background-color: #222;
         color: #33ff33;
         border: 1px solid #33ff33;
@@ -193,26 +204,51 @@
         padding: 12px;
         text-align: left;
         border-bottom: 1px solid #33ff33;
-    }.shoutout {
-    color: #00ccff;
-    background: #1a1a1a;
-    border: 1px dashed #00ccff;
-    padding: 8px 15px;
-    margin: 12px auto 20px auto;
-    text-align: center;
-    font-size: 1.06em;
-    max-width: 900px;
-    border-radius: 5px;
-}
-</style>
+    }
+    /* Auth area overrides for max-width etc. */
+    #auth-area {
+        max-width: 400px;
+        margin: 20px auto 30px auto;
+        padding: 20px;
+        background: #1a1a1a;
+        border: 1px solid #33ff33;
+        border-radius: 8px;
+    }
+    #auth-area h3 {
+        text-align: center;
+        color: #00ccff;
+        margin-bottom: 10px;
+    }
+    #auth-area input[type="email"], #auth-area input[type="password"] {
+        margin-bottom: 10px;
+    }
+    #auth-message {
+        margin-top: 10px;
+        color: #ff3333;
+        text-align: center;
+    }
+    </style>
 </head>
 <body>
     <div class="terminal">
-        <h1>Phishow Scorecard v7.12</h1>
-<p class="shoutout">
-  While this site is indebted to the kind folks at Phish.net and Phishows.com, it is in no way affiliated with those sites.
-</p>
-<p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
+        <h1>Phishow Scorecard v7.13</h1>
+        <p class="shoutout">
+          While this site is indebted to the kind folks at Phish.net and Phishows.com, it is in no way affiliated with those sites.
+        </p>
+        <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
+
+        <!-- Supabase Auth UI -->
+        <div id="auth-area">
+          <h3>Login / Signup</h3>
+          <input type="email" id="auth-email" placeholder="Email" />
+          <input type="password" id="auth-password" placeholder="Password" />
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button id="login-btn">Login</button>
+            <button id="signup-btn">Sign Up</button>
+            <button id="logout-btn" style="display:none;">Logout</button>
+          </div>
+          <div id="auth-message"></div>
+        </div>
 
         <div class="tab-container">
             <div class="tabs">
@@ -257,6 +293,58 @@
             </div>
         </div>
     </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Auth Logic -->
+    <script>
+      // --- 1. Initialize Supabase ---
+      // Replace with your own Supabase project details!
+      const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibW5iY3Z1cWhmdXRlaG1jZXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mjg2MTMsImV4cCI6MjA2OTUwNDYxM30.4Jq5BWqBftnUK05AzP1y9rSzRKpiRTL3XRcfm7aj_VM';
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // --- 2. Auth Logic ---
+      async function updateUIForAuth() {
+        const { data: { user } } = await supabase.auth.getUser();
+        document.getElementById('logout-btn').style.display = user ? 'inline-block' : 'none';
+        document.getElementById('login-btn').style.display = user ? 'none' : 'inline-block';
+        document.getElementById('signup-btn').style.display = user ? 'none' : 'inline-block';
+        // Optionally hide/show auth form fields based on login status
+        if (user) {
+          document.getElementById('auth-message').style.color = '#33ff33';
+          document.getElementById('auth-message').textContent = 'Logged in as: ' + (user.email || '');
+        } else {
+          document.getElementById('auth-message').style.color = '#ff3333';
+          document.getElementById('auth-message').textContent = '';
+        }
+      }
+
+      document.getElementById('login-btn').onclick = async () => {
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        document.getElementById('auth-message').textContent = error ? error.message : 'Logged in!';
+        updateUIForAuth();
+      };
+
+      document.getElementById('signup-btn').onclick = async () => {
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const { error } = await supabase.auth.signUp({ email, password });
+        document.getElementById('auth-message').textContent = error ? error.message : 'Check your email to confirm sign up!';
+        updateUIForAuth();
+      };
+
+      document.getElementById('logout-btn').onclick = async () => {
+        await supabase.auth.signOut();
+        updateUIForAuth();
+      };
+
+      // On page load, check auth status
+      updateUIForAuth();
+    </script>
 
     <script src="api.js"></script>
     <script src="storage.js"></script>
