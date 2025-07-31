@@ -31,7 +31,10 @@ function displayShowNotes(notes) {
 }
 
 function displaySetlist(setlistData) {
+    console.log('Displaying setlist data:', setlistData);
+
     if (!setlistData || setlistData.length <= 1) {
+        console.log('No setlist data available');
         document.getElementById("setlist-table").innerHTML = "<p>No setlist data available.</p>";
         return;
     }
@@ -40,11 +43,13 @@ function displaySetlist(setlistData) {
     const songsBySet = {};
     for (let i = 1; i < setlistData.length; i++) {
         const entry = setlistData[i];
+        console.log('Processing entry:', entry);
         if (!songsBySet[entry.set]) {
             songsBySet[entry.set] = [];
         }
         songsBySet[entry.set].push(entry);
     }
+
 
     let setlistHTML = '<h2>Setlist & Ratings</h2>';
 
