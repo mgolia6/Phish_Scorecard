@@ -255,10 +255,32 @@ function calculateShowRating() {
     `;
 }
 
+// --- Random Show Generator ---
+async function showRandomShow() {
+    try {
+        const shows = await fetchShows();
+        if (shows.length === 0) return;
+        const randomIdx = Math.floor(Math.random() * shows.length);
+        const randomShow = shows[randomIdx];
+        if (randomShow && randomShow.showdate) {
+            loadShow(randomShow.showdate);
+        }
+    } catch (err) {
+        alert("Could not load a random show.");
+        console.error(err);
+    }
+}
+
 // --- Document ready ---
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Document ready, initializing...");
     initializeShowSearch();
     // If you need to load a show on page load, call loadShow() here
     // Optionally: showTab('default-tab-id');
+
+    // Attach random show generator button handler
+    const randomBtn = document.getElementById('random-show-btn');
+    if (randomBtn) {
+        randomBtn.addEventListener('click', showRandomShow);
+    }
 });
