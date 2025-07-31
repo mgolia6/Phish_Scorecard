@@ -1,93 +1,3 @@
-function showTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.classList.remove('active');
-  });
-  document.querySelectorAll('.tab-button').forEach(button => {
-    button.classList.remove('active');
-  });
-
-  document.getElementById(tabId).classList.add('active');
-  document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-}
-
-function populateShowDropdown(shows) {
-  const showSelect = document.getElementById('showdate');
-  showSelect.innerHTML = '<option value="">-- Choose a date --</option>';
-  shows.forEach(show => {
-    const option = document.createElement('option');
-    option.value = show.showdate;
-    option.textContent = `${show.showdate} - ${show.venue}`;
-    showSelect.appendChild(option);
-  });
-}
-
-function displaySetlist(setlistData) {
-  const showDetails = document.getElementById("show-details");
-  const showNotes = document.getElementById("show-notes");
-  const setlistTable = document.getElementById("setlist-table");
-
-  const show = setlistData.data[0];
-  const setlistRaw = show.setlistdata || "";
-
-  // Show Details
-  showDetails.innerHTML = `
-    <h2>Show Details</h2>
-    <p><strong>Date:</strong> ${show.showdate}</p>
-    <p><strong>Venue:</strong> ${show.venue}</p>
-    <p><strong>Location:</strong> ${show.city}, ${show.state}, ${show.country}</p>
-  `;
-
-  // Show Notes
-  showNotes.innerHTML = `
-    <div class="show-notes">
-      <strong>Notes:</strong> ${show.setlistnotes || "No notes available."}
-    </div>
-  `;
-
-  // Render grouped setlist
-  renderSetlistByGroup(setlistRaw);
-}
-function renderSetlistByGroup(setlistRaw) {
-  const container = document.getElementById("setlist-table");
-  container.innerHTML = "";
-
-  const sets = setlistRaw.split(/\n(?=Set|Encore)/); // Split by "Set 1", "Set 2", "Encore", etc.
-
-  sets.forEach((setBlock, setIndex) => {
-    const lines = setBlock.trim().split(/\n|,|>/).filter(line => line.trim());
-    const setLabel = lines.shift(); // First line is "Set 1", "Encore", etc.
-
-    let html = `<h3 style="color:#ff6600;">${setLabel}</h3><table><tr>
-      <th>Song</th><th>Jam Chart</th><th>Gap</th><th>Rating</th><th>Notes</th></tr>`;
-
-    lines.forEach((song, i) => {
-      html += `<tr>
-        <td>${song}</td>
-        <td><input type="text" /></td>
-        <td><input type="text" /></td>
-        <td>
-          <select id="rating-${setIndex}-${i}">
-            <option value="">--</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </td>
-        <td><textarea id="notes-${setIndex}-${i}" rows="1"></textarea></td>
-      </tr>`;
-    });
-
-    html += "</table>";
-    container.innerHTML += html;
-  });
-}
-
-
-function calculateAverage() {
-  // Your existing average calculation logic
-}
 function displayShowDetails(show) {
     document.getElementById("show-details").innerHTML = `
         <h2>Show Details</h2>
@@ -107,58 +17,199 @@ function displayShowNotes(notes) {
 }
 
 function displaySetlist(setlistData) {
-    let setlistHTML = `
-        <h2>Setlist & Ratings</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Set</th>
-                    <th>Song</th>
-                    <th>Jam Chart</th>
-                    <th>Gap</th>
-                    <th>Rating (1-5)</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    if (setlistData.length <= 1) {
-        setlistHTML += '<tr><td colspan="6">No setlist data available for this show.</td></tr>';
-    } else {
-        // Skip the first entry as it's the show info
-        for (let i = 1; i < setlistData.length; i++) {
-            const entry = setlistData[i];
-            setlistHTML += `
-                <tr>
-                    <td>${entry.set || ''}</td>
-                    <td>${entry.song || ''}</td>
-                    <td>${entry.jamchart ? '✓' : ''}</td>
-                    <td>${entry.gap || 'N/A'}</td>
-                    <td>
-                        <select style="width: 60px;">
-                            <option value="">--</option>
-                            <option value="5">5</option>
-                            <option value="4">4</option>
-                            <option value="3">3</option>
-                            <option value="2">2</option>
-                            <option value="1">1</option>
-                        </select>
-                    </td>
-                    <td><input type="text" style="width: 100%;" placeholder="Add notes..."></td>
-                </tr>
-            `;
-        }
+    if (!setlistData || setlistData.length <= 1) {
+        document.getElementById("setlist-table").innerHTML = "<p>No setlist data available.</p>";
+        return;
     }
 
+    // Group songs by set
+    const songsBySet = {};
+    for (let i = 1; i < setlistData.length; i++) {
+        const entry = setlistData[i];
+        if (!songsBySet[entry.set]) {
+            songsBySet[entry.set] = [];
+        }
+        songsBySet[entry.set].push(entry);
+    }
+
+    let setlistHTML = '<h2>Setlist & Ratings</h2>';
+
+    // Display each set
+    Object.keys(songsBySet).forEach(setName => {
+        setlistHTML += `
+            <div class="set-section">
+                <h3 class="set-header">${setName === 'E' ? 'Encore' : `Set ${setName}`}</h3>
+                <table class="set-table">
+                    <thead>
+                        <tr>
+                            <th>Song</th>
+                            <th>Jam Chart</th>
+                            <th>Gap</th>
+                            <th>Rating (1-5)</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        songsBySet[setName].forEach(song => {
+            setlistHTML += `
+                <tr class="song-row">
+                    <td class="song-name">${song.song || ''}</td>
+                    <td class="jam-chart">${song.jamchart ? '✓' : ''}</td>
+                    <td class="gap">${song.gap || 'N/A'}</td>
+                    <td class="rating">
+                        <select class="rating-select" onchange="updateSongRating(this)">
+                            <option value="">--</option>
+                            <option value="5">5 - Legendary</option>
+                            <option value="4">4 - Great</option>
+                            <option value="3">3 - Solid</option>
+                            <option value="2">2 - Average</option>
+                            <option value="1">1 - Below Average</option>
+                        </select>
+                    </td>
+                    <td class="notes">
+                        <input type="text" class="notes-input" placeholder="Add notes...">
+                    </td>
+                </tr>
+            `;
+        });
+
+        setlistHTML += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    });
+
+    // Add set ratings summary
     setlistHTML += `
-        </tbody>
-    </table>
-    <div style="margin-top: 20px; text-align: right;">
-        <button onclick="calculateAverage()">Calculate Show Rating</button>
-        <span id="show-rating" style="margin-left: 10px;"></span>
-    </div>
+        <div class="ratings-summary">
+            <h3>Set Ratings</h3>
+            <div class="set-ratings">
+                ${Object.keys(songsBySet).map(setName => `
+                    <div class="set-rating">
+                        <span>${setName === 'E' ? 'Encore' : `Set ${setName}`}:</span>
+                        <span id="set-${setName}-rating">-</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="show-rating-container">
+                <button onclick="calculateShowRating()" class="calculate-button">Calculate Show Rating</button>
+                <div id="show-rating" class="show-rating"></div>
+            </div>
+        </div>
     `;
 
     document.getElementById("setlist-table").innerHTML = setlistHTML;
+    initializeRatingHandlers();
 }
+
+function initializeRatingHandlers() {
+    document.querySelectorAll('.rating-select').forEach(select => {
+        select.addEventListener('change', () => calculateSetRatings());
+    });
+}
+
+function calculateSetRatings() {
+    const sets = {};
+    document.querySelectorAll('.set-section').forEach(section => {
+        const setName = section.querySelector('.set-header').textContent;
+        const ratings = Array.from(section.querySelectorAll('.rating-select'))
+            .map(select => parseInt(select.value))
+            .filter(rating => !isNaN(rating));
+        
+        if (ratings.length > 0) {
+            const average = ratings.reduce((a, b) => a + b) / ratings.length;
+            sets[setName] = average;
+            document.getElementById(`set-${setName === 'Encore' ? 'E' : setName.split(' ')[1]}-rating`)
+                .textContent = average.toFixed(2);
+        }
+    });
+    return sets;
+}
+
+function calculateShowRating() {
+    const setRatings = calculateSetRatings();
+    const ratings = Object.values(setRatings);
+    
+    if (ratings.length === 0) {
+        document.getElementById('show-rating').innerHTML = 
+            '<p class="no-ratings">No ratings entered yet</p>';
+        return;
+    }
+
+    const average = ratings.reduce((a, b) => a + b) / ratings.length;
+    const formattedRating = average.toFixed(2);
+    
+    // Get count of songs rated
+    const ratedSongs = document.querySelectorAll('.rating-select')
+        .length;
+    
+    document.getElementById('show-rating').innerHTML = `
+        <div class="rating-details">
+            <h4>Show Rating: ${formattedRating}</h4>
+            <p>Songs Rated: ${ratedSongs}</p>
+            <div class="rating-breakdown">
+                ${Object.entries(setRatings).map(([set, rating]) => `
+                    <p>${set}: ${rating.toFixed(2)}</p>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function initializeShowSearch() {
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    
+    searchInput.addEventListener('input', debounce(async (e) => {
+        const searchTerm = e.target.value;
+        if (searchTerm.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        try {
+            const shows = await fetchShows();
+            const filteredShows = shows.filter(show => 
+                show.showdate.includes(searchTerm) ||
+                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10); // Limit to 10 results
+
+            resultsContainer.innerHTML = filteredShows.map(show => `
+                <div class="search-result" onclick="selectShow('${show.showdate}')">
+                    <span class="result-date">${show.showdate}</span>
+                    <span class="result-venue">${show.venue}</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error searching shows:', error);
+            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
+        }
+    }, 300));
+}
+
+function selectShow(date) {
+    document.getElementById('show-search').value = date;
+    document.getElementById('search-results').innerHTML = '';
+    loadShow(date);
+}
+
+// Utility function for debouncing
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Initialize UI components
+document.addEventListener('DOMContentLoaded', () => {
+    initializeShowSearch();
+});
