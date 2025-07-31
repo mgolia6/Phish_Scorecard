@@ -14,7 +14,7 @@ async function loadShow() {
 
   try {
     const setlistData = await fetchSetlist(date);
-    displaySetlist(setlistData);
+    displaySetlist(setlistData); 
   } catch (error) {
     alert('Error loading show data: ' + error.message);
   }
@@ -36,7 +36,7 @@ async function loadShow() {
             const showData = setlistData[0];
             displayShowDetails(showData);
             displayShowNotes(showData.setlistnotes);
-            displaySetlist(renderSetlistByGroup(setlistRaw);
+            displaySetlist(setlistData);
         } else {
             throw new Error('No show data found');
         }
