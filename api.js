@@ -1,4 +1,4 @@
-const apiKey = "YOUR_API_KEY_HERE"; // Replace with your actual API key
+const apiKey = "10645D7F59011FFA82A"; // Replace with your actual API key
 
 async function fetchShows() {
     try {
