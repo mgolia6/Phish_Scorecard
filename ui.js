@@ -63,7 +63,7 @@ function displaySetlist(setlistData) {
                             <option value="">--</option>
                             <option value="5">5 - Legendary</option>
                             <option value="4">4 - Great</option>
-                            <option value="3">3 - Solid</option>
+                            <option value="3">3 - Soliolid</option>
                             <option value="2">2 - Average</option>
                             <option value="1">1 - Below Average</option>
                         </select>
@@ -82,7 +82,6 @@ function displaySetlist(setlistData) {
         `;
     });
 
-    // Add set ratings summary
     setlistHTML += `
         <div class="ratings-summary">
             <h3>Set Ratings</h3>
@@ -102,13 +101,10 @@ function displaySetlist(setlistData) {
     `;
 
     document.getElementById("setlist-table").innerHTML = setlistHTML;
-    initializeRatingHandlers();
 }
 
-function initializeRatingHandlers() {
-    document.querySelectorAll('.rating-select').forEach(select => {
-        select.addEventListener('change', () => calculateSetRatings());
-    });
+function updateSongRating(selectElement) {
+    calculateSetRatings();
 }
 
 function calculateSetRatings() {
@@ -142,7 +138,6 @@ function calculateShowRating() {
     const average = ratings.reduce((a, b) => a + b) / ratings.length;
     const formattedRating = average.toFixed(2);
     
-    // Get count of songs rated
     const ratedSongs = document.querySelectorAll('.rating-select')
         .length;
     
@@ -159,62 +154,7 @@ function calculateShowRating() {
     `;
 }
 
-function initializeShowSearch() {
-    const searchInput = document.getElementById('show-search');
-    const resultsContainer = document.getElementById('search-results');
-    
-    searchInput.addEventListener('input', debounce(async (e) => {
-        const searchTerm = e.target.value;
-        if (searchTerm.length < 2) {
-            resultsContainer.innerHTML = '';
-            return;
-        }
-
-        try {
-            const shows = await fetchShows();
-            const filteredShows = shows.filter(show => 
-                show.showdate.includes(searchTerm) ||
-                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10); // Limit to 10 results
-
-            resultsContainer.innerHTML = filteredShows.map(show => `
-                <div class="search-result" onclick="selectShow('${show.showdate}')">
-                    <span class="result-date">${show.showdate}</span>
-                    <span class="result-venue">${show.venue}</span>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error searching shows:', error);
-            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
-        }
-    }, 300));
-}
-
-function selectShow(date) {
-    document.getElementById('show-search').value = date;
-    document.getElementById('search-results').innerHTML = '';
-    loadShow(date);
-}
-
-// Utility function for debouncing
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Initialize UI components
-document.addEventListener('DOMContentLoaded', () => {
-    initializeShowSearch();
-});
 function showTab(tabId) {
-    // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
@@ -222,23 +162,20 @@ function showTab(tabId) {
         button.classList.remove('active');
     });
 
-    // Show selected tab
     document.getElementById(tabId).classList.add('active');
     document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('active');
 
-    // Update content based on which tab is selected
     if (tabId === 'song-rankings') {
-        displaySongRankinkings();
+        displaySongRankings();
     } else if (tabId === 'show-ratings') {
         displayShowRatings();
     }
 }
 
 function displaySongRankings() {
- {
     const songStats = storage.getAllSongStats();
     const sortedSongs = Object.entries(songStats)
-        .map(([song, s, stats]) => ({
+        .map(([song, stats]) => ({
             song,
             averageRating: stats.totalRating / stats.count,
             count: stats.count
@@ -330,3 +267,59 @@ function displayShowRatings() {
 
     document.getElementById('show-ratings-table').innerHTML = html;
 }
+
+function initializeShowSearch() {
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (!searchInput || !resultsContainer) return;
+    
+    searchInput.addEventListener('input', debounce(async (e) => {
+        const searchTerm = e.target.value;
+        if (searchTerm.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        try {
+            const shows = await fetchShows();
+            const filteredShows = shows.filter(show => 
+                show.showdate.includes(searchTerm) ||
+                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10);
+
+            resultsContainer.innerHTML = filteredShows.map(show => `
+                <div class="search-result" onclick="selectShow('${show.showdate}')">
+                    <span class="result-date">${show.showdate}</span>
+                    <span class="result-venue">${show.venue}</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error searching shows:', error);
+            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
+        }
+    }, 300));
+}
+
+function selectShow(date) {
+    document.getElementById('show-search').value = date;
+    document.getElementById('search-results').innerHTML = '';
+    loadShow(date);
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Initialize when the document is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initializeShowSearch();
+});
