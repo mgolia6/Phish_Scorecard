@@ -268,18 +268,25 @@ function displayShowRatings() {
     document.getElementById('show-ratings-table').innerHTML = html;
 }
 
-function initializlizeShowSearch() {
+function initializeShowSearch() {
+    console.log("Initializing show search..."); // Debug log
     const searchInput = document.getElementById('show-search');
     const resultsContainer = document.getElementById('search-results');
     
-    if (!searchInput || !resultsContainer) {
-        console.error('Search input or results container not found');
+    if (!searchInput) {
+        console.error("Search input element not found!");
         return;
     }
+    if (!resultsContainer) {
+        console.error("Results container element not found!");
+        return;
+    }
+
+    console.log("Search elements found, adding event listener..."); // Debug log
     
     searchInput.addEventListener('input', debounce(async (e) => {
         const searchTerm = e.target.value;
-        console.log('Search term:', searchTerm); // Debug log
+        console.log("Search term:", searchTerm); // Debug log
         
         if (searchTerm.length < 2) {
             resultsContainer.innerHTML = '';
@@ -287,39 +294,58 @@ function initializlizeShowSearch() {
         }
 
         try {
+            console.log("Fetching shows..."); // Debug log
             const shows = await fetchShows();
-            console.log('Fetched shows:', shows.length); // Debug log
-            
+            console.log(`Fetched ${shows.length} shows`); // Debug log
+
             const filteredShows = shows.filter(show => 
                 show.showdate.includes(searchTerm) ||
                 show.venue.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10); // Limit to 10 results
+            ).slice(0, 10);
 
-            console.log('Filtered shows:', filteredShows.length); // Debug log
+            console.log(`Found ${filteredShows.length} matching shows`); // Debug log
 
-            resultsContainer.innerHTML = filteredShows.map(show => `
-                <div class="search-result" onclick="selectShow('${show.showdate}')">
-                    <span class="result-date">${show.showdate}</span>
-                    <span class="result-venue">${show.venue}</span>
-                </div>
-            `).join('');
+g
+
+            if (filteredShows.length > 0) {
+                resultsContainer.innerHTML = filteredShows.map(show => `
+                    <div class="search-result" onclick="selectShow('${show.showdate}')">
+                        <span class="result-date">${show.showdate}</span> - 
+                        <span class="result-venue">${show.venue}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsContainer.innerHTML = '<div class="search-result">No shows found</div>';
+            }
         } catch (error) {
             console.error('Error searching shows:', error);
             resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
         }
     }, 300));
+
+    // Add click event listener to document to close results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            resultsContainer.innerHTML = '';
+        }
+    });
+
+    console.log("Show search initialized"); // Debug log
 }
 
-// Make sure this function is defined
 function selectShow(date) {
-    console.log('Selected show:', date); // Debug log
-    document.getElementById('show-search').value = date;
-    document.getElementById('search-results').innerHTML = '';
+    console.log("Selecting show:", date); // Debug log
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (searchInput) searchInput.value = date;
+    if (resultsContainer) resultsContainer.innerHTML = '';
+    
     loadShow(date);
 }
 
-// Initialize when the document is ready
+// Make sure initialization happens when the document is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Initializing show search'); // Debug log
+    console.log("Document ready, initializing..."); // Debug log
     initializeShowSearch();
 });
