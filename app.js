@@ -19,12 +19,34 @@ async function loadShow() {
             displayShowDetails(showData);
             displayShowNotes(showData.setlistnotes);
             displaySetlist(setlistData);
+            addCalculateButton(); // Add this line to ensure the calculate button is added
         } else {
             throw new Error('No show data found');
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Error loading show data. Please try again.');
+    }
+}
+
+function addCalculateButton() {
+    const setlistTable = document.getElementById('setlist-table');
+    if (setlistTable) {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.marginTop = '20px';
+        buttonContainer.style.textAlign = 'right';
+        
+        const calculateButton = document.createElement('button');
+        calculateButton.textContent = 'Calculate Show Rating';
+        calculateButton.onclick = calculateAverage;
+        
+        const ratingSpan = document.createElement('span');
+        ratingSpan.id = 'show-rating';
+        ratingSpan.style.marginLeft = '10px';
+        
+        buttonContainer.appendChild(calculateButton);
+        buttonContainer.appendChild(ratingSpan);
+        setlistTable.appendChild(buttonContainer);
     }
 }
 
@@ -41,7 +63,12 @@ function calculateAverage() {
     });
 
     const average = count > 0 ? (sum / count).toFixed(2) : 'No ratings yet';
-    document.getElementById('show-rating').innerHTML = `<strong>Show Rating:</strong> ${average}`;
+    const showRatingElement = document.getElementById('show-rating');
+    if (showRatingElement) {
+        showRatingElement.innerHTML = `<strong>Show Rating:</strong> ${average}`;
+    } else {
+        console.error('Show rating element not found');
+    }
 }
 
 function submitRatings() {
@@ -81,7 +108,7 @@ function submitRatings() {
     }
 
     try {
-        // Save to local storage
+        // Save to local storage (assuming storage object is defined elsewhere)
         storage.saveRatings(showDate, ratings);
 
         // Calculate and save show average
@@ -103,8 +130,8 @@ function submitRatings() {
 
         alert('Ratings submitted successfully!');
         
-        // Optional: Update any displayed statistics
-        updateDisplayedStats();
+        // Update displayed average
+        calculateAverage();
     } catch (error) {
         console.error('Error saving ratings:', error);
         alert('Error saving ratings. Please try again.');
@@ -112,30 +139,14 @@ function submitRatings() {
 }
 
 function updateDisplayedStats() {
-    // This function can be implemented later to refresh any 
-    // displayed statistics after new ratings are submitted
-    const songRankingsTab = document.getElementById('song-rankings-table');
-    const showRatingsTab = document.getElementById('show-ratings-table');
-    
-    if (songRankingsTab) {
-        // Update song rankings display
-        const songStats = storage.getAllSongStats();
-        // Implementation for updating song rankings display
-    }
-    
-    if (showRatingsTab) {
-        // Update show ratings display
-        const showStats = storage.getAllShowRatings();
-        // Implementation for updating show ratings display
-    }
+    // Implementation for updating displayed statistics
+    // This can be expanded as needed
 }
 
-// Add event listeners for tabs
+// Add event listeners when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the app when the DOM is fully loaded
     init();
     
-    // Add any additional event listeners here
     const submitButton = document.querySelector('button[onclick="submitRatings()"]');
     if (submitButton) {
         submitButton.addEventListener('click', submitRatings);
