@@ -19,6 +19,7 @@ async function loadAllShows() {
 }
 
 async function loadShow(date) {
+    console.log('Loading show:', date); // Debug log
     const showDate = date || document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select or enter a show date.");
