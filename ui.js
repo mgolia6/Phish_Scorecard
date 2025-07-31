@@ -75,7 +75,7 @@ function displaySetlist(setlistData) {
             setlistHTML += `
                 <tr class="song-row">
                     <td class="song-name">${song.song || ''}</td>
-                    <td class="jam-chart">${song.jamchart ? '✓' : ''}</td>
+                    <td class="jam-chart">${song.isjamchart ? '✓' : ''}</td>
                     <td class="gap">${song.gap || 'N/A'}</td>
                     <td class="rating">
                         <select class="rating-select" onchange="updateSongRating(this)">
