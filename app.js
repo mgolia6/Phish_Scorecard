@@ -26,25 +26,25 @@ async function loadShow(date) {
         return;
     }
 
+    console.log("Loading show for date:", showDate); // Add this line
+
     try {
-        // Show loading state
         document.getElementById("setlist-table").innerHTML = '<div class="loading">Loading show data...</div>';
         
         const setlistData = await fetchSetlist(showDate);
+        console.log("Setlist data received:", setlistData); // Add this line
         
-        if (!setlistData || !setlistData.data || setlistData.data.length === 0) {
+        if (!setlistData || !setlistData.length) {
             document.getElementById("setlist-table").innerHTML = '<div class="error">No setlist found for this date.</div>';
             return;
         }
 
-        const showData = setlistData.data[0];
+        const showData = setlistData[0];
         
-        // Display show components
         displayShowDetails(showData);
         displayShowNotes(showData.setlistnotes);
-        displaySetlist(setlistData.data);
+        displaySetlist(setlistData);
 
-        // Load any existing ratings
         loadExistingRatings(showDate);
 
     } catch (error) {
