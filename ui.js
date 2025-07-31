@@ -180,9 +180,8 @@ function initializeShowSearch() {
         return;
     }
 
-    const handleSearch = async (e) => {
+    searchInput.addEventListener('input', async function(e) {
         const searchTerm = e.target.value;
-        console.log("Search term:", searchTerm);
         
         if (searchTerm.length < 2) {
             resultsContainer.innerHTML = '';
@@ -200,19 +199,28 @@ function initializeShowSearch() {
 
             console.log(`Found ${filteredShows.length} matching shows`);
 
-            resultsContainer.innerHTML = filteredShows.map(show => `
-                <div class="search-result" onclick="selectShow('${show.showdate}')">
-                    <span class="result-date">${show.showdate}</span> - 
-                    <span class="result-venue">${show.venue}</span>
-                </div>
-            `).join('');
+            if (filteredShows.length > 0) {
+                resultsContainer.innerHTML = filteredShows.map(show => `
+                    <div class="search-result" onclick="selectShow('${show.showdate}')">
+                        <span class="result-date">${show.showdate}</span> - 
+                        <span class="result-venue">${show.venue}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsContainer.innerHTML = '<div class="search-result">No matches found</div>';
+            }
         } catch (error) {
             console.error('Error searching shows:', error);
             resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
         }
-    };
+    });
 
-    searchInput.addEventListener('input', debounce(handleSearch, 300));
+    // Close results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            resultsContainer.innerHTML = '';
+        }
+    });
 }
 
 function selectShow(date) {
