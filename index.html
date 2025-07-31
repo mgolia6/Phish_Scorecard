@@ -4,233 +4,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phishow Scorecard v1</title>
-    <style>
-        body {
-            background-color: #0a0a0a;
-            color: #33ff33;
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .terminal {
-            max-width: 1200px;
-            margin: auto;
-            border: 2px solid #33ff33;
-            padding: 20px;
-            background-color: #111;
-            box-shadow: 0 0 10px #33ff33;
-        }
-        h1, h2, h3, h4 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #ff6600;
-            text-shadow: 0 0 5px #ff6600;
-        }
-        .sys-msg {
-            color: #ff3333;
-            font-weight: bold;
-        }
-        select, button, input[type="text"], input[type="search"] {
-            background-color: #222;
-            color: #33ff33;
-            border: 1px solid id #33ff33;
-            padding: 8px;
-            margin-top: 10px;
-            font-family: inherit;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #33ff33;
-            coloolor: #0a0a0a;
-            cursor: pointer;
-        }
-        .instructions {
-            border: 1px dashed #ff6600;
-            padding: 15px;
-            margin-bottom: 20px;
-            background-color: #1a1a1a;
-        }
-        table {
-            border-collapse: collapse;
-            margin-top: 20px;
-            width: 100%;
-        }
-        th {
-            background-color: #00ccff;
-            color: #0a0a0a;
-            padding: 12px;
-            text-align: left;
-        }
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #33ff33;
-        }
-        tr:nth-child(even) {
-            background-color: #1a1a1a;
-        }
-        .show-notes {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ff6600;
-            background-color: #1a1a1a;
-        }
-        #show-rating {
-            font-size: 1.2em;
-            co color: #ff6600;
-            margin-top: 15px;
-        }
-        .tab-container {
-            margin-top: 20px;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #33ff33;
-        }
-        .tab-button {
-            background-color: #111;
-            color: #33ff33;
-            border: 1px solid #33ff33;
-            padding: 10px 20px;
-            cursor: pointer;
- ;
-            margin-right: 5px;
-            font-family: inherit;
-            font-size: 16px;
-        }
-        .tab-buttutton.active {
-            background-color: #33ff33;
-            color: #111;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-            background-color: #1a1a1a;
-            border: 1px solid #33ff33;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        #show-search {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-        }
-        #search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: #222;
-            border: 1px solid #33ff33;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-        .search-result {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #33ff33;
-        }
-        .search-result:hover {
-            background-color: #1a1a1a;
-        }
-        .set-section {
-            margin-bottom: 30px;
-            border: 1px solid #00ccff;
-            padding: 15px;
-            background-color: #1a1a1a;
-        }
-        .set-header {
-            color: #00ccff;
-            border-bottom: 1px solid #00ccff;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .set-table {
-            width: 100%;
-        }
-        .song-row:hover {
-            background-color: #222;
-        }
-        .rating-select, .notes-input {
-            width: 100%;
-        }
-        .ratings-summary {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #222;
-            border: 1px solid #33ff33;
-        }
-        .set-ratings {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 15px;
-        }
-        .set-rating {
-            text-align: center;
-        }
-        .show-rating-container {
-            text-align: center;
-        }
-        .calculate-button {
-            font-size: 18px;
-            padding: 10px 20px;
-            margin-top: 15px;
-        }
-        .show-rating {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 15px;
-            color: #ff6600;
-        }
-        .loading, .error {
-            text-align: center;
-            padding: 20px;
-            font-size: 18px;
-        }
-        .loading {
-            color: #00ccff;
-        }
-        .error {
-            color: #ff3333;
-        }
-        .rankings-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        .rankings-table th,
-        .rankings-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #33ff33;
-        }
-        .rankings-table th {
-            background-color: #00ccff;
-            color: #0a0a0a;
-        }
-        .rankings-table tr:hover {
-            background-color: #1a1a1a;
-        }
-        .rankings-table tbody tr:nth-child(even) {
-            background-color: #111;
-        }
-    </style>
+   <style>
+    body {
+        background-color: #0a0a0a;
+        color: #33ff33;
+        font-family: 'Courier New', Courier, monospace;
+        margin: 0;
+        padding: 20px;
+        line-height: 1.6;
+    }
+    .terminal {
+        max-width: 1200px;
+        margin: auto;
+        border: 2px solid #33ff33;
+        padding: 20px;
+        background-color: #111;
+        box-shadow: 0 0 10px #33ff33;
+    }
+    h1, h2, h3, h4 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #ff6600;
+        text-shadow: 0 0 5px #ff6600;
+    }
+    .sys-msg {
+        color: #ff3333;
+        font-weight: bold;
+    }
+    select, button, input[type="text"], input[type="search"] {
+        background-color: #222;
+        color: #33ff33;
+        border: 1px solid #33ff33;
+        padding: 8px;
+        margin-top: 10px;
+        font-family: inherit;
+        font-size: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    button {
+        width: auto;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #33ff33;
+        color: #0a0a0a;
+    }
+    .instructions {
+        border: 1px dashed #ff6600;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #1a1a1a;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th {
+        background-color: #00ccff;
+        color: #0a0a0a;
+        padding: 12px;
+        text-align: left;
+    }
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #33ff33;
+    }
+    tr:nth-child(even) {
+        background-color: #1a1a1a;
+    }
+    .show-notes {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ff6600;
+        background-color: #1a1a1a;
+    }
+    .search-container {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    #show-search {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+    #search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #222;
+        border: 1px solid #33ff33;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    .search-result {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #33ff33;
+    }
+    .search-result:hover {
+        background-color: #1a1a1a;
+    }
+    .tab-container {
+        margin-top: 20px;
+    }
+    .tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #33ff33;
+    }
+    .tab-button {
+        background-color: #111;
+        color: #33ff33;
+        border: 1px solid #33ff33;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-right: 5px;
+        font-family: inherit;
+        font-size: 16px;
+    }
+    .tab-button.active {
+        background-color: #33ff33;
+        color: #111;
+    }
+    .tab-content {
+        display: none;
+        padding: 20px;
+        background-color: #1a1a1a;
+        border: 1px solid #33ff33;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    .set-section {
+        margin-bottom: 30px;
+        border: 1px solid #00ccff;
+        padding: 15px;
+        background-color: #1a1a1a;
+    }
+    .set-header {
+        color: #00ccff;
+        border-bottom: 1px solid #00ccff;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .ratings-summary {
+        margin-top: 30px;
+        padding: 15px;
+        background-color: #222;
+        border: 1px solid #33ff33;
+    }
+    .set-ratings {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 15px;
+    }
+    .calculate-button {
+        font-size: 18px;
+        padding: 10px 20px;
+        margin-top: 15px;
+    }
+    .show-rating {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 15px;
+        color: #ff6600;
+    }
+    .loading, .error {
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+    }
+    .loading {
+        color: #00ccff;
+    }
+    .error {
+        color: #ff3333;
+    }
+    .rankings-table {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .rankings-table th,
+    .rankings-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #33ff33;
+    }
+</style>
 </head>
 <body>
     <div class="terminal">
-        <h1>Phishow Scorecard v6.4</h1>
+        <h1>Phishow Scorecard v6.5</h1>
         <p><strong class="sys-msg">[SYS_MSG]</strong> Don't Suck at Phish</p>
 
         <div class="tab-container">
