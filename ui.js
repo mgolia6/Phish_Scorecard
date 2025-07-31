@@ -1,4 +1,15 @@
-// UI functions for Phish Scorecard
+// Utility debounce function
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
 // Display functions
 function displayShowDetails(show) {
@@ -109,3 +120,115 @@ function displaySetlist(setlistData) {
 
     document.getElementById("setlist-table").innerHTML = setlistHTML;
 }
+
+// --- Search functions ---
+function initializeShowSearch() {
+    console.log("Initializing show search...");
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    if (!searchInput || !resultsContainer) {
+        console.error("Search elements not found");
+        return;
+    }
+
+    searchInput.addEventListener('input', debounce(async function(e) {
+        const searchTerm = e.target.value;
+        if (searchTerm.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        try {
+            const shows = await fetchShows();
+            console.log(`Fetched ${shows.length} shows`);
+
+            const filteredShows = shows.filter(show =>
+                show.showdate.includes(searchTerm) ||
+                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10);
+
+            console.log(`Found ${filteredShows.length} matching shows`);
+
+            if (filteredShows.length > 0) {
+                resultsContainer.innerHTML = filteredShows.map(show => `
+                    <div class="search-result" onclick="selectShow('${show.showdate}')">
+                        <span class="result-date">${show.showdate}</span> -
+                        <span class="result-venue">${show.venue}</span>
+                    </div>
+                `).join('');
+            } else {
+                resultsContainer.innerHTML = '<div class="search-result">No matches found</div>';
+            }
+        } catch (error) {
+            console.error('Error searching shows:', error);
+            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
+        }
+    }, 200));
+
+    // Close results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+            resultsContainer.innerHTML = '';
+        }
+    });
+}
+
+function selectShow(date) {
+    console.log("Selecting show:", date);
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+
+    if (searchInput) searchInput.value = date;
+    if (resultsContainer) resultsContainer.innerHTML = '';
+
+    loadShow(date);
+}
+
+// --- Tab functions ---
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+    if (tabId === 'song-rankings') {
+        displaySongRankings();
+    } else if (tabId === 'show-ratings') {
+        displayShowRatings();
+    }
+}
+
+// --- Ratings utility ---
+function updateSongRating(selectElem) {
+    calculateShowRating();
+}
+
+function calculateShowRating() {
+    const ratings = Array.from(document.querySelectorAll('.rating-select'))
+        .map(select => parseInt(select.value))
+        .filter(val => !isNaN(val));
+    if (ratings.length === 0) {
+        document.getElementById('show-rating').innerHTML = '';
+        return;
+    }
+    const average = ratings.reduce((a, b) => a + b) / ratings.length;
+    document.getElementById('show-rating').innerHTML = `
+        <div class="rating-details">
+            <h4>Show Rating: ${average.toFixed(2)}</h4>
+            <p>Songs Rated: ${ratings.length}</p>
+        </div>
+    `;
+}
+
+// --- Document ready ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Document ready, initializing...");
+    initializeShowSearch();
+    // If you need to load a show on page load, call loadShow() here
+    // Optionally: showTab('default-tab-id');
+});
