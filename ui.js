@@ -11,17 +11,17 @@ const debounce = (func, wait) => {
     };
 };
 
-// Helper to create phish.net show URL
+// Helper to create phish.net show URL (timezone safe)
 function getPhishNetShowUrl(show) {
     // Full month name, lowercase
     const months = [
         "january","february","march","april","may","june",
         "july","august","september","october","november","december"
     ];
-    const dateObj = new Date(show.showdate);
-    const month = months[dateObj.getMonth()];
-    const day = dateObj.getDate();
-    const year = dateObj.getFullYear();
+    // Split the date string directly to avoid timezone offset
+    const [year, monthStr, dayStr] = show.showdate.split("-");
+    const month = months[parseInt(monthStr, 10) - 1];
+    const day = parseInt(dayStr, 10);
 
     // Helper to slugify text
     const slug = (str) =>
