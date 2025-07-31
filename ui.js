@@ -11,13 +11,43 @@ const debounce = (func, wait) => {
     };
 };
 
+// Helper to create phish.net show URL
+function getPhishNetShowUrl(show) {
+    // Full month name, lowercase
+    const months = [
+        "january","february","march","april","may","june",
+        "july","august","september","october","november","december"
+    ];
+    const dateObj = new Date(show.showdate);
+    const month = months[dateObj.getMonth()];
+    const day = dateObj.getDate();
+    const year = dateObj.getFullYear();
+
+    // Helper to slugify text
+    const slug = (str) =>
+        (str || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9 ]/g, "")
+            .replace(/\s+/g, "-");
+
+    // Assemble URL
+    return `https://phish.net/setlists/phish-${month}-${day}-${year}-${slug(show.venue)}-${slug(show.city)}-${slug(show.state)}-${slug(show.country)}.html`;
+}
+
 // Display functions
 function displayShowDetails(show) {
+    const phishNetUrl = getPhishNetShowUrl(show);
+
     document.getElementById("show-details").innerHTML = `
         <h2>Show Details</h2>
         <p><strong>Date:</strong> ${show.showdate || 'N/A'}</p>
         <p><strong>Venue:</strong> ${show.venue || 'N/A'}</p>
         <p><strong>Location:</strong> ${show.city || 'N/A'}, ${show.state || 'N/A'}, ${show.country || 'N/A'}</p>
+        <p>
+            <a href="${phishNetUrl}" target="_blank" rel="noopener">
+                View this show on phish.net
+            </a>
+        </p>
     `;
 }
 
