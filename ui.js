@@ -1,3 +1,17 @@
+// Utility functions should be defined first
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+// Display functions
 function displayShowDetails(show) {
     document.getElementById("show-details").innerHTML = `
         <h2>Show Details</h2>
@@ -38,7 +52,7 @@ function displaySetlist(setlistData) {
     Object.keys(songsBySet).forEach(setName => {
         setlistHTML += `
             <div class="set-section">
-                <h3 class="set-header">${setName === 'E' ? 'Encore' : `Set ${setName}`}</h3>
+                <h3 class=ss="set-header">${setName === 'E' ? 'Encore' : `Set ${setName}`}</h3>
                 <table class="set-table">
                     <thead>
                         <tr>
@@ -60,10 +74,10 @@ function displaySetlist(setlistData) {
                     <td class="gap">${song.gap || 'N/A'}</td>
                     <td class="rating">
                         <select class="rating-select" onchange="updateSongRating(this)">
-                            <option value="">--</option>
+                            <option value=ue="">--</option>
                             <option value="5">5 - Legendary</option>
                             <option value="4">4 - Great</option>
-                            <option value="3">3 - Soliolid</option>
+                            <option value="3">3 - Solid</option>
                             <option value="2">2 - Average</option>
                             <option value="1">1 - Below Average</option>
                         </select>
@@ -103,6 +117,7 @@ function displaySetlist(setlistData) {
     document.getElementById("setlist-table").innerHTML = setlistHTML;
 }
 
+// Rating functions
 function updateSongRating(selectElement) {
     calculateSetRatings();
 }
@@ -154,6 +169,64 @@ function calculateShowRating() {
     `;
 }
 
+// Search functions
+function initializeShowSearch() {
+    console.log("Initializing show search...");
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (!searchInput || !resultsContainer) {
+        console.error("Search elements not found");
+        return;
+    }
+
+    const handleSearch = async (e) => {
+        const searchTerm = e.target.value;
+        console.log("Search term:", searchTerm);
+        
+        if (searchTerm.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        try {
+            const shows = await fetchShows();
+            console.log(`Fetched ${shows.length} shows`);
+
+            const filteredShows = shows.filter(show => 
+                show.showdate.includes(searchTerm) ||
+                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10);
+
+            console.log(`Found ${filteredShows.length} matching shows`);
+
+            resultsContainer.innerHTML = filteredShows.map(show => `
+                <div class="search-result" onclick="selectShow('${show.showdate}')">
+                    <span class="result-date">${show.showdate}</span> - 
+                    <span class="result-venue">${show.venue}</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error searching shows:', error);
+            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
+        }
+    };
+
+    searchInput.addEventListener('input', debounce(handleSearch, 300));
+}
+
+function selectShow(date) {
+    console.log("Selecting show:", date);
+    const searchInput = document.getElementById('show-search');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (searchInput) searchInput.value = date;
+    if (resultsContainer) resultsContainer.innerHTML = '';
+    
+    loadShow(date);
+}
+
+// Tab functions
 function showTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -172,192 +245,8 @@ function showTab(tabId) {
     }
 }
 
-function displaySongRankings() {
-    const songStats = storage.getAllSongStats();
-    const sortedSongs = Object.entries(songStats)
-        .map(([song, stats]) => ({
-            song,
-            averageRating: stats.totalRating / stats.count,
-            count: stats.count
-        }))
-        .sort((a, b) => b.averageRating - a.averageRating);
-
-    let html = `
-        <table class="rankings-table">
-            <thead>
-                <tr>
-                    <th>Song</th>
-                    <th>Average Rating</th>
-                    <th>Times Rated</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    if (sortedSongs.length === 0) {
-        html += `
-            <tr>
-                <td colspan="3" style="text-align: center;">No ratings yet</td>
-            </tr>
-        `;
-    } else {
-        sortedSongs.forEach(song => {
-            html += `
-                <tr>
-                    <td>${song.song}</td>
-                    <td>${song.averageRating.toFixed(2)}</td>
-                    <td>${song.count}</td>
-                </tr>
-            `;
-        });
-    }
-
-    html += `
-            </tbody>
-        </table>
-    `;
-
-    document.getElementById('song-rankings-table').innerHTML = html;
-}
-
-function displayShowRatings() {
-    const showRatings = storage.getAllShowRatings();
-    const sortedShows = Object.entries(showRatings)
-        .map(([date, rating]) => ({
-            date,
-            rating: typeof rating === 'number' ? rating : rating.average || rating,
-            timestamp: new Date().toISOString()
-        }))
-        .sort((a, b) => b.rating - a.rating);
-
-    let html = `
-        <table class="rankings-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Rating</th>
-                    <th>Last Updated</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    if (sortedShows.length === 0) {
-        html += `
-            <tr>
-                <td colspan="3" style="text-align: center;">No shows rated yet</td>
-            </tr>
-        `;
-    } else {
-        sortedShows.forEach(show => {
-            html += `
-                <tr>
-                    <td>${show.date}</td>
-                    <td>${show.rating.toFixed(2)}</td>
-                    <td>${new Date(show.timestamp).toLocaleDateString()}</td>
-                </tr>
-            `;
-        });
-    }
-
-    html += `
-            </tbody>
-        </table>
-    `;
-
-    document.getElementById('show-ratings-table').innerHTML = html;
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-function initializeShowSearch() {
-    console.log("Initializing show search..."); // Debug log
-    const searchInput = document.getElementById('show-search');
-    const resultsContainer = document.getElementById('search-results');
-    
-    if (!searchInput) {
-        console.error("Search input element not found!");
-        return;
-    }
-    if (!resultsContainer) {
-        console.error("Results container element not found!");
-        return;
-    }
-
-    console.log("Search elements found, adding event listener..."); // Debug log
-    
-    searchInput.addEventListener('input', debounce(async (e) => {
-        const searchTerm = e.target.value;
-        console.log("Search term:", searchTerm); // Debug log
-        
-        if (searchTerm.length < 2) {
-            resultsContainer.innerHTML = '';
-            return;
-        }
-
-        try {
-            console.log("Fetching shows..."); // Debug log
-            const shows = await fetchShows();
-            console.log(`Fetched ${shows.length} shows`); // Debug log
-
-            const filteredShows = shows.filter(show => 
-                show.showdate.includes(searchTerm) ||
-                show.venue.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10);
-
-            console.log(`Found ${filteredShows.length} matching shows`); // Debug log
-
-g
-
-            if (filteredShows.length > 0) {
-                resultsContainer.innerHTML = filteredShows.map(show => `
-                    <div class="search-result" onclick="selectShow('${show.showdate}')">
-                        <span class="result-date">${show.showdate}</span> - 
-                        <span class="result-venue">${show.venue}</span>
-                    </div>
-                `).join('');
-            } else {
-                resultsContainer.innerHTML = '<div class="search-result">No shows found</div>';
-            }
-        } catch (error) {
-            console.error('Error searching shows:', error);
-            resultsContainer.innerHTML = '<div class="search-error">Error searching shows</div>';
-        }
-    }, 300));
-
-    // Add click event listener to document to close results when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
-            resultsContainer.innerHTML = '';
-        }
-    });
-
-    console.log("Show search initialized"); // Debug log
-}
-
-function selectShow(date) {
-    console.log("Selecting show:", date); // Debug log
-    const searchInput = document.getElementById('show-search');
-    const resultsContainer = document.getElementById('search-results');
-    
-    if (searchInput) searchInput.value = date;
-    if (resultsContainer) resultsContainer.innerHTML = '';
-    
-    loadShow(date);
-}
-
-// Make sure initialization happens when the document is ready
+// Initialize everything when the document is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Document ready, initializing..."); // Debug log
+    console.log("Document ready, initializing...");
     initializeShowSearch();
 });
