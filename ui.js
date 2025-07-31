@@ -268,6 +268,18 @@ function displayShowRatings() {
     document.getElementById('show-ratings-table').innerHTML = html;
 }
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 function initializeShowSearch() {
     console.log("Initializing show search..."); // Debug log
     const searchInput = document.getElementById('show-search');
