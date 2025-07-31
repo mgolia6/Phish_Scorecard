@@ -36,7 +36,7 @@ async function loadShow() {
             const showData = setlistData[0];
             displayShowDetails(showData);
             displayShowNotes(showData.setlistnotes);
-            displaySetlist(setlistData);
+            displaySetlist(renderSetlistByGroup(setlistRaw);
         } else {
             throw new Error('No show data found');
         }
