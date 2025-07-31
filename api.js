@@ -20,11 +20,13 @@ async function fetchShows() {
 
 async function fetchSetlist(date) {
     try {
+        console.log('Fetching setlist for date:', date);
         const response = await fetch(`https://api.phish.net/v5/setlists/showdate/${date}.json?apikey=${apiKey}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('Setlist API response:', data);
         return data.data;
     } catch (error) {
         console.error("Error fetching setlist:", error);
