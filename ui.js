@@ -226,11 +226,7 @@ function showTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('active');
 
-    if (tabId === 'song-rankings') {
-        displaySongRankings();
-    } else if (tabId === 'show-ratings') {
-        displayShowRatings();
-    }
+    // Tab content will be displayed but no dynamic loading for now
 }
 
 // --- Ratings utility ---
@@ -282,5 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const randomBtn = document.getElementById('random-show-btn');
     if (randomBtn) {
         randomBtn.addEventListener('click', showRandomShow);
+    }
+
+    // Attach generate show rating button handler
+    const generateRatingBtn = document.getElementById('generate-show-rating-btn');
+    if (generateRatingBtn) {
+        generateRatingBtn.addEventListener('click', calculateShowRating);
     }
 });

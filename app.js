@@ -74,7 +74,7 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    calculateShowRating();
+
 }
 
 function submitRatings() {
@@ -117,14 +117,7 @@ function submitRatings() {
         // Save ratings
         storage.saveRatings(showDate, ratings);
 
-        // Calculate and save show rating
-        const setRatings = calculateSetRatings();
-        const showRating = {
-            average: Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length,
-            setRatings: setRatings,
-            timestamp: new Date().toISOString()
-        };
-        storage.saveShowRating(showDate, showRating);
+        // Note: Show rating calculation is now done via "Generate Show Rating" button only
 
         // Update song statistics
         ratings.forEach(rating => {
@@ -134,7 +127,7 @@ function submitRatings() {
         });
 
         alert('Ratings submitted successfully!');
-        updateDisplayedStats();
+        // Note: Tab content updates removed as functions are not implemented
         
     } catch (error) {
         console.error('Error saving ratings:', error);
@@ -142,14 +135,7 @@ function submitRatings() {
     }
 }
 
-function updateDisplayedStats() {
-    if (document.querySelector('#song-rankings.active')) {
-        displaySongRankings();
-    }
-    if (document.querySelector('#show-ratings.active')) {
-        displayShowRatings();
-    }
-}
+// Note: updateDisplayedStats() function removed as referenced functions are not implemented
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', init);
