@@ -79,7 +79,10 @@ function loadExistingRatings(showDate) {
 
 function submitRatings() {
     const showDate = document.getElementById("show-search").value;
+    console.log('submitRatings called with showDate:', showDate);
+    
     if (!showDate) {
+        console.error('No show date found in show-search input field');
         alert("Please select a show first.");
         return;
     }
@@ -109,9 +112,16 @@ function submitRatings() {
     });
 
     if (!hasRatings) {
+        console.log('No ratings found, requesting user to add ratings');
         alert("Please add at least one rating or note before submitting.");
         return;
     }
+
+    console.log('Submitting ratings structure:', {
+        showDate: showDate,
+        ratingsCount: ratings.length,
+        ratings: ratings
+    });
 
     try {
         // Save ratings
@@ -137,7 +147,13 @@ function submitRatings() {
         updateDisplayedStats();
         
     } catch (error) {
-        console.error('Error saving ratings:', error);
+        console.error('Error saving ratings:', {
+            error: error,
+            showDate: showDate,
+            ratingsData: ratings,
+            errorMessage: error.message,
+            errorStack: error.stack
+        });
         alert('Error saving ratings. Please try again.');
     }
 }

@@ -1,9 +1,25 @@
 const storage = {
     // Save ratings for a specific show
     saveRatings: function(showDate, ratings) {
-        const data = this.getAllRatings();
-        data[showDate] = ratings;
-        localStorage.setItem('phishowRatings', JSON.stringify(data));
+        console.log('storage.saveRatings called with:', {
+            showDate: showDate,
+            ratingsCount: ratings ? ratings.length : 0,
+            ratings: ratings
+        });
+        
+        try {
+            const data = this.getAllRatings();
+            data[showDate] = ratings;
+            localStorage.setItem('phishowRatings', JSON.stringify(data));
+            console.log('Ratings saved successfully to localStorage');
+        } catch (error) {
+            console.error('Error in storage.saveRatings:', {
+                error: error,
+                showDate: showDate,
+                ratingsData: ratings
+            });
+            throw error; // Re-throw to let the calling function handle it
+        }
     },
 
     // Get ratings for a specific show

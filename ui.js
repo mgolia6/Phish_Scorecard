@@ -264,6 +264,8 @@ async function showRandomShow() {
         const randomShow = shows[randomIdx];
         if (randomShow && randomShow.showdate) {
             loadShow(randomShow.showdate);
+            // Update the show-search input field with the random show's date
+            document.getElementById('show-search').value = randomShow.showdate;
         }
     } catch (err) {
         alert("Could not load a random show.");
