@@ -74,7 +74,7 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    // calculateShowRating(); // <--- Removed to prevent auto-calculation on show load
+    // calculateShowRating(); // <--- KEEP THIS COMMENTED OUT!
 }
 
 function submitRatings() {
