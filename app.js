@@ -74,7 +74,7 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    calculateShowRating();
+    // calculateShowRating(); // <--- Removed to prevent auto-calculation on show load
 }
 
 function submitRatings() {
@@ -153,3 +153,11 @@ function updateDisplayedStats() {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', init);
+
+// Attach the generate show rating button only after DOM and all scripts are loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('generate-show-rating-btn');
+    if (btn && typeof calculateShowRating === 'function') {
+        btn.addEventListener('click', calculateShowRating);
+    }
+});
