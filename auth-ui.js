@@ -1,5 +1,9 @@
+// --- Auth UI Toggle ---
+// Set to false to hide login/signup functionality, true to show it.
+const SHOW_AUTH = false;
+
 // --- Supabase Setup ---
-const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co'; // <-- YOUR Supabase Project URL
+const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibW5iY3Z1cWhmdXRlaG1jZXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mjg2MTMsImV4cCI6MjA2OTUwNDYxM30.4Jq5BWqBftnUK05AzP1y9rSzRKpiRTL3XRcfm7aj_VM';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -11,6 +15,38 @@ const toSignupLink = document.getElementById('to-signup-link');
 const toLoginLink = document.getElementById('to-login-link');
 const closeModalBtn = document.getElementById('close-auth-modal');
 const headerAuth = document.getElementById('header-auth');
+
+// Quick toggle: disables/hides all auth UI and logic if SHOW_AUTH is false
+function toggleAuthUI() {
+  if (!SHOW_AUTH) {
+    if (headerAuth) headerAuth.style.display = 'none';
+    if (modalOverlay) modalOverlay.style.display = 'none';
+    // Optionally, prevent auth modal opening
+    window.openAuthModal = () => {};
+    window.closeAuthModal = () => {};
+    // Disable event listeners
+    if (toSignupLink) toSignupLink.onclick = null;
+    if (toLoginLink) toLoginLink.onclick = null;
+    if (closeModalBtn) closeModalBtn.onclick = null;
+    if (modalOverlay) modalOverlay.onclick = null;
+    window.removeEventListener('keydown', handleEscapeClose);
+    return false;
+  } else {
+    // Re-enable UI if needed (optional: refresh page or re-render)
+    if (headerAuth) headerAuth.style.display = '';
+    if (modalOverlay) modalOverlay.style.display = '';
+    toSignupLink.onclick = (e) => { e.preventDefault(); openAuthModal('signup'); };
+    toLoginLink.onclick = (e) => { e.preventDefault(); openAuthModal('login'); };
+    closeModalBtn.onclick = closeAuthModal;
+    modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeAuthModal(); };
+    window.addEventListener('keydown', handleEscapeClose);
+    return true;
+  }
+}
+
+function handleEscapeClose(e) {
+  if (e.key === "Escape") closeAuthModal();
+}
 
 // Modal workflow
 function openAuthModal(mode = 'login') {
@@ -32,11 +68,6 @@ function closeAuthModal() {
   document.getElementById('signup-error').textContent = '';
   document.body.style.overflow = '';
 }
-toSignupLink.onclick = (e) => { e.preventDefault(); openAuthModal('signup'); };
-toLoginLink.onclick = (e) => { e.preventDefault(); openAuthModal('login'); };
-closeModalBtn.onclick = closeAuthModal;
-modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeAuthModal(); };
-window.addEventListener('keydown', (e) => { if (e.key === "Escape") closeAuthModal(); });
 
 // Navbar render
 async function renderHeaderAuth() {
@@ -154,5 +185,8 @@ signupForm.onsubmit = async (e) => {
   }, 3000);
 };
 
-// On page load, render auth status
-renderHeaderAuth();
+// --- Call the toggle on page load ---
+toggleAuthUI();
+
+// Only render the auth header if auth is enabled
+if (SHOW_AUTH) renderHeaderAuth();
