@@ -144,7 +144,10 @@ function displaySetlist(setlistData) {
 
     setlistHTML += `
         <div class="ratings-summary">
-            <!-- Ratings summary will go here -->
+            <button class="calculate-button" onclick="generateShowRating()">Generate Show Rating</button>
+            <div id="ratings-summary-content" style="display: none;">
+                <!-- Set ratings summary will be populated here when Generate Show Rating is clicked -->
+            </div>
         </div>
     `;
 
@@ -235,7 +238,7 @@ function showTab(tabId) {
 
 // --- Ratings utility ---
 function updateSongRating(selectElem) {
-    calculateShowRating();
+    // Removed auto-calculation - now only happens when Generate Show Rating button is clicked
 }
 
 function calculateShowRating() {
@@ -253,6 +256,35 @@ function calculateShowRating() {
             <p>Songs Rated: ${ratings.length}</p>
         </div>
     `;
+}
+
+function generateShowRating() {
+    const setRatings = calculateSetRatings();
+    const summaryContent = document.getElementById('ratings-summary-content');
+    
+    if (Object.keys(setRatings).length === 0) {
+        summaryContent.innerHTML = '<p>No ratings to calculate. Please rate some songs first.</p>';
+        summaryContent.style.display = 'block';
+        return;
+    }
+    
+    // Calculate overall average
+    const overallAverage = Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length;
+    
+    // Build summary HTML
+    let summaryHTML = '<div class="set-ratings-summary"><h4>Show Rating Summary</h4>';
+    
+    // Add individual set ratings
+    Object.keys(setRatings).forEach(setName => {
+        summaryHTML += `<div class="set-rating"><strong>${setName}:</strong> ${setRatings[setName].toFixed(2)}</div>`;
+    });
+    
+    // Add overall average
+    summaryHTML += `<div class="overall-rating"><strong>Overall Average:</strong> ${overallAverage.toFixed(2)}</div>`;
+    summaryHTML += '</div>';
+    
+    summaryContent.innerHTML = summaryHTML;
+    summaryContent.style.display = 'block';
 }
 
 // --- Random Show Generator ---

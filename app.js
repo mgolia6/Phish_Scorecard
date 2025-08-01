@@ -74,7 +74,7 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    calculateShowRating();
+    // Removed auto-calculation - summary only shows when Generate Show Rating button is clicked
 }
 
 function submitRatings() {
@@ -117,7 +117,7 @@ function submitRatings() {
         // Save ratings
         storage.saveRatings(showDate, ratings);
 
-        // Calculate and save show rating
+        // Calculate and save show rating (but don't display it)
         const setRatings = calculateSetRatings();
         const showRating = {
             average: Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length,
@@ -140,6 +140,30 @@ function submitRatings() {
         console.error('Error saving ratings:', error);
         alert('Error saving ratings. Please try again.');
     }
+}
+
+function calculateSetRatings() {
+    const setRatings = {};
+    
+    document.querySelectorAll('.set-section').forEach(setSection => {
+        const setHeader = setSection.querySelector('.set-header').textContent;
+        const setName = setHeader === 'Encore' ? 'Encore' : setHeader; // Keep as "Set 1", "Set 2", etc.
+        
+        const ratingsInSet = [];
+        setSection.querySelectorAll('.rating-select').forEach(select => {
+            const rating = parseInt(select.value);
+            if (!isNaN(rating)) {
+                ratingsInSet.push(rating);
+            }
+        });
+        
+        if (ratingsInSet.length > 0) {
+            const average = ratingsInSet.reduce((a, b) => a + b) / ratingsInSet.length;
+            setRatings[setName] = average;
+        }
+    });
+    
+    return setRatings;
 }
 
 function updateDisplayedStats() {
