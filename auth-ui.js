@@ -3,7 +3,7 @@ const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co'; // <-- YOUR Sup
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibW5iY3Z1cWhmdXRlaG1jZXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mjg2MTMsImV4cCI6MjA2OTUwNDYxM30.4Jq5BWqBftnUK05AzP1y9rSzRKpiRTL3XRcfm7aj_VM'; // <-- YOUR Supabase anon key
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- Modal UI Elements ---
+// Modal UI Elements
 const modalOverlay = document.getElementById('auth-modal-overlay');
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
@@ -12,7 +12,7 @@ const toLoginLink = document.getElementById('to-login-link');
 const closeModalBtn = document.getElementById('close-auth-modal');
 const headerAuth = document.getElementById('header-auth');
 
-// --- Modal workflow ---
+// Modal workflow
 function openAuthModal(mode = 'login') {
   modalOverlay.classList.add('active');
   if (mode === 'signup') {
@@ -38,12 +38,11 @@ closeModalBtn.onclick = closeAuthModal;
 modalOverlay.onclick = e => { if (e.target === modalOverlay) closeAuthModal(); };
 window.addEventListener('keydown', e => { if(e.key === "Escape") closeAuthModal(); });
 
-// --- Navbar render ---
+// Navbar render
 async function renderHeaderAuth() {
   const { data: { user } } = await supabase.auth.getUser();
   headerAuth.innerHTML = '';
   if (user) {
-    // Fetch profile
     let username = '';
     const { data: profile } = await supabase
       .from('profiles')
@@ -74,7 +73,7 @@ async function renderHeaderAuth() {
   }
 }
 
-// --- Auth logic ---
+// Auth logic
 loginForm.onsubmit = async e => {
   e.preventDefault();
   document.getElementById('login-error').textContent = '';
