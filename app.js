@@ -74,7 +74,8 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    calculateShowRating();
+    // Removed automatic calculateShowRating() call
+    // User must click "Generate Show Rating" button to see summary
 }
 
 function submitRatings() {
@@ -117,7 +118,7 @@ function submitRatings() {
         // Save ratings
         storage.saveRatings(showDate, ratings);
 
-        // Calculate and save show rating
+        // Calculate and save show rating (without displaying summary)
         const setRatings = calculateSetRatings();
         const showRating = {
             average: Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length,

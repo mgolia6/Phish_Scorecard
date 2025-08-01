@@ -235,7 +235,8 @@ function showTab(tabId) {
 
 // --- Ratings utility ---
 function updateSongRating(selectElem) {
-    calculateShowRating();
+    // Rating change detected - no automatic calculation
+    // Summary will be generated when user clicks "Generate Show Rating" button
 }
 
 function calculateShowRating() {
@@ -253,6 +254,65 @@ function calculateShowRating() {
             <p>Songs Rated: ${ratings.length}</p>
         </div>
     `;
+}
+
+function calculateSetRatings() {
+    const setRatings = {};
+    
+    // Get all set sections
+    document.querySelectorAll('.set-section').forEach(setSection => {
+        const setHeader = setSection.querySelector('.set-header').textContent;
+        const setName = setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1];
+        
+        // Get all ratings for this set
+        const setRatingSelects = setSection.querySelectorAll('.rating-select');
+        const ratings = Array.from(setRatingSelects)
+            .map(select => parseInt(select.value))
+            .filter(val => !isNaN(val));
+        
+        if (ratings.length > 0) {
+            const average = ratings.reduce((a, b) => a + b) / ratings.length;
+            setRatings[setName] = average;
+        }
+    });
+    
+    return setRatings;
+}
+
+function generateShowRatingSummary() {
+    const setRatings = calculateSetRatings();
+    const summaryContainer = document.getElementById('show-rating-summary');
+    
+    if (Object.keys(setRatings).length === 0) {
+        summaryContainer.innerHTML = '<p>No ratings to display. Please rate some songs first.</p>';
+        return;
+    }
+    
+    // Calculate overall show rating
+    const overallAverage = Object.values(setRatings).reduce((a, b) => a + b, 0) / Object.keys(setRatings).length;
+    
+    // Generate summary HTML
+    let summaryHTML = `
+        <div class="ratings-summary">
+            <h3>Show Rating Summary</h3>
+            <div class="overall-rating">
+                <h4>Overall Show Rating: ${overallAverage.toFixed(2)}</h4>
+            </div>
+            <div class="set-ratings">
+                <h4>Set Ratings:</h4>
+    `;
+    
+    Object.entries(setRatings).forEach(([setName, rating]) => {
+        const setDisplayName = setName === 'E' ? 'Encore' : `Set ${setName}`;
+        summaryHTML += `<p>${setDisplayName}: ${rating.toFixed(2)}</p>`;
+    });
+    
+    summaryHTML += `
+            </div>
+        </div>
+    `;
+    
+    summaryContainer.innerHTML = summaryHTML;
 }
 
 // --- Random Show Generator ---
@@ -282,5 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const randomBtn = document.getElementById('random-show-btn');
     if (randomBtn) {
         randomBtn.addEventListener('click', showRandomShow);
+    }
+    
+    // Attach generate show rating button handler
+    const generateRatingBtn = document.getElementById('generate-show-rating-btn');
+    if (generateRatingBtn) {
+        generateRatingBtn.addEventListener('click', generateShowRatingSummary);
     }
 });
