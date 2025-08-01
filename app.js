@@ -74,7 +74,7 @@ function loadExistingRatings(showDate) {
         }
     });
 
-    calculateShowRating();
+    // Removed auto-calculation - now only calculates when "Generate Show Rating" button is clicked
 }
 
 function submitRatings() {

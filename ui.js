@@ -283,4 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (randomBtn) {
         randomBtn.addEventListener('click', showRandomShow);
     }
+
+    // Attach "Generate Show Rating" button handler
+    const generateRatingBtn = document.getElementById('generate-show-rating-btn');
+    if (generateRatingBtn) {
+        generateRatingBtn.addEventListener('click', calculateShowRating);
+    }
 });
