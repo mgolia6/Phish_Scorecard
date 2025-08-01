@@ -32,11 +32,11 @@ function closeAuthModal() {
   document.getElementById('signup-error').textContent = '';
   document.body.style.overflow = '';
 }
-toSignupLink.onclick = e => { e.preventDefault(); openAuthModal('signup'); };
-toLoginLink.onclick = e => { e.preventDefault(); openAuthModal('login'); };
+toSignupLink.onclick = (e) => { e.preventDefault(); openAuthModal('signup'); };
+toLoginLink.onclick = (e) => { e.preventDefault(); openAuthModal('login'); };
 closeModalBtn.onclick = closeAuthModal;
-modalOverlay.onclick = e => { if (e.target === modalOverlay) closeAuthModal(); };
-window.addEventListener('keydown', e => { if(e.key === "Escape") closeAuthModal(); };
+modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeAuthModal(); };
+window.addEventListener('keydown', (e) => { if (e.key === "Escape") closeAuthModal(); });
 
 // Navbar render
 async function renderHeaderAuth() {
@@ -76,7 +76,7 @@ async function renderHeaderAuth() {
 // Auth logic
 
 // Updated Login handler
-loginForm.onsubmit = async e => {
+loginForm.onsubmit = async (e) => {
   e.preventDefault();
   document.getElementById('login-error').textContent = '';
   const email = document.getElementById('login-email').value.trim();
@@ -89,7 +89,7 @@ loginForm.onsubmit = async e => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       // Check if profile exists
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', user.id)
@@ -123,7 +123,7 @@ loginForm.onsubmit = async e => {
 };
 
 // Updated Signup handler
-signupForm.onsubmit = async e => {
+signupForm.onsubmit = async (e) => {
   e.preventDefault();
   document.getElementById('signup-error').textContent = '';
   const firstName = document.getElementById('signup-first-name').value.trim();
