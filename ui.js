@@ -239,20 +239,52 @@ function updateSongRating(selectElem) {
 }
 
 function calculateShowRating() {
-    const ratings = Array.from(document.querySelectorAll('.rating-select'))
-        .map(select => parseInt(select.value))
-        .filter(val => !isNaN(val));
-    if (ratings.length === 0) {
-        document.getElementById('show-rating').innerHTML = '';
-        return;
+    // Find all set sections
+    const setSections = document.querySelectorAll('.set-section');
+    let overallRatings = [];
+    let setSummariesHtml = '';
+
+    setSections.forEach(setSection => {
+        const setHeader = setSection.querySelector('.set-header');
+        const setId = setHeader ? setHeader.textContent : "Set";
+        const ratingSelects = setSection.querySelectorAll('.rating-select');
+        const ratings = Array.from(ratingSelects)
+            .map(select => parseInt(select.value))
+            .filter(val => !isNaN(val));
+        overallRatings = overallRatings.concat(ratings);
+
+        let setAverage = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : null;
+        setSummariesHtml += `
+            <div class="set-rating-summary">
+                <h4>${setId} Summary</h4>
+                ${setAverage !== null 
+                    ? `<strong>Set Rating:</strong> ${setAverage.toFixed(2)}<br><strong>Songs Rated:</strong> ${ratings.length}` 
+                    : `<em>No ratings for this set.</em>`}
+            </div>
+        `;
+    });
+
+    // Display set summaries
+    const setSummariesDiv = document.getElementById('set-summaries');
+    if (setSummariesDiv) {
+        setSummariesDiv.innerHTML = setSummariesHtml;
     }
-    const average = ratings.reduce((a, b) => a + b) / ratings.length;
-    document.getElementById('show-rating').innerHTML = `
-        <div class="rating-details">
-            <h4>Show Rating: ${average.toFixed(2)}</h4>
-            <p>Songs Rated: ${ratings.length}</p>
-        </div>
-    `;
+
+    // Show overall show rating as before
+    const showRatingDiv = document.getElementById('show-rating');
+    if (showRatingDiv) {
+        if (overallRatings.length === 0) {
+            showRatingDiv.innerHTML = '';
+        } else {
+            const average = overallRatings.reduce((a, b) => a + b, 0) / overallRatings.length;
+            showRatingDiv.innerHTML = `
+                <div class="rating-details">
+                    <h4>Show Rating: ${average.toFixed(2)}</h4>
+                    <p>Songs Rated: ${overallRatings.length}</p>
+                </div>
+            `;
+        }
+    }
 }
 
 // --- Random Show Generator ---
