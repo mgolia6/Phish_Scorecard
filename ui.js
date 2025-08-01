@@ -235,7 +235,7 @@ function showTab(tabId) {
 
 // --- Ratings utility ---
 function updateSongRating(selectElem) {
-    calculateShowRating();
+    // calculateShowRating(); // <-- COMMENTED OUT: Only run on button click
 }
 
 function calculateShowRating() {
