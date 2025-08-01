@@ -188,7 +188,150 @@
       0% { transform: translateX(0%); }
       100% { transform: translateX(-100%); }
     }
-    /* ...other existing styles for your app, table, tabs, etc... */
+    .instructions {
+      border: 1px dashed #ff6600;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #1a1a1a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th {
+      background-color: #00ccff;
+      color: #0a0a0a;
+      padding: 12px;
+      text-align: left;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #33ff33;
+    }
+    tr:nth-child(even) {
+      background-color: #1a1a1a;
+    }
+    .show-notes {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ff6600;
+      background-color: #1a1a1a;
+    }
+    .search-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    #show-search {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: #222;
+      border: 1px solid #33ff33;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    .search-result {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #33ff33;
+    }
+    .search-result:hover {
+      background-color: #1a1a1a;
+    }
+    .tab-container {
+      margin-top: 20px;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #33ff33;
+    }
+    .tab-button {
+      background-color: #111;
+      color: #33ff33;
+      border: 1px solid #33ff33;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-right: 5px;
+      font-family: inherit;
+      font-size: 16px;
+    }
+    .tab-button.active {
+      background-color: #33ff33;
+      color: #111;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: #1a1a1a;
+      border: 1px solid #33ff33;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .set-section {
+      margin-bottom: 30px;
+      border: 1px solid #00ccff;
+      padding: 15px;
+      background-color: #1a1a1a;
+    }
+    .set-header {
+      color: #00ccff;
+      border-bottom: 1px solid #00ccff;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .ratings-summary {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #222;
+      border: 1px solid #33ff33;
+    }
+    .set-ratings {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+    .calculate-button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-top: 15px;
+    }
+    .show-rating {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 15px;
+      color: #ff6600;
+    }
+    .loading, .error {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+    }
+    .loading {
+      color: #00ccff;
+    }
+    .error {
+      color: #ff3333;
+    }
+    .rankings-table {
+      width: 100%;
+      margin-top: 20px;
+    }
+    .rankings-table th,
+    .rankings-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #33ff33;
+    }
   </style>
 </head>
 <body>
@@ -241,10 +384,43 @@
       </div>
     </div>
 
-    <!-- Your main app tab container and content goes here -->
+    <!-- Main Tabbed App Content -->
     <div class="tab-container">
-      <!-- ...unchanged... -->
-      <!-- ...scorecard, rankings, etc. -->
+      <div class="tabs">
+        <button class="tab-button active" onclick="showTab('scorecard')">Scorecard</button>
+        <button class="tab-button" onclick="showTab('song-rankings')">Song Rankings</button>
+        <button class="tab-button" onclick="showTab('show-ratings')">Show Ratings</button>
+      </div>
+      <div id="scorecard" class="tab-content active">
+        <div class="instructions">
+          <h2>📋 Instructions</h2>
+          <ol>
+            <li>Start typing a date or venue name to search for a show.</li>
+            <li>Select a show from the search results.</li>
+            <li>Rate each song using the dropdown (1–5).</li>
+            <li>Add personal notes for standout moments.</li>
+            <li>Click "Calculate Show Rating" to see your overall score.</li>
+            <li>Click "Submit Ratings" to save your ratings.</li>
+          </ol>
+        </div>
+        <div class="search-container">
+          <button id="random-show-btn" type="button">Random Show</button>
+          <input type="search" id="show-search" placeholder="Start typing a date (YYYY-MM-DD) or venue name...">
+          <div id="search-results"></div>
+        </div>
+        <div id="show-details"></div>
+        <div id="show-notes"></div>
+        <div id="setlist-table"></div>
+        <button onclick="submitRatings()">Submit Ratings</button>
+      </div>
+      <div id="song-rankings" class="tab-content">
+        <h2>Song Rankings</h2>
+        <div id="song-rankings-table"></div>
+      </div>
+      <div id="show-ratings" class="tab-content">
+        <h2>Show Ratings</h2>
+        <div id="show-ratings-table"></div>
+      </div>
     </div>
   </div>
 
