@@ -144,7 +144,11 @@ function displaySetlist(setlistData) {
 
     setlistHTML += `
         <div class="ratings-summary">
-            <!-- Ratings summary will go here -->
+            <h3>Show Rating Summary</h3>
+            <div id="show-rating">
+                <!-- Show rating will be calculated here -->
+            </div>
+            <button class="calculate-button" onclick="calculateShowRating()">Calculate Show Rating</button>
         </div>
     `;
 
@@ -242,14 +246,25 @@ function calculateShowRating() {
     const ratings = Array.from(document.querySelectorAll('.rating-select'))
         .map(select => parseInt(select.value))
         .filter(val => !isNaN(val));
-    if (ratings.length === 0) {
-        document.getElementById('show-rating').innerHTML = '';
+    
+    const showRatingElement = document.getElementById('show-rating');
+    if (!showRatingElement) {
         return;
     }
+    
+    if (ratings.length === 0) {
+        showRatingElement.innerHTML = `
+            <div class="rating-details">
+                <p>No songs rated yet. Rate some songs to see your show rating!</p>
+            </div>
+        `;
+        return;
+    }
+    
     const average = ratings.reduce((a, b) => a + b) / ratings.length;
-    document.getElementById('show-rating').innerHTML = `
+    showRatingElement.innerHTML = `
         <div class="rating-details">
-            <h4>Show Rating: ${average.toFixed(2)}</h4>
+            <div class="show-rating">Average Rating: ${average.toFixed(2)}</div>
             <p>Songs Rated: ${ratings.length}</p>
         </div>
     `;
@@ -284,3 +299,18 @@ document.addEventListener('DOMContentLoaded', () => {
         randomBtn.addEventListener('click', showRandomShow);
     }
 });
+
+// Stub functions for the other tabs to prevent errors
+function displaySongRankings() {
+    const songRankingsTable = document.getElementById('song-rankings-table');
+    if (songRankingsTable) {
+        songRankingsTable.innerHTML = '<p>Song rankings functionality is not yet implemented.</p>';
+    }
+}
+
+function displayShowRatings() {
+    const showRatingsTable = document.getElementById('show-ratings-table');
+    if (showRatingsTable) {
+        showRatingsTable.innerHTML = '<p>Show ratings functionality is not yet implemented.</p>';
+    }
+}
