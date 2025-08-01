@@ -53,6 +53,35 @@ async function loadShow(date) {
     }
 }
 
+function calculateSetRatings() {
+    const setRatings = {};
+    
+    document.querySelectorAll('.song-row').forEach(row => {
+        const ratingSelect = row.querySelector('.rating-select');
+        const rating = parseInt(ratingSelect.value);
+        const setHeader = row.closest('.set-section').querySelector('.set-header').textContent;
+        
+        // Extract set identifier (1, 2, E, etc.)
+        const setId = setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1];
+        
+        if (!isNaN(rating)) {
+            if (!setRatings[setId]) {
+                setRatings[setId] = { total: 0, count: 0 };
+            }
+            setRatings[setId].total += rating;
+            setRatings[setId].count += 1;
+        }
+    });
+    
+    // Convert to averages
+    const averages = {};
+    Object.keys(setRatings).forEach(setId => {
+        averages[setId] = setRatings[setId].total / setRatings[setId].count;
+    });
+    
+    return averages;
+}
+
 function loadExistingRatings(showDate) {
     const existingRatings = storage.getRatings(showDate);
     if (!existingRatings) return;

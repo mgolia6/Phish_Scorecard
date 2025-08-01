@@ -142,12 +142,6 @@ function displaySetlist(setlistData) {
         `;
     });
 
-    setlistHTML += `
-        <div class="ratings-summary">
-            <!-- Ratings summary will go here -->
-        </div>
-    `;
-
     document.getElementById("setlist-table").innerHTML = setlistHTML;
 }
 
@@ -239,20 +233,79 @@ function updateSongRating(selectElem) {
 }
 
 function calculateShowRating() {
-    const ratings = Array.from(document.querySelectorAll('.rating-select'))
-        .map(select => parseInt(select.value))
-        .filter(val => !isNaN(val));
-    if (ratings.length === 0) {
-        document.getElementById('show-rating').innerHTML = '';
-        return;
+    const setRatings = {};
+    const setDetails = {};
+    
+    // Calculate ratings by set
+    document.querySelectorAll('.song-row').forEach(row => {
+        const ratingSelect = row.querySelector('.rating-select');
+        const rating = parseInt(ratingSelect.value);
+        const setHeader = row.closest('.set-section').querySelector('.set-header').textContent;
+        
+        // Extract set identifier (1, 2, E, etc.)
+        const setId = setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1];
+        const setDisplayName = setHeader;
+        
+        if (!setDetails[setId]) {
+            setDetails[setId] = { 
+                displayName: setDisplayName,
+                ratings: [],
+                total: 0,
+                count: 0
+            };
+        }
+        
+        if (!isNaN(rating)) {
+            setDetails[setId].ratings.push(rating);
+            setDetails[setId].total += rating;
+            setDetails[setId].count += 1;
+        }
+    });
+    
+    // Calculate averages and build display
+    let ratingsHTML = '';
+    let overallTotal = 0;
+    let overallCount = 0;
+    let hasRatings = false;
+    
+    if (Object.keys(setDetails).length > 0) {
+        ratingsHTML += '<div class="ratings-summary"><h3>Show Ratings</h3>';
+        
+        // Display set ratings
+        ratingsHTML += '<div class="set-ratings">';
+        Object.keys(setDetails).sort().forEach(setId => {
+            const set = setDetails[setId];
+            if (set.count > 0) {
+                hasRatings = true;
+                const average = set.total / set.count;
+                setRatings[setId] = average;
+                overallTotal += set.total;
+                overallCount += set.count;
+                
+                ratingsHTML += `
+                    <div class="set-rating">
+                        <strong>${set.displayName}:</strong> ${average.toFixed(2)} (${set.count} songs)
+                    </div>
+                `;
+            }
+        });
+        ratingsHTML += '</div>';
+        
+        // Display overall rating
+        if (hasRatings) {
+            const overallAverage = overallTotal / overallCount;
+            ratingsHTML += `
+                <div class="show-rating">
+                    <strong>Overall Average:</strong> ${overallAverage.toFixed(2)} (${overallCount} songs rated)
+                </div>
+            `;
+        }
+        
+        ratingsHTML += '</div>';
     }
-    const average = ratings.reduce((a, b) => a + b) / ratings.length;
-    document.getElementById('show-rating').innerHTML = `
-        <div class="rating-details">
-            <h4>Show Rating: ${average.toFixed(2)}</h4>
-            <p>Songs Rated: ${ratings.length}</p>
-        </div>
-    `;
+    
+    // Only update the main show-rating div to avoid duplication
+    document.getElementById('show-rating').innerHTML = ratingsHTML;
 }
 
 // --- Random Show Generator ---
@@ -269,6 +322,104 @@ async function showRandomShow() {
         alert("Could not load a random show.");
         console.error(err);
     }
+}
+
+// --- Display functions for rankings and ratings ---
+function displaySongRankings() {
+    // This function displays song rankings in the Song Rankings tab
+    // Implementation would show statistics for all rated songs
+    const songStats = storage.getAllSongStats();
+    let rankingsHTML = '<h2>Song Rankings</h2>';
+    
+    if (Object.keys(songStats).length === 0) {
+        rankingsHTML += '<p>No song ratings available yet. Rate some songs to see rankings!</p>';
+    } else {
+        rankingsHTML += `
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Song</th>
+                        <th>Average Rating</th>
+                        <th>Times Rated</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        // Sort songs by average rating
+        const sortedSongs = Object.entries(songStats)
+            .map(([song, stats]) => ({
+                song,
+                average: stats.totalRating / stats.count,
+                count: stats.count,
+                lastUpdated: stats.lastUpdated
+            }))
+            .sort((a, b) => b.average - a.average);
+        
+        sortedSongs.forEach(song => {
+            const lastUpdated = song.lastUpdated ? new Date(song.lastUpdated).toLocaleDateString() : 'N/A';
+            rankingsHTML += `
+                <tr>
+                    <td>${song.song}</td>
+                    <td>${song.average.toFixed(2)}</td>
+                    <td>${song.count}</td>
+                    <td>${lastUpdated}</td>
+                </tr>
+            `;
+        });
+        
+        rankingsHTML += '</tbody></table>';
+    }
+    
+    document.getElementById('song-rankings-table').innerHTML = rankingsHTML;
+}
+
+function displayShowRatings() {
+    // This function displays show ratings in the Show Ratings tab
+    const showRatings = storage.getAllShowRatings();
+    let ratingsHTML = '<h2>Show Ratings</h2>';
+    
+    if (Object.keys(showRatings).length === 0) {
+        ratingsHTML += '<p>No show ratings available yet. Rate some shows to see your ratings!</p>';
+    } else {
+        ratingsHTML += `
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Show Date</th>
+                        <th>Overall Rating</th>
+                        <th>Set Ratings</th>
+                        <th>Date Rated</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        // Sort shows by date (newest first)
+        const sortedShows = Object.entries(showRatings)
+            .sort(([a], [b]) => new Date(b) - new Date(a));
+        
+        sortedShows.forEach(([showDate, rating]) => {
+            const setRatingsDisplay = Object.entries(rating.setRatings || {})
+                .map(([set, avg]) => `${set === 'E' ? 'Encore' : `Set ${set}`}: ${avg.toFixed(2)}`)
+                .join(', ');
+            const dateRated = rating.timestamp ? new Date(rating.timestamp).toLocaleDateString() : 'N/A';
+            
+            ratingsHTML += `
+                <tr>
+                    <td>${showDate}</td>
+                    <td>${rating.average.toFixed(2)}</td>
+                    <td>${setRatingsDisplay || 'N/A'}</td>
+                    <td>${dateRated}</td>
+                </tr>
+            `;
+        });
+        
+        ratingsHTML += '</tbody></table>';
+    }
+    
+    document.getElementById('show-ratings-table').innerHTML = ratingsHTML;
 }
 
 // --- Document ready ---
