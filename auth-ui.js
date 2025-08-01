@@ -1,6 +1,6 @@
 // --- Supabase Setup ---
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co'; // <-- YOUR Supabase Project URL
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // <-- YOUR Supabase anon key
+const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co'; // <-- YOUR Supabase Project URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhibW5iY3Z1cWhmdXRlaG1jZXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mjg2MTMsImV4cCI6MjA2OTUwNDYxM30.4Jq5BWqBftnUK05AzP1y9rSzRKpiRTL3XRcfm7aj_VM'; // <-- YOUR Supabase anon key
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- Modal UI Elements ---
