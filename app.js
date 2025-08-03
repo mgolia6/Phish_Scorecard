@@ -1,5 +1,3 @@
-// No imports here!
-
 // storage and supabase must be available globally via script tags before this file
 // E.g.
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
