@@ -152,7 +152,7 @@ function displaySetlist(setlistData) {
                     <td class="jam-chart">${song.isjamchart ? '✓' : ''}</td>
                     <td class="gap">${song.gap || 'N/A'}</td>
                     <td class="rating">
-                        <select class="rating-select" onchange="updateSongRating(this)">
+                        <select class="rating-select" onchange="updateSongRating(this)" onfocus="checkAuthenticationForRating()">
                             <option value="">--</option>
                             <option value="5">5 - Legendary</option>
                             <option value="4">4 - Great</option>
@@ -162,7 +162,7 @@ function displaySetlist(setlistData) {
                         </select>
                     </td>
                     <td class="notes">
-                        <input type="text" class="notes-input" placeholder="Add notes...">
+                        <input type="text" class="notes-input" placeholder="Add notes..." onfocus="checkAuthenticationForRating()">
                     </td>
                 </tr>
             `;
@@ -255,8 +255,64 @@ function showTab(tabId) {
 
 // --- Ratings utility ---
 function updateSongRating(selectElem) {
+    // Check authentication before allowing rating changes
+    checkAuthenticationForRating();
     // No automatic calculation on select change;
     // User must explicitly click generate/calculate button if provided.
+}
+
+async function checkAuthenticationForRating() {
+    if (!window.supabase) return true; // If no supabase, allow for now
+    
+    try {
+        const { data: { user } } = await window.supabase.auth.getUser();
+        if (!user) {
+            // Show authentication warning
+            showAuthWarning();
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.warn('Error checking authentication:', error);
+        return true; // Allow on error to avoid breaking functionality
+    }
+}
+
+function showAuthWarning() {
+    // Create or update auth warning message
+    let warningDiv = document.getElementById('auth-warning');
+    if (!warningDiv) {
+        warningDiv = document.createElement('div');
+        warningDiv.id = 'auth-warning';
+        warningDiv.style.cssText = `
+            background: #1a1a1a;
+            border: 2px solid #ff6600;
+            color: #ff6600;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.1em;
+        `;
+        warningDiv.innerHTML = `
+            <strong>⚠️ Authentication Required</strong><br>
+            You must be signed in to submit ratings and notes.
+            <button onclick="openAuthModal('login')" style="margin-left: 10px; background: #ff6600; color: #0a0a0a; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer;">Sign In</button>
+        `;
+        
+        // Insert warning above the setlist table
+        const setlistTable = document.getElementById('setlist-table');
+        if (setlistTable && setlistTable.parentNode) {
+            setlistTable.parentNode.insertBefore(warningDiv, setlistTable);
+        }
+    }
+}
+
+function hideAuthWarning() {
+    const warningDiv = document.getElementById('auth-warning');
+    if (warningDiv) {
+        warningDiv.remove();
+    }
 }
 
 function calculateShowRating() {

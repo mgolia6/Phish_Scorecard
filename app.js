@@ -77,7 +77,23 @@ function loadExistingRatings(showDate) {
     // calculateShowRating(); // <--- KEEP THIS COMMENTED OUT!
 }
 
-function submitRatings() {
+async function submitRatings() {
+    // Check if user is authenticated
+    if (!supabase) {
+        alert("Authentication service is not available. Please try again later.");
+        return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert("You must be signed in to submit ratings. Please log in first.");
+        // Optionally open the auth modal
+        if (typeof openAuthModal === 'function') {
+            openAuthModal('login');
+        }
+        return;
+    }
+
     const showDate = document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select a show first.");
@@ -114,7 +130,10 @@ function submitRatings() {
     }
 
     try {
-        // Save ratings
+        // Save ratings to Supabase
+        await saveRatingsToSupabase(user.id, showDate, ratings);
+
+        // Also save to localStorage as backup (for now)
         storage.saveRatings(showDate, ratings);
 
         // Calculate and save show rating
@@ -139,6 +158,45 @@ function submitRatings() {
     } catch (error) {
         console.error('Error saving ratings:', error);
         alert('Error saving ratings. Please try again.');
+    }
+}
+
+async function saveRatingsToSupabase(userId, showDate, ratings) {
+    if (!supabase) {
+        throw new Error('Supabase client not available');
+    }
+
+    // Prepare ratings data for Supabase
+    const supabaseRatings = ratings.map(rating => ({
+        user_id: userId,
+        show_id: showDate, // Using show date as show ID for now
+        song_id: rating.song, // Using song name as song ID for now
+        rating: rating.rating,
+        notes: rating.notes || null,
+        timestamp: new Date().toISOString(),
+        set_name: rating.set,
+        jam_chart: rating.jamChart,
+        gap: rating.gap
+    }));
+
+    // First, delete existing ratings for this user and show
+    const { error: deleteError } = await supabase
+        .from('ratings')
+        .delete()
+        .eq('user_id', userId)
+        .eq('show_id', showDate);
+
+    if (deleteError && deleteError.code !== 'PGRST116') { // PGRST116 = no rows to delete, which is fine
+        throw deleteError;
+    }
+
+    // Insert new ratings
+    const { error: insertError } = await supabase
+        .from('ratings')
+        .insert(supabaseRatings);
+
+    if (insertError) {
+        throw insertError;
     }
 }
 

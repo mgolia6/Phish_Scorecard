@@ -408,6 +408,30 @@
           </div>
         </div>
 
+        <!-- Profile Modal -->
+        <div class="modal-overlay" id="profile-modal-overlay">
+          <div class="auth-modal" id="profile-modal">
+            <button class="close-modal" id="close-profile-modal" title="Close">&times;</button>
+            <h3>User Profile</h3>
+            <div class="profile-content">
+              <div class="profile-avatar">
+                <img id="profile-avatar-img" src="" alt="User Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #33ff33; margin-bottom: 15px; display: none;">
+                <div id="profile-avatar-placeholder" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #33ff33; margin-bottom: 15px; background: #222; display: flex; align-items: center; justify-content: center; color: #33ff33; font-size: 24px;">👤</div>
+              </div>
+              <div class="profile-info">
+                <p><strong>Name:</strong> <span id="profile-name">-</span></p>
+                <p><strong>Username:</strong> <span id="profile-username">-</span></p>
+                <p><strong>Email:</strong> <span id="profile-email">-</span></p>
+                <p><strong>Member since:</strong> <span id="profile-member-since">-</span></p>
+              </div>
+              <div class="profile-actions" style="margin-top: 20px;">
+                <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                <button class="auth-btn" onclick="document.getElementById('avatar-upload').click()">Change Avatar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- All your old app content stays the same below! -->
         <div class="tab-container">
             <div class="tabs">
@@ -445,7 +469,7 @@
     </div>
 
     <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="ui.js"></script>
     <script src="api.js"></script>
     <script src="storage.js"></script>
