@@ -1,4 +1,4 @@
-// REMOVE all import/export statements for classic browser scripts
+// No imports here!
 
 // storage and supabase must be available globally via script tags before this file
 // E.g.
