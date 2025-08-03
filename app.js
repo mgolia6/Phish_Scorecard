@@ -1,7 +1,11 @@
-import storage from './storage.js';
-import { supabase } from './supabaseClient.js';
+// REMOVE all import/export statements for classic browser scripts
 
-// --- Initialization ---
+// storage and supabase must be available globally via script tags before this file
+// E.g.
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+// <script src="supabaseClient.js"></script>
+// <script src="storage.js"></script>
+
 async function init() {
     try {
         await loadAllShows();
@@ -187,6 +191,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Attach submitRatings to global scope for HTML button compatibility
+// Attach submitRatings and loadShow to global scope for HTML button compatibility
 window.submitRatings = submitRatings;
 window.loadShow = loadShow;
