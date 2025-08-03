@@ -1,3 +1,7 @@
+import storage from './storage.js';
+import { supabase } from './supabaseClient.js';
+
+// --- Initialization ---
 async function init() {
     try {
         await loadAllShows();
@@ -19,7 +23,7 @@ async function loadAllShows() {
 }
 
 async function loadShow(date) {
-    console.log('Loading show:', date); // Debug log
+    console.log('Loading show:', date);
     const showDate = date || document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select or enter a show date.");
@@ -28,44 +32,43 @@ async function loadShow(date) {
 
     try {
         document.getElementById("setlist-table").innerHTML = '<div class="loading">Loading show data...</div>';
-        
+
         const setlistData = await fetchSetlist(showDate);
-        console.log("Setlist data:", setlistData); // Debug log
-        
+        console.log("Setlist data:", setlistData);
+
         if (!setlistData || setlistData.length === 0) {
             document.getElementById("setlist-table").innerHTML = '<div class="error">No setlist found for this date.</div>';
             return;
         }
 
         const showData = setlistData[0];
-        
+
         displayShowDetails(showData);
         displayShowNotes(showData.setlistnotes);
         displaySetlist(setlistData);
 
         // Load any existing ratings
-        loadExistingRatings(showDate);
+        await loadExistingRatings(showDate);
 
     } catch (error) {
         console.error('Error loading show:', error);
-        document.getElementById("setlist-table").innerHTML = 
+        document.getElementById("setlist-table").innerHTML =
             '<div class="error">Error loading show data. Please try again.</div>';
     }
 }
 
-function loadExistingRatings(showDate) {
-    const existingRatings = storage.getRatings(showDate);
-    if (!existingRatings) return;
+// --- Load Ratings for Current Show ---
+async function loadExistingRatings(showDate) {
+    const existingRatings = await storage.getRatings(showDate);
+    if (!existingRatings || !Array.isArray(existingRatings)) return;
 
     existingRatings.forEach(rating => {
         const songRow = Array.from(document.querySelectorAll('.song-row'))
-            .find(row => row.querySelector('.song-name').textContent === rating.song);
-        
+            .find(row => row.querySelector('.song-name').textContent === (rating.song || rating.song_name));
         if (songRow) {
             const ratingSelect = songRow.querySelector('.rating-select');
             const notesInput = songRow.querySelector('.notes-input');
-            
-            if (ratingSelect && rating.rating) {
+            if (ratingSelect && (rating.rating !== undefined && rating.rating !== null)) {
                 ratingSelect.value = rating.rating;
             }
             if (notesInput && rating.notes) {
@@ -73,11 +76,11 @@ function loadExistingRatings(showDate) {
             }
         }
     });
-
     // calculateShowRating(); // <--- KEEP THIS COMMENTED OUT!
 }
 
-function submitRatings() {
+// --- Submit Ratings and Show Aggregates to Supabase ---
+async function submitRatings() {
     const showDate = document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select a show first.");
@@ -92,7 +95,7 @@ function submitRatings() {
         const ratingSelect = row.querySelector('.rating-select');
         const notesInput = row.querySelector('.notes-input');
         const setHeader = row.closest('.set-section').querySelector('.set-header').textContent;
-        
+
         if (ratingSelect.value || notesInput.value) {
             hasRatings = true;
             ratings.push({
@@ -100,8 +103,8 @@ function submitRatings() {
                 set: setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1],
                 rating: ratingSelect.value ? parseInt(ratingSelect.value) : null,
                 notes: notesInput.value,
-                jamChart: row.querySelector('.jam-chart').textContent.includes('✓'),
-                gap: row.querySelector('.gap').textContent,
+                jamChart: row.querySelector('.jam-chart')?.textContent.includes('✓') || false,
+                gap: row.querySelector('.gap')?.textContent || null,
                 date: showDate,
                 timestamp: new Date().toISOString()
             });
@@ -114,8 +117,11 @@ function submitRatings() {
     }
 
     try {
-        // Save ratings
-        storage.saveRatings(showDate, ratings);
+        // Save ratings to Supabase (uses current session user if available)
+        let user_id = null;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) user_id = user.id;
+        await storage.saveRatings(showDate, ratings, user_id);
 
         // Calculate and save show rating
         const setRatings = calculateSetRatings();
@@ -124,40 +130,63 @@ function submitRatings() {
             setRatings: setRatings,
             timestamp: new Date().toISOString()
         };
-        storage.saveShowRating(showDate, showRating);
-
-        // Update song statistics
-        ratings.forEach(rating => {
-            if (rating.rating !== null) {
-                storage.updateSongStats(rating.song, rating.rating);
-            }
-        });
+        await storage.saveShowRating(showDate, showRating);
 
         alert('Ratings submitted successfully!');
-        updateDisplayedStats();
-        
+        await updateDisplayedStats();
+
     } catch (error) {
         console.error('Error saving ratings:', error);
         alert('Error saving ratings. Please try again.');
     }
 }
 
-function updateDisplayedStats() {
+// --- Calculate Set Ratings for Current Show ---
+function calculateSetRatings() {
+    const setRatings = {};
+    const setCounts = {};
+    document.querySelectorAll('.song-row').forEach(row => {
+        const ratingSelect = row.querySelector('.rating-select');
+        const setHeader = row.closest('.set-section').querySelector('.set-header').textContent;
+        const set = setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1];
+        if (ratingSelect.value) {
+            if (!setRatings[set]) {
+                setRatings[set] = 0;
+                setCounts[set] = 0;
+            }
+            setRatings[set] += parseInt(ratingSelect.value, 10);
+            setCounts[set] += 1;
+        }
+    });
+    Object.keys(setRatings).forEach(set => {
+        setRatings[set] = setCounts[set] ? setRatings[set] / setCounts[set] : 0;
+    });
+    return setRatings;
+}
+
+// --- Update UI Tabs with Latest Data ---
+async function updateDisplayedStats() {
+    // Fetch show ratings
     if (document.querySelector('#song-rankings.active')) {
-        displaySongRankings();
+        let allSongRatings = await storage.getAllRatings();
+        displaySongRankings(allSongRatings);
     }
     if (document.querySelector('#show-ratings.active')) {
-        displayShowRatings();
+        let allShowRatings = await storage.getAllShowRatings();
+        displayShowRatings(allShowRatings);
     }
 }
 
-// Initialize the application
+// --- Event Listeners ---
 document.addEventListener('DOMContentLoaded', init);
 
-// Attach the generate show rating button only after DOM and all scripts are loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const btn = document.getElementById('generate-show-rating-btn');
     if (btn && typeof calculateShowRating === 'function') {
         btn.addEventListener('click', calculateShowRating);
     }
 });
+
+// Attach submitRatings to global scope for HTML button compatibility
+window.submitRatings = submitRatings;
+window.loadShow = loadShow;
