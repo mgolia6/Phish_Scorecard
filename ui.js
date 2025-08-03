@@ -21,7 +21,7 @@ function getPhishNetShowUrl(show) {
     // Split the date string directly to avoid timezone offset
     const [year, monthStr, dayStr] = show.showdate.split("-");
     const month = months[parseInt(monthStr, 10) - 1];
-    const day = parseInt(dayStr, 10];
+    const day = parseInt(dayStr, 10);
 
     // Helper to slugify text
     const slug = (str) =>
