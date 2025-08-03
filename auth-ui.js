@@ -160,6 +160,79 @@ async function loadUserProfile() {
   }
 }
 
+// Handle avatar upload
+async function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!supabase) {
+    alert('Avatar upload is not available when authentication service is offline.');
+    return;
+  }
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    alert('Please select a valid image file.');
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image file must be smaller than 5MB.');
+    return;
+  }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('You must be logged in to upload an avatar.');
+      return;
+    }
+
+    // Create a unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+
+    // In a real implementation, you would upload to Supabase Storage:
+    // const { data, error } = await supabase.storage
+    //   .from('avatars')
+    //   .upload(fileName, file);
+
+    // For this mock implementation, we'll create a local URL and simulate storage
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const avatarUrl = e.target.result;
+      
+      // Update the profile with the new avatar URL
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating avatar:', error);
+        alert('Error updating avatar. Please try again.');
+      } else {
+        // Update the UI
+        document.getElementById('profile-avatar-img').src = avatarUrl;
+        document.getElementById('profile-avatar-img').style.display = 'block';
+        document.getElementById('profile-avatar-placeholder').style.display = 'none';
+        
+        // Also update the header avatar if visible
+        renderHeaderAuth();
+        
+        alert('Avatar updated successfully!');
+      }
+    };
+    
+    reader.readAsDataURL(file);
+
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    alert('Error uploading avatar. Please try again.');
+  }
+}
+
 // Navbar render
 async function renderHeaderAuth() {
   if (!supabase) {
@@ -338,3 +411,11 @@ toggleAuthUI();
 
 // Only render the auth header if auth is enabled
 if (SHOW_AUTH) renderHeaderAuth();
+
+// Add avatar upload event listener
+document.addEventListener('DOMContentLoaded', function() {
+  const avatarUpload = document.getElementById('avatar-upload');
+  if (avatarUpload) {
+    avatarUpload.addEventListener('change', handleAvatarUpload);
+  }
+});
