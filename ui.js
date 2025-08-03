@@ -250,6 +250,166 @@ function showTab(tabId) {
         displaySongRankings();
     } else if (tabId === 'show-ratings') {
         displayShowRatings();
+    } else if (tabId === 'unique-song-rankings') {
+        displayUniqueSongRankings();
+    }
+}
+
+// Display aggregated show ratings
+async function displayShowRatings() {
+    const container = document.getElementById('show-ratings-content');
+    if (!container) return;
+
+    try {
+        container.innerHTML = '<div class="loading">Loading show ratings...</div>';
+        
+        const showRatings = await supabaseStorage.getAggregatedShowRatings();
+        
+        if (Object.keys(showRatings).length === 0) {
+            container.innerHTML = '<div class="error">No show ratings found. Rate some shows first!</div>';
+            return;
+        }
+
+        // Sort shows by average rating (descending)
+        const sortedShows = Object.entries(showRatings)
+            .sort(([,a], [,b]) => b.average - a.average);
+
+        let html = `
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Show Date</th>
+                        <th>Average Rating</th>
+                        <th>User Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        sortedShows.forEach(([showDate, data], index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${showDate}</td>
+                    <td>${data.average.toFixed(2)}</td>
+                    <td>${data.userCount}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading show ratings:', error);
+        container.innerHTML = '<div class="error">Error loading show ratings. Please try again.</div>';
+    }
+}
+
+// Display aggregated song rankings (all-time)
+async function displaySongRankings() {
+    const container = document.getElementById('song-rankings-content');
+    if (!container) return;
+
+    try {
+        container.innerHTML = '<div class="loading">Loading song rankings...</div>';
+        
+        const songStats = await supabaseStorage.getAggregatedSongRankings();
+        
+        if (Object.keys(songStats).length === 0) {
+            container.innerHTML = '<div class="error">No song ratings found. Rate some songs first!</div>';
+            return;
+        }
+
+        // Sort songs by average rating (descending)
+        const sortedSongs = Object.entries(songStats)
+            .sort(([,a], [,b]) => b.average - a.average);
+
+        let html = `
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Song</th>
+                        <th>Average Rating</th>
+                        <th>Total Ratings</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        sortedSongs.forEach(([songName, stats], index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${songName}</td>
+                    <td>${stats.average.toFixed(2)}</td>
+                    <td>${stats.count}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading song rankings:', error);
+        container.innerHTML = '<div class="error">Error loading song rankings. Please try again.</div>';
+    }
+}
+
+// Display unique song rankings (specific performances)
+async function displayUniqueSongRankings() {
+    const container = document.getElementById('unique-song-rankings-content');
+    if (!container) return;
+
+    try {
+        container.innerHTML = '<div class="loading">Loading unique song rankings...</div>';
+        
+        const uniquePerformances = await supabaseStorage.getUniqueSongRankings();
+        
+        if (Object.keys(uniquePerformances).length === 0) {
+            container.innerHTML = '<div class="error">No unique song performances found. Rate some shows first!</div>';
+            return;
+        }
+
+        // Sort performances by average rating (descending)
+        const sortedPerformances = Object.values(uniquePerformances)
+            .sort((a, b) => b.average - a.average);
+
+        let html = `
+            <table class="rankings-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Song</th>
+                        <th>Show Date</th>
+                        <th>Average Rating</th>
+                        <th>User Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        sortedPerformances.forEach((performance, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${performance.song}</td>
+                    <td>${performance.showDate}</td>
+                    <td>${performance.average.toFixed(2)}</td>
+                    <td>${performance.userCount}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading unique song rankings:', error);
+        container.innerHTML = '<div class="error">Error loading unique song rankings. Please try again.</div>';
     }
 }
 

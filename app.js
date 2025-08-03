@@ -54,33 +54,43 @@ async function loadShow(date) {
 }
 
 function loadExistingRatings(showDate) {
-    const existingRatings = storage.getRatings(showDate);
-    if (!existingRatings) return;
+    supabaseStorage.getRatings(showDate).then(existingRatings => {
+        if (!existingRatings) return;
 
-    existingRatings.forEach(rating => {
-        const songRow = Array.from(document.querySelectorAll('.song-row'))
-            .find(row => row.querySelector('.song-name').textContent === rating.song);
-        
-        if (songRow) {
-            const ratingSelect = songRow.querySelector('.rating-select');
-            const notesInput = songRow.querySelector('.notes-input');
+        existingRatings.forEach(rating => {
+            const songRow = Array.from(document.querySelectorAll('.song-row'))
+                .find(row => row.querySelector('.song-name').textContent === rating.song);
             
-            if (ratingSelect && rating.rating) {
-                ratingSelect.value = rating.rating;
+            if (songRow) {
+                const ratingSelect = songRow.querySelector('.rating-select');
+                const notesInput = songRow.querySelector('.notes-input');
+                
+                if (ratingSelect && rating.rating) {
+                    ratingSelect.value = rating.rating;
+                }
+                if (notesInput && rating.notes) {
+                    notesInput.value = rating.notes;
+                }
             }
-            if (notesInput && rating.notes) {
-                notesInput.value = rating.notes;
-            }
-        }
+        });
+    }).catch(error => {
+        console.error('Error loading existing ratings:', error);
     });
 
     // calculateShowRating(); // <--- KEEP THIS COMMENTED OUT!
 }
 
-function submitRatings() {
+async function submitRatings() {
     const showDate = document.getElementById("show-search").value;
     if (!showDate) {
         alert("Please select a show first.");
+        return;
+    }
+
+    // Check if user is logged in
+    const user = await supabaseStorage.getCurrentUser();
+    if (!user) {
+        alert("Please log in to submit ratings.");
         return;
     }
 
@@ -114,8 +124,8 @@ function submitRatings() {
     }
 
     try {
-        // Save ratings
-        storage.saveRatings(showDate, ratings);
+        // Save ratings to Supabase
+        await supabaseStorage.saveRatings(showDate, ratings);
 
         // Calculate and save show rating
         const setRatings = calculateSetRatings();
@@ -124,21 +134,14 @@ function submitRatings() {
             setRatings: setRatings,
             timestamp: new Date().toISOString()
         };
-        storage.saveShowRating(showDate, showRating);
-
-        // Update song statistics
-        ratings.forEach(rating => {
-            if (rating.rating !== null) {
-                storage.updateSongStats(rating.song, rating.rating);
-            }
-        });
+        await supabaseStorage.saveShowRating(showDate, showRating);
 
         alert('Ratings submitted successfully!');
         updateDisplayedStats();
         
     } catch (error) {
         console.error('Error saving ratings:', error);
-        alert('Error saving ratings. Please try again.');
+        alert('Error saving ratings: ' + error.message);
     }
 }
 
@@ -149,6 +152,31 @@ function updateDisplayedStats() {
     if (document.querySelector('#show-ratings.active')) {
         displayShowRatings();
     }
+    if (document.querySelector('#unique-song-rankings.active')) {
+        displayUniqueSongRankings();
+    }
+}
+
+// Helper function to calculate set ratings
+function calculateSetRatings() {
+    const setRatings = {};
+    const setSections = document.querySelectorAll('.set-section');
+    
+    setSections.forEach(setSection => {
+        const setHeader = setSection.querySelector('.set-header').textContent;
+        const setId = setHeader === 'Encore' ? 'E' : setHeader.split(' ')[1];
+        
+        const ratingSelects = setSection.querySelectorAll('.rating-select');
+        const ratings = Array.from(ratingSelects)
+            .map(select => parseInt(select.value))
+            .filter(val => !isNaN(val));
+        
+        if (ratings.length > 0) {
+            setRatings[setId] = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+        }
+    });
+    
+    return setRatings;
 }
 
 // Initialize the application
