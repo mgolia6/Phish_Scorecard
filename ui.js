@@ -256,18 +256,17 @@ function calculateShowRating() {
         let setAverage = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : null;
         setSummariesHtml += `
             <div class="set-rating-summary">
-                <h4>${setId} Summary</h4>
                 ${setAverage !== null 
-                    ? `<strong>Set Rating:</strong> ${setAverage.toFixed(2)}<br><strong>Songs Rated:</strong> ${ratings.length}` 
-                    : `<em>No ratings for this set.</em>`}
+                    ? `${setId}: ${setAverage.toFixed(2)} (${ratings.length} songs)` 
+                    : `${setId}: No ratings`}
             </div>
         `;
     });
 
-    // Display set summaries
-    const setSummariesDiv = document.getElementById('set-summaries');
-    if (setSummariesDiv) {
-        setSummariesDiv.innerHTML = setSummariesHtml;
+    // Display set summaries in show-rating-summary section (above show ratings)
+    const showRatingSummaryDiv = document.getElementById('show-rating-summary');
+    if (showRatingSummaryDiv) {
+        showRatingSummaryDiv.innerHTML = setSummariesHtml;
     }
 
     // Show overall show rating as before
