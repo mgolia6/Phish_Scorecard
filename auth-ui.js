@@ -1,6 +1,6 @@
 // --- Auth UI Toggle ---
 // Set to false to hide login/signup functionality, true to show it.
-const SHOW_AUTH = false;
+const SHOW_AUTH = true;
 
 // --- Supabase Setup ---
 const SUPABASE_URL = 'https://hbmnbcvuqhfutehmcezg.supabase.co';
