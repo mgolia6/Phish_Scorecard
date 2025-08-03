@@ -1,9 +1,4 @@
-// REMOVE the import if you are not using ES modules
-// import { supabase } from './supabaseClient.js'; // We'll use global supabase instead
-
-// If supabase is not global, make sure to add it via script tag before this file
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-// <script src="supabaseClient.js"></script>
+// No imports needed. Supabase should be available globally via <script>.
 
 const storage = {
     // Save ratings for a specific show to Supabase (one row per rating in 'ratings' table)
@@ -28,12 +23,13 @@ const storage = {
 
             if (error) throw error;
         } catch (e) {
-            const data = this.getAllRatings();
+            const data = await this.getAllRatings();
             data[showDate] = ratings;
             localStorage.setItem('phishowRatings', JSON.stringify(data));
         }
     },
 
+    // Get ratings for a specific show from Supabase (all users, or filter by user_id)
     async getRatings(showDate, user_id = null) {
         try {
             let query = supabase
@@ -46,17 +42,19 @@ const storage = {
             if (error) throw error;
             return data;
         } catch (e) {
-            const data = this.getAllRatings();
+            const data = await this.getAllRatings();
             return data[showDate] || null;
         }
     },
 
+    // Get all ratings from Supabase (all users, all shows)
     async getAllRatings() {
         try {
             let { data, error } = await supabase
                 .from('ratings')
                 .select('*');
             if (error) throw error;
+            // Group by show_date as in localStorage schema
             const grouped = {};
             data.forEach(r => {
                 if (!grouped[r.show_date]) grouped[r.show_date] = [];
@@ -69,6 +67,7 @@ const storage = {
         }
     },
 
+    // Save overall show rating (aggregates) to Supabase 'shows' table
     async saveShowRating(showDate, rating) {
         try {
             const { error } = await supabase
@@ -81,7 +80,7 @@ const storage = {
                 }], { onConflict: ['show_date'] });
             if (error) throw error;
         } catch (e) {
-            const data = this.getAllShowRatings();
+            const data = await this.getAllShowRatings();
             data[showDate] = {
                 average: rating.average,
                 setRatings: rating.setRatings,
@@ -91,11 +90,12 @@ const storage = {
         }
     },
 
+    // Get all show ratings/aggregates
     async getAllShowRatings() {
         try {
             let { data, error } = await supabase
                 .from('shows')
-                .select('show_date, average, set_ratings, timestamp');
+                .select('show_date,average,set_ratings,timestamp');
             if (error) throw error;
             const result = {};
             data.forEach(entry => {
@@ -112,6 +112,7 @@ const storage = {
         }
     },
 
+    // Update song statistics locally (if you want to keep this, otherwise remove)
     getAllSongStats() {
         const data = localStorage.getItem('phishowSongStats');
         return data ? JSON.parse(data) : {};
@@ -122,6 +123,7 @@ const storage = {
         return stats[song] || null;
     },
 
+    // Save user notes to Supabase (as a field in 'shows' table)
     async saveNotes(showDate, notes) {
         try {
             const { error } = await supabase
@@ -129,7 +131,7 @@ const storage = {
                 .upsert([{ show_date: showDate, notes, notes_timestamp: new Date().toISOString() }], { onConflict: ['show_date'] });
             if (error) throw error;
         } catch (e) {
-            const data = this.getAllNotes();
+            const data = await this.getAllNotes();
             data[showDate] = {
                 notes: notes,
                 timestamp: new Date().toISOString()
@@ -138,11 +140,12 @@ const storage = {
         }
     },
 
+    // Get all notes from Supabase
     async getAllNotes() {
         try {
             let { data, error } = await supabase
                 .from('shows')
-                .select('show_date, notes, notes_timestamp');
+                .select('show_date,notes,notes_timestamp');
             if (error) throw error;
             const result = {};
             data.forEach(entry => {
@@ -158,6 +161,7 @@ const storage = {
         }
     },
 
+    // Clear all stored data (local only)
     clearAllData() {
         localStorage.removeItem('phishowRatings');
         localStorage.removeItem('phishowShowRatings');
@@ -165,6 +169,7 @@ const storage = {
         localStorage.removeItem('phishowNotes');
     },
 
+    // Export all data (local only)
     exportData() {
         return {
             ratings: this.getAllRatings(),
@@ -174,6 +179,7 @@ const storage = {
         };
     },
 
+    // Import data (local only)
     importData(data) {
         if (data.ratings) localStorage.setItem('phishowRatings', JSON.stringify(data.ratings));
         if (data.showRatings) localStorage.setItem('phishowShowRatings', JSON.stringify(data.showRatings));
