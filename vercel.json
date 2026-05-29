@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/styles.css",
+      "dest": "public/styles.css"
+    },
+    {
+      "src": "/app.js",
+      "dest": "public/app.js"
+    },
+    {
+      "src": "/auth.js",
+      "dest": "public/auth.js"
+    },
+    {
+      "src": "/ui.js",
+      "dest": "public/ui.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "public/index.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PHISH_NET_API_KEY": "@phish_net_api_key",
+    "JWT_SECRET": "@jwt_secret"
+  }
+}
