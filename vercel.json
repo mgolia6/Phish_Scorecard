@@ -1,4 +1,6 @@
 {
   "version": 2,
-  "public": true
+  "public": true,
+  "buildCommand": "echo 'Static build complete'",
+  "outputDirectory": "public"
 }
