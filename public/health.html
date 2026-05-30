@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishow Scorecard - Health Check</title>
+    <style>
+        body {
+            background: #000;
+            color: #33ff33;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #33ff33;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff6600;
+            margin-top: 0;
+        }
+        .test {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #33ff33;
+        }
+        .success {
+            color: #33ff33;
+        }
+        .error {
+            color: #ff3333;
+        }
+        .pending {
+            color: #ffff00;
+        }
+        button {
+            background: #33ff33;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00ff00;
+        }
+        pre {
+            background: #111;
+            padding: 10px;
+            overflow-x: auto;
+            border: 1px solid #33ff33;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phishow Scorecard - Health Check</h1>
+        <p>Testing API connectivity and functionality</p>
+
+        <div class="test">
+            <h3>API Health</h3>
+            <button onclick="testAPI()">Test API Connection</button>
+            <div id="api-result"></div>
+        </div>
+
+        <div class="test">
+            <h3>Shows Endpoint</h3>
+            <button onclick="testShows()">Test /api/shows</button>
+            <div id="shows-result"></div>
+        </div>
+
+        <div class="test">
+            <h3>Auth Endpoint</h3>
+            <button onclick="testAuth()">Test /api/auth/me</button>
+            <div id="auth-result"></div>
+        </div>
+
+        <div class="test">
+            <h3>Search Endpoint</h3>
+            <button onclick="testSearch()">Test /api/shows/search</button>
+            <div id="search-result"></div>
+        </div>
+
+        <div class="test">
+            <h3>Clear Logs</h3>
+            <button onclick="clearLogs()">Clear All Results</button>
+        </div>
+
+        <div class="test">
+            <h3>Logs</h3>
+            <pre id="logs"></pre>
+        </div>
+    </div>
+
+    <script>
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            updateLogs();
+            console.log(logEntry);
+        }
+
+        function updateLogs() {
+            document.getElementById('logs').textContent = logs.join('\n');
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateLogs();
+            document.getElementById('api-result').innerHTML = '';
+            document.getElementById('shows-result').innerHTML = '';
+            document.getElementById('auth-result').innerHTML = '';
+            document.getElementById('search-result').innerHTML = '';
+        }
+
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<span class="pending">Testing...</span>';
+            log('Testing API connection...');
+
+            try {
+                const response = await fetch('/api/shows', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                log(`API Response Status: ${response.status}`);
+
+                if (response.ok) {
+                    resultDiv.innerHTML = '<span class="success">✓ API is responding</span>';
+                    log('API connection successful');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">✗ API returned status ${response.status}</span>`;
+                    log(`API error: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ ${error.message}</span>`;
+                log(`API error: ${error.message}`);
+            }
+        }
+
+        async function testShows() {
+            const resultDiv = document.getElementById('shows-result');
+            resultDiv.innerHTML = '<span class="pending">Loading shows...</span>';
+            log('Fetching shows...');
+
+            try {
+                const response = await fetch('/api/shows');
+                log(`Shows response status: ${response.status}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const count = Array.isArray(data) ? data.length : 0;
+                resultDiv.innerHTML = `<span class="success">✓ Loaded ${count} shows</span>`;
+                log(`Successfully loaded ${count} shows`);
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ ${error.message}</span>`;
+                log(`Shows error: ${error.message}`);
+            }
+        }
+
+        async function testAuth() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.innerHTML = '<span class="pending">Testing...</span>';
+            log('Testing auth endpoint...');
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': 'Bearer test' }
+                });
+
+                log(`Auth response status: ${response.status}`);
+
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '<span class="success">✓ Auth endpoint working (401 expected without token)</span>';
+                    log('Auth endpoint is working correctly');
+                } else if (response.ok) {
+                    resultDiv.innerHTML = '<span class="success">✓ Auth endpoint working</span>';
+                    log('Auth endpoint is working');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">✗ Unexpected status ${response.status}</span>`;
+                    log(`Unexpected auth status: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ ${error.message}</span>`;
+                log(`Auth error: ${error.message}`);
+            }
+        }
+
+        async function testSearch() {
+            const resultDiv = document.getElementById('search-result');
+            resultDiv.innerHTML = '<span class="pending">Searching...</span>';
+            log('Testing search endpoint...');
+
+            try {
+                const response = await fetch('/api/shows/search?q=2024');
+                log(`Search response status: ${response.status}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const count = Array.isArray(data) ? data.length : 0;
+                resultDiv.innerHTML = `<span class="success">✓ Search returned ${count} results</span>`;
+                log(`Search found ${count} results`);
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">✗ ${error.message}</span>`;
+                log(`Search error: ${error.message}`);
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('Health check page loaded');
+            testAPI();
+        });
+    </script>
+</body>
+</html>
