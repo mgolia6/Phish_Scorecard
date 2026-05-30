@@ -16,26 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
 // Initialize application
 async function initializeApp() {
   try {
-    // Load all shows from Phish.net API
-    await loadAllShows();
-    
-    // Setup event listeners
+    // Setup event listeners first
     setupEventListeners();
+    
+    // Try to load all shows from Phish.net API
+    // This is optional - app works without it
+    try {
+      await loadAllShows();
+    } catch (error) {
+      console.warn('Could not load shows on startup:', error);
+      // App will still work - shows will load when user searches
+    }
   } catch (error) {
     console.error('Initialization error:', error);
-    showError('Failed to initialize app. Please refresh the page.');
+    // Don't show error - app is still functional
   }
 }
 
 // Load all shows from API
 async function loadAllShows() {
   try {
+    console.log('Fetching shows from API...');
     const shows = await apiCall('/api/shows');
+    if (!shows || !Array.isArray(shows)) {
+      throw new Error('Invalid shows data received');
+    }
     allShows = shows.sort((a, b) => new Date(b.showdate) - new Date(a.showdate));
     console.log(`Loaded ${allShows.length} shows`);
+    return shows;
   } catch (error) {
     console.error('Error loading shows:', error);
-    throw error;
+    // Return empty array instead of throwing - app will work with search
+    allShows = [];
+    return [];
   }
 }
 
@@ -122,9 +135,10 @@ async function performSearch(query) {
   const searchResults = document.getElementById('search-results');
 
   try {
+    console.log('Searching for:', query);
     const results = await apiCall(`/api/shows/search?q=${encodeURIComponent(query)}`);
     
-    if (results.length === 0) {
+    if (!results || results.length === 0) {
       searchResults.innerHTML = '<div class="search-result">No shows found</div>';
       return;
     }
@@ -137,7 +151,7 @@ async function performSearch(query) {
     `).join('');
   } catch (error) {
     console.error('Search error:', error);
-    searchResults.innerHTML = '<div class="search-result error">Search error</div>';
+    searchResults.innerHTML = '<div class="search-result">Search temporarily unavailable. Try again.</div>';
   }
 }
 
