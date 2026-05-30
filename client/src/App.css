@@ -1,0 +1,155 @@
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-right span {
+  color: var(--text-secondary);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border: 2px solid var(--border);
+}
+
+.modal {
+  background: var(--bg-light);
+  border: 3px solid var(--border);
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 0 30px var(--border);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 2em;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal h2 {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.modal p {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.modal p button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  padding: 0;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.modal p button:hover {
+  color: var(--text-accent);
+}
+
+/* Messages */
+.messages {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  max-width: 400px;
+}
+
+.message {
+  margin-bottom: 10px;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-bottom: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+
+.tab-btn:hover {
+  background: var(--bg-light);
+}
+
+.tab-btn.active {
+  background: var(--text-primary);
+  color: var(--bg-dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .messages {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+
+  .modal {
+    max-width: 90%;
+  }
+}

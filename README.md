@@ -17,17 +17,25 @@ A retro-modern web application for rating Phish shows, tracking concert statisti
 
 ## Tech Stack
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: Node.js, Express.js
-- **Database**: SQLite3
-- **Authentication**: JWT (JSON Web Tokens)
-- **External API**: Phish.net API v5
+**Backend:**
+- Node.js + Express
+- PostgreSQL database
+- JWT authentication
+- Phish.net API integration
+- Caching with node-cache
+
+**Frontend:**
+- React 18
+- Vite
+- Axios
+- CSS3 with terminal styling
 
 ## Installation
 
 ### Prerequisites
-- Node.js 14+ and npm
-- Git
+- Node.js 16+
+- PostgreSQL 12+
+- npm or yarn
 
 ### Setup
 
@@ -42,14 +50,18 @@ A retro-modern web application for rating Phish shows, tracking concert statisti
    npm install
    ```
 
-3. **Configure environment variables**
+3. **Set up database**
+   ```bash
+   psql -U postgres -d phish_scorecard -f init-db.sql
+   ```
+
+4. **Configure environment variables**
    Create a `.env` file in the root directory:
    ```
-   PORT=3000
+   DATABASE_URL=postgresql://user:password@localhost/phish_scorecard
+   JWT_SECRET=your-secret-key-here
+   PORT=5000
    NODE_ENV=development
-   JWT_SECRET=your_secret_key_here
-   PHISH_NET_API_KEY=10645D7F59011FFA82A
-   DATABASE_PATH=./phish_scorecard.db
    ```
 
 4. **Start the server**

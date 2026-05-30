@@ -1,15 +1,28 @@
 {
-  "name": "phish_scorecard",
-  "version": "1.0.0",
-  "description": "Score card for rating Phish shows",
+  "name": "phish-scorecard",
+  "version": "2.0.0",
+  "description": "Full-featured Phish show rating application",
+  "type": "module",
+  "main": "server.js",
   "scripts": {
-    "build": "echo 'Static build complete'"
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server.js",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server.js",
+    "setup": "npm install && cd client && npm install"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mgolia6/Phish_Scorecard.git"
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "pg": "^8.11.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.1.2",
+    "axios": "^1.6.2",
+    "node-cache": "^5.1.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
