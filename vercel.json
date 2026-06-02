@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    { "source": "/api/auth/register", "destination": "/api/auth/register" },
+    { "source": "/api/auth/login", "destination": "/api/auth/login" },
+    { "source": "/api/auth/me", "destination": "/api/auth/me" },
+    { "source": "/api/shows", "destination": "/api/shows/index" },
+    { "source": "/api/shows/:date", "destination": "/api/shows/[date]" },
+    { "source": "/api/ratings/:showDate", "destination": "/api/ratings/[showDate]" },
+    { "source": "/api/user/shows", "destination": "/api/user/shows" },
+    { "source": "/api/analytics/songs", "destination": "/api/analytics/songs" },
+    { "source": "/api/analytics/venues", "destination": "/api/analytics/venues" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
