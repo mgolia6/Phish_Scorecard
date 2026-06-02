@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './index.css';
 
 const API = '/api';
+const PNET = 'https://phish.net';
+const PHISHTRACKS = 'https://phishtracks.com';
 
 function useApi() {
   const getToken = () => localStorage.getItem('phish_token');
-
   const request = useCallback(async (method, path, body = null) => {
     const opts = {
       method,
@@ -20,19 +21,44 @@ function useApi() {
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data;
   }, []);
-
-  return {
-    get: (path) => request('GET', path),
-    post: (path, body) => request('POST', path, body),
-  };
+  return { get: p => request('GET', p), post: (p, b) => request('POST', p, b) };
 }
 
-function Message({ messages }) {
+function formatDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+}
+
+function StarRating({ value, onChange }) {
+  const [hover, setHover] = useState(0);
   return (
-    <div className="messages-container">
-      {messages.map(m => (
-        <div key={m.id} className={`message ${m.type}`}>{m.text}</div>
+    <div className="star-rating">
+      {[1,2,3,4,5].map(n => (
+        <span
+          key={n}
+          className={`star ${n <= (hover || value) ? 'active' : ''}`}
+          onClick={() => onChange(n === value ? 0 : n)}
+          onMouseEnter={() => setHover(n)}
+          onMouseLeave={() => setHover(0)}
+        >★</span>
       ))}
+    </div>
+  );
+}
+
+function SetScore({ label, songs, ratings }) {
+  const rated = songs.filter(s => ratings[s.song]?.rating);
+  if (!rated.length) return null;
+  const avg = rated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / rated.length;
+  const pct = (avg / 5) * 100;
+  return (
+    <div className="set-score">
+      <span className="set-score-label">{label}</span>
+      <div className="set-score-bar"><div className="set-score-fill" style={{ width: `${pct}%` }} /></div>
+      <span className="set-score-val">{avg.toFixed(2)}</span>
+      <span className="set-score-count">({rated.length})</span>
     </div>
   );
 }
@@ -45,72 +71,44 @@ function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true); setError('');
+    e.preventDefault(); setLoading(true); setError('');
     try {
       const data = await api.post('/auth/login', loginForm);
       localStorage.setItem('phish_token', data.token);
       onSuccess(data.user);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
   const handleSignup = async (e) => {
-    e.preventDefault();
-    setLoading(true); setError('');
+    e.preventDefault(); setLoading(true); setError('');
     try {
       const data = await api.post('/auth/register', signupForm);
       localStorage.setItem('phish_token', data.token);
       onSuccess(data.user);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
-        <button className="modal-close" onClick={onClose}>✕</button>
-        <div className="modal-title">{mode === 'login' ? 'System Access' : 'Create Account'}</div>
-
+        <button className="modal-close" onClick={onClose}>X</button>
+        <div className="modal-title">{mode === 'login' ? 'SYSTEM ACCESS' : 'CREATE ACCOUNT'}</div>
         {error && <div className="message error" style={{ marginBottom: 16 }}>{error}</div>}
-
         {mode === 'login' ? (
           <form onSubmit={handleLogin}>
-            <input type="email" placeholder="EMAIL" value={loginForm.email}
-              onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} required />
-            <input type="password" placeholder="PASSWORD" value={loginForm.password}
-              onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} required />
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'AUTHENTICATING...' : 'LOGIN'}
-            </button>
-            <div className="modal-switch">
-              No account? <button type="button" onClick={() => setMode('signup')}>Register</button>
-            </div>
+            <input type="email" placeholder="EMAIL" value={loginForm.email} onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} required />
+            <input type="password" placeholder="PASSWORD" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} required />
+            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'AUTHENTICATING...' : 'LOGIN'}</button>
+            <div className="modal-switch">No account? <button type="button" onClick={() => setMode('signup')}>Register</button></div>
           </form>
         ) : (
           <form onSubmit={handleSignup}>
-            <input type="text" placeholder="USERNAME" value={signupForm.username}
-              onChange={e => setSignupForm({ ...signupForm, username: e.target.value })} required />
-            <input type="email" placeholder="EMAIL" value={signupForm.email}
-              onChange={e => setSignupForm({ ...signupForm, email: e.target.value })} required />
-            <input type="password" placeholder="PASSWORD" value={signupForm.password}
-              onChange={e => setSignupForm({ ...signupForm, password: e.target.value })} required />
-            <input type="text" placeholder="FIRST NAME (optional)" value={signupForm.firstName}
-              onChange={e => setSignupForm({ ...signupForm, firstName: e.target.value })} />
-            <input type="text" placeholder="LAST NAME (optional)" value={signupForm.lastName}
-              onChange={e => setSignupForm({ ...signupForm, lastName: e.target.value })} />
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'CREATING...' : 'CREATE ACCOUNT'}
-            </button>
-            <div className="modal-switch">
-              Have an account? <button type="button" onClick={() => setMode('login')}>Login</button>
-            </div>
+            <input type="text" placeholder="USERNAME" value={signupForm.username} onChange={e => setSignupForm({ ...signupForm, username: e.target.value })} required />
+            <input type="email" placeholder="EMAIL" value={signupForm.email} onChange={e => setSignupForm({ ...signupForm, email: e.target.value })} required />
+            <input type="password" placeholder="PASSWORD" value={signupForm.password} onChange={e => setSignupForm({ ...signupForm, password: e.target.value })} required />
+            <input type="text" placeholder="FIRST NAME (optional)" value={signupForm.firstName} onChange={e => setSignupForm({ ...signupForm, firstName: e.target.value })} />
+            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'CREATING...' : 'CREATE ACCOUNT'}</button>
+            <div className="modal-switch">Have an account? <button type="button" onClick={() => setMode('login')}>Login</button></div>
           </form>
         )}
       </div>
@@ -127,97 +125,61 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
   const [ratings, setRatings] = useState({});
   const [loadingShow, setLoadingShow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [existingRatings, setExistingRatings] = useState({});
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const isAuthed = !!localStorage.getItem('phish_token');
 
+  useEffect(() => { api.get('/shows').then(setResults).catch(() => {}); }, []);
+
   const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    setSearching(true);
+    e.preventDefault(); setSearching(true);
     try {
-      const data = await api.get(`/shows?q=${encodeURIComponent(query)}`);
+      const data = await api.get(`/shows${query.trim() ? `?q=${encodeURIComponent(query)}` : ''}`);
       setResults(data);
-      if (data.length === 0) showMessage('No shows found', 'info');
-    } catch (err) {
-      showMessage(err.message, 'error');
-    } finally {
-      setSearching(false);
-    }
+      if (query.trim() && !data.length) showMessage('No shows found', 'info');
+    } catch (err) { showMessage(err.message, 'error'); }
+    finally { setSearching(false); }
   };
 
   const selectShow = async (show) => {
     if (!isAuthed) { onAuthRequired(); return; }
-    setLoadingShow(true);
-    setCurrentShow(show);
-    setSongs([]);
-    setRatings({});
-    setExistingRatings({});
+    setLoadingShow(true); setCurrentShow(show); setSongs([]); setRatings({});
     try {
       const [showData, savedRatings] = await Promise.all([
         api.get(`/shows/${show.showdate}`),
         api.get(`/ratings/${show.showdate}`).catch(() => []),
       ]);
       setSongs(showData.songs || []);
-
-      // Load existing ratings into state
+      setCurrentShow(showData);
       const rMap = {};
-      const existMap = {};
-      for (const r of savedRatings) {
-        rMap[r.song_name] = { rating: r.rating, notes: r.notes };
-        existMap[r.song_name] = true;
-      }
+      for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
       setRatings(rMap);
-      setExistingRatings(existMap);
-    } catch (err) {
-      showMessage('Failed to load show', 'error');
-      setCurrentShow(null);
-    } finally {
-      setLoadingShow(false);
-    }
+    } catch (err) { showMessage('Failed to load show', 'error'); setCurrentShow(null); }
+    finally { setLoadingShow(false); }
   };
 
-  const updateRating = (songName, field, value) => {
-    setRatings(prev => ({
-      ...prev,
-      [songName]: { ...prev[songName], [field]: value }
-    }));
-  };
+  const updateRating = (songName, field, value) =>
+    setRatings(prev => ({ ...prev, [songName]: { ...prev[songName], [field]: value } }));
 
   const submitRatings = async () => {
     setSubmitting(true);
     try {
-      const ratingsList = songs
-        .filter(s => ratings[s.song]?.rating)
-        .map(s => ({
-          song: s.song,
-          set: s.set,
-          rating: parseInt(ratings[s.song].rating),
-          notes: ratings[s.song]?.notes || '',
-        }));
-
-      if (ratingsList.length === 0) {
-        showMessage('Rate at least one song first', 'info');
-        return;
-      }
-
+      const ratingsList = songs.filter(s => ratings[s.song]?.rating).map(s => ({
+        song: s.song, set: s.set,
+        rating: parseInt(ratings[s.song].rating),
+        notes: ratings[s.song]?.notes || '',
+      }));
+      if (!ratingsList.length) { showMessage('Rate at least one song', 'info'); return; }
       await api.post(`/ratings/${currentShow.showdate}`, {
         ratings: ratingsList,
-        showDetails: {
-          venue: currentShow.venue,
-          city: currentShow.city,
-          state: currentShow.state,
-          country: currentShow.country,
-        },
+        showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
+      if (phishnetHandle.trim()) localStorage.setItem('pnet_handle', phishnetHandle.trim());
       showMessage(`Saved ${ratingsList.length} ratings`, 'success');
-    } catch (err) {
-      showMessage(err.message, 'error');
-    } finally {
-      setSubmitting(false);
-    }
+    } catch (err) { showMessage(err.message, 'error'); }
+    finally { setSubmitting(false); }
   };
 
-  // Group songs by set
   const sets = songs.reduce((acc, song) => {
     const key = song.set || '1';
     if (!acc[key]) acc[key] = [];
@@ -225,89 +187,147 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
     return acc;
   }, {});
 
-  const setLabel = (key) => {
-    if (key === 'e' || key === 'E') return 'ENCORE';
-    if (key === 'e2') return 'ENCORE 2';
-    return `SET ${key}`;
+  const setLabel = k => {
+    if (k === 'e' || k === 'E') return 'ENCORE';
+    if (k === 'e2') return 'ENCORE 2';
+    if (k === 'S' || k === 's') return 'SOUNDCHECK';
+    return `SET ${k}`;
   };
+
+  const totalRated = songs.filter(s => ratings[s.song]?.rating);
+  const overallAvg = totalRated.length
+    ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / totalRated.length).toFixed(2)
+    : null;
 
   return (
     <div>
-      <div className="panel">
-        <div className="panel-title">▸ Search Shows</div>
-        <form className="search-bar" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Date (YYYY-MM-DD), venue, or city..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          <button type="submit" disabled={searching}>
-            {searching ? 'SCANNING...' : 'SEARCH'}
-          </button>
-        </form>
-
-        {results.length > 0 && (
-          <div className="results-list">
-            {results.map(show => (
-              <div key={show.showid || show.showdate} className="result-item" onClick={() => selectShow(show)}>
-                <span className="result-date">{show.showdate}</span>
-                <span className="result-venue">{show.venue}</span>
-                <span className="result-location">{show.city}{show.state ? `, ${show.state}` : ''}</span>
+      {/* Instructions */}
+      <div className="instructions-panel">
+        <button className="instructions-toggle" onClick={() => setShowInstructions(!showInstructions)}>
+          <span>HOW TO USE PHISHOW SCORECARD</span>
+          <span className="toggle-arrow">{showInstructions ? '▲ COLLAPSE' : '▼ EXPAND'}</span>
+        </button>
+        {showInstructions && (
+          <div className="instructions-body">
+            <div className="instructions-grid">
+              <div>
+                <div className="instr-step"><span className="instr-num">01</span><span>Search for any Phish show by date, venue, or city. Recent shows load by default.</span></div>
+                <div className="instr-step"><span className="instr-num">02</span><span>Click a show to load the full setlist live from Phish.net.</span></div>
+                <div className="instr-step"><span className="instr-num">03</span><span>Rate each song 1-5 stars. Jam chart songs are marked with a star badge.</span></div>
               </div>
-            ))}
+              <div>
+                <div className="instr-step"><span className="instr-num">04</span><span>Add notes per song. Segues shown between songs (soft: greater-than, hard: arrow).</span></div>
+                <div className="instr-step"><span className="instr-num">05</span><span>Click any song name to open its Phish.net history page in a new tab.</span></div>
+                <div className="instr-step"><span className="instr-num">06</span><span>Stream audio on PhishTracks, read community reviews, and track your show history.</span></div>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
-      {loadingShow && <div className="loading">LOADING SETLIST...</div>}
+      {/* Search */}
+      <div className="panel">
+        <div className="panel-title">SEARCH SHOWS</div>
+        <form className="search-bar" onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Date (YYYY-MM-DD), venue, city, or tour... browse recent shows below"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          <button type="submit" disabled={searching}>{searching ? 'SCANNING...' : 'SEARCH'}</button>
+        </form>
+        {results.length > 0 && (
+          <>
+            <div className="results-header">{query.trim() ? `${results.length} results` : 'Recent shows'}</div>
+            <div className="results-list">
+              {results.map(show => (
+                <div key={show.showid || show.showdate} className="result-item" onClick={() => selectShow(show)}>
+                  <span className="result-date">{show.showdate}</span>
+                  <span className="result-venue">{show.venue}</span>
+                  <span className="result-meta">
+                    <span className="result-location">{show.city}{show.state ? `, ${show.state}` : ''}</span>
+                    {show.tour_name && <span className="result-tour">{show.tour_name}</span>}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {loadingShow && <div className="loading">LOADING SETLIST FROM PHISH.NET...</div>}
 
       {currentShow && !loadingShow && (
         <div className="panel">
-          <div className="show-header">
-            <div className="show-header-field">
-              <label>Date</label>
-              <span>{currentShow.showdate}</span>
+          {/* Show Masthead */}
+          <div className="show-masthead">
+            <div className="show-masthead-main">
+              <div className="show-date-display">{formatDate(currentShow.showdate)}</div>
+              <div className="show-venue-display">{currentShow.venue}</div>
+              <div className="show-location-display">
+                {currentShow.city}{currentShow.state ? `, ${currentShow.state}` : ''}{currentShow.country && currentShow.country !== 'USA' ? `, ${currentShow.country}` : ''}
+              </div>
+              {currentShow.tour_name && <div className="show-tour">◈ {currentShow.tour_name}</div>}
             </div>
-            <div className="show-header-field">
-              <label>Venue</label>
-              <span>{currentShow.venue}</span>
-            </div>
-            <div className="show-header-field">
-              <label>City</label>
-              <span>{currentShow.city}{currentShow.state ? `, ${currentShow.state}` : ''}</span>
-            </div>
-            <div className="show-header-field">
-              <label>Country</label>
-              <span>{currentShow.country}</span>
+            <div className="show-masthead-links">
+              <a href={`${PNET}/setlists/${currentShow.permalink || ''}`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
+                PHISH.NET SETLIST
+              </a>
+              <a href={`${PHISHTRACKS}/shows/${currentShow.showdate}`} target="_blank" rel="noopener noreferrer" className="show-link audio-link">
+                STREAM AUDIO
+              </a>
+              {currentShow.reviews?.count > 0 && (
+                <a href={`${PNET}/setlists/${currentShow.permalink}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link reviews-link">
+                  {currentShow.reviews.count} REVIEWS {currentShow.reviews.avg_score ? `(${currentShow.reviews.avg_score}/5)` : ''}
+                </a>
+              )}
             </div>
           </div>
 
+          {currentShow.soundcheck && (
+            <div className="soundcheck-bar">
+              <span className="soundcheck-label">SOUNDCHECK:</span> {currentShow.soundcheck}
+            </div>
+          )}
+
+          {currentShow.setlist_notes && (
+            <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />
+          )}
+
           {songs.length > 0 ? (
             <>
-              <div className="panel-title">▸ Setlist & Ratings</div>
+              <div className="panel-title" style={{ marginTop: 24 }}>SETLIST & RATINGS</div>
               <div className="setlist-container">
                 {Object.entries(sets).map(([setKey, setSongs]) => (
-                  <div key={setKey}>
-                    <div className="set-label">{setLabel(setKey)}</div>
+                  <div key={setKey} className="set-block">
+                    <div className="set-header-row">
+                      <span className="set-label">{setLabel(setKey)}</span>
+                      <span className="set-song-count">{setSongs.length} songs</span>
+                    </div>
                     {setSongs.map((song, idx) => (
-                      <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''}`}>
-                        <span className={`song-name ${song.isjam ? 'jam-chart' : ''}`}>
-                          {song.song}
-                          {song.transition === '>' ? <span style={{ color: 'var(--orange)', marginLeft: 4 }}>{'>'}</span> : null}
+                      <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
+                        <span className="song-pos">{song.position || idx + 1}</span>
+                        <div className="song-info">
+                          <a
+                            href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
+                            onClick={e => e.stopPropagation()}
+                          >{song.song}</a>
+                          {song.isjam && <span className="badge jam-badge">JAM</span>}
+                          {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
+                          {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
+                        </div>
+                        <span className="song-transition">
+                          {song.transition === '>' ? <span className="segue-soft">&gt;</span>
+                            : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
+                            : null}
                         </span>
-                        <select
-                          className="rating-select"
-                          value={ratings[song.song]?.rating || ''}
-                          onChange={e => updateRating(song.song, 'rating', e.target.value)}
-                        >
-                          <option value="">—</option>
-                          <option value="5">5 ★★★★★</option>
-                          <option value="4">4 ★★★★</option>
-                          <option value="3">3 ★★★</option>
-                          <option value="2">2 ★★</option>
-                          <option value="1">1 ★</option>
-                        </select>
+                        <StarRating
+                          value={parseInt(ratings[song.song]?.rating) || 0}
+                          onChange={val => updateRating(song.song, 'rating', val)}
+                        />
                         <input
                           className="notes-input"
                           type="text"
@@ -320,17 +340,68 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
                   </div>
                 ))}
               </div>
-              <div className="submit-row">
-                <button className="btn-primary" onClick={submitRatings} disabled={submitting}>
+
+              {/* Score Summary */}
+              <div className="score-summary">
+                <div className="panel-title">SHOW SCORE</div>
+                {Object.entries(sets).filter(([k]) => k !== 'S' && k !== 's').map(([setKey, setSongs]) => (
+                  <SetScore key={setKey} label={setLabel(setKey)} songs={setSongs} ratings={ratings} />
+                ))}
+                {overallAvg && (
+                  <div className="overall-score">
+                    <span className="overall-label">OVERALL</span>
+                    <span className="overall-val">{overallAvg}</span>
+                    <span className="overall-stars">{'★'.repeat(Math.round(parseFloat(overallAvg)))}{'☆'.repeat(5 - Math.round(parseFloat(overallAvg)))}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Submit + Phish.net handle */}
+              <div className="submit-section">
+                <div className="pnet-handle-row">
+                  <span className="pnet-handle-label">PHISH.NET HANDLE:</span>
+                  <input
+                    type="text" className="pnet-handle-input" placeholder="username (optional)"
+                    value={phishnetHandle} onChange={e => setPhishnetHandle(e.target.value)}
+                  />
+                  {phishnetHandle && (
+                    <a href={`${PNET}/users/${phishnetHandle}`} target="_blank" rel="noopener noreferrer" className="pnet-profile-link">VIEW PROFILE</a>
+                  )}
+                </div>
+                <button className="btn-primary btn-submit" onClick={submitRatings} disabled={submitting}>
                   {submitting ? 'SAVING...' : 'SAVE RATINGS'}
                 </button>
               </div>
+
+              {/* Community Reviews */}
+              {currentShow.reviews?.items?.length > 0 && (
+                <div className="reviews-section">
+                  <div className="panel-title">PHISH.NET COMMUNITY REVIEWS</div>
+                  {currentShow.reviews.items.map((rev, i) => (
+                    <div key={i} className="review-item">
+                      <div className="review-header">
+                        <span className="review-author">{rev.author}</span>
+                        {rev.score && <span className="review-score">{rev.score}/5</span>}
+                        <span className="review-date">{rev.posted}</span>
+                      </div>
+                      <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review?.substring(0, 300) + (rev.review?.length > 300 ? '...' : '') }} />
+                    </div>
+                  ))}
+                  <a href={`${PNET}/setlists/${currentShow.permalink}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
+                    ALL {currentShow.reviews.count} REVIEWS ON PHISH.NET
+                  </a>
+                </div>
+              )}
             </>
           ) : (
             <div className="empty-state">NO SETLIST DATA AVAILABLE</div>
           )}
         </div>
       )}
+
+      <div className="pnet-attribution">
+        Setlist data by <a href="https://phish.net" target="_blank" rel="noopener noreferrer">Phish.net</a> — a project of the <a href="https://mbird.org" target="_blank" rel="noopener noreferrer">Mockingbird Foundation</a>
+      </div>
     </div>
   );
 }
@@ -340,34 +411,29 @@ function MyShowsTab({ api, showMessage }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/user/shows')
-      .then(setShows)
-      .catch(err => showMessage(err.message, 'error'))
-      .finally(() => setLoading(false));
+    api.get('/user/shows').then(setShows).catch(err => showMessage(err.message, 'error')).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="loading">LOADING YOUR SHOWS...</div>;
-
   return (
     <div className="panel">
-      <div className="panel-title">▸ My Rated Shows ({shows.length})</div>
-      {shows.length === 0 ? (
-        <div className="empty-state">NO RATED SHOWS YET — GO RATE A SHOW</div>
-      ) : (
-        shows.map(show => (
-          <div key={show.show_date} className="show-card">
-            <div className="show-card-date">{show.show_date}</div>
-            <div className="show-card-venue">
-              {show.venue}
-              <small>{show.city}{show.state ? `, ${show.state}` : ''}</small>
-            </div>
-            <div className="show-card-rating">
-              <div className="rating-value">{show.overall_rating ?? '—'}</div>
-              <div className="rating-label">{show.rated_count} songs rated</div>
-            </div>
+      <div className="panel-title">MY RATED SHOWS ({shows.length})</div>
+      {!shows.length ? <div className="empty-state">NO RATED SHOWS YET</div> : shows.map(show => (
+        <div key={show.show_date} className="show-card">
+          <div className="show-card-date"><div className="show-card-datestr">{formatDate(show.show_date)}</div></div>
+          <div className="show-card-info">
+            <div className="show-card-venue">{show.venue}</div>
+            <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
           </div>
-        ))
-      )}
+          <div className="show-card-links">
+            <a href={`${PHISHTRACKS}/shows/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">AUDIO</a>
+          </div>
+          <div className="show-card-rating">
+            <div className="rating-value">{show.overall_rating ?? '-'}</div>
+            <div className="rating-label">{show.rated_count} rated</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -378,43 +444,36 @@ function AnalyticsTab({ api, showMessage }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/analytics/songs'),
-      api.get('/analytics/venues'),
-    ]).then(([s, v]) => {
-      setSongs(s);
-      setVenues(v);
-    }).catch(err => showMessage(err.message, 'error'))
+    Promise.all([api.get('/analytics/songs'), api.get('/analytics/venues')])
+      .then(([s, v]) => { setSongs(s); setVenues(v); })
+      .catch(err => showMessage(err.message, 'error'))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="loading">CRUNCHING NUMBERS...</div>;
-
   return (
     <div className="analytics-grid">
       <div className="panel">
-        <div className="panel-title">▸ Top Rated Songs</div>
-        {songs.length === 0 ? (
-          <div className="empty-state">NO DATA YET</div>
-        ) : songs.slice(0, 20).map((s, i) => (
+        <div className="panel-title">TOP RATED SONGS</div>
+        {!songs.length ? <div className="empty-state">NO DATA YET</div> : songs.slice(0, 20).map((s, i) => (
           <div key={s.song_name} className="stat-row">
-            <span className="stat-rank">#{i + 1}</span>
-            <span className="stat-name">{s.song_name}</span>
+            <span className="stat-rank">#{i+1}</span>
+            <a href={`https://phish.net/song/${s.song_name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`} target="_blank" rel="noopener noreferrer" className="stat-name-link">{s.song_name}</a>
             <span className="stat-score">{s.average_rating}</span>
             <span className="stat-count">({s.total_ratings})</span>
           </div>
         ))}
       </div>
       <div className="panel">
-        <div className="panel-title">▸ Top Venues</div>
-        {venues.length === 0 ? (
-          <div className="empty-state">NO DATA YET</div>
-        ) : venues.slice(0, 20).map((v, i) => (
+        <div className="panel-title">TOP VENUES</div>
+        {!venues.length ? <div className="empty-state">NO DATA YET</div> : venues.slice(0, 20).map((v, i) => (
           <div key={`${v.venue}-${i}`} className="stat-row">
-            <span className="stat-rank">#{i + 1}</span>
-            <span className="stat-name">{v.venue}<br /><small style={{ color: 'rgba(51,255,51,0.4)', fontSize: '0.7rem' }}>{v.city}{v.state ? `, ${v.state}` : ''}</small></span>
+            <span className="stat-rank">#{i+1}</span>
+            <div className="stat-name">
+              <div>{v.venue}</div>
+              <div style={{ color: 'rgba(51,255,51,0.4)', fontSize: '0.7rem' }}>{v.city}{v.state ? `, ${v.state}` : ''} · {v.total_shows} shows</div>
+            </div>
             <span className="stat-score">{v.average_rating}</span>
-            <span className="stat-count">({v.total_shows} shows)</span>
           </div>
         ))}
       </div>
@@ -436,108 +495,57 @@ export default function App() {
     setTimeout(() => setMessages(prev => prev.filter(m => m.id !== id)), 4000);
   }, []);
 
-  // Restore session on load
   useEffect(() => {
     const token = localStorage.getItem('phish_token');
     if (!token) return;
-    api.get('/auth/me').then(setUser).catch(() => {
-      localStorage.removeItem('phish_token');
-    });
+    api.get('/auth/me').then(setUser).catch(() => localStorage.removeItem('phish_token'));
   }, []);
 
-  const handleAuthSuccess = (userData) => {
-    setUser(userData);
-    setShowAuth(false);
-    showMessage(`Welcome, ${userData.username}`, 'success');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('phish_token');
-    setUser(null);
-    setTab('scorecard');
-    showMessage('Logged out', 'info');
-  };
-
-  const openAuth = (mode = 'login') => {
-    setAuthMode(mode);
-    setShowAuth(true);
-  };
+  const handleAuthSuccess = u => { setUser(u); setShowAuth(false); showMessage(`Welcome, ${u.username}`, 'success'); };
+  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
+  const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   return (
     <div className="app">
-      <Message messages={messages} />
+      <div className="messages-container">
+        {messages.map(m => <div key={m.id} className={`message ${m.type}`}>{m.text}</div>)}
+      </div>
 
-      {/* Marquee */}
       <div className="marquee-bar">
         <span className="marquee-track">
-          ◈ DON'T SUCK AT PHISH ◈ RATE EVERY SONG ◈ TRACK YOUR SHOWS ◈ PHISHOW SCORECARD ◈ DON'T SUCK AT PHISH ◈ RATE EVERY SONG ◈ TRACK YOUR SHOWS ◈ PHISHOW SCORECARD ◈ DON'T SUCK AT PHISH ◈ RATE EVERY SONG ◈
+          DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
         </span>
       </div>
 
-      {/* Header */}
       <header className="app-header">
         <div className="header-title">
           <h1>Phishow Scorecard</h1>
           <span className="tagline">Rate. Track. Relive.</span>
         </div>
-
-        <div className="header-status">
-          <div className="status-dot" />
-          ONLINE
-        </div>
-
+        <div className="header-status"><div className="status-dot" />ONLINE</div>
         <div className="header-auth">
           {user ? (
-            <>
-              <span className="user-badge">◈ {user.username}</span>
-              <button className="btn-danger" onClick={handleLogout}>LOGOUT</button>
-            </>
+            <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
           ) : (
-            <>
-              <button onClick={() => openAuth('login')}>LOGIN</button>
-              <button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button>
-            </>
+            <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
           )}
         </div>
       </header>
 
-      {/* Tab Nav */}
       <div className="container">
         <nav className="tab-nav">
-          <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>
-            ▸ Scorecard
-          </button>
-          {user && (
-            <>
-              <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>
-                ▸ My Shows
-              </button>
-              <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>
-                ▸ Analytics
-              </button>
-            </>
-          )}
+          <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
+          {user && <>
+            <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
+            <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
+          </>}
         </nav>
-
-        {tab === 'scorecard' && (
-          <ScorecardTab api={api} showMessage={showMessage} onAuthRequired={() => openAuth('login')} />
-        )}
-        {tab === 'my-shows' && user && (
-          <MyShowsTab api={api} showMessage={showMessage} />
-        )}
-        {tab === 'analytics' && user && (
-          <AnalyticsTab api={api} showMessage={showMessage} />
-        )}
+        {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} onAuthRequired={() => openAuth('login')} />}
+        {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} />}
+        {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} />}
       </div>
 
-      {showAuth && (
-        <AuthModal
-          mode={authMode}
-          setMode={setAuthMode}
-          onSuccess={handleAuthSuccess}
-          onClose={() => setShowAuth(false)}
-        />
-      )}
+      {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
     </div>
   );
 }
