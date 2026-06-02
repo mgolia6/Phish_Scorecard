@@ -1,7 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && ./node_modules/.bin/vite build",
+  "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
+  "env": {
+    "NODE_ENV": "development"
+  },
   "rewrites": [
     { "source": "/api/auth/register", "destination": "/api/auth/register" },
     { "source": "/api/auth/login", "destination": "/api/auth/login" },
