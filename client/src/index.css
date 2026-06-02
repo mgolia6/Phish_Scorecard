@@ -700,3 +700,473 @@ select option {
   .container { padding: 20px 16px; }
   .modal { padding: 28px 20px; margin: 16px; }
 }
+
+/* ====== INSTRUCTIONS PANEL ====== */
+.instructions-panel {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.instructions-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--cyan);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+}
+
+.instructions-toggle:hover { background: rgba(0,255,255,0.05); box-shadow: none; color: var(--cyan); }
+.toggle-arrow { color: rgba(0,255,255,0.5); font-size: 0.7rem; }
+
+.instructions-body {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.instr-step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(51,255,51,0.8);
+}
+
+.instr-num {
+  color: var(--orange);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  min-width: 24px;
+  padding-top: 2px;
+}
+
+/* ====== RESULTS HEADER ====== */
+.results-header {
+  font-size: 0.7rem;
+  color: rgba(51,255,51,0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 0 4px;
+}
+
+.result-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.result-tour {
+  font-size: 0.65rem;
+  color: var(--orange);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ====== SHOW MASTHEAD ====== */
+.show-masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.show-date-display {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--orange);
+  text-shadow: var(--glow-orange);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.show-venue-display {
+  font-size: 1rem;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.show-location-display {
+  font-size: 0.85rem;
+  color: rgba(51,255,51,0.6);
+}
+
+.show-tour {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.show-masthead-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.show-link {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.pnet-link { border-color: var(--cyan); color: var(--cyan); }
+.pnet-link:hover { background: rgba(0,255,255,0.1); }
+.audio-link { border-color: var(--orange); color: var(--orange); }
+.audio-link:hover { background: rgba(255,102,0,0.1); }
+.reviews-link { border-color: rgba(51,255,51,0.4); color: rgba(51,255,51,0.7); }
+.reviews-link:hover { border-color: var(--green); color: var(--green); }
+
+/* ====== SOUNDCHECK / NOTES ====== */
+.soundcheck-bar {
+  padding: 10px 16px;
+  background: rgba(255,102,0,0.06);
+  border: 1px solid rgba(255,102,0,0.2);
+  font-size: 0.82rem;
+  color: rgba(51,255,51,0.8);
+  margin-bottom: 12px;
+}
+
+.soundcheck-label {
+  color: var(--orange);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  margin-right: 8px;
+}
+
+.setlist-notes {
+  padding: 12px 16px;
+  background: rgba(0,255,255,0.04);
+  border: 1px solid rgba(0,255,255,0.15);
+  font-size: 0.82rem;
+  color: rgba(51,255,51,0.75);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.setlist-notes a { color: var(--cyan); }
+
+/* ====== SET BLOCKS ====== */
+.set-block { margin-bottom: 16px; }
+
+.set-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.set-song-count {
+  font-size: 0.65rem;
+  color: rgba(51,255,51,0.4);
+  letter-spacing: 1px;
+}
+
+/* ====== SONG ROWS ====== */
+.song-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 32px auto 180px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid transparent;
+  border-bottom: 1px solid rgba(51,255,51,0.05);
+  transition: all 0.15s;
+}
+
+.song-row:hover { border-color: var(--border); background: rgba(51,255,51,0.03); }
+.song-row.rated { background: rgba(51,255,51,0.04); border-left: 2px solid rgba(51,255,51,0.3); }
+.song-row.jam { border-left: 2px solid var(--cyan); }
+
+.song-pos {
+  color: rgba(51,255,51,0.3);
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.song-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.song-name-link {
+  color: var(--green);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.song-name-link:hover { color: #fff; text-decoration: underline; }
+.song-name-link.jam-chart { color: var(--cyan); }
+
+.badge {
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border: 1px solid;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.jam-badge { border-color: var(--cyan); color: var(--cyan); }
+.reprise-badge { border-color: var(--orange); color: var(--orange); }
+.footnote-badge { border-color: rgba(51,255,51,0.4); color: rgba(51,255,51,0.6); cursor: help; }
+
+.song-transition { font-size: 0.9rem; text-align: center; }
+.segue-soft { color: var(--orange); font-weight: bold; }
+.segue-hard { color: var(--red); font-weight: bold; }
+
+/* ====== STAR RATING ====== */
+.star-rating { display: flex; gap: 3px; }
+
+.star {
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: rgba(51,255,51,0.2);
+  transition: color 0.1s, text-shadow 0.1s;
+  user-select: none;
+  line-height: 1;
+}
+
+.star.active { color: var(--orange); text-shadow: 0 0 8px rgba(255,102,0,0.6); }
+.star:hover { color: var(--orange); }
+
+/* ====== SCORE SUMMARY ====== */
+.score-summary {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.set-score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.set-score-label {
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  min-width: 80px;
+  text-transform: uppercase;
+}
+
+.set-score-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(51,255,51,0.1);
+  border: 1px solid var(--border);
+}
+
+.set-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  box-shadow: 0 0 8px rgba(51,255,51,0.4);
+  transition: width 0.5s ease;
+}
+
+.set-score-val {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--cyan);
+  min-width: 36px;
+  text-align: right;
+}
+
+.set-score-count { font-size: 0.7rem; color: rgba(51,255,51,0.4); }
+
+.overall-score {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.overall-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--orange);
+  letter-spacing: 3px;
+  min-width: 80px;
+}
+
+.overall-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--orange);
+  text-shadow: var(--glow-orange);
+  line-height: 1;
+}
+
+.overall-stars { font-size: 1.2rem; color: var(--orange); letter-spacing: 2px; }
+
+/* ====== SUBMIT SECTION ====== */
+.submit-section {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pnet-handle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.pnet-handle-label {
+  font-size: 0.65rem;
+  color: rgba(51,255,51,0.5);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.pnet-handle-input {
+  width: 160px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+
+.pnet-profile-link {
+  font-size: 0.7rem;
+  color: var(--cyan);
+  text-decoration: none;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(0,255,255,0.3);
+  white-space: nowrap;
+}
+
+.pnet-profile-link:hover { color: #fff; }
+
+.btn-submit { padding: 12px 32px; font-size: 0.9rem; }
+
+/* ====== COMMUNITY REVIEWS ====== */
+.reviews-section { margin-top: 24px; }
+
+.review-item {
+  padding: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.review-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-author { color: var(--cyan); font-size: 0.82rem; }
+.review-score { color: var(--orange); font-family: var(--font-display); font-size: 0.85rem; }
+.review-date { color: rgba(51,255,51,0.4); font-size: 0.72rem; margin-left: auto; }
+
+.review-text {
+  font-size: 0.8rem;
+  color: rgba(51,255,51,0.7);
+  line-height: 1.6;
+}
+
+.review-text a { color: var(--cyan); }
+
+/* ====== MY SHOWS CARD ====== */
+.show-card {
+  display: grid;
+  grid-template-columns: 130px 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+
+.show-card:hover { border-color: var(--green); }
+.show-card-datestr { color: var(--orange); font-size: 0.85rem; }
+.show-card-venue { color: var(--green); font-size: 0.88rem; }
+.show-card-loc { color: rgba(51,255,51,0.5); font-size: 0.75rem; margin-top: 2px; }
+
+.show-card-links { display: flex; gap: 6px; }
+.show-link-sm {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-decoration: none;
+  color: rgba(51,255,51,0.6);
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.show-link-sm:hover { border-color: var(--green); color: var(--green); }
+.show-link-sm.audio { border-color: rgba(255,102,0,0.4); color: var(--orange); }
+.show-link-sm.audio:hover { border-color: var(--orange); }
+
+/* ====== ANALYTICS LINKS ====== */
+.stat-name-link {
+  flex: 1;
+  color: var(--green);
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 0 12px;
+  transition: color 0.15s;
+}
+.stat-name-link:hover { color: #fff; text-decoration: underline; }
+
+/* ====== PHISH.NET ATTRIBUTION ====== */
+.pnet-attribution {
+  text-align: center;
+  padding: 24px;
+  font-size: 0.72rem;
+  color: rgba(51,255,51,0.3);
+  letter-spacing: 1px;
+}
+.pnet-attribution a { color: rgba(51,255,51,0.5); text-decoration: none; }
+.pnet-attribution a:hover { color: var(--green); }
+
+/* ====== RESPONSIVE ADDITIONS ====== */
+@media (max-width: 768px) {
+  .song-row { grid-template-columns: 24px 1fr 24px auto; }
+  .notes-input { display: none; }
+  .show-masthead { flex-direction: column; }
+  .show-masthead-links { flex-direction: row; flex-wrap: wrap; }
+  .instructions-grid { grid-template-columns: 1fr; }
+  .submit-section { flex-direction: column; align-items: flex-start; }
+  .show-card { grid-template-columns: 1fr auto; }
+  .show-card-datestr { font-size: 0.75rem; }
+}
