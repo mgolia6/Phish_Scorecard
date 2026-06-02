@@ -1,115 +1,91 @@
 # Phishow Scorecard — Session Log
 
-## Session 2 — June 2, 2026
-**Status**: Vercel-native rebuild complete. DB schema pending run. Not yet deployed.
+## Session 3 — June 2, 2026 (continued)
+**Status**: Live on Vercel. Core feature set complete. Awaiting feedback.
 
 ---
 
 ### What Was Done
 
-**Tore out:**
-- `server.js` — deleted (Express won't work on Vercel serverless)
-- `style.css` — deleted (stale, replaced)
-- Old `vercel.json` — deleted and rewritten
+**Infrastructure (completed this session):**
+- Neon Postgres provisioned, connected to Vercel, all POSTGRES_* env vars auto-injected
+- DB schema run against Neon — tables users, shows, ratings all created with indexes
+- Fixed 3 successive Vercel build failures (vite PATH, devDependencies, framework detection)
+- App is live and fully deployed
 
-**Built from scratch:**
-- `api/_db.js` — shared Postgres pool helper using `POSTGRES_URL`
-- `api/_auth.js` — JWT verify + CORS helper
-- `api/auth/register.js` — user registration
-- `api/auth/login.js` — login with bcrypt
-- `api/auth/me.js` — token verification / session restore
-- `api/shows/index.js` — Phish.net show search (uses `PHISH_NET_API_KEY`)
-- `api/shows/[date].js` — single show + setlist from Phish.net
-- `api/ratings/[showDate].js` — GET and POST ratings (auth required)
-- `api/user/shows.js` — user's rated shows with avg rating
-- `api/analytics/songs.js` — top rated songs across all users
-- `api/analytics/venues.js` — top venues by avg rating
-- `vercel.json` — full rewrite with correct build/output/rewrites config
-- `package.json` (root) — backend deps only (bcryptjs, jsonwebtoken, pg)
-- `client/package.json` — frontend deps only (react, vite)
-- `client/vite.config.js` — removed Express proxy, kept for local dev
-- `client/src/App.jsx` — full rewrite: fixed stale axios token bug, fixed ratings submission bug, proper set grouping, jam chart indicators, notes per song, session restore on load
-- `client/src/index.css` — full retro-modern redesign: Orbitron + Share Tech Mono fonts, scanline overlay, glow effects, animated header, scrolling marquee, full component system
+**API layer expanded:**
+- `api/shows/[date].js` — now pulls ALL available Phish.net fields: showid, permalink, tour_name, tourid, setlist_notes, soundcheck, isjamchart, isreprise, trans_mark, footnote, slug, position. Also fetches reviews in parallel.
+- `api/shows/index.js` — pre-populates with 20 most recent shows on load (no search needed), includes tour_name and permalink in response
 
-**Bugs fixed from Manus build:**
-- Stale axios token (was captured at mount, now reads from localStorage at call time)
-- Ratings submission missing song names (rebuilt from scratch with correct data structure)
-- No Phish.net API key in requests (now uses `PHISH_NET_API_KEY` env var)
+**Full UI overhaul (App.jsx + index.css):**
+- Marquee simplified to just "DON'T SUCK AT PHISH" on loop
+- Search pre-populates with recent 20 shows immediately on load
+- Collapsible instructions panel (collapsed by default)
+- Show date formatted as "Jan 12, 1999" instead of raw YYYY-MM-DD
+- Show masthead: formatted date, venue, city, tour name
+- External links: Phish.net setlist, PhishTracks audio stream, community review count + avg score
+- Soundcheck displayed when available
+- Setlist notes from Phish.net rendered under masthead
+- Song rows rebuilt: position number, song name links to phish.net/song/[slug], JAM badge (cyan) for jam chart songs, REPRISE badge, footnote badge with tooltip, segue indicators (> soft, --> hard segue)
+- Star ratings (1-5 click with hover preview) replacing dropdown selects
+- Per-song notes field
+- Set score bars — animated progress bar per set with average rating
+- Overall show score — large display number + star glyph string
+- Phish.net handle field (persists in localStorage, links to profile page)
+- Community reviews — top 3 previewed inline, link to all on Phish.net
+- Phish.net attribution footer (API requirement)
+- My Shows — audio link per show to PhishTracks
+- Analytics — song names link to Phish.net song pages
+- Full responsive mobile CSS for all new components
 
-**Infrastructure:**
-- Neon Postgres provisioned and connected to Vercel project
-- All POSTGRES_* env vars auto-injected by Neon into Vercel
-- JWT_SECRET and PHISH_NET_API_KEY already in Vercel env vars
-
----
-
-### What's Blocking Deploy
-
-**DB schema has not been run yet.**
-
-The tables (`users`, `shows`, `ratings`) do not exist in Neon yet.
-Schema is in `init-db.sql` — needs to run once against the Neon database.
-
-Next session has `POSTGRES_URL` in project instructions and can run the schema directly via psycopg2.
+**Credentials secured:**
+- GitHub token saved to Claude memory
+- Neon Postgres URLs saved to Claude memory
+- Vercel API key saved to Claude memory
+- Resend API key saved to Claude memory
+- Removed all credentials from project instructions
 
 ---
 
-### Next Session — Do This First
-
-1. Read `POSTGRES_URL` from project instructions
-2. Run `init-db.sql` against Neon using psycopg2
-3. Verify tables exist
-4. Check Vercel deploy status (should have auto-triggered from the pushes)
-5. Hit the live URL and test: register, search a show, rate songs, check My Shows + Analytics
-6. Debug whatever breaks (first deploy always has something)
+### Current State
+App is live. Matthew has registered an account and confirmed ratings save successfully. Full feature set deployed and awaiting feedback.
 
 ---
 
-### Architecture (current)
+### Known Debt / Next Session
+- [ ] Feedback from Matthew on UI/UX after review
+- [ ] Song duration not available from Phish.net — placeholder or skip
+- [ ] Show detail page from My Shows (click a show to see song breakdown)
+- [ ] Favorite/star a show
+- [ ] Global leaderboard / community ratings
+- [ ] Jam chart filter in setlist view
+- [ ] Tour grouping in My Shows
+- [ ] Export ratings to CSV
+- [ ] Mobile polish pass after feedback
+- [ ] Verify PhishTracks URL format works for all shows
+- [ ] Test reviews endpoint on shows that actually have reviews
 
+---
+
+### Architecture (current, stable)
 ```
 /
 ├── api/
-│   ├── _db.js               shared pool
-│   ├── _auth.js             JWT + CORS helpers
-│   ├── auth/
-│   │   ├── register.js
-│   │   ├── login.js
-│   │   └── me.js
-│   ├── shows/
-│   │   ├── index.js         search
-│   │   └── [date].js        setlist
-│   ├── ratings/
-│   │   └── [showDate].js    GET + POST
-│   ├── user/
-│   │   └── shows.js
-│   └── analytics/
-│       ├── songs.js
-│       └── venues.js
-├── client/
-│   ├── src/
-│   │   ├── App.jsx          full rewrite
-│   │   ├── index.css        retro-modern design system
-│   │   └── App.css          minimal
-│   ├── vite.config.js
-│   └── package.json
+│   ├── _db.js
+│   ├── _auth.js
+│   ├── auth/register.js, login.js, me.js
+│   ├── shows/index.js         recent 20 + search
+│   ├── shows/[date].js        full show + setlist + reviews
+│   ├── ratings/[showDate].js  GET + POST
+│   ├── user/shows.js
+│   └── analytics/songs.js, venues.js
+├── client/src/
+│   ├── App.jsx                full feature set
+│   └── index.css              complete design system
 ├── init-db.sql
 ├── package.json
 └── vercel.json
 ```
 
-### Env Vars in Vercel (all present)
-- `POSTGRES_URL` — Neon connection string (pooled)
-- `POSTGRES_URL_NON_POOLING` — for migrations if needed
-- `JWT_SECRET` — auth signing key
-- `PHISH_NET_API_KEY` — Phish.net v5 API
-- `NODE_ENV` — production
-
-### Known Debt / Future Features
-- [ ] Show detail page (click a show in My Shows to see song-by-song breakdown)
-- [ ] Global leaderboard / community ratings
-- [ ] Jam chart filter in setlist view
-- [ ] Tour grouping in My Shows
-- [ ] Export ratings to CSV
-- [ ] User profile page
-- [ ] Mobile polish pass
+### Env Vars
+All in Vercel dashboard. Credentials in Claude memory — do not put in project instructions or this file.
