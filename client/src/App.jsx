@@ -540,6 +540,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         <div className="era-filter">
           {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
             const yr = String(1983 + i);
+            if (['2005','2006','2007'].includes(yr)) return null;
             const active = query === yr;
             return (
               <button key={yr} type="button" className={`year-btn ${active ? 'active' : ''}`} onClick={() => handleYearBtn(yr)}>{yr}</button>
