@@ -2627,3 +2627,15 @@ select option {
   .era-filter { max-height: 100px; gap: 3px; }
   .year-btn { font-size: 0.68rem; padding: 5px 6px; min-width: 40px; }
 }
+
+/* ====== SAVE BUTTON — LOCKED STATE ====== */
+.btn-saved {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  opacity: 0.7;
+  cursor: not-allowed !important;
+}
+.btn-saved:hover {
+  background: transparent !important;
+  box-shadow: none !important;
+}
