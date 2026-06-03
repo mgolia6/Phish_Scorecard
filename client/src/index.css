@@ -71,20 +71,34 @@ body::before {
 .sidebar-collapsed { width: 52px; }
 .sidebar-expanded  { width: 220px; }
 
-.sidebar-toggle {
-  align-self: flex-end;
-  border: none;
-  background: transparent;
-  color: rgba(51,255,51,0.4);
-  font-size: 0.7rem;
-  padding: 10px 14px;
-  cursor: pointer;
-  letter-spacing: 0;
-  text-transform: none;
-  transition: color 0.15s;
+.sidebar-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
 }
-.sidebar-toggle:hover { color: var(--green); background: transparent; box-shadow: none; }
+.sidebar-tab {
+  position: absolute;
+  right: -20px;
+  top: 14px;
+  width: 20px;
+  height: 32px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: none;
+  color: rgba(51,255,51,0.5);
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+  transition: all 0.15s;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 0;
+}
+.sidebar-tab:hover { color: var(--green); background: var(--bg-elevated); box-shadow: none; }
 
 .sidebar-logo {
   display: flex;
