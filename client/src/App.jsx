@@ -177,7 +177,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentShow, setCurrentShow] = useState(null);
   const [songs, setSongs] = useState([]);
   const [ratings, setRatings] = useState({});
@@ -190,7 +189,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [showNotes, setShowNotes] = useState(false);
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
-  const searchRef = useRef(null);
   const debounceRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
 
@@ -200,36 +198,44 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
   }, []);
 
+  // Normalize search query — handle M/D, M/D/YY, M/D/YYYY → YYYY-MM-DD for search
+  const normalizeQuery = (q) => {
+    q = q.trim();
+    if (!q) return q;
+    const mdMatch = q.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+    if (mdMatch) {
+      const m = mdMatch[1].padStart(2, '0');
+      const d = mdMatch[2].padStart(2, '0');
+      let y = mdMatch[3];
+      if (!y) return `${m}-${d}`;
+      if (y.length === 2) y = parseInt(y) > 30 ? `19${y}` : `20${y}`;
+      return `${y}-${m}-${d}`;
+    }
+    return q;
+  };
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!query.trim()) {
-      api.get('/shows').then(data => { setResults(filterShows(data)); setDropdownOpen(false); }).catch(() => {});
+    const normalized = normalizeQuery(query);
+    if (!normalized) {
+      api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
       return;
     }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
+        const data = await api.get(`/shows?q=${encodeURIComponent(normalized)}`);
         setResults(filterShows(data));
-        setDropdownOpen(true);
       } catch (err) { showError(err.message); }
       finally { setSearching(false); }
-    }, 300);
+    }, 350);
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) setDropdownOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    document.addEventListener('touchstart', handler);
-    return () => { document.removeEventListener('mousedown', handler); document.removeEventListener('touchstart', handler); };
-  }, []);
+  // No outside-click handler needed — results are inline
 
   const loadShow = async (date) => {
     if (!isAuthed) { onAuthRequired(); return; }
-    setDropdownOpen(false);
     setLoadingShow(true);
     setCurrentShow(null);
     setSongs([]);
@@ -274,20 +280,26 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   };
 
   const selectShow = (show) => {
-    setQuery(`${formatDate(show.showdate)} — ${show.venue}`);
+    setQuery('');
+    setResults([]);
     loadShow(show.showdate);
   };
 
   const handleRandom = async () => {
     setRandomizing(true);
     try {
-      const data = await fetch(`${API}/random-show`).then(r => r.json());
+      const res = await fetch(`${API}/random-show`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
       if (data.showdate) {
         setQuery('');
+        setResults([]);
         await loadShow(data.showdate);
+      } else {
+        showError(data.error || 'No show returned');
       }
     } catch (err) {
-      showError('Failed to get random show');
+      showError('Random show failed — check connection');
     } finally {
       setRandomizing(false);
     }
@@ -382,50 +394,32 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       {/* Search */}
       <div className="panel">
         <div className="panel-title">SEARCH SHOWS</div>
-        <div className="search-autocomplete" ref={searchRef}>
+        <div className="search-wrap">
           <div className="search-input-wrap">
             <input
               type="text"
-              placeholder="Type date, venue, city, or tour..."
+              placeholder="Date (4/30/93, 1997, 2016...), venue, city, tour..."
               value={query}
-              onChange={e => { setQuery(e.target.value); if (e.target.value.trim()) setDropdownOpen(true); }}
-              onFocus={() => { if (results.length) setDropdownOpen(true); }}
+              onChange={e => setQuery(e.target.value)}
               autoComplete="off" autoCorrect="off" spellCheck="false"
             />
             {searching && <span className="search-spinner">◈</span>}
           </div>
-
-          {dropdownOpen && results.length > 0 && (
-            <div className="search-dropdown">
-              {results.map(show => (
-                <div key={show.showid || show.showdate} className="search-dropdown-item"
-                  onMouseDown={(e) => { e.preventDefault(); selectShow(show); }}
-                  onTouchStart={(e) => { e.preventDefault(); selectShow(show); }}>
-                  <span className="result-date">{formatDate(show.showdate)}</span>
-                  <span className="result-venue">{show.venue}</span>
-                  <span className="result-meta">
-                    <span className="result-location">{show.city}{show.state ? `, ${show.state}` : ''}</span>
-                    {show.tour_name && show.tour_name !== 'Not Part of a Tour' && <span className="result-tour">{show.tour_name}</span>}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+          <button
+            className="btn-random"
+            onClick={handleRandom}
+            disabled={randomizing || loadingShow}
+          >
+            {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
+          </button>
         </div>
 
-        {/* Random show button */}
-        <button
-          className="btn-random"
-          onClick={handleRandom}
-          disabled={randomizing || loadingShow}
-        >
-          {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
-        </button>
-
-        {/* Recent shows list */}
-        {!dropdownOpen && !currentShow && !loadingShow && results.length > 0 && (
+        {/* Results list — always inline, never floating */}
+        {!currentShow && !loadingShow && results.length > 0 && (
           <>
-            <div className="results-header">Recent shows — tap to load</div>
+            <div className="results-header">
+              {query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
+            </div>
             <div className="results-list">
               {results.map(show => (
                 <div key={show.showid || show.showdate} className="result-item" onClick={() => selectShow(show)}>
@@ -642,19 +636,23 @@ function MyShowsTab({ api, showMessage, showError }) {
       <div className="panel-title">MY RATED SHOWS ({shows.length})</div>
       {!shows.length ? <div className="empty-state">NO RATED SHOWS YET</div> : shows.map(show => (
         <div key={show.show_date} className="show-card">
-          <div className="show-card-date"><div className="show-card-datestr">{formatDate(show.show_date)}</div></div>
-          <div className="show-card-info">
-            <div className="show-card-venue">{show.venue}</div>
-            <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
+          <div className="show-card-top">
+            <div className="show-card-left">
+              <div className="show-card-datestr">{formatDate(show.show_date)}</div>
+              <div className="show-card-venue">{show.venue}</div>
+              <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
+            </div>
+            <div className="show-card-right">
+              <div className="rating-value">{show.overall_rating ?? '—'}</div>
+              <div className="rating-label">{show.rated_count} songs rated</div>
+            </div>
           </div>
-          <div className="show-card-links">
-            <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">RELISTEN</a>
-            <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">SETLIST</a>
-            <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
-          </div>
-          <div className="show-card-rating">
-            <div className="rating-value">{show.overall_rating ?? '-'}</div>
-            <div className="rating-label">{show.rated_count} rated</div>
+          <div className="show-card-bottom">
+            <div className="show-card-links">
+              <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
+              <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
+              <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
+            </div>
           </div>
         </div>
       ))}
