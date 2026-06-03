@@ -183,6 +183,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [audioTracks, setAudioTracks] = useState({}); // keyed by song title (normalized)
   const [loadingShow, setLoadingShow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [randomizing, setRandomizing] = useState(false);
   const [attendanceType, setAttendanceType] = useState('listened');
   const [showInstructions, setShowInstructions] = useState(false);
@@ -229,6 +230,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     setSongs([]);
     setRatings({});
     setAudioTracks({});
+    setSaved(false);
 
     try {
       // Load phish.net data + saved ratings + phish.in audio in parallel
@@ -316,6 +318,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
       if (phishnetHandle.trim()) localStorage.setItem('pnet_handle', phishnetHandle.trim());
+      setSaved(true);
       setCelebrating(true);
     } catch (err) {
       showError(err.message);
@@ -591,8 +594,12 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                     ))}
                   </div>
                 </div>
-                <button className="btn-primary btn-submit" onClick={submitRatings} disabled={submitting}>
-                  {submitting ? 'SAVING...' : 'SAVE RATINGS'}
+                <button
+                  className={`btn-primary btn-submit ${saved ? 'btn-saved' : ''}`}
+                  onClick={submitRatings}
+                  disabled={submitting || saved}
+                >
+                  {submitting ? 'SAVING...' : saved ? '✓ RATINGS SAVED' : 'SAVE RATINGS'}
                 </button>
               </div>
 
