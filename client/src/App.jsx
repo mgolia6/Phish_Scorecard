@@ -739,6 +739,7 @@ function MyShowsTab({ api, showMessage, showError }) {
   const [showImport, setShowImport] = useState(false);
   const [importType, setImportType] = useState('attendance');
   const [expandedReview, setExpandedReview] = useState(null);
+  const [importResult, setImportResult] = useState(null);
 
   const loadData = () => {
     setLoading(true);
@@ -759,7 +760,7 @@ function MyShowsTab({ api, showMessage, showError }) {
     try {
       const endpoint = importType === 'reviews' ? '/import/phishnet-reviews' : '/import/phishnet';
       const result = await api.post(endpoint, { phishnet_username: phishnetUser.trim() });
-      showMessage(`✓ ${result.message}`);
+      setImportResult({ type: importType, ...result });
       setShowImport(false);
       loadData();
     } catch (err) {
@@ -773,8 +774,32 @@ function MyShowsTab({ api, showMessage, showError }) {
 
   const displayShows = activeView === 'attended' ? attended : shows;
 
+  const ImportSuccessModal = () => {
+    if (!importResult) return null;
+    const isReviews = importResult.type === 'reviews';
+    const count = importResult.imported || 0;
+    const total = importResult.total || 0;
+    return (
+      <div className="import-modal-overlay" onClick={() => setImportResult(null)}>
+        <div className="import-modal" onClick={e => e.stopPropagation()}>
+          <div className="import-modal-icon">{isReviews ? '✍' : '◉'}</div>
+          <div className="import-modal-count">{count}</div>
+          <div className="import-modal-label">{isReviews ? 'REVIEWS IMPORTED' : 'SHOWS IMPORTED'}</div>
+          {total > count && <div className="import-modal-sub">{total - count} already existed — updated</div>}
+          <div className="import-modal-tagline">
+            {isReviews ? 'YOUR VOICE IS IN THE PHRЕЕZER' : `${count} SHOWS. FROZEN IN TIME.`}
+          </div>
+          <button className="import-modal-dismiss" onClick={() => setImportResult(null)}>
+            [ TAP TO DISMISS ]
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="panel">
+      <ImportSuccessModal />
       <div className="my-shows-header">
         <div className="my-shows-tabs">
           <button className={`my-shows-tab-btn ${activeView === 'attended' ? 'active' : ''}`} onClick={() => setActiveView('attended')}>
