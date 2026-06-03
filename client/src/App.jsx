@@ -187,6 +187,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [randomizing, setRandomizing] = useState(false);
   const [attendanceType, setAttendanceType] = useState('listened');
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
   const searchRef = useRef(null);
@@ -398,8 +399,8 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
             <div className="search-dropdown">
               {results.map(show => (
                 <div key={show.showid || show.showdate} className="search-dropdown-item"
-                  onMouseDown={() => selectShow(show)}
-                  onTouchEnd={() => selectShow(show)}>
+                  onMouseDown={(e) => { e.preventDefault(); selectShow(show); }}
+                  onTouchStart={(e) => { e.preventDefault(); selectShow(show); }}>
                   <span className="result-date">{formatDate(show.showdate)}</span>
                   <span className="result-venue">{show.venue}</span>
                   <span className="result-meta">
@@ -457,7 +458,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
             </div>
             <div className="show-masthead-links">
-              <a href={`${PNET}/setlists/${currentShow.permalink || ''}`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
+              <a href={currentShow.permalink || `${PNET}/setlists/`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
                 PHISH.NET SETLIST
               </a>
               {relistenUrl && (
@@ -466,7 +467,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 </a>
               )}
               {currentShow.reviews?.count > 0 && (
-                <a href={`${PNET}/setlists/${currentShow.permalink}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link reviews-link">
+                <a href={`${currentShow.permalink || ''}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link reviews-link">
                   {currentShow.reviews.count} REVIEWS {currentShow.reviews.avg_score ? `(${currentShow.reviews.avg_score}/5)` : ''}
                 </a>
               )}
@@ -479,7 +480,15 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
             </div>
           )}
           {currentShow.setlist_notes && (
-            <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />
+            <div className="notes-collapsible">
+              <button className="notes-toggle" onClick={() => setShowNotes(n => !n)}>
+                <span>SHOW NOTES</span>
+                <span>{showNotes ? '▲ HIDE' : '▼ EXPAND'}</span>
+              </button>
+              {showNotes && (
+                <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />
+              )}
+            </div>
           )}
 
           {songs.length > 0 ? (
@@ -580,16 +589,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                     ))}
                   </div>
                 </div>
-                <div className="pnet-handle-row">
-                  <span className="pnet-handle-label">PHISH.NET HANDLE:</span>
-                  <input
-                    type="text" className="pnet-handle-input" placeholder="username (optional)"
-                    value={phishnetHandle} onChange={e => setPhishnetHandle(e.target.value)}
-                  />
-                  {phishnetHandle && (
-                    <a href={`${PNET}/users/${phishnetHandle}`} target="_blank" rel="noopener noreferrer" className="pnet-profile-link">VIEW PROFILE</a>
-                  )}
-                </div>
                 <button className="btn-primary btn-submit" onClick={submitRatings} disabled={submitting}>
                   {submitting ? 'SAVING...' : 'SAVE RATINGS'}
                 </button>
@@ -599,7 +598,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               {currentShow.reviews?.items?.length > 0 && (
                 <div className="reviews-section">
                   <div className="panel-title">PHISH.NET COMMUNITY REVIEWS</div>
-                  {currentShow.reviews.items.map((rev, i) => (
+                  {(currentShow.reviews.items || []).map((rev, i) => (
                     <div key={i} className="review-item">
                       <div className="review-header">
                         <span className="review-author">{rev.author}</span>
@@ -609,7 +608,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                       <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review?.substring(0, 300) + (rev.review?.length > 300 ? '...' : '') }} />
                     </div>
                   ))}
-                  <a href={`${PNET}/setlists/${currentShow.permalink}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
+                  <a href={`${currentShow.permalink || ''}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
                     ALL {currentShow.reviews.count} REVIEWS ON PHISH.NET
                   </a>
                 </div>
