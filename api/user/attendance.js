@@ -16,16 +16,22 @@ export default async function handler(req, res) {
         TO_CHAR(a.show_date, 'YYYY-MM-DD') as show_date,
         a.venue, a.city, a.state, a.country, a.source,
         ROUND(AVG(r.rating)::numeric, 2) as phreezer_avg,
-        COUNT(r.id) as songs_rated,
-        ur.phishnet_score,
-        ur.review_text,
-        TO_CHAR(ur.posted_date, 'YYYY-MM-DD') as review_date
+        COUNT(DISTINCT r.id) as songs_rated,
+        JSON_AGG(
+          CASE WHEN ur.id IS NOT NULL THEN
+            JSON_BUILD_OBJECT(
+              'review_id', ur.phishnet_review_id,
+              'review_text', ur.review_text,
+              'posted_date', TO_CHAR(ur.posted_date, 'YYYY-MM-DD')
+            )
+          END
+          ORDER BY ur.posted_date ASC
+        ) FILTER (WHERE ur.id IS NOT NULL) as reviews
        FROM attendance a
        LEFT JOIN ratings r ON r.user_id = a.user_id AND r.show_date = a.show_date
        LEFT JOIN user_reviews ur ON ur.user_id = a.user_id AND ur.show_date = a.show_date
        WHERE a.user_id = $1
-       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source,
-                ur.phishnet_score, ur.review_text, ur.posted_date
+       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source
        ORDER BY a.show_date DESC`,
       [user.id]
     );
