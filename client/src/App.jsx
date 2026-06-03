@@ -903,8 +903,7 @@ export default function App() {
         <header className="app-header">
           <div className="header-left">
             <div className="header-title">
-              <img src="/assets/phreezer-snowflake.svg" alt="The Phreezer" className="mobile-header-logo" />
-              <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="mobile-header-wordmark" />
+              <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="mobile-header-logo" />
             </div>
           </div>
           <div className="header-right">
