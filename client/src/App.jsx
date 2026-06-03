@@ -31,6 +31,13 @@ function formatDate(d) {
   return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
 }
 
+function formatDuration(secs) {
+  if (!secs) return null;
+  const m = Math.floor(secs / 60);
+  const s = String(secs % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
 // Mobile-friendly rating: tap number 1-5, tap again to clear
 function SongRating({ value, onChange }) {
   return (
@@ -63,7 +70,6 @@ function SetScore({ label, songs, ratings }) {
   );
 }
 
-// Dopamine save animation
 function SaveCelebration({ onDone }) {
   useEffect(() => {
     const t = setTimeout(onDone, 2800);
@@ -83,10 +89,8 @@ function SaveCelebration({ onDone }) {
       <div className="celebrate-burst">
         {particles.map(p => (
           <span key={p.id} className="celebrate-particle" style={{
-            left: `${p.x}%`,
-            color: p.color,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.dur}s`,
+            left: `${p.x}%`, color: p.color,
+            animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s`,
           }}>{p.glyph}</span>
         ))}
       </div>
@@ -98,7 +102,6 @@ function SaveCelebration({ onDone }) {
   );
 }
 
-// Mike Says No — error display
 function MikeError({ message, onClose }) {
   useEffect(() => {
     const t = setTimeout(onClose, 5000);
@@ -118,7 +121,7 @@ function MikeError({ message, onClose }) {
 function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const api = useApi();
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [signupForm, setSignupForm] = useState({ email: '', username: '', password: '', firstName: '', lastName: '' });
+  const [signupForm, setSignupForm] = useState({ email: '', username: '', password: '', firstName: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -178,8 +181,10 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [currentShow, setCurrentShow] = useState(null);
   const [songs, setSongs] = useState([]);
   const [ratings, setRatings] = useState({});
+  const [audioTracks, setAudioTracks] = useState({}); // keyed by song title (normalized)
   const [loadingShow, setLoadingShow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [randomizing, setRandomizing] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
@@ -187,82 +192,102 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const debounceRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
 
-  // Filter out future shows
   const filterShows = (list) => list.filter(s => s.showdate <= TODAY);
 
-  // Load recent shows on mount
   useEffect(() => {
-    api.get('/shows').then(data => {
-      setResults(filterShows(data));
-    }).catch(() => {});
+    api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
   }, []);
 
-  // Debounced autocomplete
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim()) {
-      // Reset to recent shows
-      api.get('/shows').then(data => {
-        setResults(filterShows(data));
-        setDropdownOpen(false);
-      }).catch(() => {});
+      api.get('/shows').then(data => { setResults(filterShows(data)); setDropdownOpen(false); }).catch(() => {});
       return;
     }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
         const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
-        const filtered = filterShows(data);
-        setResults(filtered);
+        setResults(filterShows(data));
         setDropdownOpen(true);
-      } catch (err) {
-        showError(err.message);
-      } finally {
-        setSearching(false);
-      }
+      } catch (err) { showError(err.message); }
+      finally { setSearching(false); }
     }, 300);
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target)) setDropdownOpen(false);
     };
     document.addEventListener('mousedown', handler);
     document.addEventListener('touchstart', handler);
-    return () => {
-      document.removeEventListener('mousedown', handler);
-      document.removeEventListener('touchstart', handler);
-    };
+    return () => { document.removeEventListener('mousedown', handler); document.removeEventListener('touchstart', handler); };
   }, []);
 
-  const selectShow = async (show) => {
+  const loadShow = async (date) => {
     if (!isAuthed) { onAuthRequired(); return; }
     setDropdownOpen(false);
-    setQuery(`${formatDate(show.showdate)} — ${show.venue}`);
     setLoadingShow(true);
-    setCurrentShow(show);
+    setCurrentShow(null);
     setSongs([]);
     setRatings({});
+    setAudioTracks({});
+
     try {
-      const [showData, savedRatings] = await Promise.all([
-        api.get(`/shows/${show.showdate}`),
-        api.get(`/ratings/${show.showdate}`).catch(() => []),
+      // Load phish.net data + saved ratings + phish.in audio in parallel
+      const [showData, savedRatings, audioData] = await Promise.all([
+        api.get(`/shows/${date}`),
+        api.get(`/ratings/${date}`).catch(() => []),
+        fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
       ]);
+
       setSongs(showData.songs || []);
       setCurrentShow(showData);
+
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
       setRatings(rMap);
+
+      // Build audio map keyed by normalized title
+      const aMap = {};
+      for (const t of (audioData.tracks || [])) {
+        const key = t.title?.toLowerCase().trim();
+        if (key) aMap[key] = t;
+      }
+      setAudioTracks(aMap);
+
     } catch (err) {
       showError('Failed to load show');
       setCurrentShow(null);
     } finally {
       setLoadingShow(false);
     }
+  };
+
+  const selectShow = (show) => {
+    setQuery(`${formatDate(show.showdate)} — ${show.venue}`);
+    loadShow(show.showdate);
+  };
+
+  const handleRandom = async () => {
+    setRandomizing(true);
+    try {
+      const data = await fetch(`${API}/random-show`).then(r => r.json());
+      if (data.showdate) {
+        setQuery('');
+        await loadShow(data.showdate);
+      }
+    } catch (err) {
+      showError('Failed to get random show');
+    } finally {
+      setRandomizing(false);
+    }
+  };
+
+  const getAudioForSong = (songName) => {
+    const key = songName?.toLowerCase().trim();
+    return audioTracks[key] || null;
   };
 
   const updateRating = (songName, field, value) =>
@@ -309,13 +334,17 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / totalRated.length).toFixed(2)
     : null;
 
+  const hasAudio = Object.keys(audioTracks).length > 0;
   const relistenUrl = currentShow
     ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}`
     : null;
 
   return (
     <div>
-      {celebrating && <SaveCelebration onDone={() => { setCelebrating(false); showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success'); }} />}
+      {celebrating && <SaveCelebration onDone={() => {
+        setCelebrating(false);
+        showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success');
+      }} />}
 
       {/* Instructions */}
       <div className="instructions-panel">
@@ -328,20 +357,20 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
             <div className="instructions-grid">
               <div>
                 <div className="instr-step"><span className="instr-num">01</span><span>Type any date, venue, or city — results appear instantly as you type.</span></div>
-                <div className="instr-step"><span className="instr-num">02</span><span>Click a show to load the full setlist live from Phish.net.</span></div>
-                <div className="instr-step"><span className="instr-num">03</span><span>Tap 1–5 to rate each song. Tap the same number again to clear.</span></div>
+                <div className="instr-step"><span className="instr-num">02</span><span>Hit RANDOM SHOW to let fate decide what you rate tonight.</span></div>
+                <div className="instr-step"><span className="instr-num">03</span><span>Tap 1–5 to rate each song. Tap same number again to clear.</span></div>
               </div>
               <div>
-                <div className="instr-step"><span className="instr-num">04</span><span>Add notes per song. Segues shown between songs.</span></div>
+                <div className="instr-step"><span className="instr-num">04</span><span>▶ buttons stream individual songs direct from Phish.in.</span></div>
                 <div className="instr-step"><span className="instr-num">05</span><span>Click any song name to open its Phish.net history page.</span></div>
-                <div className="instr-step"><span className="instr-num">06</span><span>Stream audio on Relisten, read community reviews, track your show history.</span></div>
+                <div className="instr-step"><span className="instr-num">06</span><span>Save your ratings to track show history and see analytics.</span></div>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Search — autocomplete */}
+      {/* Search */}
       <div className="panel">
         <div className="panel-title">SEARCH SHOWS</div>
         <div className="search-autocomplete" ref={searchRef}>
@@ -352,16 +381,17 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               value={query}
               onChange={e => { setQuery(e.target.value); if (e.target.value.trim()) setDropdownOpen(true); }}
               onFocus={() => { if (results.length) setDropdownOpen(true); }}
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck="false"
+              autoComplete="off" autoCorrect="off" spellCheck="false"
             />
             {searching && <span className="search-spinner">◈</span>}
           </div>
+
           {dropdownOpen && results.length > 0 && (
             <div className="search-dropdown">
               {results.map(show => (
-                <div key={show.showid || show.showdate} className="search-dropdown-item" onMouseDown={() => selectShow(show)} onTouchEnd={() => selectShow(show)}>
+                <div key={show.showid || show.showdate} className="search-dropdown-item"
+                  onMouseDown={() => selectShow(show)}
+                  onTouchEnd={() => selectShow(show)}>
                   <span className="result-date">{formatDate(show.showdate)}</span>
                   <span className="result-venue">{show.venue}</span>
                   <span className="result-meta">
@@ -374,7 +404,16 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
           )}
         </div>
 
-        {/* Recent shows list — shown when no dropdown */}
+        {/* Random show button */}
+        <button
+          className="btn-random"
+          onClick={handleRandom}
+          disabled={randomizing || loadingShow}
+        >
+          {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
+        </button>
+
+        {/* Recent shows list */}
         {!dropdownOpen && !currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">Recent shows — tap to load</div>
@@ -407,6 +446,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 {currentShow.city}{currentShow.state ? `, ${currentShow.state}` : ''}{currentShow.country && currentShow.country !== 'USA' ? `, ${currentShow.country}` : ''}
               </div>
               {currentShow.tour_name && <div className="show-tour">◈ {currentShow.tour_name}</div>}
+              {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
             </div>
             <div className="show-masthead-links">
               <a href={`${PNET}/setlists/${currentShow.permalink || ''}`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
@@ -430,7 +470,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               <span className="soundcheck-label">SOUNDCHECK:</span> {currentShow.soundcheck}
             </div>
           )}
-
           {currentShow.setlist_notes && (
             <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />
           )}
@@ -445,40 +484,55 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                       <span className="set-label">{setLabel(setKey)}</span>
                       <span className="set-song-count">{setSongs.length} songs</span>
                     </div>
-                    {setSongs.map((song, idx) => (
-                      <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
-                        <span className="song-pos">{song.position || idx + 1}</span>
-                        <div className="song-info">
-                          <a
-                            href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
-                            target="_blank" rel="noopener noreferrer"
-                            className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
-                            onClick={e => e.stopPropagation()}
-                          >{song.song}</a>
-                          {song.isjam && <span className="badge jam-badge">JAM</span>}
-                          {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
-                          {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
+                    {setSongs.map((song, idx) => {
+                      const audio = getAudioForSong(song.song);
+                      const duration = formatDuration(audio?.duration);
+                      return (
+                        <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
+                          <span className="song-pos">{song.position || idx + 1}</span>
+                          <div className="song-info">
+                            <a
+                              href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
+                              onClick={e => e.stopPropagation()}
+                            >{song.song}</a>
+                            {song.isjam && <span className="badge jam-badge">JAM</span>}
+                            {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
+                            {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
+                            {duration && <span className="song-duration">{duration}</span>}
+                          </div>
+                          <span className="song-transition">
+                            {song.transition === '>' ? <span className="segue-soft">&gt;</span>
+                              : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
+                              : null}
+                          </span>
+                          <div className="song-row-controls">
+                            {audio?.mp3_url && (
+                              <a
+                                href={audio.mp3_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="song-play-btn"
+                                title={`Stream ${song.song} on Phish.in`}
+                                onClick={e => e.stopPropagation()}
+                              >▶</a>
+                            )}
+                            <SongRating
+                              value={parseInt(ratings[song.song]?.rating) || 0}
+                              onChange={val => updateRating(song.song, 'rating', val)}
+                            />
+                            <input
+                              className="notes-input"
+                              type="text"
+                              placeholder="notes..."
+                              value={ratings[song.song]?.notes || ''}
+                              onChange={e => updateRating(song.song, 'notes', e.target.value)}
+                            />
+                          </div>
                         </div>
-                        <span className="song-transition">
-                          {song.transition === '>' ? <span className="segue-soft">&gt;</span>
-                            : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
-                            : null}
-                        </span>
-                        <div className="song-row-controls">
-                          <SongRating
-                            value={parseInt(ratings[song.song]?.rating) || 0}
-                            onChange={val => updateRating(song.song, 'rating', val)}
-                          />
-                          <input
-                            className="notes-input"
-                            type="text"
-                            placeholder="notes..."
-                            value={ratings[song.song]?.notes || ''}
-                            onChange={e => updateRating(song.song, 'notes', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -543,6 +597,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 
       <div className="pnet-attribution">
         Setlist data by <a href="https://phish.net" target="_blank" rel="noopener noreferrer">Phish.net</a> — a project of the <a href="https://mbird.org" target="_blank" rel="noopener noreferrer">Mockingbird Foundation</a>
+        {' · '}Audio via <a href="https://phish.in" target="_blank" rel="noopener noreferrer">Phish.in</a>
       </div>
     </div>
   );
@@ -570,6 +625,7 @@ function MyShowsTab({ api, showMessage, showError }) {
           <div className="show-card-links">
             <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">RELISTEN</a>
             <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">SETLIST</a>
+            <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
           </div>
           <div className="show-card-rating">
             <div className="rating-value">{show.overall_rating ?? '-'}</div>
@@ -639,10 +695,7 @@ export default function App() {
     setTimeout(() => setMessages(prev => prev.filter(m => m.id !== id)), 4000);
   }, []);
 
-  // Mike Says No for errors
-  const showError = useCallback((text) => {
-    setMikeError(text);
-  }, []);
+  const showError = useCallback((text) => setMikeError(text), []);
 
   useEffect(() => {
     const token = localStorage.getItem('phish_token');
@@ -657,7 +710,6 @@ export default function App() {
   return (
     <div className="app">
       {mikeError && <MikeError message={mikeError} onClose={() => setMikeError(null)} />}
-
       <div className="messages-container">
         {messages.map(m => <div key={m.id} className={`message ${m.type}`}>{m.text}</div>)}
       </div>
