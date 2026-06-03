@@ -212,9 +212,9 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
         {/* Logo row — no toggle inside, no dead space */}
         <div className="sidebar-logo">
           {expanded ? (
-            <img src="/assets/fish-and-hook.png" alt="Phishook" className="sidebar-logo-img-expanded" />
+            <img src="/assets/fish-and-hook.png" alt="Phreezer" className="sidebar-logo-img-expanded" />
           ) : (
-            <img src="/assets/hook-only.png" alt="Phishook" className="sidebar-logo-img-collapsed" />
+            <img src="/assets/hook-only.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
           )}
         </div>
 
@@ -498,7 +498,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 
       <div className="instructions-panel">
         <button className="instructions-toggle" onClick={() => setShowInstructions(!showInstructions)}>
-          <span>HOW TO USE PHISHOOK</span>
+          <span>HOW TO USE PHREEZER</span>
           <span className="toggle-arrow">{showInstructions ? '▲ COLLAPSE' : '▼ EXPAND'}</span>
         </button>
         {showInstructions && (
@@ -903,7 +903,7 @@ export default function App() {
         <header className="app-header">
           <div className="header-left">
             <div className="header-title">
-              <h1>Phishook</h1>
+              <h1>Phreezer</h1>
               <span className="tagline">Rate. Track. Relive.</span>
             </div>
           </div>
@@ -936,5 +936,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
