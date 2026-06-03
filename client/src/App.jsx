@@ -883,8 +883,8 @@ function MyShowsTab({ api, showMessage, showError }) {
         </div>
       ) : displayShows.map(show => {
         const reviewExpanded = expandedReview === show.show_date;
-        const hasReview = !!show.review_text;
-        const phishnetScore = show.phishnet_score != null && show.phishnet_score > 0 ? parseFloat(show.phishnet_score).toFixed(1) : null;
+        const reviews = show.reviews || [];
+        const hasReview = reviews.length > 0;
         const phreezerScore = show.phreezer_avg ?? show.overall_rating ?? null;
         return (
           <div key={show.show_date} className="show-card">
@@ -899,10 +899,12 @@ function MyShowsTab({ api, showMessage, showError }) {
                   <span className="show-score-label">PHREEZER</span>
                   <span className="show-score-val cyan">{phreezerScore ?? '—'}</span>
                 </div>
-                <div className="show-score-row">
-                  <span className="show-score-label">PHISH.NET</span>
-                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}★` : '—'}</span>
-                </div>
+                {hasReview && (
+                  <div className="show-score-row">
+                    <span className="show-score-label">REVIEWS</span>
+                    <span className="show-score-val orange">{reviews.length}</span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="show-card-bottom">
@@ -919,8 +921,13 @@ function MyShowsTab({ api, showMessage, showError }) {
             </div>
             {reviewExpanded && hasReview && (
               <div className="show-review-expanded">
-                <div className="show-review-text">{show.review_text}</div>
-                {show.review_date && <div className="show-review-date">Posted {show.review_date}</div>}
+                {reviews.map((rev, i) => (
+                  <div key={rev.review_id || i} className={`review-entry ${i > 0 ? 'review-entry-divider' : ''}`}>
+                    {reviews.length > 1 && <div className="review-entry-num">REVIEW {i + 1} OF {reviews.length}</div>}
+                    <div className="show-review-text">{rev.review_text}</div>
+                    {rev.posted_date && <div className="show-review-date">Posted {rev.posted_date}</div>}
+                  </div>
+                ))}
               </div>
             )}
           </div>
