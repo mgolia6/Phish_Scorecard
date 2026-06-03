@@ -1822,9 +1822,7 @@ select option {
     font-size: 0.8rem;
   }
 
-  .song-duration {
-    display: none;
-  }
+  /* song-duration: shown on mobile inline */
 }
 
 /* ====== AUTOCOMPLETE SEARCH ====== */
@@ -2191,9 +2189,7 @@ select option {
     font-size: 0.8rem;
   }
 
-  .song-duration {
-    display: none;
-  }
+  /* song-duration: shown on mobile inline */
 }
 
 /* ====== ATTENDANCE SELECTOR ====== */
@@ -2253,4 +2249,177 @@ select option {
     font-size: 0.68rem;
     padding: 10px 6px;
   }
+}
+
+
+/* ====== NOTES COLLAPSIBLE ====== */
+.notes-collapsible {
+  margin-bottom: 12px;
+}
+
+.notes-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border: 1px solid rgba(0,255,255,0.2);
+  background: transparent;
+  color: rgba(0,255,255,0.6);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+}
+
+.notes-toggle:hover {
+  background: rgba(0,255,255,0.04);
+  box-shadow: none;
+  color: var(--cyan);
+}
+
+/* ====== COMPREHENSIVE MOBILE FIXES ====== */
+@media (max-width: 768px) {
+
+  /* Container: full width, minimal padding */
+  .container { padding: 16px 12px; }
+  .panel { padding: 16px 12px; }
+
+  /* Song row: full vertical stack, no overflow */
+  .song-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 10px 10px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* Song position + info on same line */
+  .song-pos {
+    display: inline;
+    margin-right: 4px;
+  }
+
+  .song-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .song-name-link {
+    font-size: 0.88rem;
+    word-break: break-word;
+    text-decoration: underline;
+    text-decoration-color: rgba(51,255,51,0.3);
+  }
+
+  /* Controls row: rating buttons + notes full width */
+  .song-row-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  /* Rating buttons: equal split across available width */
+  .song-rating-row {
+    display: flex;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .rating-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+  }
+
+  /* Notes input: takes remaining space */
+  .notes-input {
+    display: block !important;
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  /* Play button */
+  .song-play-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+
+  /* Song transition: hide on mobile */
+  .song-transition { display: none; }
+
+  /* Show masthead: stack */
+  .show-masthead {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .show-masthead-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .show-link {
+    font-size: 0.68rem;
+    padding: 5px 8px;
+  }
+
+  /* Submit section */
+  .submit-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .btn-submit { width: 100%; padding: 14px; font-size: 0.9rem; }
+
+  /* Attendance buttons: full width row */
+  .attendance-options { gap: 6px; }
+  .attendance-btn { padding: 10px 4px; font-size: 0.68rem; min-width: 80px; }
+
+  /* Analytics */
+  .analytics-grid { grid-template-columns: 1fr; }
+
+  /* Show cards */
+  .show-card { grid-template-columns: 1fr auto; gap: 10px; }
+  .show-card-links { flex-wrap: wrap; gap: 4px; }
+  .show-link-sm { font-size: 0.6rem; padding: 3px 6px; }
+
+  /* Instructions */
+  .instructions-grid { grid-template-columns: 1fr; }
+
+  /* Celebrations */
+  .celebrate-main { font-size: 1.4rem; }
+  .mike-no { font-size: 1.6rem; }
+  .mike-error-inner { padding: 32px 20px; margin: 16px; }
+
+  /* Header */
+  .app-header { flex-direction: column; gap: 12px; align-items: flex-start; padding: 16px; }
+  .header-title h1 { font-size: 1.4rem; }
+
+  /* Search dropdown: ensure full width, no overflow */
+  .search-dropdown { max-height: 280px; }
+  .search-dropdown-item {
+    padding: 12px 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .result-venue { font-size: 0.82rem; }
+  .result-date { font-size: 0.82rem; min-width: 90px; }
+
+  /* Score summary */
+  .score-summary { padding: 14px 12px; }
+  .overall-val { font-size: 1.6rem; }
 }
