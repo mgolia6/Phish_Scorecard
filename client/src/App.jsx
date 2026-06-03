@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './index.css';
 
 const API = '/api';
 const PNET = 'https://phish.net';
-const PHISHTRACKS = 'https://phishtracks.com';
+const RELISTEN = 'https://relisten.net/phish';
 
 function useApi() {
   const getToken = () => localStorage.getItem('phish_token');
@@ -31,18 +31,18 @@ function formatDate(d) {
   return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
 }
 
-function StarRating({ value, onChange }) {
-  const [hover, setHover] = useState(0);
+// Mobile-friendly rating: tap number 1-5, tap again to clear
+function SongRating({ value, onChange }) {
   return (
-    <div className="star-rating">
+    <div className="song-rating-row">
       {[1,2,3,4,5].map(n => (
-        <span
+        <button
           key={n}
-          className={`star ${n <= (hover || value) ? 'active' : ''}`}
+          type="button"
+          className={`rating-btn ${n <= value ? 'active' : ''} ${n === value ? 'selected' : ''}`}
           onClick={() => onChange(n === value ? 0 : n)}
-          onMouseEnter={() => setHover(n)}
-          onMouseLeave={() => setHover(0)}
-        >★</span>
+          aria-label={`Rate ${n}`}
+        >{n}</button>
       ))}
     </div>
   );
@@ -59,6 +59,58 @@ function SetScore({ label, songs, ratings }) {
       <div className="set-score-bar"><div className="set-score-fill" style={{ width: `${pct}%` }} /></div>
       <span className="set-score-val">{avg.toFixed(2)}</span>
       <span className="set-score-count">({rated.length})</span>
+    </div>
+  );
+}
+
+// Dopamine save animation
+function SaveCelebration({ onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2800);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  const glyphs = ['★','◈','✦','◉','⬡','⬢','✧','◆'];
+  const particles = Array.from({ length: 18 }, (_, i) => ({
+    id: i,
+    glyph: glyphs[i % glyphs.length],
+    x: Math.random() * 100,
+    delay: Math.random() * 0.4,
+    dur: 1.2 + Math.random() * 0.8,
+    color: i % 3 === 0 ? 'var(--orange)' : i % 3 === 1 ? 'var(--cyan)' : 'var(--green)',
+  }));
+  return (
+    <div className="celebrate-overlay">
+      <div className="celebrate-burst">
+        {particles.map(p => (
+          <span key={p.id} className="celebrate-particle" style={{
+            left: `${p.x}%`,
+            color: p.color,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.dur}s`,
+          }}>{p.glyph}</span>
+        ))}
+      </div>
+      <div className="celebrate-msg">
+        <span className="celebrate-main">RATINGS LOCKED IN</span>
+        <span className="celebrate-sub">◈ DON'T SUCK AT PHISH ◈</span>
+      </div>
+    </div>
+  );
+}
+
+// Mike Says No — error display
+function MikeError({ message, onClose }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 5000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  return (
+    <div className="mike-error" onClick={onClose}>
+      <div className="mike-error-inner">
+        <div className="mike-no">MIKE SAYS NO</div>
+        <div className="mike-msg">{message}</div>
+        <div className="mike-sub">[ TAP TO DISMISS ]</div>
+      </div>
     </div>
   );
 }
@@ -116,10 +168,13 @@ function AuthModal({ mode, setMode, onSuccess, onClose }) {
   );
 }
 
-function ScorecardTab({ api, showMessage, onAuthRequired }) {
+const TODAY = new Date().toISOString().split('T')[0];
+
+function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentShow, setCurrentShow] = useState(null);
   const [songs, setSongs] = useState([]);
   const [ratings, setRatings] = useState({});
@@ -127,23 +182,71 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
   const [submitting, setSubmitting] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
+  const [celebrating, setCelebrating] = useState(false);
+  const searchRef = useRef(null);
+  const debounceRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
 
-  useEffect(() => { api.get('/shows').then(setResults).catch(() => {}); }, []);
+  // Filter out future shows
+  const filterShows = (list) => list.filter(s => s.showdate <= TODAY);
 
-  const handleSearch = async (e) => {
-    e.preventDefault(); setSearching(true);
-    try {
-      const data = await api.get(`/shows${query.trim() ? `?q=${encodeURIComponent(query)}` : ''}`);
-      setResults(data);
-      if (query.trim() && !data.length) showMessage('No shows found', 'info');
-    } catch (err) { showMessage(err.message, 'error'); }
-    finally { setSearching(false); }
-  };
+  // Load recent shows on mount
+  useEffect(() => {
+    api.get('/shows').then(data => {
+      setResults(filterShows(data));
+    }).catch(() => {});
+  }, []);
+
+  // Debounced autocomplete
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!query.trim()) {
+      // Reset to recent shows
+      api.get('/shows').then(data => {
+        setResults(filterShows(data));
+        setDropdownOpen(false);
+      }).catch(() => {});
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
+        const filtered = filterShows(data);
+        setResults(filtered);
+        setDropdownOpen(true);
+      } catch (err) {
+        showError(err.message);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [query]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, []);
 
   const selectShow = async (show) => {
     if (!isAuthed) { onAuthRequired(); return; }
-    setLoadingShow(true); setCurrentShow(show); setSongs([]); setRatings({});
+    setDropdownOpen(false);
+    setQuery(`${formatDate(show.showdate)} — ${show.venue}`);
+    setLoadingShow(true);
+    setCurrentShow(show);
+    setSongs([]);
+    setRatings({});
     try {
       const [showData, savedRatings] = await Promise.all([
         api.get(`/shows/${show.showdate}`),
@@ -154,8 +257,12 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
       setRatings(rMap);
-    } catch (err) { showMessage('Failed to load show', 'error'); setCurrentShow(null); }
-    finally { setLoadingShow(false); }
+    } catch (err) {
+      showError('Failed to load show');
+      setCurrentShow(null);
+    } finally {
+      setLoadingShow(false);
+    }
   };
 
   const updateRating = (songName, field, value) =>
@@ -169,15 +276,18 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
         rating: parseInt(ratings[s.song].rating),
         notes: ratings[s.song]?.notes || '',
       }));
-      if (!ratingsList.length) { showMessage('Rate at least one song', 'info'); return; }
+      if (!ratingsList.length) { showMessage('Rate at least one song first', 'info'); setSubmitting(false); return; }
       await api.post(`/ratings/${currentShow.showdate}`, {
         ratings: ratingsList,
         showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
       if (phishnetHandle.trim()) localStorage.setItem('pnet_handle', phishnetHandle.trim());
-      showMessage(`Saved ${ratingsList.length} ratings`, 'success');
-    } catch (err) { showMessage(err.message, 'error'); }
-    finally { setSubmitting(false); }
+      setCelebrating(true);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const sets = songs.reduce((acc, song) => {
@@ -199,8 +309,14 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
     ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / totalRated.length).toFixed(2)
     : null;
 
+  const relistenUrl = currentShow
+    ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}`
+    : null;
+
   return (
     <div>
+      {celebrating && <SaveCelebration onDone={() => { setCelebrating(false); showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success'); }} />}
+
       {/* Instructions */}
       <div className="instructions-panel">
         <button className="instructions-toggle" onClick={() => setShowInstructions(!showInstructions)}>
@@ -211,43 +327,65 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
           <div className="instructions-body">
             <div className="instructions-grid">
               <div>
-                <div className="instr-step"><span className="instr-num">01</span><span>Search for any Phish show by date, venue, or city. Recent shows load by default.</span></div>
+                <div className="instr-step"><span className="instr-num">01</span><span>Type any date, venue, or city — results appear instantly as you type.</span></div>
                 <div className="instr-step"><span className="instr-num">02</span><span>Click a show to load the full setlist live from Phish.net.</span></div>
-                <div className="instr-step"><span className="instr-num">03</span><span>Rate each song 1-5 stars. Jam chart songs are marked with a star badge.</span></div>
+                <div className="instr-step"><span className="instr-num">03</span><span>Tap 1–5 to rate each song. Tap the same number again to clear.</span></div>
               </div>
               <div>
-                <div className="instr-step"><span className="instr-num">04</span><span>Add notes per song. Segues shown between songs (soft: greater-than, hard: arrow).</span></div>
-                <div className="instr-step"><span className="instr-num">05</span><span>Click any song name to open its Phish.net history page in a new tab.</span></div>
-                <div className="instr-step"><span className="instr-num">06</span><span>Stream audio on PhishTracks, read community reviews, and track your show history.</span></div>
+                <div className="instr-step"><span className="instr-num">04</span><span>Add notes per song. Segues shown between songs.</span></div>
+                <div className="instr-step"><span className="instr-num">05</span><span>Click any song name to open its Phish.net history page.</span></div>
+                <div className="instr-step"><span className="instr-num">06</span><span>Stream audio on Relisten, read community reviews, track your show history.</span></div>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Search */}
+      {/* Search — autocomplete */}
       <div className="panel">
         <div className="panel-title">SEARCH SHOWS</div>
-        <form className="search-bar" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Date (YYYY-MM-DD), venue, city, or tour... browse recent shows below"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          <button type="submit" disabled={searching}>{searching ? 'SCANNING...' : 'SEARCH'}</button>
-        </form>
-        {results.length > 0 && (
-          <>
-            <div className="results-header">{query.trim() ? `${results.length} results` : 'Recent shows'}</div>
-            <div className="results-list">
+        <div className="search-autocomplete" ref={searchRef}>
+          <div className="search-input-wrap">
+            <input
+              type="text"
+              placeholder="Type date, venue, city, or tour..."
+              value={query}
+              onChange={e => { setQuery(e.target.value); if (e.target.value.trim()) setDropdownOpen(true); }}
+              onFocus={() => { if (results.length) setDropdownOpen(true); }}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck="false"
+            />
+            {searching && <span className="search-spinner">◈</span>}
+          </div>
+          {dropdownOpen && results.length > 0 && (
+            <div className="search-dropdown">
               {results.map(show => (
-                <div key={show.showid || show.showdate} className="result-item" onClick={() => selectShow(show)}>
-                  <span className="result-date">{show.showdate}</span>
+                <div key={show.showid || show.showdate} className="search-dropdown-item" onMouseDown={() => selectShow(show)} onTouchEnd={() => selectShow(show)}>
+                  <span className="result-date">{formatDate(show.showdate)}</span>
                   <span className="result-venue">{show.venue}</span>
                   <span className="result-meta">
                     <span className="result-location">{show.city}{show.state ? `, ${show.state}` : ''}</span>
-                    {show.tour_name && <span className="result-tour">{show.tour_name}</span>}
+                    {show.tour_name && show.tour_name !== 'Not Part of a Tour' && <span className="result-tour">{show.tour_name}</span>}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recent shows list — shown when no dropdown */}
+        {!dropdownOpen && !currentShow && !loadingShow && results.length > 0 && (
+          <>
+            <div className="results-header">Recent shows — tap to load</div>
+            <div className="results-list">
+              {results.map(show => (
+                <div key={show.showid || show.showdate} className="result-item" onClick={() => selectShow(show)}>
+                  <span className="result-date">{formatDate(show.showdate)}</span>
+                  <span className="result-venue">{show.venue}</span>
+                  <span className="result-meta">
+                    <span className="result-location">{show.city}{show.state ? `, ${show.state}` : ''}</span>
+                    {show.tour_name && show.tour_name !== 'Not Part of a Tour' && <span className="result-tour">{show.tour_name}</span>}
                   </span>
                 </div>
               ))}
@@ -274,9 +412,11 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
               <a href={`${PNET}/setlists/${currentShow.permalink || ''}`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
                 PHISH.NET SETLIST
               </a>
-              <a href={`${PHISHTRACKS}/shows/${currentShow.showdate}`} target="_blank" rel="noopener noreferrer" className="show-link audio-link">
-                STREAM AUDIO
-              </a>
+              {relistenUrl && (
+                <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link">
+                  STREAM ON RELISTEN
+                </a>
+              )}
               {currentShow.reviews?.count > 0 && (
                 <a href={`${PNET}/setlists/${currentShow.permalink}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link reviews-link">
                   {currentShow.reviews.count} REVIEWS {currentShow.reviews.avg_score ? `(${currentShow.reviews.avg_score}/5)` : ''}
@@ -324,17 +464,19 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
                             : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
                             : null}
                         </span>
-                        <StarRating
-                          value={parseInt(ratings[song.song]?.rating) || 0}
-                          onChange={val => updateRating(song.song, 'rating', val)}
-                        />
-                        <input
-                          className="notes-input"
-                          type="text"
-                          placeholder="notes..."
-                          value={ratings[song.song]?.notes || ''}
-                          onChange={e => updateRating(song.song, 'notes', e.target.value)}
-                        />
+                        <div className="song-row-controls">
+                          <SongRating
+                            value={parseInt(ratings[song.song]?.rating) || 0}
+                            onChange={val => updateRating(song.song, 'rating', val)}
+                          />
+                          <input
+                            className="notes-input"
+                            type="text"
+                            placeholder="notes..."
+                            value={ratings[song.song]?.notes || ''}
+                            onChange={e => updateRating(song.song, 'notes', e.target.value)}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -356,7 +498,7 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
                 )}
               </div>
 
-              {/* Submit + Phish.net handle */}
+              {/* Submit */}
               <div className="submit-section">
                 <div className="pnet-handle-row">
                   <span className="pnet-handle-label">PHISH.NET HANDLE:</span>
@@ -406,12 +548,12 @@ function ScorecardTab({ api, showMessage, onAuthRequired }) {
   );
 }
 
-function MyShowsTab({ api, showMessage }) {
+function MyShowsTab({ api, showMessage, showError }) {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/user/shows').then(setShows).catch(err => showMessage(err.message, 'error')).finally(() => setLoading(false));
+    api.get('/user/shows').then(setShows).catch(err => showError(err.message)).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="loading">LOADING YOUR SHOWS...</div>;
@@ -426,7 +568,8 @@ function MyShowsTab({ api, showMessage }) {
             <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
           </div>
           <div className="show-card-links">
-            <a href={`${PHISHTRACKS}/shows/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">AUDIO</a>
+            <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">RELISTEN</a>
+            <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">SETLIST</a>
           </div>
           <div className="show-card-rating">
             <div className="rating-value">{show.overall_rating ?? '-'}</div>
@@ -438,7 +581,7 @@ function MyShowsTab({ api, showMessage }) {
   );
 }
 
-function AnalyticsTab({ api, showMessage }) {
+function AnalyticsTab({ api, showMessage, showError }) {
   const [songs, setSongs] = useState([]);
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -446,7 +589,7 @@ function AnalyticsTab({ api, showMessage }) {
   useEffect(() => {
     Promise.all([api.get('/analytics/songs'), api.get('/analytics/venues')])
       .then(([s, v]) => { setSongs(s); setVenues(v); })
-      .catch(err => showMessage(err.message, 'error'))
+      .catch(err => showError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -487,6 +630,7 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [messages, setMessages] = useState([]);
+  const [mikeError, setMikeError] = useState(null);
   const api = useApi();
 
   const showMessage = useCallback((text, type = 'info') => {
@@ -495,18 +639,25 @@ export default function App() {
     setTimeout(() => setMessages(prev => prev.filter(m => m.id !== id)), 4000);
   }, []);
 
+  // Mike Says No for errors
+  const showError = useCallback((text) => {
+    setMikeError(text);
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('phish_token');
     if (!token) return;
     api.get('/auth/me').then(setUser).catch(() => localStorage.removeItem('phish_token'));
   }, []);
 
-  const handleAuthSuccess = u => { setUser(u); setShowAuth(false); showMessage(`Welcome, ${u.username}`, 'success'); };
+  const handleAuthSuccess = u => { setUser(u); setShowAuth(false); showMessage(`Welcome back, ${u.username}`, 'success'); };
   const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   return (
     <div className="app">
+      {mikeError && <MikeError message={mikeError} onClose={() => setMikeError(null)} />}
+
       <div className="messages-container">
         {messages.map(m => <div key={m.id} className={`message ${m.type}`}>{m.text}</div>)}
       </div>
@@ -540,9 +691,9 @@ export default function App() {
             <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
           </>}
         </nav>
-        {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} onAuthRequired={() => openAuth('login')} />}
-        {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} />}
-        {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} />}
+        {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
+        {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
+        {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
