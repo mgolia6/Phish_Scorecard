@@ -838,7 +838,7 @@ function MyShowsTab({ api, showMessage, showError }) {
                 </div>
                 <div className="show-score-row">
                   <span className="show-score-label">PHISH.NET</span>
-                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}/10` : '—'}</span>
+                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}/5` : '—'}</span>
                 </div>
               </div>
             </div>
