@@ -26,44 +26,45 @@ export default async function handler(req, res) {
 
     const pool = getPool();
     let imported = 0;
+    let updated = 0;
     let skipped = 0;
 
     for (const review of reviews) {
       const showDate = review.showdate;
-      if (!showDate) continue;
+      const reviewId = review.reviewid;
+      if (!showDate || !reviewId) continue;
 
-      // phish.net score is 1-5 stars (personal user rating)
-      // 0 means not personally rated — treat as null
-      const rawScore = review.score != null ? parseFloat(review.score) : null;
-      const score = (!isNaN(rawScore) && rawScore >= 1 && rawScore <= 5) ? rawScore : null;
-
-      // actual field name from phish.net API is review_text
       const reviewText = review.review_text || review.review || review.body || null;
-      // actual field name from phish.net API is posted_at
       const postedRaw = review.posted_at || review.posted_date || review.tstamp || null;
       const postedDate = typeof postedRaw === 'string' ? postedRaw.slice(0, 10) : null;
-      
-      // Debug log first review
-      if (imported === 0) console.log('REVIEW FIELDS:', JSON.stringify({ score: review.score, rawScore, scoreFields: Object.keys(review).filter(k => k.includes('score')) }));
 
       try {
-        await pool.query(
-          `INSERT INTO user_reviews (user_id, show_date, phishnet_score, review_text, posted_date, source)
+        const result = await pool.query(
+          `INSERT INTO user_reviews 
+            (user_id, show_date, phishnet_review_id, review_text, posted_date, source)
            VALUES ($1, $2, $3, $4, $5, 'phishnet')
-           ON CONFLICT (user_id, show_date) DO UPDATE SET
-             phishnet_score = EXCLUDED.phishnet_score,
+           ON CONFLICT (user_id, phishnet_review_id) DO UPDATE SET
              review_text = EXCLUDED.review_text,
              posted_date = EXCLUDED.posted_date,
-             imported_at = CURRENT_TIMESTAMP`,
-          [user.id, showDate, score, reviewText, postedDate]
+             imported_at = CURRENT_TIMESTAMP
+           RETURNING (xmax = 0) as inserted`,
+          [user.id, showDate, reviewId, reviewText, postedDate]
         );
-        imported++;
+        if (result.rows[0]?.inserted) imported++;
+        else updated++;
       } catch (e) {
+        console.error('Row error:', e.message, { showDate, reviewId });
         skipped++;
       }
     }
 
-    res.json({ imported, skipped, total: reviews.length, message: `Imported ${imported} reviews from phish.net` });
+    res.json({ 
+      imported, 
+      updated,
+      skipped, 
+      total: reviews.length, 
+      message: `Imported ${imported} new reviews, updated ${updated} from phish.net` 
+    });
   } catch (err) {
     console.error('Phish.net reviews import error:', err);
     res.status(500).json({ error: err.message });
