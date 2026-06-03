@@ -1,3 +1,55 @@
+## Session 7 — 2026-06-03
+
+### Decisions
+- App renamed: Phishow Scorecard → Phishook → **Phreezer** (song title, Ph spelling, freeze/preserve metaphor)
+- Tagline: FREEZE. RATE. RELIVE.
+- Logo: SVG built inline — snowflake icon + THE PHREEZER wordmark, no external font deps
+- Collapsed sidebar: orange snowflake SVG
+- Expanded sidebar + mobile header: full wordmark SVG
+- Hiatus years 2005/2006/2007 hidden from year buttons; 2008 kept (one-off show)
+
+### What Was Built
+- CLAUDE.md created for Claude Code session context
+- Full rename pass: Phishook → Phreezer throughout codebase
+- Logo assets pushed to client/public/assets/ (SVG preferred over PNG)
+- Phish.net attendance import: /api/import/phishnet.js
+- Attendance table: user_id, show_date, venue, city, state, country, source
+- User reviews import: /api/import/phishnet-reviews.js
+- user_reviews table: user_id, show_date, phishnet_score (1-5), review_text, posted_date
+- Attendance endpoint updated to JOIN user_reviews — returns all three scores per show
+- My Shows tab rebuilt: ATTENDED/RATED toggle, IMPORT panel with ATTENDANCE/REVIEWS+SCORES toggle
+- Dopamine import modal: big glowing count, tagline, tap to dismiss
+- Sort controls: DATE↓↑, PHREEZER↓, PHISH.NET↓, UNRATED FIRST
+- Filter pills: ALL, REVIEWED, RATED, UNRATED
+- Side-by-side scores on show cards: PHREEZER avg + PHISH.NET star rating
+- Expandable written review inline on show card
+- Fixed: song duration format (ms vs seconds)
+- Fixed: pre-1998 shows (bumped API limit to 2500)
+- Fixed: phish.net link format in attended cards (?d=YYYY-MM-DD)
+- Fixed: phish.net score scale — 1-5 stars, 0 treated as null
+
+### Data Imported (mpgink)
+- 188 attended shows from phish.net
+- 35 written reviews from phish.net
+- Scores: 1-5 star personal ratings, nulls where not personally rated
+
+### Known Issues / Open Debt
+- Debug endpoint /api/debug/reviews.js still in repo — remove before public launch
+- phish.net community score (3.79/5 overall) not yet pulled — separate from personal score
+- Filter by year not yet built (sort exists, year filter deferred)
+- KPI dashboard not yet built (shows rated, avg score, top song, etc.)
+- Song versions expandable list not yet built
+- Tap to rate from attended list not yet built
+- Login screen welcome/hero moment not yet built
+- Subdomain phreezer.mpgink.com not yet configured
+
+### Next Session Priorities
+1. KPI cards at top of My Shows (shows attended, rated, avg score, top song, rarest show)
+2. Tap to rate directly from attended show card
+3. Filter attended by year (dropdown or pill)
+4. Song versions expandable in Analytics
+5. Login/landing hero screen with full lockup + tagline
+
 # Phishook Scorecard — Session Log
 
 ## Session 6 — June 3, 2026
