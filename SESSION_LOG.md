@@ -1,3 +1,31 @@
+## Session 8 — 2026-06-03
+
+### What Was Built
+- **Onboarding flow** — 4-step modal for new users only. Walks through what Phreezer does, ends with CTA: IMPORT FROM PHISH.NET or RATE A SHOW NOW. Stored in localStorage per user ID (`phreezer_onboarding_{id}`). Skippable.
+- **T&Cs** — fires on first login for any user who hasn't accepted. Plain English: not affiliated, you own your data, Phish.net attribution, don't be a jerk. Accept button sets `phreezer_tandc_{id}` in localStorage.
+- **KPI dashboard** — top of My Shows tab. 4 stat cards: SHOWS ATTENDED / SHOWS RATED / AVG SCORE / REVIEWS. Highlight bar below: TOP SONG + MOST VISITED venue. Backed by new `/api/user/kpi.js` endpoint.
+- **Tap to rate from attended list** — every show card has ◈ RATE / ◈ RE-RATE button. Tapping navigates to Scorecard tab with that show pre-loaded via `initialShowDate` prop + `onShowLoaded` callback.
+- **psycopg2-binary installed** in session container for future DB work.
+
+### Decisions Made
+- Community rating on show cards (phish.net overall score) deferred — requires lazy DB caching to avoid 188 API calls on My Shows load. Will tackle as standalone piece.
+- T&C and onboarding both keyed to user ID in localStorage — fires once per user, respects multi-user scenarios.
+- Onboarding only triggers on new account registration (`isNewUser = true` flag from AuthModal).
+- T&C fires for any user (new or existing) who hasn't accepted yet — good for retroactive rollout.
+
+### Known Issues / Open Debt
+- Debug endpoint /api/debug/reviews.js still in repo — DELETE before launch
+- Community rating on show cards not yet built (deferred — needs caching layer)
+- Onboarding testing: to re-trigger, run `Object.keys(localStorage).filter(k => k.startsWith('phreezer_')).forEach(k => localStorage.removeItem(k))` in console, then re-register
+- CSS at ~760 lines — still clean, no duplication, but watch it
+
+### Next Session Priorities
+1. **Test onboarding end-to-end** with fresh account (Matthew was doing this at session close)
+2. **Delete /api/debug/reviews.js** — overdue
+3. **Community rating caching** — add `pnet_community_score` column to attendance table, write on show load, display on cards
+4. **Share cards** — post-rating shareable image for Twitter/Instagram
+5. **Subdomain** — phreezer.mpgink.com CNAME → Vercel
+
 ## Session 7 — 2026-06-03 (FINAL UPDATE)
 
 ### Completed This Session
