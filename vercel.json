@@ -61,6 +61,10 @@
       "destination": "/api/import/phishnet-reviews"
     },
     {
+      "source": "/api/debug/reviews",
+      "destination": "/api/debug/reviews"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
