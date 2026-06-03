@@ -1,6 +1,30 @@
 import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 
+let migrated = false;
+async function ensureMigration(pool) {
+  if (migrated) return;
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_show_attendance (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        show_date DATE NOT NULL REFERENCES shows(show_date) ON DELETE CASCADE,
+        attendance_type VARCHAR(20) NOT NULL DEFAULT 'listened'
+          CHECK (attendance_type IN ('attended', 'webcast', 'listened')),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, show_date)
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_attendance_user_id ON user_show_attendance(user_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_attendance_show_date ON user_show_attendance(show_date)`);
+    migrated = true;
+  } catch (err) {
+    console.error('Migration error (non-fatal):', err.message);
+  }
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -12,27 +36,40 @@ export default async function handler(req, res) {
   if (!showDate) return res.status(400).json({ error: 'Show date required' });
 
   const pool = getPool();
+  await ensureMigration(pool);
 
-  // GET - fetch this user's ratings for a show
+  // GET — fetch ratings + attendance for this show
   if (req.method === 'GET') {
     try {
-      const result = await pool.query(
-        'SELECT * FROM ratings WHERE user_id = $1 AND show_date = $2 ORDER BY set_number, id',
-        [user.id, showDate]
-      );
-      return res.json(result.rows);
+      const [ratingsResult, attendanceResult] = await Promise.all([
+        pool.query(
+          'SELECT * FROM ratings WHERE user_id = $1 AND show_date = $2 ORDER BY set_number, id',
+          [user.id, showDate]
+        ),
+        pool.query(
+          'SELECT attendance_type FROM user_show_attendance WHERE user_id = $1 AND show_date = $2',
+          [user.id, showDate]
+        ),
+      ]);
+      return res.json({
+        ratings: ratingsResult.rows,
+        attendance_type: attendanceResult.rows[0]?.attendance_type || null,
+      });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
 
-  // POST - submit ratings for a show
+  // POST — submit ratings + attendance
   if (req.method === 'POST') {
-    const { ratings, showDetails } = req.body;
+    const { ratings, showDetails, attendance_type } = req.body;
 
     if (!ratings || !Array.isArray(ratings)) {
       return res.status(400).json({ error: 'ratings array required' });
     }
+
+    const validAttendance = ['attended', 'webcast', 'listened'];
+    const attendanceType = validAttendance.includes(attendance_type) ? attendance_type : 'listened';
 
     try {
       // Upsert show record
@@ -41,6 +78,15 @@ export default async function handler(req, res) {
          VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (show_date) DO NOTHING`,
         [showDate, showDetails?.venue, showDetails?.city, showDetails?.state, showDetails?.country]
+      );
+
+      // Upsert attendance
+      await pool.query(
+        `INSERT INTO user_show_attendance (user_id, show_date, attendance_type)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (user_id, show_date)
+         DO UPDATE SET attendance_type = $3, updated_at = NOW()`,
+        [user.id, showDate, attendanceType]
       );
 
       // Upsert each rating
