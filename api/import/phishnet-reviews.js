@@ -32,13 +32,18 @@ export default async function handler(req, res) {
       const showDate = review.showdate;
       if (!showDate) continue;
 
-      // phish.net score is 0-5 star scale
+      // phish.net score is 1-5 stars (personal user rating)
       const rawScore = review.score != null ? parseFloat(review.score) : null;
-      const score = !isNaN(rawScore) ? rawScore : null;
+      const score = (!isNaN(rawScore) && rawScore <= 5) ? rawScore : null;
 
-      const reviewText = review.review || review.body || review.text || null;
-      const postedRaw = review.posted_date || review.tstamp || review.date || null;
+      // actual field name from phish.net API is review_text
+      const reviewText = review.review_text || review.review || review.body || null;
+      // actual field name from phish.net API is posted_at
+      const postedRaw = review.posted_at || review.posted_date || review.tstamp || null;
       const postedDate = typeof postedRaw === 'string' ? postedRaw.slice(0, 10) : null;
+      
+      // Debug log first review
+      if (imported === 0) console.log('REVIEW FIELDS:', JSON.stringify({ score: review.score, rawScore, scoreFields: Object.keys(review).filter(k => k.includes('score')) }));
 
       try {
         await pool.query(
