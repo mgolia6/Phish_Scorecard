@@ -1,4 +1,4 @@
-# INSTRUCTIONS — Phishow Scorecard
+# INSTRUCTIONS — Phreezer
 
 ## Project Overview
 Full-stack Phish show rating app. Stack: React + Vite frontend (`/client`), Vercel serverless functions (`/api`), Neon Postgres (via `POSTGRES_URL`), JWT auth, Phish.net API v5. Retro terminal aesthetic (green/cyan/orange on dark) with modern polish — Orbitron display font, scanlines, glow effects. Non-negotiable identity.
@@ -75,3 +75,4 @@ After each session, update SESSION_LOG.md with:
 - Decisions made and why
 - Known issues or open debt
 - Next session priorities
+
