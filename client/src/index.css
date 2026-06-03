@@ -491,3 +491,18 @@ select option { background: var(--bg); color: var(--green); }
 .import-input:focus { border-color: var(--cyan); }
 .import-go { padding: 8px 16px; font-size: 0.6rem; }
 .import-hint { font-size: 0.6rem; color: rgba(51,255,51,0.3); margin-top: 8px; letter-spacing: 1px; }
+
+.show-scores-col { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
+.show-score-row { display: flex; align-items: center; gap: 6px; }
+.show-score-label { font-size: 0.55rem; letter-spacing: 2px; color: rgba(51,255,51,0.4); font-family: var(--font-display); }
+.show-score-val { font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; }
+.show-score-val.cyan { color: var(--cyan); }
+.show-score-val.orange { color: var(--orange); }
+.review-toggle { background: transparent; border: 1px solid rgba(51,255,51,0.3); color: rgba(51,255,51,0.5); font-family: var(--font-display); font-size: 0.55rem; letter-spacing: 1px; padding: 3px 8px; cursor: pointer; }
+.review-toggle:hover { border-color: var(--green); color: var(--green); }
+.show-review-expanded { padding: 12px 14px; border-top: 1px solid var(--border); background: var(--bg-elevated); }
+.show-review-text { font-size: 0.8rem; color: rgba(51,255,51,0.75); line-height: 1.6; white-space: pre-wrap; }
+.show-review-date { font-size: 0.6rem; color: rgba(51,255,51,0.3); letter-spacing: 2px; margin-top: 8px; }
+.import-type-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.import-type-btn { background: transparent; border: 1px solid var(--border); color: rgba(51,255,51,0.4); font-family: var(--font-display); font-size: 0.55rem; letter-spacing: 2px; padding: 5px 10px; cursor: pointer; }
+.import-type-btn.active { border-color: var(--cyan); color: var(--cyan); }
