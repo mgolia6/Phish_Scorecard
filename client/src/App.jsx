@@ -903,8 +903,8 @@ export default function App() {
         <header className="app-header">
           <div className="header-left">
             <div className="header-title">
-              <h1>Phreezer</h1>
-              <span className="tagline">Rate. Track. Relive.</span>
+              <img src="/assets/phreezer-snowflake.png" alt="The Phreezer" className="mobile-header-logo" />
+              <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="mobile-header-wordmark" />
             </div>
           </div>
           <div className="header-right">
