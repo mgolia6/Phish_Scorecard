@@ -52,7 +52,9 @@ export default async function handler(req, res) {
           score = n > 5 ? (n / 2).toFixed(1) : n.toFixed(1);
         }
       }
-      const posted = r.posted_date || r.tstamp || r.date || '';
+      // Strip ISO timestamp suffix — keep only YYYY-MM-DD
+      const rawPosted = r.posted_date || r.tstamp || r.date || '';
+      const posted = typeof rawPosted === 'string' ? rawPosted.slice(0, 10) : '';
       return { author, score, review: text, posted };
     });
 
