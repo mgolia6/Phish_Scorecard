@@ -15,13 +15,17 @@ export default async function handler(req, res) {
       `SELECT
         TO_CHAR(a.show_date, 'YYYY-MM-DD') as show_date,
         a.venue, a.city, a.state, a.country, a.source,
-        TO_CHAR(a.imported_at, 'YYYY-MM-DD') as imported_at,
-        ROUND(AVG(r.rating)::numeric, 2) as avg_rating,
-        COUNT(r.id) as songs_rated
+        ROUND(AVG(r.rating)::numeric, 2) as phreezer_avg,
+        COUNT(r.id) as songs_rated,
+        ur.phishnet_score,
+        ur.review_text,
+        TO_CHAR(ur.posted_date, 'YYYY-MM-DD') as review_date
        FROM attendance a
        LEFT JOIN ratings r ON r.user_id = a.user_id AND r.show_date = a.show_date
+       LEFT JOIN user_reviews ur ON ur.user_id = a.user_id AND ur.show_date = a.show_date
        WHERE a.user_id = $1
-       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source, a.imported_at
+       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source,
+                ur.phishnet_score, ur.review_text, ur.posted_date
        ORDER BY a.show_date DESC`,
       [user.id]
     );
