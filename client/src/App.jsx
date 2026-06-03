@@ -206,17 +206,14 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
   ];
 
   return (
-    <aside className={`sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
-      {/* Toggle button */}
-      <button className="sidebar-toggle" onClick={() => setExpanded(e => !e)} title={expanded ? 'Collapse' : 'Expand'}>
-        {expanded ? '◀' : '▶'}
-      </button>
+    <div className="sidebar-wrapper">
+      <aside className={`sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
 
-      {/* Logo */}
-      <div className="sidebar-logo">
-        <span className="sidebar-logo-glyph">⟁</span>
-        {expanded && <span className="sidebar-logo-text">PHISHOOK</span>}
-      </div>
+        {/* Logo row — no toggle inside, no dead space */}
+        <div className="sidebar-logo">
+          <span className="sidebar-logo-glyph">⟁</span>
+          {expanded && <span className="sidebar-logo-text">PHISHOOK</span>}
+        </div>
 
       {/* Nav */}
       <nav className="sidebar-nav">
@@ -298,7 +295,17 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
           </>
         )}
       </div>
-    </aside>
+      </aside>
+
+      {/* Toggle tab — protrudes from right edge of sidebar, inline with logo */}
+      <button
+        className="sidebar-tab"
+        onClick={() => setExpanded(e => !e)}
+        title={expanded ? 'Collapse' : 'Expand'}
+      >
+        {expanded ? '◀' : '▶'}
+      </button>
+    </div>
   );
 }
 
@@ -926,3 +933,4 @@ export default function App() {
     </div>
   );
 }
+
