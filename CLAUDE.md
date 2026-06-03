@@ -1,11 +1,11 @@
-# CLAUDE.md — Phishook
+# CLAUDE.md — Phreezer
 
 ## What This Is
 Full-stack Phish show rating app. Stack: React + Vite frontend (`/client`), Vercel serverless functions (`/api`), Neon Postgres (via `POSTGRES_URL`), JWT auth, Phish.net API v5.
 
 Retro terminal aesthetic: green/cyan/orange on dark, Orbitron display font, scanlines, glow effects. **Non-negotiable identity — don't touch it.**
 
-App name: **Phishook** (renamed from Phishow Scorecard — rename pass not yet applied to codebase as of Session 6)
+App name: **Phreezer** (renamed from Phishow Scorecard → Phishook → Phreezer. Rename pass applied Session 7.)
 
 ---
 
@@ -96,3 +96,4 @@ After each session, update SESSION_LOG.md:
 - Decisions made and why
 - Known issues or open debt
 - Next session priorities
+
