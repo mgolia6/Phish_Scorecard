@@ -600,3 +600,65 @@ select option { background: var(--bg); color: var(--green); }
 
 .review-entry-divider { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px; }
 .review-entry-num { font-family: var(--font-display); font-size: 0.55rem; letter-spacing: 3px; color: var(--orange); margin-bottom: 8px; }
+
+
+/* ====== T&C MODAL ====== */
+.tandc-body { display: flex; flex-direction: column; gap: 16px; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.tandc-section { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.tandc-section:last-child { border-bottom: none; }
+.tandc-heading { font-family: var(--font-display); font-size: 0.65rem; color: var(--orange); letter-spacing: 3px; margin-bottom: 8px; }
+.tandc-section p { font-size: 0.82rem; color: rgba(51,255,51,0.75); line-height: 1.6; }
+.tandc-section a { color: var(--cyan); text-decoration: none; }
+.tandc-section a:hover { text-decoration: underline; }
+
+/* ====== ONBOARDING MODAL ====== */
+.onboarding-modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--cyan);
+  box-shadow: 0 0 40px rgba(0,255,255,0.15), 0 0 80px rgba(0,255,255,0.05);
+  padding: 48px 40px 36px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  animation: modalPop 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.onboarding-glyph { font-size: 3rem; margin-bottom: 16px; animation: pulse 2s ease infinite; }
+.onboarding-title { font-family: var(--font-display); font-size: 1.1rem; color: var(--orange); letter-spacing: 3px; text-transform: uppercase; text-shadow: var(--glow-orange); margin-bottom: 8px; }
+.onboarding-sub { font-family: var(--font-mono); font-size: 0.85rem; color: var(--cyan); letter-spacing: 2px; margin-bottom: 16px; }
+.onboarding-body { font-size: 0.88rem; color: rgba(51,255,51,0.8); line-height: 1.7; margin-bottom: 28px; }
+.onboarding-progress { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+.onboarding-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(51,255,51,0.2); border: 1px solid var(--border); transition: all 0.2s; }
+.onboarding-dot.active { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px rgba(255,102,0,0.5); }
+.onboarding-dot.done { background: rgba(0,255,255,0.3); border-color: var(--cyan); }
+.onboarding-actions { display: flex; gap: 10px; }
+.onboarding-skip { margin-top: 16px; background: transparent; border: none; color: rgba(51,255,51,0.25); font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 2px; cursor: pointer; padding: 4px; text-transform: uppercase; }
+.onboarding-skip:hover { color: rgba(51,255,51,0.5); box-shadow: none; background: transparent; }
+
+/* ====== KPI CARDS ====== */
+.kpi-section { margin-bottom: 20px; }
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+.kpi-loading { font-size: 0.65rem; color: rgba(51,255,51,0.3); letter-spacing: 3px; padding: 16px 0; text-align: center; animation: blink 1s step-end infinite; }
+.kpi-card { background: var(--bg-elevated); border: 1px solid var(--border); padding: 14px 12px; text-align: center; }
+.kpi-value { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+.kpi-value.kpi-cyan { color: var(--cyan); text-shadow: var(--glow-cyan); }
+.kpi-value.kpi-orange { color: var(--orange); text-shadow: var(--glow-orange); }
+.kpi-value.kpi-green { color: var(--green); text-shadow: var(--glow-green); }
+.kpi-label { font-size: 0.55rem; color: rgba(51,255,51,0.4); letter-spacing: 2px; text-transform: uppercase; }
+.kpi-highlights { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-elevated); border: 1px solid var(--border); border-top: none; }
+.kpi-highlight-item { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px; }
+.kpi-hl-label { font-size: 0.55rem; color: rgba(51,255,51,0.35); letter-spacing: 2px; white-space: nowrap; }
+.kpi-hl-val { font-size: 0.8rem; color: var(--green); }
+.kpi-hl-score { color: var(--orange); font-family: var(--font-display); font-size: 0.75rem; }
+
+/* ====== RATE BUTTON ON SHOW CARD ====== */
+.show-link-sm.rate-btn { border-color: rgba(255,102,0,0.5); color: var(--orange); cursor: pointer; background: transparent; font-family: var(--font-mono); }
+.show-link-sm.rate-btn:hover { border-color: var(--orange); background: rgba(255,102,0,0.1); box-shadow: 0 0 8px rgba(255,102,0,0.3); }
+
+/* ====== MOBILE KPI ====== */
+@media (max-width: 768px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .kpi-value { font-size: 1.3rem; }
+  .onboarding-modal { padding: 36px 20px 28px; margin: 16px; }
+  .onboarding-actions { flex-direction: column; }
+  .tandc-body { max-height: 50vh; }
+}
