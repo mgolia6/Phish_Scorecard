@@ -38,7 +38,6 @@ function formatDuration(secs) {
   return `${m}:${s}`;
 }
 
-// Mobile-friendly rating: tap number 1-5, tap again to clear
 function SongRating({ value, onChange }) {
   return (
     <div className="song-rating-row">
@@ -173,8 +172,6 @@ function AuthModal({ mode, setMode, onSuccess, onClose }) {
 
 const TODAY = new Date().toISOString().split('T')[0];
 
-// FIX: year-only query gets exact showdate year match, not substring match
-// This prevents tour names like "2002-2003 NYE Run" from polluting 2002 results
 function filterByQuery(shows, q) {
   if (!q) return shows;
   const isYearOnly = /^\d{4}$/.test(q.trim());
@@ -191,12 +188,128 @@ function filterByQuery(shows, q) {
   );
 }
 
+// ============================================================
+// SIDEBAR COMPONENT (desktop only)
+// ============================================================
+function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }) {
+  const navItems = [
+    { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
+    { id: 'my-shows', label: 'MY SHOWS', glyph: '◉', section: null, authRequired: true },
+    { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
+  ];
+
+  const comingSoon = [
+    { id: 'community', label: 'SHOW RATINGS', glyph: '★', section: 'COMMUNITY' },
+    { id: 'songs', label: 'SONG RANKINGS', glyph: '♫', section: null },
+    { id: 'venues', label: 'VENUE RANKINGS', glyph: '⬡', section: null },
+    { id: 'links', label: 'NOTABLE LINKS', glyph: '⌬', section: 'LINKS' },
+  ];
+
+  return (
+    <aside className={`sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
+      {/* Toggle button */}
+      <button className="sidebar-toggle" onClick={() => setExpanded(e => !e)} title={expanded ? 'Collapse' : 'Expand'}>
+        {expanded ? '◀' : '▶'}
+      </button>
+
+      {/* Logo */}
+      <div className="sidebar-logo">
+        <span className="sidebar-logo-glyph">⟁</span>
+        {expanded && <span className="sidebar-logo-text">PHISHOOK</span>}
+      </div>
+
+      {/* Nav */}
+      <nav className="sidebar-nav">
+        {navItems.map((item, i) => {
+          const isFirst = i === 0 || navItems[i - 1]?.section !== item.section;
+          const disabled = item.authRequired && !user;
+          return (
+            <React.Fragment key={item.id}>
+              {item.section && expanded && (
+                <div className="sidebar-section-label">{item.section}</div>
+              )}
+              {item.section && !expanded && i > 0 && (
+                <div className="sidebar-divider" />
+              )}
+              <button
+                className={`sidebar-nav-btn ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                onClick={() => !disabled && setTab(item.id)}
+                title={item.label}
+                disabled={disabled}
+              >
+                <span className="sidebar-nav-glyph">{item.glyph}</span>
+                {expanded && <span className="sidebar-nav-label">{item.label}</span>}
+              </button>
+            </React.Fragment>
+          );
+        })}
+
+        {/* Coming soon */}
+        <div className="sidebar-divider" style={{ margin: '8px 0' }} />
+        {comingSoon.map((item) => (
+          <React.Fragment key={item.id}>
+            {item.section && expanded && (
+              <div className="sidebar-section-label">{item.section}</div>
+            )}
+            <button
+              className="sidebar-nav-btn sidebar-nav-soon"
+              title={`${item.label} — Coming Soon`}
+              disabled
+            >
+              <span className="sidebar-nav-glyph">{item.glyph}</span>
+              {expanded && (
+                <span className="sidebar-nav-label">
+                  {item.label}
+                  <span className="soon-badge">SOON</span>
+                </span>
+              )}
+            </button>
+          </React.Fragment>
+        ))}
+      </nav>
+
+      {/* Bottom: user + auth */}
+      <div className="sidebar-footer">
+        {user ? (
+          <>
+            <div className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}>
+              <div className="sidebar-avatar">{user.username?.[0]?.toUpperCase() || '?'}</div>
+              {expanded && <span className="sidebar-username">{user.username}</span>}
+            </div>
+            <button
+              className="sidebar-nav-btn sidebar-logout"
+              onClick={onLogout}
+              title="Logout"
+            >
+              <span className="sidebar-nav-glyph">⏻</span>
+              {expanded && <span className="sidebar-nav-label">LOGOUT</span>}
+            </button>
+          </>
+        ) : (
+          <>
+            <button className="sidebar-nav-btn" onClick={() => onLogin('login')} title="Login">
+              <span className="sidebar-nav-glyph">→</span>
+              {expanded && <span className="sidebar-nav-label">LOGIN</span>}
+            </button>
+            <button className="sidebar-nav-btn sidebar-register" onClick={() => onLogin('signup')} title="Register">
+              <span className="sidebar-nav-glyph">+</span>
+              {expanded && <span className="sidebar-nav-label">REGISTER</span>}
+            </button>
+          </>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+// ============================================================
+// SCORECARD TAB
+// ============================================================
 function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [query, setQuery] = useState('');
   const [allShows, setAllShows] = useState([]);
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  // Delay showing spinner so <1s loads don't flash
   const [showSpinner, setShowSpinner] = useState(false);
   const [currentShow, setCurrentShow] = useState(null);
   const [songs, setSongs] = useState([]);
@@ -209,7 +322,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [attendanceType, setAttendanceType] = useState('listened');
   const [showInstructions, setShowInstructions] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
-  const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
@@ -217,7 +329,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 
   const filterShows = (list) => list.filter(s => s.showdate <= TODAY);
 
-  // Load all shows once into local cache so year buttons work instantly client-side
   useEffect(() => {
     api.get('/shows?limit=2000').then(data => {
       const filtered = filterShows(data);
@@ -235,29 +346,20 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       setResults(allShows.slice(0, 20));
       return;
     }
+    if (query.trim().length < 2) { setResults([]); return; }
 
-    if (query.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-
-    // Check if it's a pure year — filter client-side immediately, no spinner
     const isYearOnly = /^\d{4}$/.test(query.trim());
     if (isYearOnly && allShows.length > 0) {
-      const filtered = filterByQuery(allShows, query.trim());
-      setResults(filtered.slice(0, 100));
+      setResults(filterByQuery(allShows, query.trim()).slice(0, 100));
       return;
     }
 
-    // For venue/city/tour queries: debounce + spinner only after 300ms
     debounceRef.current = setTimeout(async () => {
-      // Only show spinner if fetch actually takes a moment
       spinnerTimerRef.current = setTimeout(() => setShowSpinner(true), 300);
       setSearching(true);
       try {
         const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
         const filtered = filterShows(data);
-        // Client-side re-filter for year accuracy (catches tour name bleed)
         setResults(filterByQuery(filtered, query.trim()).slice(0, 50));
       } catch (err) { showError(err.message); }
       finally {
@@ -266,10 +368,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         if (spinnerTimerRef.current) clearTimeout(spinnerTimerRef.current);
       }
     }, 400);
-    return () => {
-      clearTimeout(debounceRef.current);
-      clearTimeout(spinnerTimerRef.current);
-    };
+    return () => { clearTimeout(debounceRef.current); clearTimeout(spinnerTimerRef.current); };
   }, [query, allShows]);
 
   const loadShow = async (date) => {
@@ -280,33 +379,26 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     setRatings({});
     setAudioTracks({});
     setSaved(false);
-
     try {
       const [showData, ratingsResp, audioData] = await Promise.all([
         api.get(`/shows/${date}`),
         api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })),
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
       ]);
-
       setSongs(showData.songs || []);
       setCurrentShow(showData);
-
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
-      const savedAttendance = !Array.isArray(ratingsResp) && ratingsResp.attendance_type
-        ? ratingsResp.attendance_type : 'listened';
+      const savedAttendance = !Array.isArray(ratingsResp) && ratingsResp.attendance_type ? ratingsResp.attendance_type : 'listened';
       setAttendanceType(savedAttendance);
-
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
       setRatings(rMap);
-
       const aMap = {};
       for (const t of (audioData.tracks || [])) {
         const key = t.title?.toLowerCase().trim();
         if (key) aMap[key] = t;
       }
       setAudioTracks(aMap);
-
     } catch (err) {
       showError('Failed to load show');
       setCurrentShow(null);
@@ -315,21 +407,12 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     }
   };
 
-  const selectShow = (show) => {
-    setQuery('');
-    setResults([]);
-    loadShow(show.showdate);
-  };
+  const selectShow = (show) => { setQuery(''); setResults([]); loadShow(show.showdate); };
 
   const handleYearBtn = (yr) => {
     const isActive = query === yr;
-    if (isActive) {
-      setQuery('');
-      setCurrentShow(null);
-    } else {
-      setQuery(yr);
-      setCurrentShow(null); // clear any loaded show so results panel shows
-    }
+    if (isActive) { setQuery(''); setCurrentShow(null); }
+    else { setQuery(yr); setCurrentShow(null); }
   };
 
   const handleRandom = async () => {
@@ -338,25 +421,13 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       const res = await fetch(`${API}/random-show`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.showdate) {
-        setQuery('');
-        setResults([]);
-        await loadShow(data.showdate);
-      } else {
-        showError(data.error || `Random show returned no date. Raw: ${JSON.stringify(data).slice(0, 100)}`);
-      }
-    } catch (err) {
-      showError(`Random show: ${err.message}`);
-    } finally {
-      setRandomizing(false);
-    }
+      if (data.showdate) { setQuery(''); setResults([]); await loadShow(data.showdate); }
+      else showError(data.error || `Random show returned no date.`);
+    } catch (err) { showError(`Random show: ${err.message}`); }
+    finally { setRandomizing(false); }
   };
 
-  const getAudioForSong = (songName) => {
-    const key = songName?.toLowerCase().trim();
-    return audioTracks[key] || null;
-  };
-
+  const getAudioForSong = (songName) => audioTracks[songName?.toLowerCase().trim()] || null;
   const updateRating = (songName, field, value) =>
     setRatings(prev => ({ ...prev, [songName]: { ...prev[songName], [field]: value } }));
 
@@ -374,14 +445,10 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         attendance_type: attendanceType,
         showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
-      if (phishnetHandle.trim()) localStorage.setItem('pnet_handle', phishnetHandle.trim());
       setSaved(true);
       setCelebrating(true);
-    } catch (err) {
-      showError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
+    } catch (err) { showError(err.message); }
+    finally { setSubmitting(false); }
   };
 
   const sets = songs.reduce((acc, song) => {
@@ -404,19 +471,12 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     : null;
 
   const hasAudio = Object.keys(audioTracks).length > 0;
-
-  // Build relisten URL: base path always works; relisten.net/phish/YYYY/MM/DD
-  const relistenUrl = currentShow
-    ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}`
-    : null;
-
-  // Merge phish.net setlist + reviews into one link
-  // Show review count in label if available
+  const relistenUrl = currentShow ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}` : null;
   const pnetUrl = currentShow?.permalink || `${PNET}/setlists/`;
   const reviewCount = currentShow?.reviews?.count || 0;
   const reviewAvg = currentShow?.reviews?.avg_score;
   const pnetLabel = reviewCount > 0
-    ? `PHISH.NET · ${reviewCount} REVIEWS${reviewAvg ? ` (${reviewAvg}/5)` : ''}`
+    ? `PHISH.NET SETLIST + REVIEWS (${reviewCount})`
     : 'PHISH.NET SETLIST';
 
   return (
@@ -426,17 +486,16 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success');
       }} />}
 
-      {/* Instructions */}
       <div className="instructions-panel">
         <button className="instructions-toggle" onClick={() => setShowInstructions(!showInstructions)}>
-          <span>HOW TO USE PHISHOW SCORECARD</span>
+          <span>HOW TO USE PHISHOOK</span>
           <span className="toggle-arrow">{showInstructions ? '▲ COLLAPSE' : '▼ EXPAND'}</span>
         </button>
         {showInstructions && (
           <div className="instructions-body">
             <div className="instructions-grid">
               <div>
-                <div className="instr-step"><span className="instr-num">01</span><span>Type any date, venue, or city — results appear instantly as you type.</span></div>
+                <div className="instr-step"><span className="instr-num">01</span><span>Type any date, venue, or city — results appear instantly.</span></div>
                 <div className="instr-step"><span className="instr-num">02</span><span>Hit RANDOM SHOW to let fate decide what you rate tonight.</span></div>
                 <div className="instr-step"><span className="instr-num">03</span><span>Tap 1–5 to rate each song. Tap same number again to clear.</span></div>
               </div>
@@ -450,7 +509,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         )}
       </div>
 
-      {/* Search */}
       <div className="panel">
         <div className="panel-title">SEARCH SHOWS</div>
         <div className="search-wrap">
@@ -462,35 +520,21 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               onChange={e => setQuery(e.target.value)}
               autoComplete="off" autoCorrect="off" spellCheck="false"
             />
-            {/* Only show spinner after 300ms delay — prevents glitch flash */}
             {showSpinner && <span className="search-spinner">◈</span>}
           </div>
-          <button
-            className="btn-random"
-            onClick={handleRandom}
-            disabled={randomizing || loadingShow}
-          >
+          <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow}>
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
           </button>
         </div>
-
-        {/* Year quick-filter — handleYearBtn clears currentShow so results appear */}
         <div className="era-filter">
           {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
             const yr = String(1983 + i);
             const active = query === yr;
             return (
-              <button
-                key={yr}
-                type="button"
-                className={`year-btn ${active ? 'active' : ''}`}
-                onClick={() => handleYearBtn(yr)}
-              >{yr}</button>
+              <button key={yr} type="button" className={`year-btn ${active ? 'active' : ''}`} onClick={() => handleYearBtn(yr)}>{yr}</button>
             );
           }).reverse()}
         </div>
-
-        {/* Results — show when no current show loaded */}
         {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
@@ -516,7 +560,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 
       {currentShow && !loadingShow && (
         <div className="panel">
-          {/* Show Masthead */}
           <div className="show-masthead">
             <div className="show-masthead-main">
               <div className="show-date-display">{formatDate(currentShow.showdate)}</div>
@@ -528,15 +571,9 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
             </div>
             <div className="show-masthead-links">
-              {/* Merged phish.net + reviews button */}
-              <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
-                {pnetLabel}
-              </a>
-              {/* Relisten — direct show URL */}
+              <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">{pnetLabel}</a>
               {relistenUrl && (
-                <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link">
-                  STREAM ON RELISTEN
-                </a>
+                <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link">STREAM ON RELISTEN</a>
               )}
             </div>
           </div>
@@ -552,9 +589,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 <span>SHOW NOTES</span>
                 <span>{showNotes ? '▲ HIDE' : '▼ EXPAND'}</span>
               </button>
-              {showNotes && (
-                <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />
-              )}
+              {showNotes && <div className="setlist-notes" dangerouslySetInnerHTML={{ __html: currentShow.setlist_notes }} />}
             </div>
           )}
 
@@ -593,26 +628,14 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                           </span>
                           <div className="song-row-controls">
                             {audio?.mp3_url && (
-                              <a
-                                href={audio.mp3_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="song-play-btn"
-                                title={`Stream ${song.song} on Phish.in`}
-                                onClick={e => e.stopPropagation()}
-                              >▶</a>
+                              <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
+                                className="song-play-btn" title={`Stream ${song.song}`}
+                                onClick={e => e.stopPropagation()}>▶</a>
                             )}
-                            <SongRating
-                              value={parseInt(ratings[song.song]?.rating) || 0}
-                              onChange={val => updateRating(song.song, 'rating', val)}
-                            />
-                            <input
-                              className="notes-input"
-                              type="text"
-                              placeholder="notes..."
+                            <SongRating value={parseInt(ratings[song.song]?.rating) || 0} onChange={val => updateRating(song.song, 'rating', val)} />
+                            <input className="notes-input" type="text" placeholder="notes..."
                               value={ratings[song.song]?.notes || ''}
-                              onChange={e => updateRating(song.song, 'notes', e.target.value)}
-                            />
+                              onChange={e => updateRating(song.song, 'notes', e.target.value)} />
                           </div>
                         </div>
                       );
@@ -621,7 +644,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 ))}
               </div>
 
-              {/* Score Summary */}
               <div className="score-summary">
                 <div className="panel-title">SHOW SCORE</div>
                 {Object.entries(sets).filter(([k]) => k !== 'S' && k !== 's').map(([setKey, setSongs]) => (
@@ -636,7 +658,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 )}
               </div>
 
-              {/* Attendance + Submit */}
               <div className="submit-section">
                 <div className="attendance-row">
                   <span className="attendance-label">HOW DID YOU EXPERIENCE THIS SHOW?</span>
@@ -646,26 +667,20 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                       { value: 'webcast', label: '📺 WEBCAST', desc: 'Watched live stream' },
                       { value: 'listened', label: '🎧 LISTENED', desc: 'Heard recording' },
                     ].map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
+                      <button key={opt.value} type="button"
                         className={`attendance-btn ${attendanceType === opt.value ? 'active' : ''}`}
-                        onClick={() => setAttendanceType(opt.value)}
-                        title={opt.desc}
-                      >{opt.label}</button>
+                        onClick={() => setAttendanceType(opt.value)} title={opt.desc}>{opt.label}</button>
                     ))}
                   </div>
                 </div>
                 <button
                   className={`btn-primary btn-submit ${saved ? 'btn-saved' : ''}`}
-                  onClick={submitRatings}
-                  disabled={submitting || saved}
+                  onClick={submitRatings} disabled={submitting || saved}
                 >
                   {submitting ? 'SAVING...' : saved ? '✓ RATINGS SAVED' : 'SAVE RATINGS'}
                 </button>
               </div>
 
-              {/* Community Reviews */}
               {currentShow.reviews?.items?.length > 0 && (
                 <div className="reviews-section">
                   <div className="panel-title">PHISH.NET COMMUNITY REVIEWS</div>
@@ -699,6 +714,9 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   );
 }
 
+// ============================================================
+// MY SHOWS TAB
+// ============================================================
 function MyShowsTab({ api, showMessage, showError }) {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -737,6 +755,9 @@ function MyShowsTab({ api, showMessage, showError }) {
   );
 }
 
+// ============================================================
+// ANALYTICS TAB
+// ============================================================
 function AnalyticsTab({ api, showMessage, showError }) {
   const [songs, setSongs] = useState([]);
   const [venues, setVenues] = useState([]);
@@ -780,6 +801,27 @@ function AnalyticsTab({ api, showMessage, showError }) {
   );
 }
 
+// ============================================================
+// COMMUNITY TAB (shell)
+// ============================================================
+function CommunityTab() {
+  return (
+    <div className="panel">
+      <div className="panel-title">COMMUNITY</div>
+      <div className="empty-state" style={{ flexDirection: 'column', gap: 12 }}>
+        <div style={{ fontSize: '2rem' }}>⟁</div>
+        <div>COMMUNITY RATINGS COMING SOON</div>
+        <div style={{ fontSize: '0.72rem', opacity: 0.5, marginTop: 8 }}>
+          Show ratings · Song rankings · Venue rankings
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ROOT APP
+// ============================================================
 export default function App() {
   const [tab, setTab] = useState('scorecard');
   const [user, setUser] = useState(null);
@@ -787,6 +829,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState('login');
   const [messages, setMessages] = useState([]);
   const [mikeError, setMikeError] = useState(null);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const api = useApi();
 
   const showMessage = useCallback((text, type = 'info') => {
@@ -808,49 +851,75 @@ export default function App() {
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   return (
-    <div className="app">
+    <div className="app-shell">
       {mikeError && <MikeError message={mikeError} onClose={() => setMikeError(null)} />}
       <div className="messages-container">
         {messages.map(m => <div key={m.id} className={`message ${m.type}`}>{m.text}</div>)}
       </div>
 
-      <div className="marquee-bar">
-        <span className="marquee-track">
-          DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
-        </span>
+      {/* DESKTOP LAYOUT: sidebar + main */}
+      <div className="desktop-layout">
+        <Sidebar
+          tab={tab}
+          setTab={setTab}
+          user={user}
+          onLogin={openAuth}
+          onLogout={handleLogout}
+          expanded={sidebarExpanded}
+          setExpanded={setSidebarExpanded}
+        />
+        <div className="main-area">
+          <div className="marquee-bar">
+            <span className="marquee-track">
+              DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
+            </span>
+          </div>
+          <div className="container">
+            {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
+            {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
+            {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
+            {tab === 'community' && <CommunityTab />}
+          </div>
+        </div>
       </div>
 
-      {/* DESKTOP HEADER — tighter, more purposeful layout */}
-      <header className="app-header">
-        <div className="header-left">
-          <div className="header-title">
-            <h1>Phishow Scorecard</h1>
-            <span className="tagline">Rate. Track. Relive.</span>
-          </div>
+      {/* MOBILE LAYOUT: original header + tabs */}
+      <div className="mobile-layout">
+        <div className="marquee-bar">
+          <span className="marquee-track">
+            DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
+          </span>
         </div>
-        <div className="header-right">
-          <div className="header-status"><div className="status-dot" /><span className="status-label">ONLINE</span></div>
-          <div className="header-auth">
-            {user ? (
-              <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
-            ) : (
-              <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
-            )}
+        <header className="app-header">
+          <div className="header-left">
+            <div className="header-title">
+              <h1>Phishook</h1>
+              <span className="tagline">Rate. Track. Relive.</span>
+            </div>
           </div>
+          <div className="header-right">
+            <div className="header-auth">
+              {user ? (
+                <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
+              ) : (
+                <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
+              )}
+            </div>
+          </div>
+        </header>
+        <div className="container">
+          <nav className="tab-nav">
+            <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
+            {user && <>
+              <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
+              <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
+            </>}
+          </nav>
+          {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
+          {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
+          {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
+          {tab === 'community' && <CommunityTab />}
         </div>
-      </header>
-
-      <div className="container">
-        <nav className="tab-nav">
-          <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
-          {user && <>
-            <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
-            <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
-          </>}
-        </nav>
-        {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
-        {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
-        {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
