@@ -57,6 +57,10 @@
       "destination": "/api/user/attendance"
     },
     {
+      "source": "/api/import/phishnet-reviews",
+      "destination": "/api/import/phishnet-reviews"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
