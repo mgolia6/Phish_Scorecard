@@ -104,7 +104,7 @@ function SaveCelebration({ onDone }) {
 
 function MikeError({ message, onClose }) {
   useEffect(() => {
-    const t = setTimeout(onClose, 5000);
+    const t = setTimeout(onClose, 8000);
     return () => clearTimeout(t);
   }, [onClose]);
   return (
@@ -198,37 +198,25 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
   }, []);
 
-  // Normalize search query — handle M/D, M/D/YY, M/D/YYYY → YYYY-MM-DD for search
-  const normalizeQuery = (q) => {
-    q = q.trim();
-    if (!q) return q;
-    const mdMatch = q.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
-    if (mdMatch) {
-      const m = mdMatch[1].padStart(2, '0');
-      const d = mdMatch[2].padStart(2, '0');
-      let y = mdMatch[3];
-      if (!y) return `${m}-${d}`;
-      if (y.length === 2) y = parseInt(y) > 30 ? `19${y}` : `20${y}`;
-      return `${y}-${m}-${d}`;
-    }
-    return q;
-  };
-
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    const normalized = normalizeQuery(query);
-    if (!normalized) {
+    if (!query.trim()) {
       api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
+      return;
+    }
+    // Don't search on very short queries
+    if (query.trim().length < 2) {
+      setResults([]);
       return;
     }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const data = await api.get(`/shows?q=${encodeURIComponent(normalized)}`);
+        const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
         setResults(filterShows(data));
       } catch (err) { showError(err.message); }
       finally { setSearching(false); }
-    }, 350);
+    }, 400);
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
@@ -296,10 +284,10 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
         setResults([]);
         await loadShow(data.showdate);
       } else {
-        showError(data.error || 'No show returned');
+        showError(data.error || `Random show returned no date. Raw: ${JSON.stringify(data).slice(0, 100)}`);
       }
     } catch (err) {
-      showError('Random show failed — check connection');
+      showError(`Random show: ${err.message}`);
     } finally {
       setRandomizing(false);
     }
@@ -398,7 +386,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
           <div className="search-input-wrap">
             <input
               type="text"
-              placeholder="Date (4/30/93, 1997, 2016...), venue, city, tour..."
+              placeholder="Venue, city, year (1997), or tour name..."
               value={query}
               onChange={e => setQuery(e.target.value)}
               autoComplete="off" autoCorrect="off" spellCheck="false"
@@ -412,6 +400,26 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
           >
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
           </button>
+        </div>
+        {/* Era quick-filter */}
+        <div className="era-filter">
+          {['1.0','2.0','3.0','4.0','5.0'].map(era => {
+            const labels = { '1.0':'Pre-Hiatus (83–04)', '2.0':'2.0 (02–04)', '3.0':'3.0 (09–14)', '4.0':'4.0 (18–20)', '5.0':'5.0 (21+)' };
+            const years = { '1.0':'1983', '2.0':'2002', '3.0':'2009', '4.0':'2018', '5.0':'2021' };
+            return null; // replaced by year buttons below
+          })}
+          {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
+            const yr = String(1983 + i);
+            const active = query === yr;
+            return (
+              <button
+                key={yr}
+                type="button"
+                className={`year-btn ${active ? 'active' : ''}`}
+                onClick={() => setQuery(active ? '' : yr)}
+              >{yr}</button>
+            );
+          }).reverse()}
         </div>
 
         {/* Results list — always inline, never floating */}
