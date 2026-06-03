@@ -13,6 +13,8 @@
     { "source": "/api/user/shows", "destination": "/api/user/shows" },
     { "source": "/api/analytics/songs", "destination": "/api/analytics/songs" },
     { "source": "/api/analytics/venues", "destination": "/api/analytics/venues" },
+    { "source": "/api/random-show", "destination": "/api/random-show" },
+    { "source": "/api/audio/:date", "destination": "/api/audio/[date]" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
