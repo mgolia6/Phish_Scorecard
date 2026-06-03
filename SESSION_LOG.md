@@ -1,3 +1,57 @@
+## Session 7 — 2026-06-03 (FINAL UPDATE)
+
+### Completed This Session
+- App renamed Phishow Scorecard → Phishook → **Phreezer**
+- Tagline: FREEZE. RATE. RELIVE.
+- SVG logo built inline: snowflake + THE PHREEZER wordmark, no external font deps
+- Collapsed sidebar: orange snowflake SVG
+- Expanded sidebar + mobile header: full wordmark SVG
+- Hiatus years 2005/2006/2007 hidden from year buttons; 2008 kept
+- CLAUDE.md created for Claude Code session context
+- Full rename pass throughout codebase
+- Song duration format fixed (ms vs seconds)
+- Pre-1998 shows fixed (API limit bumped to 2500)
+- Phish.net link format fixed in attended cards (?d=YYYY-MM-DD)
+- Attendance table + import: /api/import/phishnet.js
+- user_reviews table v2: one row per review using phishnet_review_id as unique key
+- Reviews import: /api/import/phishnet-reviews.js — all distinct reviews per show
+- Attendance endpoint: returns all reviews as JSON array per show
+- My Shows tab rebuilt: ATTENDED/RATED toggle, import panel, sort/filter
+- Sort: DATE↓↑, PHREEZER↓, PHISH.NET↓, UNRATED FIRST
+- Filter pills: ALL, REVIEWED, RATED, UNRATED
+- Side-by-side scores on show cards: PHREEZER avg
+- Multiple reviews per show displayed chronologically with REVIEW X OF N label
+- Dopamine import modal: glowing count, tagline, tap to dismiss
+
+### Data State (mpgink)
+- 188 attended shows imported from phish.net
+- 35 reviews imported — multiple per show where applicable
+- phishnet_score field dropped from active use — review upvote score not personal rating
+- Personal phish.net star rating not accessible via API without OAuth — deferred
+
+### Decisions Made
+- phish.net `score` field on reviews = community upvotes on the review, not personal show rating
+- Personal star rating requires OAuth — not worth building, deferred indefinitely
+- PHISH.NET score column on show cards to show community rating pulled from setlist API instead
+- Social sharing: Twitter/X and Instagram story after rating a show
+- Share card = marketing — "I just froze 12/31/95 — 4.8/5 on Phreezer"
+- Platform scope: Phish community only, no expansion beyond
+- App is moving toward platform — onboarding, T&Cs, social sharing needed
+
+### Next Session Priorities
+1. **Onboarding flow** — welcome screen, what is Phreezer, import phish.net, rate first show, T&Cs
+2. **T&Cs** — plain English, not affiliated with Phish/phish.net, data attribution, user owns content
+3. **Share cards** — after rating, generate shareable image: show, score, Phreezer brand → Twitter/Instagram
+4. **Community rating on show cards** — pull phish.net overall show rating from setlist API, cache per show, display alongside Phreezer avg
+5. **KPI dashboard** — top of My Shows: shows attended, rated, avg score, top song, peak era, geographic footprint
+6. **Tap to rate from attended list** — eliminate friction of going back to Scorecard
+7. **Remove debug endpoint** — /api/debug/reviews.js before public launch
+
+### Open Technical Debt
+- Debug endpoint still in repo: api/debug/reviews.js — DELETE before launch
+- index.css approaching bloat again — rebuild pass needed soon
+- Session log token pattern only needed in claude.ai — Claude Code reads files directly
+
 ## Session 7 — 2026-06-03
 
 ### Decisions
