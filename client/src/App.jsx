@@ -118,6 +118,112 @@ function MikeError({ message, onClose }) {
   );
 }
 
+// ============================================================
+// T&C MODAL — fires once per user, stores acceptance in localStorage
+// ============================================================
+function TandCModal({ onAccept }) {
+  return (
+    <div className="modal-overlay" style={{ zIndex: 900 }}>
+      <div className="modal" style={{ maxWidth: 520 }}>
+        <div className="modal-title">BEFORE YOU FREEZE</div>
+        <div className="tandc-body">
+          <div className="tandc-section">
+            <div className="tandc-heading">◈ WHAT THIS IS</div>
+            <p>Phreezer is an independent fan tool for rating and tracking Phish shows. We are not affiliated with Phish, phish.net, or the Mockingbird Foundation.</p>
+          </div>
+          <div className="tandc-section">
+            <div className="tandc-heading">◈ YOUR DATA</div>
+            <p>Your ratings and reviews belong to you. We don't sell them, share them, or do anything sketchy with them. You can delete your account anytime.</p>
+          </div>
+          <div className="tandc-section">
+            <div className="tandc-heading">◈ ATTRIBUTION</div>
+            <p>Setlist data from <a href="https://phish.net" target="_blank" rel="noopener noreferrer">Phish.net</a> / Mockingbird Foundation. Audio via <a href="https://phish.in" target="_blank" rel="noopener noreferrer">Phish.in</a>. Community reviews from phish.net used under fair use for personal tracking only.</p>
+          </div>
+          <div className="tandc-section">
+            <div className="tandc-heading">◈ GROUND RULES</div>
+            <p>Use it for yourself. Don't scrape it. Don't be a jerk. That's it.</p>
+          </div>
+        </div>
+        <button className="btn-primary" style={{ width: '100%', marginTop: 24, padding: '14px' }} onClick={onAccept}>
+          I UNDERSTAND — LET'S FREEZE SOME SHOWS
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ONBOARDING FLOW — new user welcome, multi-step
+// ============================================================
+function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
+  const [step, setStep] = useState(0);
+
+  const steps = [
+    {
+      glyph: '❄',
+      title: 'WELCOME TO PHREEZER',
+      sub: `Hey ${user?.firstName || user?.username || 'there'}.`,
+      body: 'Phreezer is your personal Phish show archive. Rate every song. Track every show. Relive every night.',
+      cta: 'WHAT DOES IT DO?',
+    },
+    {
+      glyph: '◈',
+      title: 'RATE SHOWS',
+      sub: 'Song by song.',
+      body: 'Find any Phish show going back to 1983. Rate each song 1–5. Phreezer calculates your set scores and overall show score automatically.',
+      cta: 'WHAT ELSE?',
+    },
+    {
+      glyph: '◉',
+      title: 'TRACK YOUR HISTORY',
+      sub: 'Every show you\'ve attended.',
+      body: 'Import your attendance and reviews straight from phish.net. Your whole history, frozen in the Phreezer.',
+      cta: 'SOUNDS GOOD',
+    },
+    {
+      glyph: '▦',
+      title: 'SEE YOUR ANALYTICS',
+      sub: 'What does your taste say about you?',
+      body: 'Top rated songs. Best venues. Your average score across every show you\'ve rated. The data doesn\'t lie.',
+      cta: 'LET\'S GO',
+    },
+  ];
+
+  const current = steps[step];
+  const isLast = step === steps.length - 1;
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 800 }}>
+      <div className="onboarding-modal">
+        <div className="onboarding-glyph">{current.glyph}</div>
+        <div className="onboarding-title">{current.title}</div>
+        <div className="onboarding-sub">{current.sub}</div>
+        <div className="onboarding-body">{current.body}</div>
+        <div className="onboarding-progress">
+          {steps.map((_, i) => (
+            <div key={i} className={`onboarding-dot ${i === step ? 'active' : i < step ? 'done' : ''}`} />
+          ))}
+        </div>
+        {isLast ? (
+          <div className="onboarding-actions">
+            <button className="btn-primary" style={{ flex: 1, padding: '12px' }} onClick={() => { onComplete(); onStartImport(); }}>
+              IMPORT FROM PHISH.NET
+            </button>
+            <button style={{ flex: 1, padding: '12px' }} onClick={() => { onComplete(); onGoToScorecard(); }}>
+              RATE A SHOW NOW
+            </button>
+          </div>
+        ) : (
+          <button className="btn-primary" style={{ width: '100%', padding: '12px' }} onClick={() => setStep(s => s + 1)}>
+            {current.cta}
+          </button>
+        )}
+        <button className="onboarding-skip" onClick={onComplete}>SKIP INTRO</button>
+      </div>
+    </div>
+  );
+}
+
 function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const api = useApi();
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
@@ -139,7 +245,7 @@ function AuthModal({ mode, setMode, onSuccess, onClose }) {
     try {
       const data = await api.post('/auth/register', signupForm);
       localStorage.setItem('phish_token', data.token);
-      onSuccess(data.user);
+      onSuccess(data.user, true); // true = new user
     } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
@@ -210,7 +316,6 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
     <div className="sidebar-wrapper">
       <aside className={`sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
 
-        {/* Logo row — no toggle inside, no dead space */}
         <div className="sidebar-logo">
           {expanded ? (
             <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="sidebar-logo-img-expanded" />
@@ -219,10 +324,8 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
           )}
         </div>
 
-      {/* Nav */}
       <nav className="sidebar-nav">
         {navItems.map((item, i) => {
-          const isFirst = i === 0 || navItems[i - 1]?.section !== item.section;
           const disabled = item.authRequired && !user;
           return (
             <React.Fragment key={item.id}>
@@ -245,7 +348,6 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
           );
         })}
 
-        {/* Coming soon */}
         <div className="sidebar-divider" style={{ margin: '8px 0' }} />
         {comingSoon.map((item) => (
           <React.Fragment key={item.id}>
@@ -269,7 +371,6 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
         ))}
       </nav>
 
-      {/* Bottom: user + auth */}
       <div className="sidebar-footer">
         {user ? (
           <>
@@ -301,7 +402,6 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
       </div>
       </aside>
 
-      {/* Toggle tab — protrudes from right edge of sidebar, inline with logo */}
       <button
         className="sidebar-tab"
         onClick={() => setExpanded(e => !e)}
@@ -314,9 +414,61 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
 }
 
 // ============================================================
+// KPI CARDS
+// ============================================================
+function KPICards({ api }) {
+  const [kpi, setKpi] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/user/kpi')
+      .then(setKpi)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="kpi-row kpi-loading">LOADING STATS...</div>;
+  if (!kpi) return null;
+
+  const cards = [
+    { label: 'SHOWS ATTENDED', value: kpi.shows_attended, color: 'cyan' },
+    { label: 'SHOWS RATED', value: kpi.shows_rated, color: 'orange' },
+    { label: 'AVG SCORE', value: kpi.avg_score ?? '—', color: 'green' },
+    { label: 'REVIEWS', value: kpi.shows_with_reviews, color: 'cyan' },
+  ];
+
+  return (
+    <div className="kpi-section">
+      <div className="kpi-row">
+        {cards.map(c => (
+          <div key={c.label} className="kpi-card">
+            <div className={`kpi-value kpi-${c.color}`}>{c.value}</div>
+            <div className="kpi-label">{c.label}</div>
+          </div>
+        ))}
+      </div>
+      {kpi.top_song && (
+        <div className="kpi-highlights">
+          <span className="kpi-highlight-item">
+            <span className="kpi-hl-label">TOP SONG</span>
+            <span className="kpi-hl-val">{kpi.top_song.song_name} <span className="kpi-hl-score">({kpi.top_song.avg})</span></span>
+          </span>
+          {kpi.top_venue && (
+            <span className="kpi-highlight-item">
+              <span className="kpi-hl-label">MOST VISITED</span>
+              <span className="kpi-hl-val">{kpi.top_venue.venue} <span className="kpi-hl-score">({kpi.top_venue.shows}x)</span></span>
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // SCORECARD TAB
 // ============================================================
-function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
+function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShowDate, onShowLoaded }) {
   const [query, setQuery] = useState('');
   const [allShows, setAllShows] = useState([]);
   const [results, setResults] = useState([]);
@@ -337,6 +489,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
+  const initialLoadDone = useRef(false);
 
   const filterShows = (list) => list.filter(s => s.showdate <= TODAY);
 
@@ -347,6 +500,15 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       setResults(filtered.slice(0, 20));
     }).catch(() => {});
   }, []);
+
+  // Load a specific show if navigated from My Shows
+  useEffect(() => {
+    if (initialShowDate && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      loadShow(initialShowDate);
+      if (onShowLoaded) onShowLoaded();
+    }
+  }, [initialShowDate]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -485,7 +647,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const relistenUrl = currentShow ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}` : null;
   const pnetUrl = currentShow?.permalink || `${PNET}/setlists/`;
   const reviewCount = currentShow?.reviews?.count || 0;
-  const reviewAvg = currentShow?.reviews?.avg_score;
   const pnetLabel = reviewCount > 0
     ? `PHISH.NET SETLIST + REVIEWS (${reviewCount})`
     : 'PHISH.NET SETLIST';
@@ -729,7 +890,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 // ============================================================
 // MY SHOWS TAB
 // ============================================================
-function MyShowsTab({ api, showMessage, showError }) {
+function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount }) {
   const [shows, setShows] = useState([]);
   const [attended, setAttended] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -756,6 +917,11 @@ function MyShowsTab({ api, showMessage, showError }) {
 
   useEffect(() => { loadData(); }, []);
 
+  // Auto-open import panel if flagged from onboarding
+  useEffect(() => {
+    if (openImportOnMount) setShowImport(true);
+  }, [openImportOnMount]);
+
   const handleImport = async () => {
     if (!phishnetUser.trim()) return;
     setImporting(true);
@@ -778,7 +944,7 @@ function MyShowsTab({ api, showMessage, showError }) {
 
   const filteredShows = rawShows.filter(show => {
     if (activeView !== 'attended') return true;
-    if (filterBy === 'has_review') return !!show.review_text;
+    if (filterBy === 'has_review') return !!show.review_text || (show.reviews && show.reviews.length > 0);
     if (filterBy === 'has_phreezer') return show.phreezer_avg != null;
     if (filterBy === 'no_phreezer') return show.phreezer_avg == null;
     return true;
@@ -820,6 +986,10 @@ function MyShowsTab({ api, showMessage, showError }) {
   return (
     <div className="panel">
       <ImportSuccessModal />
+
+      {/* KPI Cards */}
+      <KPICards api={api} />
+
       <div className="my-shows-header">
         <div className="my-shows-tabs">
           <button className={`my-shows-tab-btn ${activeView === 'attended' ? 'active' : ''}`} onClick={() => setActiveView('attended')}>
@@ -897,7 +1067,7 @@ function MyShowsTab({ api, showMessage, showError }) {
               <div className="show-scores-col">
                 <div className="show-score-row">
                   <span className="show-score-label">PHREEZER</span>
-                  <span className="show-score-val cyan">{phreezerScore ?? '—'}</span>
+                  <span className="show-score-val cyan">{phreezerScore != null ? phreezerScore : '—'}</span>
                 </div>
                 {hasReview && (
                   <div className="show-score-row">
@@ -909,6 +1079,13 @@ function MyShowsTab({ api, showMessage, showError }) {
             </div>
             <div className="show-card-bottom">
               <div className="show-card-links">
+                <button
+                  className="show-link-sm rate-btn"
+                  onClick={() => onRateShow(show.show_date)}
+                  title="Rate this show in Scorecard"
+                >
+                  {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
+                </button>
                 <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
                 <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
                 <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
@@ -1012,6 +1189,10 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [mikeError, setMikeError] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [showTandC, setShowTandC] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [pendingImportOnMyShows, setPendingImportOnMyShows] = useState(false);
+  const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
   const api = useApi();
 
   const showMessage = useCallback((text, type = 'info') => {
@@ -1025,12 +1206,88 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('phish_token');
     if (!token) return;
-    api.get('/auth/me').then(setUser).catch(() => localStorage.removeItem('phish_token'));
+    api.get('/auth/me').then(u => {
+      setUser(u);
+      // Check if T&C accepted
+      const tandcKey = `phreezer_tandc_${u.id}`;
+      if (!localStorage.getItem(tandcKey)) {
+        setShowTandC(true);
+      }
+    }).catch(() => localStorage.removeItem('phish_token'));
   }, []);
 
-  const handleAuthSuccess = u => { setUser(u); setShowAuth(false); showMessage(`Welcome back, ${u.username}`, 'success'); };
+  const handleTandCAccept = () => {
+    if (user) localStorage.setItem(`phreezer_tandc_${user.id}`, '1');
+    setShowTandC(false);
+  };
+
+  const handleAuthSuccess = (u, isNewUser = false) => {
+    setUser(u);
+    setShowAuth(false);
+    showMessage(`Welcome${isNewUser ? '' : ' back'}, ${u.username}`, 'success');
+    const tandcKey = `phreezer_tandc_${u.id}`;
+    if (!localStorage.getItem(tandcKey)) {
+      setShowTandC(true);
+      if (isNewUser) {
+        // Show onboarding after T&C for new users
+        setTimeout(() => setShowOnboarding(true), 100);
+      }
+    } else if (isNewUser) {
+      setShowOnboarding(true);
+    }
+  };
+
   const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
+
+  // Navigate from My Shows → Scorecard with a specific show pre-loaded
+  const handleRateShow = (showDate) => {
+    setRateShowDate(showDate);
+    setTab('scorecard');
+  };
+
+  // After onboarding, navigate to My Shows with import panel open
+  const handleOnboardingImport = () => {
+    setShowOnboarding(false);
+    setPendingImportOnMyShows(true);
+    setTab('my-shows');
+  };
+
+  const handleOnboardingScorecard = () => {
+    setShowOnboarding(false);
+    setTab('scorecard');
+  };
+
+  const handleOnboardingComplete = () => {
+    if (user) localStorage.setItem(`phreezer_onboarding_${user.id}`, '1');
+    setShowOnboarding(false);
+  };
+
+  const renderMain = (isMobile = false) => (
+    <>
+      {tab === 'scorecard' && (
+        <ScorecardTab
+          api={api}
+          showMessage={showMessage}
+          showError={showError}
+          onAuthRequired={() => openAuth('login')}
+          initialShowDate={rateShowDate}
+          onShowLoaded={() => setRateShowDate(null)}
+        />
+      )}
+      {tab === 'my-shows' && user && (
+        <MyShowsTab
+          api={api}
+          showMessage={showMessage}
+          showError={showError}
+          onRateShow={handleRateShow}
+          openImportOnMount={pendingImportOnMyShows}
+        />
+      )}
+      {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'community' && <CommunityTab />}
+    </>
+  );
 
   return (
     <div className="app-shell">
@@ -1038,6 +1295,19 @@ export default function App() {
       <div className="messages-container">
         {messages.map(m => <div key={m.id} className={`message ${m.type}`}>{m.text}</div>)}
       </div>
+
+      {/* T&C fires first */}
+      {showTandC && !showOnboarding && <TandCModal onAccept={handleTandCAccept} />}
+
+      {/* Onboarding fires after T&C for new users */}
+      {showOnboarding && !showTandC && (
+        <OnboardingFlow
+          user={user}
+          onComplete={handleOnboardingComplete}
+          onStartImport={handleOnboardingImport}
+          onGoToScorecard={handleOnboardingScorecard}
+        />
+      )}
 
       {/* DESKTOP LAYOUT: sidebar + main */}
       <div className="desktop-layout">
@@ -1057,10 +1327,7 @@ export default function App() {
             </span>
           </div>
           <div className="container">
-            {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
-            {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
-            {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
-            {tab === 'community' && <CommunityTab />}
+            {renderMain()}
           </div>
         </div>
       </div>
@@ -1096,10 +1363,7 @@ export default function App() {
               <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
             </>}
           </nav>
-          {tab === 'scorecard' && <ScorecardTab api={api} showMessage={showMessage} showError={showError} onAuthRequired={() => openAuth('login')} />}
-          {tab === 'my-shows' && user && <MyShowsTab api={api} showMessage={showMessage} showError={showError} />}
-          {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
-          {tab === 'community' && <CommunityTab />}
+          {renderMain(true)}
         </div>
       </div>
 
@@ -1107,6 +1371,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
