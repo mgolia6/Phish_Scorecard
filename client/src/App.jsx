@@ -33,8 +33,9 @@ function formatDate(d) {
 
 function formatDuration(secs) {
   if (!secs) return null;
-  const m = Math.floor(secs / 60);
-  const s = String(secs % 60).padStart(2, '0');
+  const total = secs > 3600 ? Math.round(secs / 1000) : Math.round(secs);
+  const m = Math.floor(total / 60);
+  const s = String(total % 60).padStart(2, '0');
   return `${m}:${s}`;
 }
 
