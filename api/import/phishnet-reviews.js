@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       const showDate = review.showdate;
       if (!showDate) continue;
 
-      // phish.net score is 0-10
+      // phish.net score is 0-5 star scale
       const rawScore = review.score != null ? parseFloat(review.score) : null;
       const score = !isNaN(rawScore) ? rawScore : null;
 
