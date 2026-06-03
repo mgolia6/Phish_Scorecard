@@ -7,7 +7,7 @@ const CACHE_TTL = 60 * 60 * 1000;
 async function getShows() {
   if (cachedShows && Date.now() - cacheTime < CACHE_TTL) return cachedShows;
   const res = await fetch(
-    `https://api.phish.net/v5/shows/artist/phish.json?apikey=${process.env.PHISH_NET_API_KEY}&order_by=showdate&direction=desc&limit=1000`
+    `https://api.phish.net/v5/shows/artist/phish.json?apikey=${process.env.PHISH_NET_API_KEY}&order_by=showdate&direction=desc&limit=2000`
   );
   const data = await res.json();
   cachedShows = data.data || [];
