@@ -33,8 +33,9 @@ export default async function handler(req, res) {
       if (!showDate) continue;
 
       // phish.net score is 1-5 stars (personal user rating)
+      // 0 means not personally rated — treat as null
       const rawScore = review.score != null ? parseFloat(review.score) : null;
-      const score = (!isNaN(rawScore) && rawScore <= 5) ? rawScore : null;
+      const score = (!isNaN(rawScore) && rawScore >= 1 && rawScore <= 5) ? rawScore : null;
 
       // actual field name from phish.net API is review_text
       const reviewText = review.review_text || review.review || review.body || null;
