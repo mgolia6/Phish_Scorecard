@@ -2423,3 +2423,162 @@ select option {
   .score-summary { padding: 14px 12px; }
   .overall-val { font-size: 1.6rem; }
 }
+
+
+/* ====== SEARCH — INLINE (no dropdown) ====== */
+.search-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Remove old autocomplete/dropdown styles that conflict */
+.search-autocomplete { position: static; }
+.search-dropdown { display: none; } /* Safety — no longer used */
+
+/* ====== MY SHOWS CARD — REDESIGNED ====== */
+/* Override old grid with a cleaner card layout */
+.show-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 18px 16px !important;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.show-card:hover { border-color: var(--green); }
+
+.show-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.show-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.show-card-datestr {
+  color: var(--orange);
+  font-size: 1rem !important;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+.show-card-venue {
+  color: var(--green);
+  font-size: 1rem !important;
+  line-height: 1.3;
+}
+
+.show-card-loc {
+  color: rgba(51,255,51,0.5);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.show-card-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.show-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.show-card-links {
+  display: flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap;
+}
+
+.show-card-rating {
+  text-align: right;
+}
+
+.rating-value {
+  font-family: var(--font-display) !important;
+  font-size: 1.8rem !important;
+  color: var(--cyan) !important;
+  text-shadow: var(--glow-cyan) !important;
+  line-height: 1 !important;
+}
+
+.rating-label {
+  font-size: 0.7rem !important;
+  color: rgba(51,255,51,0.4) !important;
+}
+
+/* ====== RESULTS LIST — BIGGER, MORE READABLE ====== */
+.result-item {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.result-item:hover, .result-item:active {
+  border-color: var(--green);
+  background: rgba(51,255,51,0.05);
+}
+
+.result-date {
+  color: var(--orange);
+  font-size: 0.95rem !important;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+.result-venue {
+  color: var(--green);
+  font-size: 0.92rem !important;
+  flex: none !important;
+  padding: 0 !important;
+}
+
+.result-meta {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.result-location {
+  color: rgba(51,255,51,0.5);
+  font-size: 0.8rem;
+}
+
+.result-tour {
+  font-size: 0.7rem;
+  color: var(--orange);
+  opacity: 0.7;
+}
+
+/* ====== MOBILE SHOW CARD ====== */
+@media (max-width: 768px) {
+  .show-card { padding: 16px 14px !important; }
+  .show-card-datestr { font-size: 0.95rem !important; }
+  .show-card-venue { font-size: 0.92rem !important; }
+  .rating-value { font-size: 1.6rem !important; }
+  .show-card-links { gap: 5px !important; }
+  .show-link-sm { font-size: 0.62rem; padding: 4px 8px; }
+}
