@@ -214,7 +214,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
           {expanded ? (
             <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="sidebar-logo-img-expanded" />
           ) : (
-            <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
+            <img src="/assets/phreezer-snowflake.svg" alt="Phreezer" className="sidebar-logo-img-collapsed" />
           )}
         </div>
 
@@ -903,7 +903,7 @@ export default function App() {
         <header className="app-header">
           <div className="header-left">
             <div className="header-title">
-              <img src="/assets/phreezer-snowflake.png" alt="The Phreezer" className="mobile-header-logo" />
+              <img src="/assets/phreezer-snowflake.svg" alt="The Phreezer" className="mobile-header-logo" />
               <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="mobile-header-wordmark" />
             </div>
           </div>
