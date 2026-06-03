@@ -1,12 +1,6 @@
 <svg width="100%" viewBox="0 0 680 160" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>The Phreezer logo</title>
+  <title>The Phreezer</title>
   <desc>The Phreezer wordmark with snowflake icon and tagline FREEZE. RATE. RELIVE.</desc>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-    .wm { font-family: 'Orbitron', monospace; font-size: 54px; font-weight: 700; fill: #00E0D0; letter-spacing: 4px; }
-    .sub-the { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; fill: #00E0D0; letter-spacing: 8px; }
-    .tag { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; fill: #FF8A00; letter-spacing: 5px; }
-  </style>
   <g transform="translate(40, 20)">
     <g transform="translate(36, 55)" stroke="#00E0D0" stroke-width="2.5" stroke-linecap="round">
       <line x1="0" y1="-32" x2="0" y2="32"/>
@@ -26,11 +20,11 @@
       <line x1="-27.7" y1="-16" x2="-22" y2="-27"/>
       <circle cx="0" cy="0" r="4" fill="#00E0D0" stroke="none"/>
     </g>
-    <text x="88" y="30" class="sub-the">THE</text>
-    <text x="85" y="82" class="wm">PHREEZER</text>
+    <text x="88" y="30" font-family="'Orbitron', 'Courier New', monospace" font-size="18" font-weight="700" fill="#00E0D0" letter-spacing="8">THE</text>
+    <text x="85" y="82" font-family="'Orbitron', 'Courier New', monospace" font-size="54" font-weight="700" fill="#00E0D0" letter-spacing="4">PHREEZER</text>
     <line x1="85" y1="90" x2="555" y2="90" stroke="#00E0D0" stroke-width="1.5" fill="none"/>
     <line x1="85" y1="113" x2="175" y2="113" stroke="#FF8A00" stroke-width="1.5" fill="none"/>
-    <text x="185" y="117" class="tag">FREEZE . RATE . RELIVE.</text>
+    <text x="185" y="117" font-family="'Orbitron', 'Courier New', monospace" font-size="13" font-weight="700" fill="#FF8A00" letter-spacing="5">FREEZE . RATE . RELIVE.</text>
     <line x1="468" y1="113" x2="555" y2="113" stroke="#FF8A00" stroke-width="1.5" fill="none"/>
   </g>
 </svg>
