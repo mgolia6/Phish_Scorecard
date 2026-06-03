@@ -212,9 +212,9 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
         {/* Logo row — no toggle inside, no dead space */}
         <div className="sidebar-logo">
           {expanded ? (
-            <img src="/assets/fish-and-hook.png" alt="Phreezer" className="sidebar-logo-img-expanded" />
+            <img src="/assets/phreezer-full-lockup.png" alt="Phreezer" className="sidebar-logo-img-expanded" />
           ) : (
-            <img src="/assets/hook-only.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
+            <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
           )}
         </div>
 
