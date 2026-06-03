@@ -731,17 +731,85 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 // ============================================================
 function MyShowsTab({ api, showMessage, showError }) {
   const [shows, setShows] = useState([]);
+  const [attended, setAttended] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeView, setActiveView] = useState('attended');
+  const [importing, setImporting] = useState(false);
+  const [phishnetUser, setPhishnetUser] = useState('');
+  const [showImport, setShowImport] = useState(false);
 
-  useEffect(() => {
-    api.get('/user/shows').then(setShows).catch(err => showError(err.message)).finally(() => setLoading(false));
-  }, []);
+  const loadData = () => {
+    setLoading(true);
+    Promise.all([
+      api.get('/user/shows').catch(() => []),
+      api.get('/user/attendance').catch(() => ({ shows: [] })),
+    ]).then(([ratedShows, attendanceData]) => {
+      setShows(ratedShows);
+      setAttended(attendanceData.shows || []);
+    }).catch(err => showError(err.message)).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const handleImport = async () => {
+    if (!phishnetUser.trim()) return;
+    setImporting(true);
+    try {
+      const result = await api.post('/import/phishnet', { phishnet_username: phishnetUser.trim() });
+      showMessage(`✓ ${result.message}`);
+      setShowImport(false);
+      loadData();
+    } catch (err) {
+      showError(err.message || 'Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   if (loading) return <div className="loading">LOADING YOUR SHOWS...</div>;
+
+  const displayShows = activeView === 'attended' ? attended : shows;
+
   return (
     <div className="panel">
-      <div className="panel-title">MY RATED SHOWS ({shows.length})</div>
-      {!shows.length ? <div className="empty-state">NO RATED SHOWS YET</div> : shows.map(show => (
+      <div className="my-shows-header">
+        <div className="my-shows-tabs">
+          <button className={`my-shows-tab-btn ${activeView === 'attended' ? 'active' : ''}`} onClick={() => setActiveView('attended')}>
+            ATTENDED ({attended.length})
+          </button>
+          <button className={`my-shows-tab-btn ${activeView === 'rated' ? 'active' : ''}`} onClick={() => setActiveView('rated')}>
+            RATED ({shows.length})
+          </button>
+        </div>
+        <button className="import-btn" onClick={() => setShowImport(!showImport)}>
+          ↓ IMPORT
+        </button>
+      </div>
+
+      {showImport && (
+        <div className="import-panel">
+          <div className="import-label">PHISH.NET USERNAME</div>
+          <div className="import-row">
+            <input
+              className="import-input"
+              placeholder="e.g. mgolia6"
+              value={phishnetUser}
+              onChange={e => setPhishnetUser(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleImport()}
+            />
+            <button className="btn-primary import-go" onClick={handleImport} disabled={importing}>
+              {importing ? 'IMPORTING...' : 'IMPORT'}
+            </button>
+          </div>
+          <div className="import-hint">Imports all shows marked "I Was There" on phish.net</div>
+        </div>
+      )}
+
+      {!displayShows.length ? (
+        <div className="empty-state">
+          {activeView === 'attended' ? 'NO ATTENDED SHOWS — IMPORT FROM PHISH.NET ABOVE' : 'NO RATED SHOWS YET'}
+        </div>
+      ) : displayShows.map(show => (
         <div key={show.show_date} className="show-card">
           <div className="show-card-top">
             <div className="show-card-left">
@@ -750,8 +818,17 @@ function MyShowsTab({ api, showMessage, showError }) {
               <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
             </div>
             <div className="show-card-right">
-              <div className="rating-value">{show.overall_rating ?? '—'}</div>
-              <div className="rating-label">{show.rated_count} songs rated</div>
+              {activeView === 'rated' ? (
+                <>
+                  <div className="rating-value">{show.overall_rating ?? '—'}</div>
+                  <div className="rating-label">{show.rated_count} songs rated</div>
+                </>
+              ) : (
+                <>
+                  <div className="rating-value">{show.avg_rating ?? '—'}</div>
+                  <div className="rating-label">{show.songs_rated > 0 ? `${show.songs_rated} rated` : 'not rated'}</div>
+                </>
+              )}
             </div>
           </div>
           <div className="show-card-bottom">
