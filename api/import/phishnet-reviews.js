@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   if (!phishnet_username) return res.status(400).json({ error: 'phishnet_username required' });
 
   try {
-    const url = `https://api.phish.net/v5/reviews/username/${encodeURIComponent(phishnet_username)}.json?apikey=${process.env.PHISH_NET_API_KEY}`;
+    const url = `https://api.phish.net/v5/reviews/username/${encodeURIComponent(phishnet_username.toLowerCase())}.json?apikey=${process.env.PHISH_NET_API_KEY}`;
     const r = await fetch(url);
     const d = await r.json();
 
