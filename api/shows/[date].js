@@ -48,8 +48,8 @@ export default async function handler(req, res) {
       if (rawScore != null && rawScore !== '') {
         const n = parseFloat(rawScore);
         if (!isNaN(n)) {
-          // phish.net scores are 0-5 scale
-          score = n.toFixed(1);
+          // phish.net scores are 0-100 scale
+          score = Math.round(n);
         }
       }
       // Strip ISO timestamp suffix — keep only YYYY-MM-DD
