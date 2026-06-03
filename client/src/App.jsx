@@ -737,6 +737,8 @@ function MyShowsTab({ api, showMessage, showError }) {
   const [importing, setImporting] = useState(false);
   const [phishnetUser, setPhishnetUser] = useState('');
   const [showImport, setShowImport] = useState(false);
+  const [importType, setImportType] = useState('attendance');
+  const [expandedReview, setExpandedReview] = useState(null);
 
   const loadData = () => {
     setLoading(true);
@@ -755,7 +757,8 @@ function MyShowsTab({ api, showMessage, showError }) {
     if (!phishnetUser.trim()) return;
     setImporting(true);
     try {
-      const result = await api.post('/import/phishnet', { phishnet_username: phishnetUser.trim() });
+      const endpoint = importType === 'reviews' ? '/import/phishnet-reviews' : '/import/phishnet';
+      const result = await api.post(endpoint, { phishnet_username: phishnetUser.trim() });
       showMessage(`✓ ${result.message}`);
       setShowImport(false);
       loadData();
@@ -788,6 +791,10 @@ function MyShowsTab({ api, showMessage, showError }) {
 
       {showImport && (
         <div className="import-panel">
+          <div className="import-type-row">
+            <button className={`import-type-btn ${importType === 'attendance' ? 'active' : ''}`} onClick={() => setImportType('attendance')}>ATTENDANCE</button>
+            <button className={`import-type-btn ${importType === 'reviews' ? 'active' : ''}`} onClick={() => setImportType('reviews')}>REVIEWS + SCORES</button>
+          </div>
           <div className="import-label">PHISH.NET USERNAME</div>
           <div className="import-row">
             <input
@@ -801,7 +808,9 @@ function MyShowsTab({ api, showMessage, showError }) {
               {importing ? 'IMPORTING...' : 'IMPORT'}
             </button>
           </div>
-          <div className="import-hint">Imports all shows marked "I Was There" on phish.net</div>
+          <div className="import-hint">
+            {importType === 'attendance' ? 'Imports all shows marked "I Was There" on phish.net' : 'Imports your written reviews and scores from phish.net'}
+          </div>
         </div>
       )}
 
@@ -809,37 +818,51 @@ function MyShowsTab({ api, showMessage, showError }) {
         <div className="empty-state">
           {activeView === 'attended' ? 'NO ATTENDED SHOWS — IMPORT FROM PHISH.NET ABOVE' : 'NO RATED SHOWS YET'}
         </div>
-      ) : displayShows.map(show => (
-        <div key={show.show_date} className="show-card">
-          <div className="show-card-top">
-            <div className="show-card-left">
-              <div className="show-card-datestr">{formatDate(show.show_date)}</div>
-              <div className="show-card-venue">{show.venue}</div>
-              <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
+      ) : displayShows.map(show => {
+        const reviewExpanded = expandedReview === show.show_date;
+        const hasReview = !!show.review_text;
+        const phishnetScore = show.phishnet_score != null ? parseFloat(show.phishnet_score).toFixed(1) : null;
+        const phreezerScore = show.phreezer_avg ?? show.overall_rating ?? null;
+        return (
+          <div key={show.show_date} className="show-card">
+            <div className="show-card-top">
+              <div className="show-card-left">
+                <div className="show-card-datestr">{formatDate(show.show_date)}</div>
+                <div className="show-card-venue">{show.venue}</div>
+                <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
+              </div>
+              <div className="show-scores-col">
+                <div className="show-score-row">
+                  <span className="show-score-label">PHREEZER</span>
+                  <span className="show-score-val cyan">{phreezerScore ?? '—'}</span>
+                </div>
+                <div className="show-score-row">
+                  <span className="show-score-label">PHISH.NET</span>
+                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}/10` : '—'}</span>
+                </div>
+              </div>
             </div>
-            <div className="show-card-right">
-              {activeView === 'rated' ? (
-                <>
-                  <div className="rating-value">{show.overall_rating ?? '—'}</div>
-                  <div className="rating-label">{show.rated_count} songs rated</div>
-                </>
-              ) : (
-                <>
-                  <div className="rating-value">{show.avg_rating ?? '—'}</div>
-                  <div className="rating-label">{show.songs_rated > 0 ? `${show.songs_rated} rated` : 'not rated'}</div>
-                </>
-              )}
+            <div className="show-card-bottom">
+              <div className="show-card-links">
+                <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
+                <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
+                <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
+                {hasReview && (
+                  <button className="show-link-sm review-toggle" onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}>
+                    {reviewExpanded ? '▲ REVIEW' : '▼ REVIEW'}
+                  </button>
+                )}
+              </div>
             </div>
+            {reviewExpanded && hasReview && (
+              <div className="show-review-expanded">
+                <div className="show-review-text">{show.review_text}</div>
+                {show.review_date && <div className="show-review-date">Posted {show.review_date}</div>}
+              </div>
+            )}
           </div>
-          <div className="show-card-bottom">
-            <div className="show-card-links">
-              <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
-              <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
-              <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
-            </div>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
