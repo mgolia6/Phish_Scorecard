@@ -173,14 +173,35 @@ function AuthModal({ mode, setMode, onSuccess, onClose }) {
 
 const TODAY = new Date().toISOString().split('T')[0];
 
+// FIX: year-only query gets exact showdate year match, not substring match
+// This prevents tour names like "2002-2003 NYE Run" from polluting 2002 results
+function filterByQuery(shows, q) {
+  if (!q) return shows;
+  const isYearOnly = /^\d{4}$/.test(q.trim());
+  if (isYearOnly) {
+    return shows.filter(s => s.showdate?.startsWith(q.trim()));
+  }
+  const query = q.toLowerCase();
+  return shows.filter(s =>
+    s.showdate?.includes(q) ||
+    s.venue?.toLowerCase().includes(query) ||
+    s.city?.toLowerCase().includes(query) ||
+    s.state?.toLowerCase().includes(query) ||
+    s.tour_name?.toLowerCase().includes(query)
+  );
+}
+
 function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [query, setQuery] = useState('');
+  const [allShows, setAllShows] = useState([]);
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  // Delay showing spinner so <1s loads don't flash
+  const [showSpinner, setShowSpinner] = useState(false);
   const [currentShow, setCurrentShow] = useState(null);
   const [songs, setSongs] = useState([]);
   const [ratings, setRatings] = useState({});
-  const [audioTracks, setAudioTracks] = useState({}); // keyed by song title (normalized)
+  const [audioTracks, setAudioTracks] = useState({});
   const [loadingShow, setLoadingShow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -191,37 +212,65 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
   const debounceRef = useRef(null);
+  const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
 
   const filterShows = (list) => list.filter(s => s.showdate <= TODAY);
 
+  // Load all shows once into local cache so year buttons work instantly client-side
   useEffect(() => {
-    api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
+    api.get('/shows?limit=2000').then(data => {
+      const filtered = filterShows(data);
+      setAllShows(filtered);
+      setResults(filtered.slice(0, 20));
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (spinnerTimerRef.current) clearTimeout(spinnerTimerRef.current);
+    setShowSpinner(false);
+
     if (!query.trim()) {
-      api.get('/shows').then(data => setResults(filterShows(data))).catch(() => {});
+      setResults(allShows.slice(0, 20));
       return;
     }
-    // Don't search on very short queries
+
     if (query.trim().length < 2) {
       setResults([]);
       return;
     }
+
+    // Check if it's a pure year — filter client-side immediately, no spinner
+    const isYearOnly = /^\d{4}$/.test(query.trim());
+    if (isYearOnly && allShows.length > 0) {
+      const filtered = filterByQuery(allShows, query.trim());
+      setResults(filtered.slice(0, 100));
+      return;
+    }
+
+    // For venue/city/tour queries: debounce + spinner only after 300ms
     debounceRef.current = setTimeout(async () => {
+      // Only show spinner if fetch actually takes a moment
+      spinnerTimerRef.current = setTimeout(() => setShowSpinner(true), 300);
       setSearching(true);
       try {
         const data = await api.get(`/shows?q=${encodeURIComponent(query.trim())}`);
-        setResults(filterShows(data));
+        const filtered = filterShows(data);
+        // Client-side re-filter for year accuracy (catches tour name bleed)
+        setResults(filterByQuery(filtered, query.trim()).slice(0, 50));
       } catch (err) { showError(err.message); }
-      finally { setSearching(false); }
+      finally {
+        setSearching(false);
+        setShowSpinner(false);
+        if (spinnerTimerRef.current) clearTimeout(spinnerTimerRef.current);
+      }
     }, 400);
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
-
-  // No outside-click handler needed — results are inline
+    return () => {
+      clearTimeout(debounceRef.current);
+      clearTimeout(spinnerTimerRef.current);
+    };
+  }, [query, allShows]);
 
   const loadShow = async (date) => {
     if (!isAuthed) { onAuthRequired(); return; }
@@ -233,7 +282,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     setSaved(false);
 
     try {
-      // Load phish.net data + saved ratings + phish.in audio in parallel
       const [showData, ratingsResp, audioData] = await Promise.all([
         api.get(`/shows/${date}`),
         api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })),
@@ -243,7 +291,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       setSongs(showData.songs || []);
       setCurrentShow(showData);
 
-      // Handle both new {ratings, attendance_type} shape and legacy bare array
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
       const savedAttendance = !Array.isArray(ratingsResp) && ratingsResp.attendance_type
         ? ratingsResp.attendance_type : 'listened';
@@ -253,7 +300,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
       setRatings(rMap);
 
-      // Build audio map keyed by normalized title
       const aMap = {};
       for (const t of (audioData.tracks || [])) {
         const key = t.title?.toLowerCase().trim();
@@ -273,6 +319,17 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     setQuery('');
     setResults([]);
     loadShow(show.showdate);
+  };
+
+  const handleYearBtn = (yr) => {
+    const isActive = query === yr;
+    if (isActive) {
+      setQuery('');
+      setCurrentShow(null);
+    } else {
+      setQuery(yr);
+      setCurrentShow(null); // clear any loaded show so results panel shows
+    }
   };
 
   const handleRandom = async () => {
@@ -347,9 +404,20 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
     : null;
 
   const hasAudio = Object.keys(audioTracks).length > 0;
+
+  // Build relisten URL: base path always works; relisten.net/phish/YYYY/MM/DD
   const relistenUrl = currentShow
     ? `${RELISTEN}/${currentShow.showdate?.replace(/-/g, '/')}`
     : null;
+
+  // Merge phish.net setlist + reviews into one link
+  // Show review count in label if available
+  const pnetUrl = currentShow?.permalink || `${PNET}/setlists/`;
+  const reviewCount = currentShow?.reviews?.count || 0;
+  const reviewAvg = currentShow?.reviews?.avg_score;
+  const pnetLabel = reviewCount > 0
+    ? `PHISH.NET · ${reviewCount} REVIEWS${reviewAvg ? ` (${reviewAvg}/5)` : ''}`
+    : 'PHISH.NET SETLIST';
 
   return (
     <div>
@@ -394,7 +462,8 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               onChange={e => setQuery(e.target.value)}
               autoComplete="off" autoCorrect="off" spellCheck="false"
             />
-            {searching && <span className="search-spinner">◈</span>}
+            {/* Only show spinner after 300ms delay — prevents glitch flash */}
+            {showSpinner && <span className="search-spinner">◈</span>}
           </div>
           <button
             className="btn-random"
@@ -404,13 +473,9 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
           </button>
         </div>
-        {/* Era quick-filter */}
+
+        {/* Year quick-filter — handleYearBtn clears currentShow so results appear */}
         <div className="era-filter">
-          {['1.0','2.0','3.0','4.0','5.0'].map(era => {
-            const labels = { '1.0':'Pre-Hiatus (83–04)', '2.0':'2.0 (02–04)', '3.0':'3.0 (09–14)', '4.0':'4.0 (18–20)', '5.0':'5.0 (21+)' };
-            const years = { '1.0':'1983', '2.0':'2002', '3.0':'2009', '4.0':'2018', '5.0':'2021' };
-            return null; // replaced by year buttons below
-          })}
           {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
             const yr = String(1983 + i);
             const active = query === yr;
@@ -419,13 +484,13 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 key={yr}
                 type="button"
                 className={`year-btn ${active ? 'active' : ''}`}
-                onClick={() => setQuery(active ? '' : yr)}
+                onClick={() => handleYearBtn(yr)}
               >{yr}</button>
             );
           }).reverse()}
         </div>
 
-        {/* Results list — always inline, never floating */}
+        {/* Results — show when no current show loaded */}
         {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
@@ -463,17 +528,14 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
               {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
             </div>
             <div className="show-masthead-links">
-              <a href={currentShow.permalink || `${PNET}/setlists/`} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
-                PHISH.NET SETLIST
+              {/* Merged phish.net + reviews button */}
+              <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">
+                {pnetLabel}
               </a>
+              {/* Relisten — direct show URL */}
               {relistenUrl && (
                 <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link">
                   STREAM ON RELISTEN
-                </a>
-              )}
-              {currentShow.reviews?.count > 0 && (
-                <a href={`${currentShow.permalink || ''}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link reviews-link">
-                  {currentShow.reviews.count} REVIEWS {currentShow.reviews.avg_score ? `(${currentShow.reviews.avg_score}/5)` : ''}
                 </a>
               )}
             </div>
@@ -617,7 +679,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                       <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review?.substring(0, 300) + (rev.review?.length > 300 ? '...' : '') }} />
                     </div>
                   ))}
-                  <a href={`${currentShow.permalink || ''}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
+                  <a href={`${pnetUrl}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
                     ALL {currentShow.reviews.count} REVIEWS ON PHISH.NET
                   </a>
                 </div>
@@ -758,18 +820,23 @@ export default function App() {
         </span>
       </div>
 
+      {/* DESKTOP HEADER — tighter, more purposeful layout */}
       <header className="app-header">
-        <div className="header-title">
-          <h1>Phishow Scorecard</h1>
-          <span className="tagline">Rate. Track. Relive.</span>
+        <div className="header-left">
+          <div className="header-title">
+            <h1>Phishow Scorecard</h1>
+            <span className="tagline">Rate. Track. Relive.</span>
+          </div>
         </div>
-        <div className="header-status"><div className="status-dot" />ONLINE</div>
-        <div className="header-auth">
-          {user ? (
-            <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
-          ) : (
-            <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
-          )}
+        <div className="header-right">
+          <div className="header-status"><div className="status-dot" /><span className="status-label">ONLINE</span></div>
+          <div className="header-auth">
+            {user ? (
+              <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
+            ) : (
+              <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
+            )}
+          </div>
         </div>
       </header>
 
