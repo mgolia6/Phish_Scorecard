@@ -211,8 +211,11 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
 
         {/* Logo row — no toggle inside, no dead space */}
         <div className="sidebar-logo">
-          <span className="sidebar-logo-glyph">⟁</span>
-          {expanded && <span className="sidebar-logo-text">PHISHOOK</span>}
+          {expanded ? (
+            <img src="/assets/fish-and-hook.png" alt="Phishook" className="sidebar-logo-img-expanded" />
+          ) : (
+            <img src="/assets/hook-only.png" alt="Phishook" className="sidebar-logo-img-collapsed" />
+          )}
         </div>
 
       {/* Nav */}
@@ -933,4 +936,5 @@ export default function App() {
     </div>
   );
 }
+
 
