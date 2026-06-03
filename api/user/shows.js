@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   try {
     const result = await pool.query(
       `SELECT 
-        s.show_date, s.venue, s.city, s.state, s.country,
+        TO_CHAR(s.show_date, 'YYYY-MM-DD') as show_date,
+        s.venue, s.city, s.state, s.country,
         ROUND(AVG(r.rating)::numeric, 2) as overall_rating,
         COUNT(r.id) as song_count,
         COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as rated_count
