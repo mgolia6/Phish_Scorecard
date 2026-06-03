@@ -185,6 +185,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
   const [loadingShow, setLoadingShow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [randomizing, setRandomizing] = useState(false);
+  const [attendanceType, setAttendanceType] = useState('listened');
   const [showInstructions, setShowInstructions] = useState(false);
   const [phishnetHandle, setPhishnetHandle] = useState(localStorage.getItem('pnet_handle') || '');
   const [celebrating, setCelebrating] = useState(false);
@@ -236,14 +237,20 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
 
     try {
       // Load phish.net data + saved ratings + phish.in audio in parallel
-      const [showData, savedRatings, audioData] = await Promise.all([
+      const [showData, ratingsResp, audioData] = await Promise.all([
         api.get(`/shows/${date}`),
-        api.get(`/ratings/${date}`).catch(() => []),
+        api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })),
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
       ]);
 
       setSongs(showData.songs || []);
       setCurrentShow(showData);
+
+      // Handle both new {ratings, attendance_type} shape and legacy bare array
+      const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
+      const savedAttendance = !Array.isArray(ratingsResp) && ratingsResp.attendance_type
+        ? ratingsResp.attendance_type : 'listened';
+      setAttendanceType(savedAttendance);
 
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
@@ -304,6 +311,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
       if (!ratingsList.length) { showMessage('Rate at least one song first', 'info'); setSubmitting(false); return; }
       await api.post(`/ratings/${currentShow.showdate}`, {
         ratings: ratingsList,
+        attendance_type: attendanceType,
         showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
       if (phishnetHandle.trim()) localStorage.setItem('pnet_handle', phishnetHandle.trim());
@@ -552,8 +560,26 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired }) {
                 )}
               </div>
 
-              {/* Submit */}
+              {/* Attendance + Submit */}
               <div className="submit-section">
+                <div className="attendance-row">
+                  <span className="attendance-label">HOW DID YOU EXPERIENCE THIS SHOW?</span>
+                  <div className="attendance-options">
+                    {[
+                      { value: 'attended', label: '🎸 ATTENDED', desc: 'I was there' },
+                      { value: 'webcast', label: '📺 WEBCAST', desc: 'Watched live stream' },
+                      { value: 'listened', label: '🎧 LISTENED', desc: 'Heard recording' },
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`attendance-btn ${attendanceType === opt.value ? 'active' : ''}`}
+                        onClick={() => setAttendanceType(opt.value)}
+                        title={opt.desc}
+                      >{opt.label}</button>
+                    ))}
+                  </div>
+                </div>
                 <div className="pnet-handle-row">
                   <span className="pnet-handle-label">PHISH.NET HANDLE:</span>
                   <input
