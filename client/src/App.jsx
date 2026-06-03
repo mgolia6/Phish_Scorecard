@@ -884,7 +884,7 @@ function MyShowsTab({ api, showMessage, showError }) {
       ) : displayShows.map(show => {
         const reviewExpanded = expandedReview === show.show_date;
         const hasReview = !!show.review_text;
-        const phishnetScore = show.phishnet_score != null ? Math.round(parseFloat(show.phishnet_score)) : null;
+        const phishnetScore = show.phishnet_score != null && show.phishnet_score > 0 ? parseFloat(show.phishnet_score).toFixed(1) : null;
         const phreezerScore = show.phreezer_avg ?? show.overall_rating ?? null;
         return (
           <div key={show.show_date} className="show-card">
@@ -901,7 +901,7 @@ function MyShowsTab({ api, showMessage, showError }) {
                 </div>
                 <div className="show-score-row">
                   <span className="show-score-label">PHISH.NET</span>
-                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}/100` : '—'}</span>
+                  <span className="show-score-val orange">{phishnetScore ? `${phishnetScore}★` : '—'}</span>
                 </div>
               </div>
             </div>
