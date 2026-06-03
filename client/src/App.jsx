@@ -740,6 +740,8 @@ function MyShowsTab({ api, showMessage, showError }) {
   const [importType, setImportType] = useState('attendance');
   const [expandedReview, setExpandedReview] = useState(null);
   const [importResult, setImportResult] = useState(null);
+  const [sortBy, setSortBy] = useState('date_desc');
+  const [filterBy, setFilterBy] = useState('all');
 
   const loadData = () => {
     setLoading(true);
@@ -772,7 +774,25 @@ function MyShowsTab({ api, showMessage, showError }) {
 
   if (loading) return <div className="loading">LOADING YOUR SHOWS...</div>;
 
-  const displayShows = activeView === 'attended' ? attended : shows;
+  const rawShows = activeView === 'attended' ? attended : shows;
+
+  const filteredShows = rawShows.filter(show => {
+    if (activeView !== 'attended') return true;
+    if (filterBy === 'has_review') return !!show.review_text;
+    if (filterBy === 'has_phreezer') return show.phreezer_avg != null;
+    if (filterBy === 'no_phreezer') return show.phreezer_avg == null;
+    return true;
+  });
+
+  const displayShows = [...filteredShows].sort((a, b) => {
+    if (activeView !== 'attended') return 0;
+    if (sortBy === 'date_desc') return new Date(b.show_date) - new Date(a.show_date);
+    if (sortBy === 'date_asc') return new Date(a.show_date) - new Date(b.show_date);
+    if (sortBy === 'phreezer_desc') return (b.phreezer_avg ?? -1) - (a.phreezer_avg ?? -1);
+    if (sortBy === 'phishnet_desc') return (b.phishnet_score ?? -1) - (a.phishnet_score ?? -1);
+    if (sortBy === 'no_phreezer') return (a.phreezer_avg != null ? 1 : -1) - (b.phreezer_avg != null ? 1 : -1);
+    return 0;
+  });
 
   const ImportSuccessModal = () => {
     if (!importResult) return null;
@@ -813,6 +833,24 @@ function MyShowsTab({ api, showMessage, showError }) {
           ↓ IMPORT
         </button>
       </div>
+
+      {activeView === 'attended' && (
+        <div className="shows-controls">
+          <div className="shows-filter-row">
+            <button className={`filter-pill ${filterBy === 'all' ? 'active' : ''}`} onClick={() => setFilterBy('all')}>ALL</button>
+            <button className={`filter-pill ${filterBy === 'has_review' ? 'active' : ''}`} onClick={() => setFilterBy('has_review')}>REVIEWED</button>
+            <button className={`filter-pill ${filterBy === 'has_phreezer' ? 'active' : ''}`} onClick={() => setFilterBy('has_phreezer')}>RATED</button>
+            <button className={`filter-pill ${filterBy === 'no_phreezer' ? 'active' : ''}`} onClick={() => setFilterBy('no_phreezer')}>UNRATED</button>
+          </div>
+          <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+            <option value="date_desc">DATE ↓</option>
+            <option value="date_asc">DATE ↑</option>
+            <option value="phreezer_desc">PHREEZER ↓</option>
+            <option value="phishnet_desc">PHISH.NET ↓</option>
+            <option value="no_phreezer">UNRATED FIRST</option>
+          </select>
+        </div>
+      )}
 
       {showImport && (
         <div className="import-panel">
