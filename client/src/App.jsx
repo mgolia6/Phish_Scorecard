@@ -870,7 +870,7 @@ function MyShowsTab({ api, showMessage, showError }) {
             <div className="show-card-bottom">
               <div className="show-card-links">
                 <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
-                <a href={`https://phish.net/setlists/phish-${show.show_date}.html`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
+                <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
                 <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
                 {hasReview && (
                   <button className="show-link-sm review-toggle" onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}>
