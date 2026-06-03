@@ -35,16 +35,30 @@ export default async function handler(req, res) {
       isreprise:  entry.isreprise === '1' || entry.isreprise === 1,
     }));
 
-    const reviews = (reviewsData.data || []).map(r => ({
-      author:  r.author,
-      score:   parseFloat(r.score) || null,
-      review:  r.review,
-      posted:  r.posted_date,
-    }));
+    // phish.net v5 reviews: fields are reviewid, showid, uid, score (0-10), review (text), tstamp, author
+    // Map defensively — log raw first item to verify field names
+    const rawReviews = reviewsData.data || [];
+    const reviews = rawReviews.map(r => {
+      // Try all known field name variants
+      const author = r.author || r.username || r.uid || 'Anonymous';
+      const text = r.review || r.body || r.text || '';
+      const rawScore = r.score;
+      // phish.net scores 0-10 scale; normalize to 0-5
+      let score = null;
+      if (rawScore != null && rawScore !== '') {
+        const n = parseFloat(rawScore);
+        if (!isNaN(n)) {
+          // If score > 5, it's on 0-10 scale — halve it
+          score = n > 5 ? (n / 2).toFixed(1) : n.toFixed(1);
+        }
+      }
+      const posted = r.posted_date || r.tstamp || r.date || '';
+      return { author, score, review: text, posted };
+    });
 
     const scoredReviews = reviews.filter(r => r.score);
     const avgReviewScore = scoredReviews.length
-      ? (scoredReviews.reduce((s, r) => s + r.score, 0) / scoredReviews.length).toFixed(2)
+      ? (scoredReviews.reduce((s, r) => s + parseFloat(r.score), 0) / scoredReviews.length).toFixed(2)
       : null;
 
     res.json({
