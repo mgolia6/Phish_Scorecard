@@ -2582,3 +2582,48 @@ select option {
   .show-card-links { gap: 5px !important; }
   .show-link-sm { font-size: 0.62rem; padding: 4px 8px; }
 }
+
+/* ====== YEAR FILTER ====== */
+.era-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.year-btn {
+  padding: 5px 8px;
+  border: 1px solid rgba(51,255,51,0.2);
+  background: transparent;
+  color: rgba(51,255,51,0.5);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: all 0.12s;
+  min-width: 44px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.year-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(51,255,51,0.06);
+  box-shadow: none;
+}
+
+.year-btn.active {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: rgba(255,102,0,0.12);
+  box-shadow: 0 0 6px rgba(255,102,0,0.3);
+}
+
+@media (max-width: 768px) {
+  .era-filter { max-height: 100px; gap: 3px; }
+  .year-btn { font-size: 0.68rem; padding: 5px 6px; min-width: 40px; }
+}
