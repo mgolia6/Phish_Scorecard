@@ -1,3 +1,50 @@
+## Session 9 — 2026-06-03 (continued)
+
+### What Was Built
+- **Welcome back celebration** — rotating Phish lyrics on every login. Fires once per browser session (sessionStorage gate). Auto-dismisses in 3.2s, tappable to skip.
+- **Lyrics in rotation** — 9 lines including "We're glad, glad, glad that you've arrived!", Farmhouse, Tweezer, Everything's Right, Halley's Comet, Say it to Me Santos, and others
+- **T&C copy overhauled** — title: "BEFORE YOU STEP INTO THE PHREEZER...", gratitude section acknowledges phish.net/Mockingbird/phish.in and the fan community, ground rules: "Don't be a jerk. Don't suck at Phish. Or at least try not to.", CTA: "STEP INTO THE PHREEZER"
+- **Onboarding 5th step added** — support note: Phreezer is free, overhead is real, if the spirit moves you
+- **Full-page snowflake loader** — spinning ❄ centered on black screen replaces inline loading text everywhere
+- **Admin toasts killed** — all admin actions now silent, confirm modal is the only feedback
+- **Welcome back gated to session** — fires once per tab session, not on every refresh
+- **Year/month dropdowns** — replaced the wall of year buttons with two compact selects. Year auto-loads results, month narrows. Clean.
+- **Random show fixed** — phish.in API changed, now goes direct to phish.net
+- **Triple-tap logo → admin** — admin tab removed from nav entirely, 3 taps within 800ms on logo opens admin panel. Desktop sidebar logo also works.
+- **Mobile logo enlarged** — 38px → 52px
+- **Admin tab built** — user cards with stats, reset onboarding, reset password, clear data, delete user. Confirm modal for destructive actions.
+- **Bootstrap page** — /bootstrap.html for one-time admin setup. BOOTSTRAP_SECRET env var gates it.
+- **DB flags** — is_admin, tandc_accepted, onboarding_complete moved to users table (DB-backed, not localStorage)
+- **Auth endpoints updated** — login, register, me all return is_admin + tandc_accepted + onboarding_complete
+- **KPI cards** — top of My Shows: attended, rated, avg score, reviews count + top song + most visited venue
+- **Tap to rate** — ◈ RATE / ◈ RE-RATE button on every attended show card, navigates to Scorecard with show pre-loaded
+
+### Decisions Made
+- Welcome back fires on auto-login (page load with token) AND manual login, but gated to once per session
+- Admin is secret — triple-tap logo only, not in nav. Keeps UI clean for regular users.
+- phish.net handle auth: no OAuth available. Data tied to Phreezer user ID so no collision between users importing same handle. Add "I confirm this is my account" checkbox on profile setup.
+- Onboarding slideshow kept for now — will be replaced by interactive tour guide in a future session (needs desktop testing)
+- Profile setup page scoped but not built — fires after T&C, before slideshow. Fields: phish.net handle + confirmation checkbox, favorite song (searchable), favorite venue (searchable), favorite show (show search → loads Scorecard). All optional, not skippable.
+
+### Open Technical Debt
+- Debug endpoint /api/debug/reviews.js still in repo — DELETE before launch
+- Community rating on show cards not built (needs caching layer)
+- Import button in onboarding last step — still needs real-world verification
+- Profile setup page not built yet
+- Tour guide not built yet
+- Streaks + badges + leaderboard scoped but not built
+- Share cards not built
+- Subdomain phreezer.mpgink.com not configured
+- Vercel cron for reminders/sync not set up
+
+### Next Session Priorities
+1. **Profile setup page** — after T&C, before slideshow. phish.net handle + confirmation, favorite song/venue/show (searchable selects). Favorite show → Scorecard. DB columns: favorite_song, favorite_venue, favorite_show_date, phishnet_username on users table.
+2. **Tour guide** — replace static slideshow with interactive overlay that walks user through each section. Needs desktop + mobile testing.
+3. **Streaks** — login streak + rating streak. Store last_login_date on users table, calculate streak server-side.
+4. **Badges** — import expert, reviewer, show milestones (10/25/50/100 rated). Display on profile.
+5. **Leaderboard** — Community tab: rankings by shows rated, avg score, streak. Badges next to names.
+6. **Delete /api/debug/reviews.js**
+
 ## Session 8 — 2026-06-03
 
 ### What Was Built
