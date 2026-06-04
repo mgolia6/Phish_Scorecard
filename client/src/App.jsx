@@ -105,6 +105,7 @@ function SaveCelebration({ onDone }) {
 
 function WelcomeCelebration({ username, onDone }) {
   const lyrics = [
+    "We're glad, glad, glad that you've arrived!",
     "Glad glad glad that you've arrived.",
     "Welcome. This is our farmhouse. We have cluster flies, alas.",
     "You're already there.",
@@ -1549,7 +1550,8 @@ export default function App() {
       setUser(u);
       if (!u.tandc_accepted) {
         setShowTandC(true);
-      } else {
+      } else if (!sessionStorage.getItem('phreezer_welcomed')) {
+        sessionStorage.setItem('phreezer_welcomed', '1');
         setShowWelcome(true);
       }
     }).catch(() => localStorage.removeItem('phish_token'));
