@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       tour_name:     first.tour_name || '',
       tourid:        first.tourid,
       setlist_notes: first.setlistnotes || '',
-      soundcheck:    first.soundcheck || '',
+      soundcheck:    (first.soundcheck || '').replace(/<[^>]*>/g, '').trim(),
       songs,
       reviews: {
         count:     reviews.length,
