@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   // GET — fetch ratings + attendance for this show
   if (req.method === 'GET') {
     try {
-      const [ratingsResult, attendanceResult] = await Promise.all([
+      const [ratingsResult, attendanceResult, importedAttendance] = await Promise.all([
         pool.query(
           'SELECT * FROM ratings WHERE user_id = $1 AND show_date = $2 ORDER BY set_number, id',
           [user.id, showDate]
@@ -50,10 +50,22 @@ export default async function handler(req, res) {
           'SELECT attendance_type FROM user_show_attendance WHERE user_id = $1 AND show_date = $2',
           [user.id, showDate]
         ),
+        // Check if user imported this show as attended from phish.net
+        pool.query(
+          'SELECT 1 FROM attendance WHERE user_id = $1 AND show_date = $2 LIMIT 1',
+          [user.id, showDate]
+        ),
       ]);
+
+      // Priority: saved preference > phish.net import (attended) > null
+      let attendance_type = attendanceResult.rows[0]?.attendance_type || null;
+      if (!attendance_type && importedAttendance.rows.length > 0) {
+        attendance_type = 'attended';
+      }
+
       return res.json({
         ratings: ratingsResult.rows,
-        attendance_type: attendanceResult.rows[0]?.attendance_type || null,
+        attendance_type,
       });
     } catch (err) {
       return res.status(500).json({ error: err.message });
