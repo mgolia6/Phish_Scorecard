@@ -1344,7 +1344,6 @@ function AdminTab({ api, showMessage, showError }) {
         if (action === 'reset-password') {
           // email sent — confirm modal handles feedback
         } else if (action === 'reset-onboarding') {
-          showMessage('Onboarding + T&C reset', 'success');
           loadUsers();
         } else if (action === 'clear-data') {
           loadUsers();
@@ -1369,9 +1368,8 @@ function AdminTab({ api, showMessage, showError }) {
       const data = await res.json();
       const failed = data.results?.filter(r => r.status === 'error');
       if (failed?.length) {
-        showError(`${failed.length} migration(s) failed: ${failed.map(f => f.migration).join(', ')}`);
+        showError(`${failed.length} migration(s) failed`);
       } else {
-        showMessage(`${data.results?.length} migrations ran OK`, 'success');
         loadUsers();
       }
     } catch (err) {
