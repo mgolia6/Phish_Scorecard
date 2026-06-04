@@ -206,10 +206,10 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
         </div>
         {isLast ? (
           <div className="onboarding-actions">
-            <button className="btn-primary" style={{ flex: 1, padding: '12px' }} onClick={() => { onComplete(); onStartImport(); }}>
+            <button className="btn-primary" style={{ flex: 1, padding: '12px' }} onClick={() => { onStartImport(); }}>
               IMPORT FROM PHISH.NET
             </button>
-            <button style={{ flex: 1, padding: '12px' }} onClick={() => { onComplete(); onGoToScorecard(); }}>
+            <button style={{ flex: 1, padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
               RATE A SHOW NOW
             </button>
           </div>
@@ -303,7 +303,6 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
     { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
     { id: 'my-shows', label: 'MY SHOWS', glyph: '◉', section: null, authRequired: true },
     { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
-    { id: 'admin', label: 'ADMIN', glyph: '⚙', section: null, authRequired: true, adminOnly: true },
   ];
 
   const comingSoon = [
@@ -319,7 +318,20 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
 
         <div className="sidebar-logo">
           {expanded ? (
-            <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="sidebar-logo-img-expanded" />
+            <img
+              src="/assets/phreezer-logo.svg"
+              alt="The Phreezer"
+              className="sidebar-logo-img-expanded"
+              onClick={() => {
+                if (!user?.is_admin) return;
+                const now = Date.now();
+                if (!window._logoTaps) window._logoTaps = [];
+                window._logoTaps = window._logoTaps.filter(t => now - t < 800);
+                window._logoTaps.push(now);
+                if (window._logoTaps.length >= 3) { window._logoTaps = []; setTab('admin'); }
+              }}
+              style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
+            />
           ) : (
             <img src="/assets/phreezer-snowflake.svg" alt="Phreezer" className="sidebar-logo-img-collapsed" />
           )}
@@ -1568,7 +1580,23 @@ export default function App() {
         <header className="app-header">
           <div className="header-left">
             <div className="header-title">
-              <img src="/assets/phreezer-logo.svg" alt="The Phreezer" className="mobile-header-logo" />
+              <img
+                src="/assets/phreezer-logo.svg"
+                alt="The Phreezer"
+                className="mobile-header-logo"
+                onClick={() => {
+                  if (!user?.is_admin) return;
+                  const now = Date.now();
+                  if (!window._logoTaps) window._logoTaps = [];
+                  window._logoTaps = window._logoTaps.filter(t => now - t < 800);
+                  window._logoTaps.push(now);
+                  if (window._logoTaps.length >= 3) {
+                    window._logoTaps = [];
+                    setTab('admin');
+                  }
+                }}
+                style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
+              />
             </div>
           </div>
           <div className="header-right">
@@ -1587,7 +1615,7 @@ export default function App() {
             {user && <>
               <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
               <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
-              {user.is_admin && <button className={`tab-btn ${tab === 'admin' ? 'active' : ''}`} onClick={() => setTab('admin')}>ADMIN</button>}
+  
             </>}
           </nav>
           {renderMain(true)}
