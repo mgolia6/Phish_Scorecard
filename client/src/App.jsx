@@ -282,7 +282,8 @@ const TODAY = new Date().toISOString().split('T')[0];
 function filterByQuery(shows, q) {
   if (!q) return shows;
   const isYearOnly = /^\d{4}$/.test(q.trim());
-  if (isYearOnly) {
+  const isYearMonth = /^\d{4}-\d{2}$/.test(q.trim());
+  if (isYearOnly || isYearMonth) {
     return shows.filter(s => s.showdate?.startsWith(q.trim()));
   }
   const query = q.toLowerCase();
@@ -497,6 +498,8 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
   const [saved, setSaved] = useState(false);
   const [randomizing, setRandomizing] = useState(false);
   const [attendanceType, setAttendanceType] = useState('listened');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
@@ -531,6 +534,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
 
     if (!query.trim()) {
       setResults(allShows.slice(0, 20));
+      if (!selectedYear) { setSelectedYear(''); setSelectedMonth(''); }
       return;
     }
     if (query.trim().length < 2) { setResults([]); return; }
@@ -712,15 +716,47 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
           </button>
         </div>
-        <div className="era-filter">
-          {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
-            const yr = String(1983 + i);
-            if (['2005','2006','2007'].includes(yr)) return null;
-            const active = query === yr;
-            return (
-              <button key={yr} type="button" className={`year-btn ${active ? 'active' : ''}`} onClick={() => handleYearBtn(yr)}>{yr}</button>
-            );
-          }).reverse()}
+        <div className="era-filter-dropdowns">
+          <select
+            className="era-select"
+            value={selectedYear}
+            onChange={e => {
+              setSelectedYear(e.target.value);
+              setSelectedMonth('');
+              if (e.target.value) {
+                setQuery(e.target.value);
+                setCurrentShow(null);
+              } else {
+                setQuery('');
+              }
+            }}
+          >
+            <option value="">ALL YEARS</option>
+            {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
+              const yr = String(new Date().getFullYear() - i);
+              if (['2005','2006','2007'].includes(yr)) return null;
+              return <option key={yr} value={yr}>{yr}</option>;
+            })}
+          </select>
+          <select
+            className="era-select"
+            value={selectedMonth}
+            disabled={!selectedYear}
+            onChange={e => {
+              setSelectedMonth(e.target.value);
+              if (e.target.value && selectedYear) {
+                setQuery(`${selectedYear}-${e.target.value}`);
+              } else {
+                setQuery(selectedYear);
+              }
+              setCurrentShow(null);
+            }}
+          >
+            <option value="">ALL MONTHS</option>
+            {['01','02','03','04','05','06','07','08','09','10','11','12'].map((m, i) => (
+              <option key={m} value={m}>{['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][i]}</option>
+            ))}
+          </select>
         </div>
         {!currentShow && !loadingShow && results.length > 0 && (
           <>
