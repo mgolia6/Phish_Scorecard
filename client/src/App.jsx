@@ -330,19 +330,35 @@ function ProfileSetupModal({ api, onComplete }) {
   const [confirmedHandle, setConfirmedHandle] = useState(false);
   const [favoriteSong, setFavoriteSong] = useState('');
   const [favoriteVenue, setFavoriteVenue] = useState('');
-  const [favoriteShow, setFavoriteShow] = useState('');
-  const [options, setOptions] = useState({ songs: [], venues: [], shows: [] });
-  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [favoriteShowDate, setFavoriteShowDate] = useState('');
+  const [favoriteShowLabel, setFavoriteShowLabel] = useState('');
+  const [songs, setSongs] = useState([]);
+  const [venues, setVenues] = useState([]);
   const [importing, setImporting] = useState(false);
   const [importDone, setImportDone] = useState(false);
   const [importCount, setImportCount] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    api.get('/user/profile-options')
-      .then(data => { setOptions(data); setLoadingOptions(false); })
-      .catch(() => setLoadingOptions(false));
-  }, [importDone]); // re-fetch after import so dropdowns populate
+  // Load existing data on mount — user may already have rated songs / attended shows
+  const loadOptions = async () => {
+    try {
+      const data = await api.get('/user/profile-options');
+      if (data.songs?.length) setSongs(data.songs);
+      if (data.venues?.length) setVenues(data.venues);
+      // Auto-set favorite show to first attended show (chronologically oldest)
+      if (data.shows?.length) {
+        const first = [...data.shows].sort((a, b) => a.show_date.localeCompare(b.show_date))[0];
+        if (first) {
+          setFavoriteShowDate(first.show_date);
+          const [y, m, day] = first.show_date.split('-');
+          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          setFavoriteShowLabel(`${months[parseInt(m)-1]} ${parseInt(day)}, ${y} — ${first.venue}${first.city ? `, ${first.city}` : ''}`);
+        }
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => { loadOptions(); }, []);
 
   const handleImport = async () => {
     if (!phishnetUsername.trim() || !confirmedHandle) return;
@@ -354,6 +370,7 @@ function ProfileSetupModal({ api, onComplete }) {
       ]);
       setImportCount({ attendance: attRes.imported || 0, reviews: revRes.imported || 0 });
       setImportDone(true);
+      await loadOptions(); // reload dropdowns immediately after import
     } catch (e) {}
     finally { setImporting(false); }
   };
@@ -365,17 +382,10 @@ function ProfileSetupModal({ api, onComplete }) {
         phishnet_username: phishnetUsername || null,
         favorite_song: favoriteSong || null,
         favorite_venue: favoriteVenue || null,
-        favorite_show_date: favoriteShow || null,
+        favorite_show_date: favoriteShowDate || null,
       });
     } catch (e) {}
     onComplete();
-  };
-
-  const formatShowOption = (s) => {
-    const d = s.show_date;
-    const [y, m, day] = d.split('-');
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y} — ${s.venue}${s.city ? `, ${s.city}` : ''}`;
   };
 
   return (
@@ -396,9 +406,9 @@ function ProfileSetupModal({ api, onComplete }) {
             onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); setImportDone(false); setImportCount(null); }}
           />
           {phishnetUsername && (
-            <label className="profile-checkbox-row">
-              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0 }} />
-              <span className="profile-checkbox-label">I confirm this is my phish.net account</span>
+            <label className="profile-checkbox-row" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 8, cursor: 'pointer' }}>
+              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.7)', letterSpacing: '1px', lineHeight: 1.5 }}>I confirm this is my phish.net account</span>
             </label>
           )}
           {phishnetUsername && confirmedHandle && !importDone && (
@@ -408,86 +418,73 @@ function ProfileSetupModal({ api, onComplete }) {
               onClick={handleImport}
               disabled={importing}
             >
-              {importing ? '◈ IMPORTING ATTENDANCE...' : '↓ IMPORT ATTENDANCE FROM PHISH.NET'}
+              {importing ? '◈ IMPORTING...' : '↓ IMPORT ATTENDANCE + REVIEWS'}
             </button>
           )}
           {importDone && importCount && (
-            <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--cyan)', letterSpacing: '2px', lineHeight: 1.7 }}>
+            <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--cyan)', letterSpacing: '2px', lineHeight: 1.8 }}>
               ✓ {importCount.attendance} SHOWS · {importCount.reviews} REVIEWS IMPORTED
-              <br /><span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.55rem' }}>DROPDOWNS UPDATED BELOW</span>
             </div>
           )}
-          <div className="profile-setup-hint">Import your attended shows to unlock the dropdowns below</div>
         </div>
 
-        {/* Favorite song — select from rated songs */}
+        {/* Favorite song */}
         <div className="profile-setup-field">
           <label className="profile-setup-label">FAVORITE SONG</label>
-          {loadingOptions ? (
-            <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.3)', padding: '8px 0' }}>LOADING...</div>
-          ) : options.songs.length > 0 ? (
+          {songs.length > 0 ? (
             <select value={favoriteSong} onChange={e => setFavoriteSong(e.target.value)} className="era-select" style={{ width: '100%' }}>
               <option value="">— SELECT A SONG —</option>
-              {options.songs.map(s => <option key={s} value={s}>{s}</option>)}
+              {songs.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           ) : (
             <input
               type="text"
-              placeholder="e.g. Tweezer (rate shows to unlock dropdown)"
+              placeholder="e.g. Tweezer"
               value={favoriteSong}
               onChange={e => setFavoriteSong(e.target.value)}
             />
           )}
+          <div className="profile-setup-hint">
+            {songs.length === 0 ? 'Rate some shows and this becomes a dropdown' : `${songs.length} songs from your ratings`}
+          </div>
         </div>
 
-        {/* Favorite venue — select from attended venues */}
+        {/* Favorite venue */}
         <div className="profile-setup-field">
           <label className="profile-setup-label">FAVORITE VENUE</label>
-          {loadingOptions ? (
-            <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.3)', padding: '8px 0' }}>LOADING...</div>
-          ) : options.venues.length > 0 ? (
+          {venues.length > 0 ? (
             <select value={favoriteVenue} onChange={e => setFavoriteVenue(e.target.value)} className="era-select" style={{ width: '100%' }}>
               <option value="">— SELECT A VENUE —</option>
-              {options.venues.map((v, i) => (
+              {venues.map((v, i) => (
                 <option key={i} value={v.venue}>{v.venue}{v.city ? ` — ${v.city}${v.state ? `, ${v.state}` : ''}` : ''}</option>
               ))}
             </select>
           ) : (
             <input
               type="text"
-              placeholder="e.g. Madison Square Garden (import attendance to unlock dropdown)"
+              placeholder="e.g. Madison Square Garden"
               value={favoriteVenue}
               onChange={e => setFavoriteVenue(e.target.value)}
             />
           )}
+          <div className="profile-setup-hint">
+            {venues.length === 0 ? 'Import attendance and this becomes a dropdown' : `${venues.length} venues from your history`}
+          </div>
         </div>
 
-        {/* Favorite show — select from attended shows */}
-        <div className="profile-setup-field">
-          <label className="profile-setup-label">FAVORITE SHOW</label>
-          {loadingOptions ? (
-            <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.3)', padding: '8px 0' }}>LOADING...</div>
-          ) : options.shows.length > 0 ? (
-            <select value={favoriteShow} onChange={e => setFavoriteShow(e.target.value)} className="era-select" style={{ width: '100%' }}>
-              <option value="">— SELECT A SHOW —</option>
-              {options.shows.map(s => (
-                <option key={s.show_date} value={s.show_date}>{formatShowOption(s)}</option>
-              ))}
-            </select>
-          ) : (
-            <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.3)', padding: '8px 0', letterSpacing: '1px' }}>
-              Import your attendance above to select your favorite show
+        {/* Favorite show — auto-set to first attended, display only */}
+        {favoriteShowDate && (
+          <div className="profile-setup-field">
+            <label className="profile-setup-label">FIRST SHOW ◈ AUTO-SET</label>
+            <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', background: 'rgba(0,224,208,0.04)' }}>
+              {favoriteShowLabel}
             </div>
-          )}
-        </div>
+            <div className="profile-setup-hint">Your earliest attended show — saved as your first show</div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-          <button
-            className="btn-primary"
-            style={{ flex: 1, padding: '13px' }}
-            onClick={handleSave}
-            disabled={saving}
-          >
+          <button className="btn-primary" style={{ flex: 1, padding: '13px' }} onClick={handleSave} disabled={saving}>
             {saving ? 'SAVING...' : 'SAVE PROFILE'}
           </button>
           <button style={{ flex: 1, padding: '13px' }} onClick={onComplete}>
