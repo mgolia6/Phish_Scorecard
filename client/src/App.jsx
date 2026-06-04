@@ -2187,43 +2187,42 @@ export default function App() {
       <div className="mobile-layout">
         <div className="mobile-sticky-header">
           <div className="marquee-bar">
-          <span className="marquee-track">
-            DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
-          </span>
-        </div>
-        <header className="app-header">
-          <div className="header-left">
-            <div className="header-title">
-              <img
-                src="/assets/phreezer-logo.svg"
-                alt="The Phreezer"
-                className="mobile-header-logo"
-                onClick={() => {
-                  if (!user?.is_admin) return;
-                  const now = Date.now();
-                  if (!window._logoTaps) window._logoTaps = [];
-                  window._logoTaps = window._logoTaps.filter(t => now - t < 800);
-                  window._logoTaps.push(now);
-                  if (window._logoTaps.length >= 3) {
-                    window._logoTaps = [];
-                    setTab('admin');
-                  }
-                }}
-                style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
-              />
-            </div>
+            <span className="marquee-track">
+              DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
+            </span>
           </div>
-          <div className="header-right">
-            <div className="header-auth">
-              {user ? (
-                <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
-              ) : (
-                <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
-              )}
+          <header className="app-header">
+            <div className="header-left">
+              <div className="header-title">
+                <img
+                  src="/assets/phreezer-logo.svg"
+                  alt="The Phreezer"
+                  className="mobile-header-logo"
+                  onClick={() => {
+                    if (!user?.is_admin) return;
+                    const now = Date.now();
+                    if (!window._logoTaps) window._logoTaps = [];
+                    window._logoTaps = window._logoTaps.filter(t => now - t < 800);
+                    window._logoTaps.push(now);
+                    if (window._logoTaps.length >= 3) {
+                      window._logoTaps = [];
+                      setTab('admin');
+                    }
+                  }}
+                  style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
+                />
+              </div>
             </div>
-          </div>
-        </header>
-        <div className="container">
+            <div className="header-right">
+              <div className="header-auth">
+                {user ? (
+                  <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
+                ) : (
+                  <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
+                )}
+              </div>
+            </div>
+          </header>
           <nav className="tab-nav">
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
             {user && <>
@@ -2232,7 +2231,6 @@ export default function App() {
               <button className={`tab-btn ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>PROFILE</button>
             </>}
           </nav>
-          {/* Second-level tabs */}
           {user && ['my-shows','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
@@ -2244,7 +2242,7 @@ export default function App() {
               <button className={`sub-tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
             </div>
           )}
-        </div>{/* end mobile-sticky-header */}
+        </div>
         <div className="mobile-scroll-body">
           <div className="container">
             {renderMain(true)}
