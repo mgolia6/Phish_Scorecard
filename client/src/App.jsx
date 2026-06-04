@@ -2245,8 +2245,6 @@ export default function App() {
             </div>
           )}
           {renderMain(true)}
-        </div>
-        </div>{/* end mobile-scroll-body */}
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
