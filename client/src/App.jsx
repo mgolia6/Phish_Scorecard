@@ -255,8 +255,9 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
       glyph: '◈',
       title: 'KEEP IT GOING',
       sub: 'If the spirit moves you.',
-      body: 'Phreezer will always be free. But it takes real time and real overhead to keep it running. If you like what you see, consider hitting the support button. No pressure. No guilt. Just appreciation if the spirit moves you.',
+      body: 'Phreezer will always be free. But it takes real time and real overhead to keep it running. If you like what you see, consider buying a coffee. No pressure. No guilt. Just appreciation if the spirit moves you.',
       cta: null,
+      bmc: true,
     },
   ];
 
@@ -277,7 +278,12 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
         </div>
         {isLast ? (
           <div className="onboarding-actions" style={{ flexDirection: 'column' }}>
-            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10 }} onClick={() => { onStartImport(); }}>
+            <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+              className="btn-primary"
+              style={{ width: '100%', padding: '14px', marginBottom: 10, display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box' }}>
+              ☕ BUY A COFFEE
+            </a>
+            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10, borderColor: 'var(--cyan)', color: 'var(--cyan)' }} onClick={() => { onStartImport(); }}>
               ↓ IMPORT FROM PHISH.NET
             </button>
             <button style={{ width: '100%', padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
@@ -637,6 +643,19 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
               <div className="sidebar-avatar">{user.username?.[0]?.toUpperCase() || '?'}</div>
               {expanded && <span className="sidebar-username">{user.username}</span>}
             </div>
+            {expanded && (
+              <a
+                href="https://buymeacoffee.com/mpgink"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="sidebar-nav-btn"
+                style={{ textDecoration: 'none', color: 'var(--orange)', borderColor: 'rgba(255,102,0,0.3)', marginBottom: 4 }}
+                title="Buy Me a Coffee"
+              >
+                <span className="sidebar-nav-glyph">☕</span>
+                <span className="sidebar-nav-label">BUY A COFFEE</span>
+              </a>
+            )}
             <button
               className="sidebar-nav-btn sidebar-logout"
               onClick={onLogout}
@@ -736,6 +755,16 @@ function KPICards({ api }) {
           ))}
         </div>
       )}
+      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+        <a
+          href="https://buymeacoffee.com/mpgink"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', textDecoration: 'none' }}
+        >
+          ☕ KEEP PHREEZER RUNNING — BUY A COFFEE
+        </a>
+      </div>
     </div>
   );
 }
