@@ -51,7 +51,22 @@ body::before {
 
 @media (max-width: 768px) {
   .desktop-layout { display: none; }
-  .mobile-layout { display: block; }
+  .mobile-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .mobile-sticky-header {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 200;
+  }
+  .mobile-scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ====== SIDEBAR ====== */
@@ -161,10 +176,7 @@ body::before {
 .sidebar-username { font-size: 0.78rem; color: var(--cyan); letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; }
 
 /* ====== MARQUEE ====== */
-.marquee-bar {
-  position: sticky;
-  top: 0;
-  z-index: 201; background: var(--bg-elevated); border-bottom: 1px solid var(--border); padding: 6px 0; overflow: hidden; white-space: nowrap; flex-shrink: 0; }
+.marquee-bar { background: var(--bg-elevated); border-bottom: 1px solid var(--border); padding: 6px 0; overflow: hidden; white-space: nowrap; flex-shrink: 0; }
 .marquee-track { display: inline-block; animation: marquee 30s linear infinite; color: var(--orange); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
 @keyframes marquee { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
 
@@ -176,9 +188,7 @@ body::before {
   align-items: center;
   justify-content: space-between;
   background: var(--bg-panel);
-  position: sticky;
-  top: 28px;
-  z-index: 200;
+  position: relative;
   gap: 12px;
 }
 .app-header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--green), transparent); animation: scanH 4s ease-in-out infinite; }
