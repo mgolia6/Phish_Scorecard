@@ -2244,7 +2244,10 @@ export default function App() {
               <button className={`sub-tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
             </div>
           )}
+        </div>{/* end mobile-sticky-header */}
+        <div className="mobile-scroll-body">
           {renderMain(true)}
+        </div>
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
