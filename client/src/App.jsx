@@ -441,9 +441,9 @@ function ProfileSetupModal({ api, onComplete }) {
               onChange={e => setFavoriteSong(e.target.value)}
             />
           )}
-          <div className="profile-setup-hint">
-            {songs.length === 0 ? 'Rate some shows and this becomes a dropdown' : `${songs.length} songs from your ratings`}
-          </div>
+          {songs.length > 0 && (
+            <div className="profile-setup-hint">{songs.length} songs from your ratings</div>
+          )}
         </div>
 
         {/* Favorite venue */}
@@ -1160,14 +1160,33 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                           <div className="song-row-controls">
                             {audio?.mp3_url && (
                               <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
-                                className="song-play-btn" title={`Stream ${song.song}`}
-                                onClick={e => e.stopPropagation()}>▶</a>
+                                className="song-play-btn" title={`Stream ${song.song} on Phish.in`}
+                                onClick={e => e.stopPropagation()}>
+                                ▶ PLAY
+                              </a>
                             )}
                             <SongRating value={parseInt(ratings[song.song]?.rating) || 0} onChange={val => updateRating(song.song, 'rating', val)} />
-                            <input className="notes-input" type="text" placeholder="notes..."
-                              value={ratings[song.song]?.notes || ''}
-                              onChange={e => updateRating(song.song, 'notes', e.target.value)} />
                           </div>
+                          {ratings[song.song]?.notesOpen ? (
+                            <div className="song-notes-expanded">
+                              <input className="notes-input" type="text" placeholder="Add a note..."
+                                value={ratings[song.song]?.notes || ''}
+                                autoFocus
+                                onChange={e => updateRating(song.song, 'notes', e.target.value)}
+                                onBlur={() => { if (!ratings[song.song]?.notes) updateRating(song.song, 'notesOpen', false); }}
+                              />
+                            </div>
+                          ) : (
+                            <button
+                              className="song-notes-toggle"
+                              onClick={() => updateRating(song.song, 'notesOpen', true)}
+                            >
+                              {ratings[song.song]?.notes
+                                ? <span className="song-notes-preview">✎ {ratings[song.song].notes}</span>
+                                : <span className="song-notes-add">+ NOTE</span>
+                              }
+                            </button>
+                          )}
                         </div>
                       );
                     })}
@@ -1871,6 +1890,7 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [pendingImportOnMyShows, setPendingImportOnMyShows] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [showFirstShowPrompt, setShowFirstShowPrompt] = useState(false);
   const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
   const api = useApi();
 
@@ -1965,6 +1985,7 @@ export default function App() {
       await api.post('/auth/accept?field=onboarding', {});
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
+    setShowFirstShowPrompt(true);
   };
 
   const renderMain = (isMobile = false) => (
@@ -2100,6 +2121,33 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
+
+      {showFirstShowPrompt && (
+        <div className="modal-overlay" style={{ zIndex: 750 }}>
+          <div className="modal" style={{ maxWidth: 400, textAlign: 'center' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>❄</div>
+            <div className="modal-title" style={{ fontSize: '1rem', letterSpacing: '3px' }}>LET'S GO BACKWARDS</div>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(51,255,51,0.65)', lineHeight: 1.7, margin: '16px 0 24px', letterSpacing: '0.5px' }}>
+              Take a trip down memory lane. Rate the first show you ever attended — then keep going backwards down the number line.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                className="btn-primary"
+                style={{ width: '100%', padding: '13px' }}
+                onClick={() => {
+                  setShowFirstShowPrompt(false);
+                  setTab('scorecard');
+                }}
+              >
+                ◈ RATE MY FIRST SHOW
+              </button>
+              <button style={{ width: '100%', padding: '11px', fontSize: '0.6rem' }} onClick={() => setShowFirstShowPrompt(false)}>
+                MAYBE LATER
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
