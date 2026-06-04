@@ -805,7 +805,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [randomizing, setRandomizing] = useState(false);
-  const [attendanceType, setAttendanceType] = useState('listened');
+  const [attendanceType, setAttendanceType] = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
@@ -887,7 +887,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
       setSongs(showData.songs || []);
       setCurrentShow(showData);
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
-      const savedAttendance = !Array.isArray(ratingsResp) && ratingsResp.attendance_type ? ratingsResp.attendance_type : 'listened';
+      const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : 'listened';
       setAttendanceType(savedAttendance);
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
@@ -1234,11 +1234,15 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
               {currentShow.reviews?.items?.length > 0 && (
                 <div className="reviews-section">
                   <div className="panel-title">PHISH.NET COMMUNITY REVIEWS</div>
-                  {(currentShow.reviews.items || []).map((rev, i) => (
+                  {(currentShow.reviews.items || []).filter(rev => rev.review && rev.review.trim()).map((rev, i) => (
                     <div key={i} className="review-item">
                       <div className="review-header">
                         <span className="review-author">{rev.author}</span>
-                        {rev.score && <span className="review-score">{rev.score}/5</span>}
+                        {rev.score > 0 && (
+                          <span className="review-score">
+                            {'★'.repeat(Math.round(rev.score))}{'☆'.repeat(5 - Math.round(rev.score))}
+                          </span>
+                        )}
                         <span className="review-date">{rev.posted}</span>
                       </div>
                       <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review?.substring(0, 300) + (rev.review?.length > 300 ? '...' : '') }} />
