@@ -334,9 +334,9 @@ function ProfileSetupModal({ api, onComplete }) {
             onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
           />
           {phishnetUsername && (
-            <label className="profile-checkbox-row">
-              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} />
-              <span className="profile-checkbox-label">I confirm this is my phish.net account</span>
+            <label className="profile-checkbox-row" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0 }} />
+              <span className="profile-checkbox-label" style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>I confirm this is my phish.net account</span>
             </label>
           )}
           <div className="profile-setup-hint">Used to import your attendance and reviews</div>
@@ -1443,6 +1443,7 @@ function AdminTab({ api, showMessage, showError }) {
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(null); // { userId, action }
   const [working, setWorking] = useState(null);
+  const [migrationResult, setMigrationResult] = useState(null); // { results: [...] }
 
   const loadUsers = () => {
     setLoading(true);
@@ -1501,14 +1502,10 @@ function AdminTab({ api, showMessage, showError }) {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
       const data = await res.json();
-      const failed = data.results?.filter(r => r.status === 'error');
-      if (failed?.length) {
-        showError(`${failed.length} migration(s) failed`);
-      } else {
-        loadUsers();
-      }
+      setMigrationResult(data);
+      loadUsers();
     } catch (err) {
-      showError(err.message);
+      setMigrationResult({ error: err.message });
     } finally {
       setWorking(null);
     }
@@ -1518,6 +1515,48 @@ function AdminTab({ api, showMessage, showError }) {
 
   return (
     <div>
+      {/* Migration result modal */}
+      {migrationResult && (
+        <div className="modal-overlay" style={{ zIndex: 700 }}>
+          <div className="modal" style={{ maxWidth: 480 }}>
+            <div className="modal-title" style={{ color: migrationResult.error ? 'var(--red)' : 'var(--cyan)' }}>
+              {migrationResult.error ? 'MIGRATION ERROR' : 'MIGRATIONS COMPLETE'}
+            </div>
+            {migrationResult.error ? (
+              <p style={{ color: 'var(--red)', fontSize: '0.8rem', marginBottom: 20 }}>{migrationResult.error}</p>
+            ) : (
+              <>
+                <div style={{ marginBottom: 16 }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px' }}>
+                    {migrationResult.results?.filter(r => r.status === 'ok').length} OK
+                    {migrationResult.results?.filter(r => r.status === 'error').length > 0 &&
+                      ` · ${migrationResult.results.filter(r => r.status === 'error').length} FAILED`}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: '50vh', overflowY: 'auto', marginBottom: 20 }}>
+                  {migrationResult.results?.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ color: r.status === 'ok' ? 'var(--green)' : 'var(--red)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', flexShrink: 0 }}>
+                        {r.status === 'ok' ? '✓' : '✗'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: r.status === 'ok' ? 'rgba(51,255,51,0.7)' : 'var(--red)' }}>
+                        {r.migration}
+                      </span>
+                      {r.error && (
+                        <span style={{ fontSize: '0.6rem', color: 'var(--red)', opacity: 0.7 }}>{r.error}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            <button className="btn-primary" style={{ width: '100%', padding: '13px' }} onClick={() => setMigrationResult(null)}>
+              CLOSE
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Confirm overlay */}
       {confirming && (
         <div className="modal-overlay" style={{ zIndex: 600 }}>
