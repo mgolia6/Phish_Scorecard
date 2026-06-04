@@ -189,11 +189,22 @@ function MikeError({ message, onClose }) {
 // T&C MODAL — fires once per user, stores acceptance in localStorage
 // ============================================================
 function TandCModal({ onAccept }) {
+  const [scrolled, setScrolled] = React.useState(false);
+  const bodyRef = React.useRef(null);
+
+  const handleScroll = () => {
+    const el = bodyRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+      setScrolled(true);
+    }
+  };
+
   return (
     <div className="modal-overlay" style={{ zIndex: 900 }}>
       <div className="modal" style={{ maxWidth: 520 }}>
         <div className="modal-title">BEFORE YOU STEP INTO THE PHREEZER...</div>
-        <div className="tandc-body">
+        <div className="tandc-body" ref={bodyRef} onScroll={handleScroll}>
           <div className="tandc-section">
             <div className="tandc-heading">◈ WITH GRATITUDE</div>
             <p>Phreezer is an independent fan tool. We are not affiliated with Phish, Phish.net, the Mockingbird Foundation, or Phish.in — but we are deeply indebted to them. To the record keepers, statisticians, archivists, and volunteers who have spent decades maintaining the continuity of this community: this wouldn't exist without your work.</p>
@@ -208,7 +219,17 @@ function TandCModal({ onAccept }) {
             <p>Don't be a jerk. Don't suck at Phish. Or at least try not to.</p>
           </div>
         </div>
-        <button className="btn-primary" style={{ width: '100%', marginTop: 24, padding: '14px' }} onClick={onAccept}>
+        {!scrolled && (
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(51,255,51,0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
+            ▼ SCROLL TO CONTINUE
+          </div>
+        )}
+        <button
+          className="btn-primary"
+          style={{ width: '100%', marginTop: 12, padding: '14px', opacity: scrolled ? 1 : 0.25, cursor: scrolled ? 'pointer' : 'not-allowed', transition: 'opacity 0.3s' }}
+          onClick={scrolled ? onAccept : undefined}
+          disabled={!scrolled}
+        >
           STEP INTO THE PHREEZER
         </button>
       </div>
@@ -327,9 +348,12 @@ function ProfileSetupModal({ api, onComplete }) {
     if (!phishnetUsername.trim() || !confirmedHandle) return;
     setImporting(true);
     try {
-      const res = await api.post('/import/phishnet', { phishnet_username: phishnetUsername.trim() });
-      setImportCount(res.imported || 0);
-      setImportDone(true); // triggers re-fetch of options
+      const [attRes, revRes] = await Promise.all([
+        api.post('/import/phishnet', { phishnet_username: phishnetUsername.trim() }).catch(() => ({ imported: 0 })),
+        api.post('/import/phishnet-reviews', { phishnet_username: phishnetUsername.trim() }).catch(() => ({ imported: 0 })),
+      ]);
+      setImportCount({ attendance: attRes.imported || 0, reviews: revRes.imported || 0 });
+      setImportDone(true);
     } catch (e) {}
     finally { setImporting(false); }
   };
@@ -387,9 +411,10 @@ function ProfileSetupModal({ api, onComplete }) {
               {importing ? '◈ IMPORTING ATTENDANCE...' : '↓ IMPORT ATTENDANCE FROM PHISH.NET'}
             </button>
           )}
-          {importDone && (
-            <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--cyan)', letterSpacing: '2px' }}>
-              ✓ {importCount} SHOWS IMPORTED — DROPDOWNS UPDATED
+          {importDone && importCount && (
+            <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--cyan)', letterSpacing: '2px', lineHeight: 1.7 }}>
+              ✓ {importCount.attendance} SHOWS · {importCount.reviews} REVIEWS IMPORTED
+              <br /><span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.55rem' }}>DROPDOWNS UPDATED BELOW</span>
             </div>
           )}
           <div className="profile-setup-hint">Import your attended shows to unlock the dropdowns below</div>
@@ -1679,11 +1704,41 @@ function AdminTab({ api, showMessage, showError }) {
         <div className="modal-overlay" style={{ zIndex: 600 }}>
           <div className="modal" style={{ maxWidth: 360 }}>
             <div className="modal-title" style={{ color: 'var(--red)' }}>CONFIRM</div>
-            <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', marginBottom: 24, lineHeight: 1.6 }}>
-              {confirming.action === 'delete' && `Delete user ${confirming.username}? This removes all their data permanently.`}
-              {confirming.action === 'clear-data' && `Clear all show data for ${confirming.username}? Keeps account, removes ratings, attendance, reviews.`}
-              {confirming.action === 'reset-onboarding' && `Reset onboarding + T&C for ${confirming.username}?`}
-            </p>
+            {confirming.action === 'delete' && (
+              <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', marginBottom: 24, lineHeight: 1.6 }}>
+                Delete <strong style={{ color: 'var(--red)' }}>{confirming.username}</strong>? This removes all their data permanently. Cannot be undone.
+              </p>
+            )}
+            {confirming.action === 'clear-data' && (
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', lineHeight: 1.6, marginBottom: 12 }}>
+                  Clear all show data for <strong style={{ color: 'var(--orange)' }}>{confirming.username}</strong>?
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px', background: 'rgba(255,102,0,0.05)', border: '1px solid rgba(255,102,0,0.2)' }}>
+                  {['All ratings', 'All attendance records', 'All imported reviews', 'KPI / streak data'].map(item => (
+                    <div key={item} style={{ display: 'flex', gap: 8, fontSize: '0.75rem', color: 'rgba(255,102,0,0.8)' }}>
+                      <span>✗</span><span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.4)', marginTop: 10 }}>Account and login are preserved.</p>
+              </div>
+            )}
+            {confirming.action === 'reset-onboarding' && (
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', lineHeight: 1.6, marginBottom: 12 }}>
+                  Reset onboarding for <strong style={{ color: 'var(--cyan)' }}>{confirming.username}</strong>?
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px', background: 'rgba(0,224,208,0.04)', border: '1px solid rgba(0,224,208,0.15)' }}>
+                  {['T&C acceptance cleared', 'Onboarding complete flag cleared', 'Profile setup will re-fire on next login'].map(item => (
+                    <div key={item} style={{ display: 'flex', gap: 8, fontSize: '0.75rem', color: 'rgba(0,224,208,0.7)' }}>
+                      <span>↺</span><span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.4)', marginTop: 10 }}>Show data and ratings are not affected.</p>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 className="btn-primary"
