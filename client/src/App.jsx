@@ -1154,18 +1154,18 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                       const duration = formatDuration(audio?.duration);
                       return (
                         <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
-                          <span className="song-pos">{song.position || idx + 1}</span>
                           <div className="song-info">
+                            <span className="song-num-inline">{song.position || idx + 1}.</span>
                             <a
                               href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
                               target="_blank" rel="noopener noreferrer"
                               className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
                               onClick={e => e.stopPropagation()}
                             >{song.song}</a>
+                            {duration && <span className="song-duration">{duration}</span>}
                             {song.isjam && <span className="badge jam-badge">JAM</span>}
                             {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
                             {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
-                            {duration && <span className="song-duration">{duration}</span>}
                           </div>
                           <span className="song-transition">
                             {song.transition === '>' ? <span className="segue-soft">&gt;</span>
@@ -2186,7 +2186,7 @@ export default function App() {
       {/* MOBILE LAYOUT: original header + tabs */}
       <div className="mobile-layout">
         <div className="mobile-sticky-header">
-        <div className="marquee-bar">
+          <div className="marquee-bar">
           <span className="marquee-track">
             DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
           </span>
@@ -2246,7 +2246,9 @@ export default function App() {
           )}
         </div>{/* end mobile-sticky-header */}
         <div className="mobile-scroll-body">
-          {renderMain(true)}
+          <div className="container">
+            {renderMain(true)}
+          </div>
         </div>
       </div>
 
