@@ -51,21 +51,17 @@ body::before {
 
 @media (max-width: 768px) {
   .desktop-layout { display: none; }
-  .mobile-layout {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    overflow: hidden;
-  }
+  .mobile-layout { display: block; }
   .mobile-sticky-header {
-    flex-shrink: 0;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 200;
+    background: var(--bg);
   }
   .mobile-scroll-body {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    padding-top: var(--mobile-header-height, 120px);
   }
 }
 
@@ -993,28 +989,41 @@ select option { background: var(--bg); color: var(--green); }
 /* ====== STAR RATING ====== */
 .song-rating-row {
   display: flex;
-  gap: 2px;
+  gap: 4px;
   align-items: center;
 }
 .rating-btn {
-  width: 32px;
-  height: 32px;
-  font-size: 1.1rem;
+  width: 38px;
+  height: 38px;
+  font-size: 1.3rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: none;
-  color: rgba(51,255,51,0.2);
+  border: 1px solid rgba(255,102,0,0.25);
+  color: rgba(255,102,0,0.25);
   cursor: pointer;
   padding: 0;
-  transition: color 0.1s, transform 0.1s;
+  transition: all 0.12s;
   font-family: inherit;
   line-height: 1;
+  border-radius: 2px;
 }
-.rating-btn:hover { color: var(--orange); transform: scale(1.15); }
-.rating-btn.active { color: var(--orange); }
-.rating-btn.selected { color: var(--orange); transform: scale(1.1); }
+.rating-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: rgba(255,102,0,0.08);
+}
+.rating-btn.active {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: rgba(255,102,0,0.12);
+}
+.rating-btn.selected {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: rgba(255,102,0,0.2);
+}
 
 /* ====== SONG ROW — TIGHT INLINE LAYOUT ====== */
 .song-row {
@@ -1098,4 +1107,47 @@ select option { background: var(--bg); color: var(--green); }
   font-size: 0.7rem;
   color: rgba(51,255,51,0.25);
   font-style: italic;
+}
+
+
+/* ====== SONG INFO LINE — VISIBLE ====== */
+.song-pos {
+  color: rgba(255,102,0,0.6);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  min-width: 18px;
+  flex-shrink: 0;
+}
+.song-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.song-name-link {
+  font-size: 0.95rem;
+  color: var(--green);
+  font-weight: 500;
+}
+.song-duration {
+  font-size: 0.7rem;
+  color: rgba(51,255,51,0.5);
+  font-family: var(--font-mono);
+}
+.song-row { padding: 12px 8px 8px; }
+
+/* Song number inline with name */
+.song-row > .song-pos { display: none; } /* hide old pos, it's now in song-info */
+.song-name-with-num {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.song-num-inline {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: rgba(255,102,0,0.5);
+  min-width: 16px;
+  flex-shrink: 0;
 }
