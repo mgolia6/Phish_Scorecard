@@ -1109,6 +1109,21 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
             </div>
           </div>
 
+          <div className="attendance-row" style={{ marginBottom: 12 }}>
+            <span className="attendance-label">HOW DID YOU EXPERIENCE THIS SHOW?</span>
+            <div className="attendance-options">
+              {[
+                { value: 'attended', label: '🎸 ATTENDED', desc: 'I was there' },
+                { value: 'webcast', label: '📺 WEBCAST', desc: 'Watched live stream' },
+                { value: 'listened', label: '🎧 LISTENED', desc: 'Heard recording' },
+              ].map(opt => (
+                <button key={opt.value} type="button"
+                  className={`attendance-btn ${attendanceType === opt.value ? 'active' : ''}`}
+                  onClick={() => setAttendanceType(opt.value)} title={opt.desc}>{opt.label}</button>
+              ))}
+            </div>
+          </div>
+
           {currentShow.soundcheck && (
             <div className="soundcheck-bar">
               <span className="soundcheck-label">SOUNDCHECK:</span> {currentShow.soundcheck}
@@ -1157,14 +1172,17 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                               : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
                               : null}
                           </span>
-                          <div className="song-row-controls">
-                            {audio?.mp3_url && (
+                          {audio?.mp3_url && (
+                            <div className="song-play-row">
                               <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
                                 className="song-play-btn" title={`Stream ${song.song} on Phish.in`}
                                 onClick={e => e.stopPropagation()}>
                                 ▶ PLAY
                               </a>
-                            )}
+                              <span className="song-play-source">PHISH.IN</span>
+                            </div>
+                          )}
+                          <div className="song-row-controls">
                             <SongRating value={parseInt(ratings[song.song]?.rating) || 0} onChange={val => updateRating(song.song, 'rating', val)} />
                           </div>
                           {ratings[song.song]?.notesOpen ? (
@@ -1177,14 +1195,10 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                               />
                             </div>
                           ) : (
-                            <button
-                              className="song-notes-toggle"
-                              onClick={() => updateRating(song.song, 'notesOpen', true)}
-                            >
+                            <button className="song-notes-toggle" onClick={() => updateRating(song.song, 'notesOpen', true)}>
                               {ratings[song.song]?.notes
                                 ? <span className="song-notes-preview">✎ {ratings[song.song].notes}</span>
-                                : <span className="song-notes-add">+ NOTE</span>
-                              }
+                                : <span className="song-notes-add">+ NOTE</span>}
                             </button>
                           )}
                         </div>
@@ -1209,20 +1223,6 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
               </div>
 
               <div className="submit-section">
-                <div className="attendance-row">
-                  <span className="attendance-label">HOW DID YOU EXPERIENCE THIS SHOW?</span>
-                  <div className="attendance-options">
-                    {[
-                      { value: 'attended', label: '🎸 ATTENDED', desc: 'I was there' },
-                      { value: 'webcast', label: '📺 WEBCAST', desc: 'Watched live stream' },
-                      { value: 'listened', label: '🎧 LISTENED', desc: 'Heard recording' },
-                    ].map(opt => (
-                      <button key={opt.value} type="button"
-                        className={`attendance-btn ${attendanceType === opt.value ? 'active' : ''}`}
-                        onClick={() => setAttendanceType(opt.value)} title={opt.desc}>{opt.label}</button>
-                    ))}
-                  </div>
-                </div>
                 <button
                   className={`btn-primary btn-submit ${saved ? 'btn-saved' : ''}`}
                   onClick={submitRatings} disabled={submitting || saved}
@@ -1239,9 +1239,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                       <div className="review-header">
                         <span className="review-author">{rev.author}</span>
                         {rev.score > 0 && (
-                          <span className="review-score">
-                            {'★'.repeat(Math.round(rev.score))}{'☆'.repeat(5 - Math.round(rev.score))}
-                          </span>
+                          <span className="review-score" title="Community upvotes">▲ {rev.score}</span>
                         )}
                         <span className="review-date">{rev.posted}</span>
                       </div>
