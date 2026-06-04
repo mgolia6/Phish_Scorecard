@@ -871,3 +871,65 @@ select option { background: var(--bg); color: var(--green); }
   .leaderboard-row { grid-template-columns: 28px 1fr 50px 50px 50px; }
   .lb-streak-col { display: none; }
 }
+
+
+/* ====== SONG ROW — PLAY BUTTON PROMINENT ====== */
+.song-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  border: 1px solid rgba(0,224,208,0.4);
+  padding: 5px 10px;
+  text-decoration: none;
+  background: rgba(0,224,208,0.06);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.song-play-btn:hover { background: rgba(0,224,208,0.15); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,224,208,0.3); }
+
+/* ====== NOTES — COLLAPSIBLE ====== */
+.song-notes-toggle {
+  background: transparent;
+  border: none;
+  padding: 3px 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: rgba(51,255,51,0.3);
+  letter-spacing: 1px;
+  text-align: left;
+  transition: color 0.15s;
+  margin-top: 4px;
+}
+.song-notes-toggle:hover { color: rgba(51,255,51,0.6); }
+.song-notes-add { color: rgba(51,255,51,0.25); }
+.song-notes-preview { color: rgba(51,255,51,0.55); font-style: italic; }
+.song-notes-expanded {
+  margin-top: 6px;
+  padding-top: 6px;
+}
+.song-notes-expanded .notes-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ====== STAR RATING — clearer 1-5 labeling ====== */
+.rating-btn {
+  position: relative;
+}
+.rating-btn::after {
+  content: '★';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.45rem;
+  color: rgba(255,102,0,0.0);
+  transition: color 0.15s;
+  pointer-events: none;
+}
+.rating-btn.selected::after { color: rgba(255,102,0,0.6); }
