@@ -12,11 +12,19 @@ export default async function handler(req, res) {
   const pool = getPool();
   try {
     const result = await pool.query(
-      'SELECT id, email, username, first_name, last_name, created_at FROM users WHERE id = $1',
+      `SELECT id, email, username, first_name, last_name,
+              is_admin, tandc_accepted, onboarding_complete, created_at
+       FROM users WHERE id = $1`,
       [user.id]
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
-    res.json(result.rows[0]);
+    if (!result.rows.length) return res.status(404).json({ error: 'User not found' });
+    const u = result.rows[0];
+    res.json({
+      ...u,
+      is_admin: !!u.is_admin,
+      tandc_accepted: !!u.tandc_accepted,
+      onboarding_complete: !!u.onboarding_complete,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
