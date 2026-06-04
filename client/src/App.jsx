@@ -993,14 +993,14 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
           <div className="instructions-body">
             <div className="instructions-grid">
               <div>
-                <div className="instr-step"><span className="instr-num">01</span><span>Type any date, venue, or city — results appear instantly.</span></div>
-                <div className="instr-step"><span className="instr-num">02</span><span>Hit RANDOM SHOW to let fate decide what you rate tonight.</span></div>
-                <div className="instr-step"><span className="instr-num">03</span><span>Tap 1–5 to rate each song. Tap same number again to clear.</span></div>
+                <div className="instr-step"><span className="instr-num">01</span><span>Search by date, venue, city, or year. Or let RANDOM SHOW decide your fate.</span></div>
+                <div className="instr-step"><span className="instr-num">02</span><span>Rate each song 1–5. 1 means they tried. 5 means you were there in spirit even if you weren't.</span></div>
+                <div className="instr-step"><span className="instr-num">03</span><span>▶ PLAY streams the song from Phish.in. Rate while you listen. That's the move.</span></div>
               </div>
               <div>
-                <div className="instr-step"><span className="instr-num">04</span><span>▶ buttons stream individual songs direct from Phish.in.</span></div>
-                <div className="instr-step"><span className="instr-num">05</span><span>Click any song name to open its Phish.net history page.</span></div>
-                <div className="instr-step"><span className="instr-num">06</span><span>Save your ratings to track show history and see analytics.</span></div>
+                <div className="instr-step"><span className="instr-num">04</span><span>Tap a song name to pull up its full Phish.net history. Every version, every year.</span></div>
+                <div className="instr-step"><span className="instr-num">05</span><span>Save ratings. They stack up in My Shows, Analytics, and the Leaderboard.</span></div>
+                <div className="instr-step"><span className="instr-num">06</span><span>Don't suck at Phish. Or at least try not to.</span></div>
               </div>
             </div>
           </div>
