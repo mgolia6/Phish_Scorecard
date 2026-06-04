@@ -303,6 +303,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
     { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
     { id: 'my-shows', label: 'MY SHOWS', glyph: '◉', section: null, authRequired: true },
     { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
+    { id: 'admin', label: 'ADMIN', glyph: '⚙', section: null, authRequired: true, adminOnly: true },
   ];
 
   const comingSoon = [
@@ -326,7 +327,8 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
 
       <nav className="sidebar-nav">
         {navItems.map((item, i) => {
-          const disabled = item.authRequired && !user;
+          const disabled = (item.authRequired && !user) || (item.adminOnly && !user?.is_admin);
+          if (item.adminOnly && !user?.is_admin) return null;
           return (
             <React.Fragment key={item.id}>
               {item.section && expanded && (
@@ -1178,6 +1180,226 @@ function CommunityTab() {
   );
 }
 
+
+// ============================================================
+// ADMIN TAB
+// ============================================================
+function AdminTab({ api, showMessage, showError }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [confirming, setConfirming] = useState(null); // { userId, action }
+  const [working, setWorking] = useState(null);
+
+  const loadUsers = () => {
+    setLoading(true);
+    api.get('/admin/users')
+      .then(setUsers)
+      .catch(err => showError(err.message))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadUsers(); }, []);
+
+  const doAction = async (userId, action, method = 'POST') => {
+    setWorking(`${userId}-${action}`);
+    try {
+      if (method === 'DELETE') {
+        await api.post(`/admin/user?id=${userId}&_method=DELETE`, {});
+        // Actually use fetch directly for DELETE
+        const token = localStorage.getItem('phish_token');
+        const res = await fetch(`/api/admin/user?id=${userId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showMessage('User deleted', 'success');
+        setUsers(prev => prev.filter(u => u.id !== userId));
+      } else {
+        const token = localStorage.getItem('phish_token');
+        const res = await fetch(`/api/admin/user?id=${userId}&action=${action}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        if (action === 'reset-password') {
+          showMessage(`Reset email sent to ${data.email}`, 'success');
+        } else if (action === 'reset-onboarding') {
+          showMessage('Onboarding + T&C reset', 'success');
+          loadUsers();
+        } else if (action === 'clear-data') {
+          showMessage('Show data cleared', 'success');
+          loadUsers();
+        }
+      }
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setWorking(null);
+      setConfirming(null);
+    }
+  };
+
+  const runMigrations = async () => {
+    setWorking('migrate');
+    try {
+      const token = localStorage.getItem('phish_token');
+      const res = await fetch('/api/admin/migrate', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      const failed = data.results?.filter(r => r.status === 'error');
+      if (failed?.length) {
+        showError(`${failed.length} migration(s) failed: ${failed.map(f => f.migration).join(', ')}`);
+      } else {
+        showMessage(`${data.results?.length} migrations ran OK`, 'success');
+        loadUsers();
+      }
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setWorking(null);
+    }
+  };
+
+  if (loading) return <div className="loading">LOADING USERS...</div>;
+
+  return (
+    <div>
+      {/* Confirm overlay */}
+      {confirming && (
+        <div className="modal-overlay" style={{ zIndex: 600 }}>
+          <div className="modal" style={{ maxWidth: 360 }}>
+            <div className="modal-title" style={{ color: 'var(--red)' }}>CONFIRM</div>
+            <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', marginBottom: 24, lineHeight: 1.6 }}>
+              {confirming.action === 'delete' && `Delete user ${confirming.username}? This removes all their data permanently.`}
+              {confirming.action === 'clear-data' && `Clear all show data for ${confirming.username}? Keeps account, removes ratings, attendance, reviews.`}
+              {confirming.action === 'reset-onboarding' && `Reset onboarding + T&C for ${confirming.username}?`}
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="btn-primary"
+                style={{ flex: 1, borderColor: 'var(--red)', color: 'var(--red)' }}
+                onClick={() => {
+                  if (confirming.action === 'delete') doAction(confirming.userId, null, 'DELETE');
+                  else doAction(confirming.userId, confirming.action);
+                }}
+                disabled={!!working}
+              >
+                {working ? 'WORKING...' : 'CONFIRM'}
+              </button>
+              <button style={{ flex: 1 }} onClick={() => setConfirming(null)}>CANCEL</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="panel">
+        <div className="panel-title">ADMIN</div>
+
+        {/* DB controls */}
+        <div className="admin-controls">
+          <button
+            className="admin-action-btn"
+            onClick={runMigrations}
+            disabled={working === 'migrate'}
+            style={{ borderColor: 'var(--cyan)', color: 'var(--cyan)' }}
+          >
+            {working === 'migrate' ? 'RUNNING...' : '⚙ RUN MIGRATIONS'}
+          </button>
+        </div>
+
+        {/* User count */}
+        <div className="admin-stat-bar">
+          <span>{users.length} REGISTERED USER{users.length !== 1 ? 'S' : ''}</span>
+        </div>
+
+        {/* User cards — mobile-first card layout */}
+        <div className="admin-user-list">
+          {users.map(u => (
+            <div key={u.id} className={`admin-user-card ${u.is_admin ? 'admin-user-card-admin' : ''}`}>
+              <div className="admin-user-header">
+                <div className="admin-user-identity">
+                  <span className="admin-user-name">{u.username}</span>
+                  {u.is_admin && <span className="admin-badge">ADMIN</span>}
+                </div>
+                <div className="admin-user-meta">
+                  <span className="admin-user-email">{u.email}</span>
+                  <span className="admin-user-joined">Joined {u.joined}</span>
+                </div>
+              </div>
+
+              <div className="admin-user-stats">
+                <div className="admin-stat-item">
+                  <span className="admin-stat-val cyan">{u.shows_attended}</span>
+                  <span className="admin-stat-lbl">ATTENDED</span>
+                </div>
+                <div className="admin-stat-item">
+                  <span className="admin-stat-val orange">{u.shows_rated}</span>
+                  <span className="admin-stat-lbl">RATED</span>
+                </div>
+                <div className="admin-stat-item">
+                  <span className="admin-stat-val green">{u.reviews}</span>
+                  <span className="admin-stat-lbl">REVIEWS</span>
+                </div>
+                <div className="admin-stat-item">
+                  <span className="admin-stat-val" style={{ color: u.tandc_accepted ? 'var(--green)' : 'rgba(51,255,51,0.25)' }}>
+                    {u.tandc_accepted ? '✓' : '✗'}
+                  </span>
+                  <span className="admin-stat-lbl">T&C</span>
+                </div>
+                <div className="admin-stat-item">
+                  <span className="admin-stat-val" style={{ color: u.onboarding_complete ? 'var(--green)' : 'rgba(51,255,51,0.25)' }}>
+                    {u.onboarding_complete ? '✓' : '✗'}
+                  </span>
+                  <span className="admin-stat-lbl">ONBOARD</span>
+                </div>
+              </div>
+
+              <div className="admin-user-actions">
+                <button
+                  className="admin-action-btn"
+                  onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'reset-onboarding' })}
+                  disabled={!!working}
+                >
+                  RESET ONBOARDING
+                </button>
+                <button
+                  className="admin-action-btn"
+                  onClick={() => doAction(u.id, 'reset-password')}
+                  disabled={!!working}
+                >
+                  {working === `${u.id}-reset-password` ? 'SENDING...' : 'RESET PASSWORD'}
+                </button>
+                <button
+                  className="admin-action-btn"
+                  style={{ borderColor: 'rgba(255,102,0,0.5)', color: 'var(--orange)' }}
+                  onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'clear-data' })}
+                  disabled={!!working}
+                >
+                  CLEAR DATA
+                </button>
+                {!u.is_admin && (
+                  <button
+                    className="admin-action-btn"
+                    style={{ borderColor: 'rgba(255,51,51,0.5)', color: 'var(--red)' }}
+                    onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })}
+                    disabled={!!working}
+                  >
+                    DELETE USER
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============================================================
 // ROOT APP
 // ============================================================
@@ -1208,31 +1430,31 @@ export default function App() {
     if (!token) return;
     api.get('/auth/me').then(u => {
       setUser(u);
-      // Check if T&C accepted
-      const tandcKey = `phreezer_tandc_${u.id}`;
-      if (!localStorage.getItem(tandcKey)) {
+      // Check if T&C accepted (DB-backed)
+      if (!u.tandc_accepted) {
         setShowTandC(true);
       }
     }).catch(() => localStorage.removeItem('phish_token'));
   }, []);
 
-  const handleTandCAccept = () => {
-    if (user) localStorage.setItem(`phreezer_tandc_${user.id}`, '1');
+  const handleTandCAccept = async () => {
     setShowTandC(false);
+    try {
+      await api.post('/auth/accept?field=tandc', {});
+      setUser(u => ({ ...u, tandc_accepted: true }));
+    } catch (e) {}
   };
 
   const handleAuthSuccess = (u, isNewUser = false) => {
     setUser(u);
     setShowAuth(false);
     showMessage(`Welcome${isNewUser ? '' : ' back'}, ${u.username}`, 'success');
-    const tandcKey = `phreezer_tandc_${u.id}`;
-    if (!localStorage.getItem(tandcKey)) {
+    if (!u.tandc_accepted) {
       setShowTandC(true);
       if (isNewUser) {
-        // Show onboarding after T&C for new users
         setTimeout(() => setShowOnboarding(true), 100);
       }
-    } else if (isNewUser) {
+    } else if (isNewUser && !u.onboarding_complete) {
       setShowOnboarding(true);
     }
   };
@@ -1258,9 +1480,12 @@ export default function App() {
     setTab('scorecard');
   };
 
-  const handleOnboardingComplete = () => {
-    if (user) localStorage.setItem(`phreezer_onboarding_${user.id}`, '1');
+  const handleOnboardingComplete = async () => {
     setShowOnboarding(false);
+    try {
+      await api.post('/auth/accept?field=onboarding', {});
+      setUser(u => ({ ...u, onboarding_complete: true }));
+    } catch (e) {}
   };
 
   const renderMain = (isMobile = false) => (
@@ -1286,6 +1511,7 @@ export default function App() {
       )}
       {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'community' && <CommunityTab />}
+      {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
   );
 
@@ -1361,6 +1587,7 @@ export default function App() {
             {user && <>
               <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
               <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
+              {user.is_admin && <button className={`tab-btn ${tab === 'admin' ? 'active' : ''}`} onClick={() => setTab('admin')}>ADMIN</button>}
             </>}
           </nav>
           {renderMain(true)}
