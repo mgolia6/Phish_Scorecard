@@ -180,27 +180,23 @@ function TandCModal({ onAccept }) {
   return (
     <div className="modal-overlay" style={{ zIndex: 900 }}>
       <div className="modal" style={{ maxWidth: 520 }}>
-        <div className="modal-title">BEFORE YOU FREEZE</div>
+        <div className="modal-title">BEFORE YOU STEP INTO THE PHREEZER...</div>
         <div className="tandc-body">
           <div className="tandc-section">
-            <div className="tandc-heading">◈ WHAT THIS IS</div>
-            <p>Phreezer is an independent fan tool for rating and tracking Phish shows. We are not affiliated with Phish, phish.net, or the Mockingbird Foundation.</p>
+            <div className="tandc-heading">◈ WON'T YOU STEP INTO THE PHREEZER</div>
+            <p>While we are not affiliated with Phish, Phish.net, the Mockingbird Foundation, or Phish.in — we are indebted to all of them, and to you, for celebrating this amazing community.</p>
           </div>
           <div className="tandc-section">
             <div className="tandc-heading">◈ YOUR DATA</div>
             <p>Your ratings and reviews belong to you. We don't sell them, share them, or do anything sketchy with them. You can delete your account anytime.</p>
           </div>
           <div className="tandc-section">
-            <div className="tandc-heading">◈ ATTRIBUTION</div>
-            <p>Setlist data from <a href="https://phish.net" target="_blank" rel="noopener noreferrer">Phish.net</a> / Mockingbird Foundation. Audio via <a href="https://phish.in" target="_blank" rel="noopener noreferrer">Phish.in</a>. Community reviews from phish.net used under fair use for personal tracking only.</p>
-          </div>
-          <div className="tandc-section">
             <div className="tandc-heading">◈ GROUND RULES</div>
-            <p>Use it for yourself. Don't scrape it. Don't be a jerk. That's it.</p>
+            <p>Don't be a jerk. Don't suck at Phish. Or at least try not to.</p>
           </div>
         </div>
         <button className="btn-primary" style={{ width: '100%', marginTop: 24, padding: '14px' }} onClick={onAccept}>
-          I UNDERSTAND — LET'S FREEZE SOME SHOWS
+          STEP INTO THE PHREEZER
         </button>
       </div>
     </div>
@@ -260,12 +256,12 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
           ))}
         </div>
         {isLast ? (
-          <div className="onboarding-actions">
-            <button className="btn-primary" style={{ flex: 1, padding: '12px' }} onClick={() => { onStartImport(); }}>
-              IMPORT FROM PHISH.NET
+          <div className="onboarding-actions" style={{ flexDirection: 'column' }}>
+            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10 }} onClick={() => { onStartImport(); }}>
+              ↓ IMPORT FROM PHISH.NET
             </button>
-            <button style={{ flex: 1, padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
-              RATE A SHOW NOW
+            <button style={{ width: '100%', padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
+              RATE A SHOW FIRST
             </button>
           </div>
         ) : (
@@ -1575,14 +1571,22 @@ export default function App() {
   };
 
   // After onboarding, navigate to My Shows with import panel open
-  const handleOnboardingImport = () => {
+  const handleOnboardingImport = async () => {
     setShowOnboarding(false);
+    try {
+      await api.post('/auth/accept?field=onboarding', {});
+      setUser(u => ({ ...u, onboarding_complete: true }));
+    } catch (e) {}
     setPendingImportOnMyShows(true);
-    setTab('my-shows');
+    setTimeout(() => setTab('my-shows'), 100);
   };
 
-  const handleOnboardingScorecard = () => {
+  const handleOnboardingScorecard = async () => {
     setShowOnboarding(false);
+    try {
+      await api.post('/auth/accept?field=onboarding', {});
+      setUser(u => ({ ...u, onboarding_complete: true }));
+    } catch (e) {}
     setTab('scorecard');
   };
 
