@@ -17,6 +17,10 @@
       "destination": "/api/auth/me"
     },
     {
+      "source": "/api/auth/accept",
+      "destination": "/api/auth/accept"
+    },
+    {
       "source": "/api/shows",
       "destination": "/api/shows/index"
     },
@@ -31,6 +35,18 @@
     {
       "source": "/api/user/shows",
       "destination": "/api/user/shows"
+    },
+    {
+      "source": "/api/user/attendance",
+      "destination": "/api/user/attendance"
+    },
+    {
+      "source": "/api/user/kpi",
+      "destination": "/api/user/kpi"
+    },
+    {
+      "source": "/api/user/profile",
+      "destination": "/api/user/profile"
     },
     {
       "source": "/api/analytics/songs",
@@ -53,16 +69,24 @@
       "destination": "/api/import/phishnet"
     },
     {
-      "source": "/api/user/attendance",
-      "destination": "/api/user/attendance"
-    },
-    {
       "source": "/api/import/phishnet-reviews",
       "destination": "/api/import/phishnet-reviews"
     },
     {
-      "source": "/api/debug/reviews",
-      "destination": "/api/debug/reviews"
+      "source": "/api/admin/users",
+      "destination": "/api/admin/users"
+    },
+    {
+      "source": "/api/admin/user",
+      "destination": "/api/admin/user"
+    },
+    {
+      "source": "/api/admin/migrate",
+      "destination": "/api/admin/migrate"
+    },
+    {
+      "source": "/api/community/leaderboard",
+      "destination": "/api/community/leaderboard"
     },
     {
       "source": "/(.*)",
