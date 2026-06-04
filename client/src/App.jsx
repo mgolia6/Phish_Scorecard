@@ -194,8 +194,9 @@ function TandCModal({ onAccept }) {
         <div className="modal-title">BEFORE YOU STEP INTO THE PHREEZER...</div>
         <div className="tandc-body">
           <div className="tandc-section">
-            <div className="tandc-heading">◈ WON'T YOU STEP INTO THE PHREEZER</div>
-            <p>While we are not affiliated with Phish, Phish.net, the Mockingbird Foundation, or Phish.in — we are indebted to all of them, and to you, for celebrating this amazing community.</p>
+            <div className="tandc-heading">◈ WITH GRATITUDE</div>
+            <p>Phreezer is an independent fan tool. We are not affiliated with Phish, Phish.net, the Mockingbird Foundation, or Phish.in — but we are deeply indebted to them. To the record keepers, statisticians, archivists, and volunteers who have spent decades maintaining the continuity of this community: this wouldn't exist without your work.</p>
+            <p style={{ marginTop: 10 }}>We're equally indebted to you — the fans who celebrate, commiserate, defend, and cherish this band and the live music experience it represents.</p>
           </div>
           <div className="tandc-section">
             <div className="tandc-heading">◈ YOUR DATA</div>
@@ -247,7 +248,14 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
       title: 'SEE YOUR ANALYTICS',
       sub: 'What does your taste say about you?',
       body: 'Top rated songs. Best venues. Your average score across every show you\'ve rated. The data doesn\'t lie.',
-      cta: 'LET\'S GO',
+      cta: 'ONE MORE THING',
+    },
+    {
+      glyph: '◈',
+      title: 'KEEP IT GOING',
+      sub: 'If the spirit moves you.',
+      body: 'Phreezer will always be free. But it takes real time and real overhead to keep it running. If you like what you see, consider hitting the support button. No pressure. No guilt. Just appreciation if the spirit moves you.',
+      cta: null,
     },
   ];
 
