@@ -295,6 +295,91 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
   );
 }
 
+// ============================================================
+// PROFILE SETUP MODAL — fires after T&C, before onboarding
+// ============================================================
+function ProfileSetupModal({ api, onComplete }) {
+  const [phishnetUsername, setPhishnetUsername] = useState('');
+  const [confirmedHandle, setConfirmedHandle] = useState(false);
+  const [favoriteSong, setFavoriteSong] = useState('');
+  const [favoriteVenue, setFavoriteVenue] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.post('/user/profile', {
+        phishnet_username: phishnetUsername || null,
+        favorite_song: favoriteSong || null,
+        favorite_venue: favoriteVenue || null,
+      });
+    } catch (e) {}
+    onComplete();
+  };
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 850 }}>
+      <div className="modal" style={{ maxWidth: 480 }}>
+        <div className="modal-title">SET UP YOUR PROFILE</div>
+        <div style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.5)', letterSpacing: '1px', marginBottom: 24, lineHeight: 1.6 }}>
+          All optional. Skip any you don't want to fill in.
+        </div>
+
+        <div className="profile-setup-field">
+          <label className="profile-setup-label">PHISH.NET USERNAME</label>
+          <input
+            type="text"
+            placeholder="e.g. mgolia6"
+            value={phishnetUsername}
+            onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
+          />
+          {phishnetUsername && (
+            <label className="profile-checkbox-row">
+              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} />
+              <span className="profile-checkbox-label">I confirm this is my phish.net account</span>
+            </label>
+          )}
+          <div className="profile-setup-hint">Used to import your attendance and reviews</div>
+        </div>
+
+        <div className="profile-setup-field">
+          <label className="profile-setup-label">FAVORITE SONG</label>
+          <input
+            type="text"
+            placeholder="e.g. Tweezer"
+            value={favoriteSong}
+            onChange={e => setFavoriteSong(e.target.value)}
+          />
+        </div>
+
+        <div className="profile-setup-field">
+          <label className="profile-setup-label">FAVORITE VENUE</label>
+          <input
+            type="text"
+            placeholder="e.g. Madison Square Garden"
+            value={favoriteVenue}
+            onChange={e => setFavoriteVenue(e.target.value)}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+          <button
+            className="btn-primary"
+            style={{ flex: 1, padding: '13px' }}
+            onClick={handleSave}
+            disabled={saving || (phishnetUsername && !confirmedHandle)}
+          >
+            {saving ? 'SAVING...' : 'SAVE PROFILE'}
+          </button>
+          <button style={{ flex: 1, padding: '13px' }} onClick={onComplete}>
+            SKIP FOR NOW
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const api = useApi();
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
@@ -533,6 +618,11 @@ function KPICards({ api }) {
           </div>
         ))}
       </div>
+      {kpi.login_streak > 1 && (
+        <div className="kpi-streak">
+          ⚡ {kpi.login_streak}-DAY LOGIN STREAK
+        </div>
+      )}
       {kpi.top_song && (
         <div className="kpi-highlights">
           <span className="kpi-highlight-item">
@@ -545,6 +635,17 @@ function KPICards({ api }) {
               <span className="kpi-hl-val">{kpi.top_venue.venue} <span className="kpi-hl-score">({kpi.top_venue.shows}x)</span></span>
             </span>
           )}
+        </div>
+      )}
+      {kpi.badges && kpi.badges.length > 0 && (
+        <div className="badges-row">
+          {kpi.badges.map(b => (
+            <div key={b.id} className="badge-chip">
+              <span>{b.glyph}</span>
+              <span>{b.label}</span>
+              <div className="badge-tooltip">{b.desc}</div>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -1282,19 +1383,53 @@ function AnalyticsTab({ api, showMessage, showError }) {
 }
 
 // ============================================================
-// COMMUNITY TAB (shell)
+// COMMUNITY TAB — Leaderboard
 // ============================================================
-function CommunityTab() {
+function CommunityTab({ api }) {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/community/leaderboard')
+      .then(setRows)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <FullPageLoader text="LOADING LEADERBOARD..." />;
+
   return (
     <div className="panel">
-      <div className="panel-title">COMMUNITY</div>
-      <div className="empty-state" style={{ flexDirection: 'column', gap: 12 }}>
-        <div style={{ fontSize: '2rem' }}>⟁</div>
-        <div>COMMUNITY RATINGS COMING SOON</div>
-        <div style={{ fontSize: '0.72rem', opacity: 0.5, marginTop: 8 }}>
-          Show ratings · Song rankings · Venue rankings
-        </div>
-      </div>
+      <div className="panel-title">LEADERBOARD</div>
+      {!rows.length ? (
+        <div className="lb-empty">NO DATA YET — RATE SOME SHOWS</div>
+      ) : (
+        <>
+          <div className="leaderboard-header-row">
+            <div className="lb-col-label">#</div>
+            <div className="lb-col-label">USER</div>
+            <div className="lb-col-label">ATTENDED</div>
+            <div className="lb-col-label">RATED</div>
+            <div className="lb-col-label">AVG</div>
+            <div className="lb-col-label lb-streak-col">STREAK</div>
+          </div>
+          {rows.map(row => (
+            <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}>
+              <div className={`lb-rank ${row.rank <= 3 ? 'top3' : ''}`}>
+                {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : `#${row.rank}`}
+              </div>
+              <div className="lb-username">
+                {row.username}
+                {row.is_me && <span className="lb-me-tag">YOU</span>}
+              </div>
+              <div className="lb-val cyan">{row.shows_attended}</div>
+              <div className="lb-val orange">{row.shows_rated}</div>
+              <div className="lb-val green">{row.avg_score ?? '—'}</div>
+              <div className="lb-val lb-streak-col">{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</div>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 }
@@ -1530,6 +1665,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [pendingImportOnMyShows, setPendingImportOnMyShows] = useState(false);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
   const api = useApi();
 
@@ -1561,6 +1697,10 @@ export default function App() {
       await api.post('/auth/accept?field=tandc', {});
       setUser(u => ({ ...u, tandc_accepted: true }));
     } catch (e) {}
+    // Show profile setup for new users (onboarding is queued after)
+    if (!user?.onboarding_complete) {
+      setShowProfileSetup(true);
+    }
   };
 
   const handleAuthSuccess = (u, isNewUser = false) => {
@@ -1588,6 +1728,13 @@ export default function App() {
   };
 
   // After onboarding, navigate to My Shows with import panel open
+  const handleProfileSetupComplete = () => {
+    setShowProfileSetup(false);
+    if (!user?.onboarding_complete) {
+      setShowOnboarding(true);
+    }
+  };
+
   const handleOnboardingImport = async () => {
     setShowOnboarding(false);
     try {
@@ -1637,7 +1784,7 @@ export default function App() {
         />
       )}
       {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'community' && <CommunityTab />}
+      {tab === 'community' && <CommunityTab api={api} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
   );
@@ -1657,8 +1804,13 @@ export default function App() {
       {/* T&C fires first */}
       {showTandC && !showOnboarding && <TandCModal onAccept={handleTandCAccept} />}
 
+      {/* Profile setup fires after T&C for new users */}
+      {showProfileSetup && !showTandC && !showOnboarding && (
+        <ProfileSetupModal api={api} onComplete={handleProfileSetupComplete} />
+      )}
+
       {/* Onboarding fires after T&C for new users */}
-      {showOnboarding && !showTandC && (
+      {showOnboarding && !showTandC && !showProfileSetup && (
         <OnboardingFlow
           user={user}
           onComplete={handleOnboardingComplete}
