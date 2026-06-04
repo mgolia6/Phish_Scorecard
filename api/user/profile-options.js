@@ -12,25 +12,22 @@ export default async function handler(req, res) {
   const pool = getPool();
   try {
     const [songsRes, venuesRes, showsRes] = await Promise.all([
-      // Rated songs, ordered by times rated (most familiar first)
       pool.query(
-        `SELECT DISTINCT song_name
+        `SELECT song_name, COUNT(*) as times_rated
          FROM ratings WHERE user_id = $1 AND rating IS NOT NULL
-         GROUP BY song_name ORDER BY COUNT(*) DESC LIMIT 200`,
+         GROUP BY song_name ORDER BY times_rated DESC LIMIT 200`,
         [user.id]
       ),
-      // Attended venues
       pool.query(
-        `SELECT DISTINCT venue, city, state
+        `SELECT venue, city, state, COUNT(*) as shows
          FROM attendance WHERE user_id = $1
-         ORDER BY venue ASC`,
+         GROUP BY venue, city, state ORDER BY venue ASC`,
         [user.id]
       ),
-      // Attended shows for favorite show picker
       pool.query(
         `SELECT TO_CHAR(show_date, 'YYYY-MM-DD') as show_date, venue, city, state
          FROM attendance WHERE user_id = $1
-         ORDER BY show_date DESC`,
+         ORDER BY show_date ASC`,
         [user.id]
       ),
     ]);
