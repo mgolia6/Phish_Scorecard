@@ -48,8 +48,8 @@ function SongRating({ value, onChange }) {
           type="button"
           className={`rating-btn ${n <= value ? 'active' : ''} ${n === value ? 'selected' : ''}`}
           onClick={() => onChange(n === value ? 0 : n)}
-          aria-label={`Rate ${n}`}
-        >{n}</button>
+          aria-label={`Rate ${n} stars`}
+        >{n <= value ? '★' : '☆'}</button>
       ))}
     </div>
   );
@@ -1172,17 +1172,14 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                               : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
                               : null}
                           </span>
-                          {audio?.mp3_url && (
-                            <div className="song-play-row">
-                              <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
-                                className="song-play-btn" title={`Stream ${song.song} on Phish.in`}
-                                onClick={e => e.stopPropagation()}>
-                                ▶ PLAY
-                              </a>
-                              <span className="song-play-source">PHISH.IN</span>
-                            </div>
-                          )}
                           <div className="song-row-controls">
+                            {audio?.mp3_url ? (
+                              <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
+                                className="song-play-inline" title={`Stream on Phish.in`}
+                                onClick={e => e.stopPropagation()}>▶</a>
+                            ) : (
+                              <span style={{ width: 32, display: 'inline-block', flexShrink: 0 }} />
+                            )}
                             <SongRating value={parseInt(ratings[song.song]?.rating) || 0} onChange={val => updateRating(song.song, 'rating', val)} />
                           </div>
                           {ratings[song.song]?.notesOpen ? (
@@ -1450,8 +1447,8 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                 </div>
                 {hasReview && (
                   <div className="show-score-row">
-                    <span className="show-score-label">REVIEWS</span>
-                    <span className="show-score-val orange">{reviews.length}</span>
+                    <span className="show-score-label">MY REVIEW</span>
+                    <span className="show-score-val orange">✎</span>
                   </div>
                 )}
               </div>
@@ -1540,6 +1537,115 @@ function AnalyticsTab({ api, showMessage, showError }) {
             <span className="stat-score">{v.average_rating}</span>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// PROFILE TAB
+// ============================================================
+function ProfileTab({ api, user }) {
+  const [profile, setProfile] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [options, setOptions] = useState({ songs: [], venues: [] });
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/user/profile'),
+      api.get('/user/profile-options'),
+    ]).then(([p, o]) => {
+      setProfile(p);
+      setForm(p);
+      setOptions(o);
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.post('/user/profile', form);
+      setProfile(form);
+      setEditing(false);
+    } catch (e) {}
+    finally { setSaving(false); }
+  };
+
+  if (!profile) return <FullPageLoader text="LOADING PROFILE..." />;
+
+  const fields = [
+    { key: 'phishnet_username', label: 'PHISH.NET HANDLE' },
+    { key: 'favorite_song', label: 'FAVORITE SONG' },
+    { key: 'favorite_venue', label: 'FAVORITE VENUE' },
+    { key: 'favorite_show_date', label: 'FIRST SHOW' },
+  ];
+
+  return (
+    <div className="panel">
+      <div className="panel-title">PROFILE</div>
+
+      <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--cyan)', letterSpacing: '2px' }}>
+          {user.username}
+        </div>
+        <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.35)', marginTop: 4, letterSpacing: '1px' }}>
+          {user.email}
+        </div>
+      </div>
+
+      {!editing ? (
+        <>
+          {fields.map(f => (
+            <div key={f.key} className="profile-field-row">
+              <div className="profile-field-label">{f.label}</div>
+              {profile[f.key]
+                ? <div className="profile-field-val">{profile[f.key]}</div>
+                : <div className="profile-field-empty">not set</div>
+              }
+            </div>
+          ))}
+          <button className="btn-primary" style={{ width: '100%', padding: '12px', marginTop: 8 }} onClick={() => setEditing(true)}>
+            ✎ EDIT PROFILE
+          </button>
+        </>
+      ) : (
+        <>
+          {fields.map(f => (
+            <div key={f.key} className="profile-field-row">
+              <label className="profile-field-label">{f.label}</label>
+              {f.key === 'favorite_song' && options.songs.length > 0 ? (
+                <select className="era-select" style={{ width: '100%' }} value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}>
+                  <option value="">— SELECT —</option>
+                  {options.songs.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              ) : f.key === 'favorite_venue' && options.venues.length > 0 ? (
+                <select className="era-select" style={{ width: '100%' }} value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}>
+                  <option value="">— SELECT —</option>
+                  {options.venues.map((v, i) => <option key={i} value={v.venue}>{v.venue}{v.city ? ` — ${v.city}` : ''}</option>)}
+                </select>
+              ) : (
+                <input type="text" value={form[f.key] || ''} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.label.toLowerCase()} />
+              )}
+            </div>
+          ))}
+          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+            <button className="btn-primary" style={{ flex: 1, padding: '12px' }} onClick={handleSave} disabled={saving}>
+              {saving ? 'SAVING...' : 'SAVE'}
+            </button>
+            <button style={{ flex: 1, padding: '12px' }} onClick={() => { setEditing(false); setForm(profile); }}>
+              CANCEL
+            </button>
+          </div>
+        </>
+      )}
+
+      <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+        <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+          style={{ display: 'block', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--orange)', letterSpacing: '2px', textDecoration: 'none', padding: '12px', border: '1px solid rgba(255,102,0,0.3)' }}>
+          ☕ BUY A COFFEE — KEEP PHREEZER RUNNING
+        </a>
       </div>
     </div>
   );
@@ -2019,6 +2125,7 @@ export default function App() {
       )}
       {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'community' && <CommunityTab api={api} />}
+      {tab === 'profile' && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
   );
@@ -2078,12 +2185,12 @@ export default function App() {
 
       {/* MOBILE LAYOUT: original header + tabs */}
       <div className="mobile-layout">
-        <div className="marquee-bar" style={{ position: 'sticky', top: 0, zIndex: 201 }}>
+        <div className="marquee-bar">
           <span className="marquee-track">
             DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
           </span>
         </div>
-        <header className="app-header" style={{ position: 'sticky', top: 0, zIndex: 200 }}>
+        <header className="app-header">
           <div className="header-left">
             <div className="header-title">
               <img
@@ -2119,11 +2226,23 @@ export default function App() {
           <nav className="tab-nav">
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
             {user && <>
-              <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
-              <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
-              <button className={`tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+              <button className={`tab-btn ${['my-shows','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
+              <button className={`tab-btn ${['community','leaderboard'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
+              <button className={`tab-btn ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>PROFILE</button>
             </>}
           </nav>
+          {/* Second-level tabs */}
+          {user && ['my-shows','analytics'].includes(tab) && (
+            <div className="sub-tab-nav">
+              <button className={`sub-tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
+              <button className={`sub-tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
+            </div>
+          )}
+          {user && ['community','leaderboard'].includes(tab) && (
+            <div className="sub-tab-nav">
+              <button className={`sub-tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+            </div>
+          )}
           {renderMain(true)}
         </div>
       </div>
