@@ -460,10 +460,10 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
     { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
     { id: 'my-shows', label: 'MY SHOWS', glyph: '◉', section: null, authRequired: true },
     { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
+    { id: 'community', label: 'LEADERBOARD', glyph: '★', section: 'COMMUNITY' },
   ];
 
   const comingSoon = [
-    { id: 'community', label: 'SHOW RATINGS', glyph: '★', section: 'COMMUNITY' },
     { id: 'songs', label: 'SONG RANKINGS', glyph: '♫', section: null },
     { id: 'venues', label: 'VENUE RANKINGS', glyph: '⬡', section: null },
     { id: 'links', label: 'NOTABLE LINKS', glyph: '⌬', section: 'LINKS' },
@@ -1887,7 +1887,7 @@ export default function App() {
             {user && <>
               <button className={`tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
               <button className={`tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
-  
+              <button className={`tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
             </>}
           </nav>
           {renderMain(true)}
