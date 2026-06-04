@@ -89,6 +89,10 @@
       "destination": "/api/community/leaderboard"
     },
     {
+      "source": "/api/user/profile-options",
+      "destination": "/api/user/profile-options"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
