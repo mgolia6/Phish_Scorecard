@@ -662,3 +662,53 @@ select option { background: var(--bg); color: var(--green); }
   .onboarding-actions { flex-direction: column; }
   .tandc-body { max-height: 50vh; }
 }
+
+
+/* ====== ADMIN TAB ====== */
+.admin-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.admin-stat-bar { font-size: 0.65rem; color: rgba(51,255,51,0.4); letter-spacing: 3px; padding: 8px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+.admin-user-list { display: flex; flex-direction: column; gap: 12px; }
+
+.admin-user-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-user-card-admin { border-color: rgba(255,102,0,0.4); }
+
+.admin-user-header { display: flex; flex-direction: column; gap: 4px; }
+.admin-user-identity { display: flex; align-items: center; gap: 10px; }
+.admin-user-name { font-family: var(--font-display); font-size: 0.9rem; color: var(--green); letter-spacing: 1px; }
+.admin-badge { font-size: 0.5rem; padding: 2px 6px; border: 1px solid var(--orange); color: var(--orange); letter-spacing: 2px; }
+.admin-user-meta { display: flex; flex-direction: column; gap: 2px; }
+.admin-user-email { font-size: 0.75rem; color: rgba(51,255,51,0.5); }
+.admin-user-joined { font-size: 0.65rem; color: rgba(51,255,51,0.3); letter-spacing: 1px; }
+
+.admin-user-stats { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.admin-stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 48px; }
+.admin-stat-val { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+.admin-stat-val.cyan { color: var(--cyan); }
+.admin-stat-val.orange { color: var(--orange); }
+.admin-stat-val.green { color: var(--green); }
+.admin-stat-lbl { font-size: 0.5rem; color: rgba(51,255,51,0.35); letter-spacing: 2px; }
+
+.admin-user-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.admin-action-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: rgba(51,255,51,0.6);
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.admin-action-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); background: rgba(51,255,51,0.05); box-shadow: none; }
+.admin-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
