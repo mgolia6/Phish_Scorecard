@@ -1470,9 +1470,15 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                 <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
                 {hasReview && (
                   <button className="show-link-sm review-toggle" onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}>
-                    {reviewExpanded ? '▲ REVIEW' : '▼ REVIEW'}
+                    {reviewExpanded ? '▲ MY REVIEW' : '▼ MY REVIEW'}
                   </button>
                 )}
+                <a
+                  href={`https://phish.net/setlists/?d=${show.show_date}#addreview`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="show-link-sm"
+                  title="Write a review on Phish.net"
+                >✎ REVIEW ON .NET</a>
               </div>
             </div>
             {reviewExpanded && hasReview && (
