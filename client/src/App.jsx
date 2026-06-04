@@ -304,11 +304,8 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
               style={{ width: '100%', padding: '14px', marginBottom: 10, display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box' }}>
               ☕ BUY A COFFEE
             </a>
-            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10, borderColor: 'var(--cyan)', color: 'var(--cyan)' }} onClick={() => { onStartImport(); }}>
-              ↓ IMPORT FROM PHISH.NET
-            </button>
             <button style={{ width: '100%', padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
-              RATE A SHOW FIRST
+              LET'S GO
             </button>
           </div>
         ) : (
@@ -406,10 +403,10 @@ function ProfileSetupModal({ api, onComplete }) {
             onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); setImportDone(false); setImportCount(null); }}
           />
           {phishnetUsername && (
-            <label className="profile-checkbox-row" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 8, cursor: 'pointer' }}>
-              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0, marginTop: 2 }} />
-              <span style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.7)', letterSpacing: '1px', lineHeight: 1.5 }}>I confirm this is my phish.net account</span>
-            </label>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10, cursor: 'pointer' }} onClick={() => setConfirmedHandle(v => !v)}>
+              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0, marginTop: 3, accentColor: 'var(--orange)', width: 16, height: 16 }} />
+              <span style={{ fontSize: '0.72rem', color: 'rgba(51,255,51,0.75)', letterSpacing: '0.5px', lineHeight: 1.5, flex: 1, minWidth: 0 }}>I confirm this is my phish.net account</span>
+            </div>
           )}
           {phishnetUsername && confirmedHandle && !importDone && (
             <button
@@ -1305,7 +1302,7 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
 
   const filteredShows = rawShows.filter(show => {
     if (activeView !== 'attended') return true;
-    if (filterBy === 'has_review') return !!show.review_text || (show.reviews && show.reviews.length > 0);
+    if (filterBy === 'has_review') return Array.isArray(show.reviews) && show.reviews.length > 0;
     if (filterBy === 'has_phreezer') return show.phreezer_avg != null;
     if (filterBy === 'no_phreezer') return show.phreezer_avg == null;
     return true;
@@ -2052,12 +2049,12 @@ export default function App() {
 
       {/* MOBILE LAYOUT: original header + tabs */}
       <div className="mobile-layout">
-        <div className="marquee-bar">
+        <div className="marquee-bar" style={{ position: 'sticky', top: 0, zIndex: 201 }}>
           <span className="marquee-track">
             DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
           </span>
         </div>
-        <header className="app-header">
+        <header className="app-header" style={{ position: 'sticky', top: 0, zIndex: 200 }}>
           <div className="header-left">
             <div className="header-title">
               <img
