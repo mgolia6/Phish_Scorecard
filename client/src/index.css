@@ -748,3 +748,126 @@ select option { background: var(--bg); color: var(--green); }
   text-transform: uppercase;
   animation: blink 1.2s step-end infinite;
 }
+
+
+/* ====== BADGES ====== */
+.badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.badge-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0,224,208,0.07);
+  border: 1px solid rgba(0,224,208,0.25);
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+  white-space: nowrap;
+  position: relative;
+  cursor: default;
+}
+.badge-chip:hover .badge-tooltip { display: block; }
+.badge-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: rgba(51,255,51,0.6);
+  font-size: 0.55rem;
+  padding: 4px 8px;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  z-index: 10;
+  pointer-events: none;
+}
+.kpi-streak {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: rgba(255,102,0,0.7);
+  letter-spacing: 2px;
+}
+
+/* ====== PROFILE SETUP MODAL ====== */
+.profile-setup-field { margin-bottom: 16px; }
+.profile-setup-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: rgba(51,255,51,0.5);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  display: block;
+}
+.profile-setup-hint {
+  font-size: 0.62rem;
+  color: rgba(51,255,51,0.3);
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+.profile-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.profile-checkbox-row input[type=checkbox] { margin-top: 2px; accent-color: var(--orange); }
+.profile-checkbox-label {
+  font-size: 0.7rem;
+  color: rgba(51,255,51,0.7);
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+/* ====== LEADERBOARD ====== */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.leaderboard-header-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 60px 60px 60px 60px;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 60px 60px 60px 60px;
+  gap: 8px;
+  padding: 9px 8px;
+  border-bottom: 1px solid rgba(51,255,51,0.06);
+  align-items: center;
+  transition: background 0.1s;
+}
+.leaderboard-row:hover { background: rgba(51,255,51,0.03); }
+.leaderboard-row.is-me { background: rgba(0,224,208,0.06); border-left: 2px solid var(--cyan); }
+.lb-rank { font-family: var(--font-display); font-size: 0.65rem; color: rgba(51,255,51,0.3); }
+.lb-rank.top3 { color: var(--orange); }
+.lb-username { font-family: var(--font-display); font-size: 0.75rem; color: var(--green); letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-me-tag { font-size: 0.5rem; color: var(--cyan); margin-left: 6px; }
+.lb-val { font-family: var(--font-display); font-size: 0.75rem; text-align: right; }
+.lb-val.cyan { color: var(--cyan); }
+.lb-val.orange { color: var(--orange); }
+.lb-val.green { color: var(--green); }
+.lb-col-label { font-size: 0.5rem; color: rgba(51,255,51,0.3); letter-spacing: 2px; text-align: right; }
+.lb-col-label:first-child { text-align: left; }
+.lb-empty { font-size: 0.7rem; color: rgba(51,255,51,0.3); padding: 24px; text-align: center; letter-spacing: 2px; }
+
+@media (max-width: 768px) {
+  .leaderboard-header-row,
+  .leaderboard-row { grid-template-columns: 28px 1fr 50px 50px 50px; }
+  .lb-streak-col { display: none; }
+}
