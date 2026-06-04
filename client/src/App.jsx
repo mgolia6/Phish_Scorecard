@@ -157,6 +157,17 @@ function WelcomeCelebration({ username, onDone }) {
   );
 }
 
+function FullPageLoader({ text }) {
+  return (
+    <div className="fullpage-loader">
+      <div className="fullpage-loader-inner">
+        <div className="fullpage-snowflake">❄</div>
+        <div className="fullpage-loader-text">{text || 'LOADING...'}</div>
+      </div>
+    </div>
+  );
+}
+
 function MikeError({ message, onClose }) {
   useEffect(() => {
     const t = setTimeout(onClose, 8000);
@@ -1039,7 +1050,7 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
     }
   };
 
-  if (loading) return <div className="loading">LOADING YOUR SHOWS...</div>;
+  if (loading) return <FullPageLoader text="LOADING YOUR SHOWS..." />;
 
   const rawShows = activeView === 'attended' ? attended : shows;
 
@@ -1230,7 +1241,7 @@ function AnalyticsTab({ api, showMessage, showError }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="loading">CRUNCHING NUMBERS...</div>;
+  if (loading) return <FullPageLoader text="CRUNCHING NUMBERS..." />;
   return (
     <div className="analytics-grid">
       <div className="panel">
@@ -1312,7 +1323,6 @@ function AdminTab({ api, showMessage, showError }) {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
-        showMessage('User deleted', 'success');
         setUsers(prev => prev.filter(u => u.id !== userId));
       } else {
         const token = localStorage.getItem('phish_token');
@@ -1323,12 +1333,11 @@ function AdminTab({ api, showMessage, showError }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         if (action === 'reset-password') {
-          showMessage(`Reset email sent to ${data.email}`, 'success');
+          // email sent — confirm modal handles feedback
         } else if (action === 'reset-onboarding') {
           showMessage('Onboarding + T&C reset', 'success');
           loadUsers();
         } else if (action === 'clear-data') {
-          showMessage('Show data cleared', 'success');
           loadUsers();
         }
       }
@@ -1363,7 +1372,7 @@ function AdminTab({ api, showMessage, showError }) {
     }
   };
 
-  if (loading) return <div className="loading">LOADING USERS...</div>;
+  if (loading) return <FullPageLoader text="LOADING USERS..." />;
 
   return (
     <div>
@@ -1380,14 +1389,14 @@ function AdminTab({ api, showMessage, showError }) {
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 className="btn-primary"
-                style={{ flex: 1, borderColor: 'var(--red)', color: 'var(--red)' }}
+                style={{ flex: 1, borderColor: confirming.action === 'delete' ? 'var(--red)' : 'var(--orange)', color: confirming.action === 'delete' ? 'var(--red)' : 'var(--orange)' }}
                 onClick={() => {
                   if (confirming.action === 'delete') doAction(confirming.userId, null, 'DELETE');
                   else doAction(confirming.userId, confirming.action);
                 }}
                 disabled={!!working}
               >
-                {working ? 'WORKING...' : 'CONFIRM'}
+                {working ? '◈ WORKING...' : 'CONFIRM'}
               </button>
               <button style={{ flex: 1 }} onClick={() => setConfirming(null)}>CANCEL</button>
             </div>
