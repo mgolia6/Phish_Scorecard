@@ -2185,6 +2185,7 @@ export default function App() {
 
       {/* MOBILE LAYOUT: original header + tabs */}
       <div className="mobile-layout">
+        <div className="mobile-sticky-header">
         <div className="marquee-bar">
           <span className="marquee-track">
             DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
@@ -2245,6 +2246,7 @@ export default function App() {
           )}
           {renderMain(true)}
         </div>
+        </div>{/* end mobile-scroll-body */}
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
