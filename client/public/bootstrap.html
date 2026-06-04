@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phreezer Bootstrap</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #33ff33;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .box {
+      border: 1px solid rgba(51,255,51,0.3);
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 420px;
+      background: #050f05;
+    }
+    h1 {
+      font-size: 1rem;
+      letter-spacing: 4px;
+      color: #ff6600;
+      text-shadow: 0 0 10px rgba(255,102,0,0.5);
+      margin-bottom: 8px;
+    }
+    .sub {
+      font-size: 0.65rem;
+      color: rgba(51,255,51,0.4);
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+    }
+    label {
+      display: block;
+      font-size: 0.6rem;
+      color: rgba(51,255,51,0.5);
+      letter-spacing: 3px;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+    input {
+      width: 100%;
+      background: #0a1a0a;
+      border: 1px solid rgba(51,255,51,0.3);
+      color: #33ff33;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      outline: none;
+    }
+    input:focus { border-color: #00ffff; }
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid #ff6600;
+      color: #ff6600;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    button:hover { background: rgba(255,102,0,0.1); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .result {
+      margin-top: 20px;
+      padding: 14px;
+      border: 1px solid;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .result.success { border-color: #33ff33; color: #33ff33; background: rgba(51,255,51,0.05); }
+    .result.error { border-color: #ff3333; color: #ff3333; background: rgba(255,51,51,0.05); }
+    .warning {
+      margin-top: 20px;
+      font-size: 0.62rem;
+      color: rgba(51,255,51,0.3);
+      letter-spacing: 1px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>PHREEZER</h1>
+    <div class="sub">ADMIN BOOTSTRAP — ONE TIME USE</div>
+
+    <label>BOOTSTRAP SECRET</label>
+    <input type="password" id="secret" placeholder="Enter bootstrap secret" />
+
+    <label>USERNAME TO MAKE ADMIN</label>
+    <input type="text" id="username" placeholder="e.g. mgolia6" />
+
+    <button id="btn" onclick="bootstrap()">RUN BOOTSTRAP + MIGRATIONS</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="warning">
+      ◈ This page runs DB migrations and sets the specified user as admin.<br>
+      ◈ Only works with the correct BOOTSTRAP_SECRET.<br>
+      ◈ Delete or ignore this page after use.
+    </div>
+  </div>
+
+  <script>
+    async function bootstrap() {
+      const secret = document.getElementById('secret').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const btn = document.getElementById('btn');
+      const result = document.getElementById('result');
+
+      if (!secret || !username) {
+        showResult('error', 'Both fields required.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'RUNNING...';
+      result.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/bootstrap', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-bootstrap-secret': secret,
+          },
+          body: JSON.stringify({ username }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showResult('error', data.error || 'Bootstrap failed.');
+        } else {
+          showResult('success',
+            '✓ MIGRATIONS COMPLETE\n' +
+            '✓ USER ' + data.user.username.toUpperCase() + ' IS NOW ADMIN\n\n' +
+            'Log out and back in to activate admin access.\n' +
+            'Then go to Admin tab → Run Migrations to finalize schema.'
+          );
+        }
+      } catch (err) {
+        showResult('error', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'RUN BOOTSTRAP + MIGRATIONS';
+      }
+    }
+
+    function showResult(type, msg) {
+      const el = document.getElementById('result');
+      el.className = 'result ' + type;
+      el.style.display = 'block';
+      el.style.whiteSpace = 'pre-wrap';
+      el.textContent = msg;
+    }
+
+    // Allow Enter key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') bootstrap();
+    });
+  </script>
+</body>
+</html>
