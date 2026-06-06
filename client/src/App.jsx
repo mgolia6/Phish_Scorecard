@@ -18,7 +18,7 @@ function useApi() {
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(`${API}${path}`, opts);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Request failed');
+    if (!res.ok) throw new Error(`${res.status}: ${data.error || 'Request failed'}`);
     return data;
   }, []);
   return { get: p => request('GET', p), post: (p, b) => request('POST', p, b), delete: (p, b) => request('DELETE', p, b) };
@@ -3548,15 +3548,21 @@ export default function App() {
     if (!token) return;
     api.get('/auth/me').then(u => {
       setUser(u);
-      // Smart default: My Shows for returning users, Scorecard for new
-      setTab(u.onboarding_complete ? 'my-shows' : 'scorecard');
+      // Smart default: My Shows for any logged-in user, Scorecard only for brand new
+      setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
       } else if (!sessionStorage.getItem('phreezer_welcomed')) {
         sessionStorage.setItem('phreezer_welcomed', '1');
         setShowWelcome(true);
       }
-    }).catch(() => localStorage.removeItem('phish_token'));
+    }).catch(err => {
+      // Only clear token on explicit 401 — not network errors or cold starts
+      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        localStorage.removeItem('phish_token');
+      }
+      // Otherwise keep token — user stays logged in on retry
+    });
   }, []);
 
   const handleTandCAccept = async () => {
