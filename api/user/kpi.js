@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
   const pool = getPool();
   try {
-    const [attendedRes, ratedRes, topSongRes, topVenueRes, reviewsRes, streakRes] = await Promise.all([
+    const [attendedRes, ratedRes, topSongRes, topVenueRes, reviewsRes, streakRes, firstShowRes, lastSyncRes] = await Promise.all([
       pool.query('SELECT COUNT(*) as count FROM attendance WHERE user_id = $1', [user.id]),
       pool.query(
         `SELECT COUNT(DISTINCT show_date) as count, ROUND(AVG(rating)::numeric, 2) as avg_score
@@ -62,6 +62,14 @@ export default async function handler(req, res) {
         [user.id]
       ),
       pool.query('SELECT login_streak FROM users WHERE id = $1', [user.id]),
+      pool.query(
+        `SELECT TO_CHAR(MIN(show_date), 'YYYY-MM-DD') as first_show FROM attendance WHERE user_id = $1`,
+        [user.id]
+      ),
+      pool.query(
+        `SELECT TO_CHAR(MAX(created_at), 'Mon DD, YYYY · HH12:MIam') as last_sync FROM ratings WHERE user_id = $1`,
+        [user.id]
+      ),
     ]);
 
     const shows_attended = parseInt(attendedRes.rows[0]?.count || 0);
@@ -77,6 +85,8 @@ export default async function handler(req, res) {
       top_venue: topVenueRes.rows[0] || null,
       shows_with_reviews,
       login_streak,
+      first_show: firstShowRes.rows[0]?.first_show || null,
+      last_sync: lastSyncRes.rows[0]?.last_sync || null,
       badges: computeBadges({ shows_attended, shows_rated, shows_with_reviews, login_streak }),
     });
   } catch (err) {
