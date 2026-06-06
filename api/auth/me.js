@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   try {
     const result = await pool.query(
       `SELECT id, email, username, first_name, last_name,
-              is_admin, tandc_accepted, onboarding_complete, created_at
+              is_admin, tandc_accepted, onboarding_complete, created_at, avatar_icon
        FROM users WHERE id = $1`,
       [user.id]
     );
