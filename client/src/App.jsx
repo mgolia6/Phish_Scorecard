@@ -2718,75 +2718,60 @@ function AdminTab({ api, showMessage, showError }) {
         {/* User cards — mobile-first card layout */}
         <div className="admin-user-list">
           {users.map(u => (
-            <div key={u.id} className={`admin-user-card ${u.is_admin ? 'admin-user-card-admin' : ''}`}>
-              <div className="admin-user-header">
-                <div className="admin-user-identity">
-                  <span className="admin-user-name">{u.username}</span>
-                  {u.is_admin && <span className="admin-badge">ADMIN</span>}
+            <div key={u.id} style={{
+              marginBottom: 12,
+              border: `1px solid ${u.is_admin ? 'rgba(0,224,208,0.35)' : 'var(--border)'}`,
+              borderLeft: `3px solid ${u.is_admin ? 'var(--cyan)' : 'rgba(51,255,51,0.3)'}`,
+              background: 'var(--bg-panel)',
+            }}>
+              {/* Header */}
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(51,255,51,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--white)' }}>{u.username}</span>
+                    {u.is_admin && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', color: 'var(--cyan)', border: '1px solid rgba(0,224,208,0.4)', padding: '2px 5px' }}>ADMIN</span>}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>{u.email}</div>
                 </div>
-                <div className="admin-user-meta">
-                  <span className="admin-user-email">{u.email}</span>
-                  <span className="admin-user-joined">Joined {u.joined}</span>
-                </div>
-              </div>
-
-              <div className="admin-user-stats">
-                <div className="admin-stat-item">
-                  <span className="admin-stat-val cyan">{u.shows_attended}</span>
-                  <span className="admin-stat-lbl">ATTENDED</span>
-                </div>
-                <div className="admin-stat-item">
-                  <span className="admin-stat-val orange">{u.shows_rated}</span>
-                  <span className="admin-stat-lbl">RATED</span>
-                </div>
-                <div className="admin-stat-item">
-                  <span className="admin-stat-val green">{u.reviews}</span>
-                  <span className="admin-stat-lbl">REVIEWS</span>
-                </div>
-                <div className="admin-stat-item">
-                  <span className="admin-stat-val" style={{ color: u.tandc_accepted ? 'var(--green)' : 'rgba(51,255,51,0.25)' }}>
-                    {u.tandc_accepted ? '✓' : '✗'}
-                  </span>
-                  <span className="admin-stat-lbl">T&C</span>
-                </div>
-                <div className="admin-stat-item">
-                  <span className="admin-stat-val" style={{ color: u.onboarding_complete ? 'var(--green)' : 'rgba(51,255,51,0.25)' }}>
-                    {u.onboarding_complete ? '✓' : '✗'}
-                  </span>
-                  <span className="admin-stat-lbl">ONBOARD</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1.5px', textAlign: 'right', flexShrink: 0 }}>
+                  JOINED<br/>
+                  <span style={{ color: 'var(--text-label)' }}>{u.joined}</span>
                 </div>
               </div>
 
-              <div className="admin-user-actions">
-                <button
-                  className="admin-action-btn"
-                  onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'reset-onboarding' })}
-                  disabled={!!working}
-                >
+              {/* Stats row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                {[
+                  { val: u.shows_attended, lbl: 'ATTENDED', col: 'var(--cyan)' },
+                  { val: u.shows_rated,    lbl: 'RATED',    col: 'var(--orange)' },
+                  { val: u.reviews,        lbl: 'REVIEWS',  col: 'var(--green)' },
+                  { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? 'var(--green)' : 'rgba(51,255,51,0.2)' },
+                  { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? 'var(--green)' : 'rgba(51,255,51,0.2)' },
+                ].map(({ val, lbl, col }) => (
+                  <div key={lbl} style={{ padding: '10px 4px', textAlign: 'center', borderRight: '1px solid rgba(51,255,51,0.06)' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: col, lineHeight: 1 }}>{val}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 4 }}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '10px 14px' }}>
+                <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'reset-onboarding' })} disabled={!!working}
+                  style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: '1px solid rgba(0,224,208,0.35)', background: 'transparent', color: 'var(--cyan)', cursor: 'pointer' }}>
                   RESET ONBOARDING
                 </button>
-                <button
-                  className="admin-action-btn"
-                  onClick={() => doAction(u.id, 'reset-password')}
-                  disabled={!!working}
-                >
+                <button onClick={() => doAction(u.id, 'reset-password')} disabled={!!working}
+                  style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: '1px solid rgba(51,255,51,0.3)', background: 'transparent', color: 'var(--text-label)', cursor: 'pointer' }}>
                   {working === `${u.id}-reset-password` ? 'SENDING...' : 'RESET PASSWORD'}
                 </button>
-                <button
-                  className="admin-action-btn"
-                  style={{ borderColor: 'rgba(255,102,0,0.5)', color: 'var(--orange)' }}
-                  onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'clear-data' })}
-                  disabled={!!working}
-                >
+                <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'clear-data' })} disabled={!!working}
+                  style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: '1px solid rgba(255,102,0,0.4)', background: 'transparent', color: 'var(--orange)', cursor: 'pointer' }}>
                   CLEAR DATA
                 </button>
                 {!u.is_admin && (
-                  <button
-                    className="admin-action-btn"
-                    style={{ borderColor: 'rgba(255,51,51,0.5)', color: 'var(--red)' }}
-                    onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })}
-                    disabled={!!working}
-                  >
+                  <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })} disabled={!!working}
+                    style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: '1px solid rgba(255,51,51,0.4)', background: 'transparent', color: 'var(--red)', cursor: 'pointer' }}>
                     DELETE USER
                   </button>
                 )}
@@ -3258,7 +3243,7 @@ function BadgesSection({ api }) {
 // ============================================================
 const AVATAR_ICONS = ['❄','◈','⚡','✦','⬡','◉','▦','✎','🔥','🐟','🌀','🎸','💯','★','✍','🏔'];
 
-function ProfileModal({ user, api, onClose, onAvatarChange }) {
+function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
   const [sec, setSec] = React.useState('info');
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
@@ -3364,7 +3349,7 @@ function ProfileModal({ user, api, onClose, onAvatarChange }) {
               <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
                   className="btn-glow-cyan" style={{ marginBottom: 4 }}>◈ SUPPORT THE PHREEZER</a>
-                <button className="btn-glow-red">SIGN OUT</button>
+                <button className="btn-glow-red" onClick={() => { onLogout && onLogout(); onClose(); }}>SIGN OUT</button>
               </div>
             </div>
           )}
@@ -3689,7 +3674,7 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
-      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} />}
+      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
 
       {showFirstShowPrompt && (
         <div className="modal-overlay" style={{ zIndex: 750 }}>
