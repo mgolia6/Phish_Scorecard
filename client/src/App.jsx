@@ -1156,7 +1156,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                         <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
                           <div className="song-info">
                             <div className="song-name-with-num">
-                              <span className="song-num-inline">{song.position || idx + 1}.</span>
+                              <span className="song-num-inline">{idx + 1}.</span>
                               <a
                                 href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
                                 target="_blank" rel="noopener noreferrer"
@@ -1450,7 +1450,11 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--cyan)', letterSpacing: '1.5px', marginBottom: 4 }}>
-                    {otdShow.show_date ? otdShow.show_date.slice(0,4) : ''}
+                    {otdShow.show_date ? (() => {
+                      const [y, m, day] = otdShow.show_date.split('-');
+                      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+                      return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+                    })() : ''}
                   </div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {otdShow.venue}
@@ -1468,8 +1472,15 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                   ) : (
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,255,255,0.4)', letterSpacing: '1.5px', textAlign: 'center' }}>NOT<br/>RATED</div>
                   )}
-                  <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, border: '1px solid rgba(0,255,255,0.45)', background: 'rgba(0,255,255,0.08)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', boxShadow: '0 0 10px rgba(0,255,255,0.25)' }}>▶</a>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, border: '1px solid rgba(0,255,255,0.45)', background: 'rgba(0,255,255,0.08)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', boxShadow: '0 0 10px rgba(0,255,255,0.25)' }}>▶</a>
+                    <button
+                      onClick={() => { setActiveTab('scorecard'); loadShow(otdShow.show_date); }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, padding: '0 8px', border: '1px solid rgba(255,140,0,0.55)', background: 'rgba(255,140,0,0.08)', color: 'var(--orange)', fontSize: '0.48rem', fontFamily: 'var(--font-display)', letterSpacing: '1.5px', cursor: 'pointer', boxShadow: '0 0 10px rgba(255,140,0,0.2)', whiteSpace: 'nowrap' }}>
+                      ◈ RATE
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
