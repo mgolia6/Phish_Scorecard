@@ -1504,12 +1504,7 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                       MY SCORE
                     </div>
                   )}
-                  {show.phishnet_score != null && (
-                    <div style={{ marginTop: 6, textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: 'rgba(51,255,51,0.65)', letterSpacing: 1, lineHeight: 1 }}>{show.phishnet_score}</div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 2 }}>.NET</div>
-                    </div>
-                  )}
+
                 </div>
                 {/* Stream + Review indicator */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
