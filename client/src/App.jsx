@@ -767,26 +767,23 @@ function KPICards({ api }) {
         </div>
       )}
       {kpi.badges && kpi.badges.length > 0 && (
-        <div className="badges-row">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
           {kpi.badges.map(b => (
-            <div key={b.id} className="badge-chip">
-              <span>{b.glyph}</span>
-              <span>{b.label}</span>
-              <div className="badge-tooltip">{b.desc}</div>
+            <div key={b.id} title={b.desc} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '4px 9px',
+              border: '1px solid rgba(51,255,51,0.22)',
+              background: 'var(--bg-elevated)',
+              fontFamily: 'var(--font-display)', fontSize: '0.46rem',
+              color: 'var(--green)', letterSpacing: '1.5px',
+              cursor: 'default',
+            }}>
+              <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
             </div>
           ))}
         </div>
       )}
-      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-        <a
-          href="https://buymeacoffee.com/mpgink"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', textDecoration: 'none' }}
-        >
-          ☕ KEEP PHREEZER RUNNING — BUY A COFFEE
-        </a>
-      </div>
+
     </div>
   );
 }
@@ -1507,6 +1504,12 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                       MY SCORE
                     </div>
                   )}
+                  {show.phishnet_score != null && (
+                    <div style={{ marginTop: 6, textAlign: 'right' }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: 'rgba(51,255,51,0.65)', letterSpacing: 1, lineHeight: 1 }}>{show.phishnet_score}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 2 }}>.NET</div>
+                    </div>
+                  )}
                 </div>
                 {/* Stream + Review indicator */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2062,37 +2065,187 @@ function AdminTab({ api, showMessage, showError }) {
 
 
 // ============================================================
-// MY SONGS TAB — stub (Phase 2)
+// MY SONGS TAB
 // ============================================================
 function MySongsTab({ api, showMessage, showError }) {
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/analytics/songs')
+      .then(setSongs)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <FullPageLoader text="LOADING YOUR SONGS..." />;
+
   return (
-    <div className="panel">
-      <div className="panel-title">MY SONGS</div>
-      <div className="loading">LOADING YOUR SONG DATA...</div>
+    <div>
+      <div className="kpi-grid" style={{ marginBottom: 14 }}>
+        {[
+          { label: 'SONGS RATED', value: songs.reduce((s,r) => s + parseInt(r.total_ratings||0), 0), color: 'var(--cyan)' },
+          { label: 'UNIQUE SONGS', value: songs.length, color: 'var(--orange)' },
+          { label: 'AVG SONG SCORE', value: songs.length ? (songs.reduce((s,r) => s + parseFloat(r.average_rating||0), 0) / songs.length).toFixed(2) : '—', color: 'var(--green)' },
+          { label: 'PERFECT 5s', value: songs.filter(s => parseFloat(s.average_rating) === 5).length, color: 'var(--orange)' },
+        ].map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
+            <div className="kpi-value" style={{ color: k.color }}>{k.value}</div>
+            <div className="kpi-label">{k.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="panel">
+        <div className="panel-title">YOUR TOP RATED SONGS</div>
+        {!songs.length ? <div className="empty-state">RATE SOME SONGS FIRST</div> : songs.slice(0,25).map((s,i) => (
+          <div key={s.song_name} style={{
+            display: 'grid', gridTemplateColumns: '22px 1fr auto',
+            alignItems: 'center', gap: 10,
+            padding: '10px 0', borderBottom: i < songs.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
+          }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)' }}>{i+1}.</span>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 3 }}>{s.song_name}</div>
+              <div style={{ height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
+                <div style={{ width: `${(parseFloat(s.average_rating)/5)*100}%`, height: '100%', background: parseFloat(s.average_rating) >= 4.5 ? 'var(--orange)' : 'var(--cyan)', borderRadius: 2 }}/>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.92rem', color: parseFloat(s.average_rating) >= 4.5 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.average_rating}</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px' }}>{s.total_ratings}x</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 // ============================================================
-// MY VENUES TAB — stub (Phase 2)
+// MY VENUES TAB
 // ============================================================
 function MyVenuesTab({ api, showMessage, showError }) {
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/analytics/venues')
+      .then(setVenues)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <FullPageLoader text="LOADING YOUR VENUES..." />;
+
   return (
-    <div className="panel">
-      <div className="panel-title">MY VENUES</div>
-      <div className="loading">LOADING YOUR VENUE DATA...</div>
+    <div>
+      <div className="kpi-grid" style={{ marginBottom: 14 }}>
+        {[
+          { label: 'UNIQUE VENUES', value: venues.length, color: 'var(--cyan)' },
+          { label: 'TOP VENUE AVG', value: venues[0]?.average_rating || '—', color: 'var(--orange)' },
+          { label: 'TOTAL SHOWS', value: venues.reduce((s,v) => s + parseInt(v.total_shows||0), 0), color: 'var(--green)' },
+          { label: 'TOP VENUE', value: venues[0]?.venue?.split(' ').slice(0,2).join(' ') || '—', color: 'var(--cyan)' },
+        ].map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
+            <div className="kpi-value" style={{ color: k.color, fontSize: k.label === 'TOP VENUE' ? '0.9rem' : '1.55rem' }}>{k.value}</div>
+            <div className="kpi-label">{k.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="panel">
+        <div className="panel-title">YOUR TOP VENUES</div>
+        {!venues.length ? <div className="empty-state">RATE SOME SHOWS FIRST</div> : venues.slice(0,20).map((v,i) => {
+          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.35)';
+          return (
+            <div key={`${v.venue}-${i}`} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '12px 0', borderBottom: i < venues.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
+              borderLeft: i < 3 ? `2px solid ${accent}` : 'none',
+              paddingLeft: i < 3 ? 10 : 0,
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.venue}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{v.city}{v.state ? `, ${v.state}` : ''} · {v.total_shows} shows rated</div>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: accent, textShadow: `0 0 10px ${accent}55`, letterSpacing: 1, lineHeight: 1 }}>{v.average_rating}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{v.total_ratings} SONGS</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 // ============================================================
-// MY STATES TAB — stub (Phase 2)
+// MY STATES TAB
 // ============================================================
 function MyStatesTab({ api, showMessage, showError }) {
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/analytics/venues')
+      .then(setVenues)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <FullPageLoader text="LOADING YOUR STATES..." />;
+
+  // Aggregate by state
+  const byState = {};
+  venues.forEach(v => {
+    const st = v.state || v.country || 'Unknown';
+    if (!byState[st]) byState[st] = { state: st, shows: 0, totalRating: 0, venueCount: 0, topVenue: v.venue };
+    byState[st].shows    += parseInt(v.total_shows || 0);
+    byState[st].totalRating += parseFloat(v.average_rating || 0) * parseInt(v.total_shows || 0);
+    byState[st].venueCount++;
+  });
+  const states = Object.values(byState)
+    .map(s => ({ ...s, avg: s.shows > 0 ? (s.totalRating / s.shows).toFixed(2) : '—' }))
+    .sort((a,b) => parseFloat(b.avg) - parseFloat(a.avg));
+
   return (
-    <div className="panel">
-      <div className="panel-title">MY STATES</div>
-      <div className="loading">LOADING YOUR STATE DATA...</div>
+    <div>
+      <div className="kpi-grid" style={{ marginBottom: 14 }}>
+        {[
+          { label: 'STATES VISITED', value: states.length, color: 'var(--cyan)' },
+          { label: 'TOP STATE', value: states[0]?.state || '—', color: 'var(--orange)' },
+          { label: 'TOP STATE AVG', value: states[0]?.avg || '—', color: 'var(--green)' },
+          { label: 'SHOWS IN TOP', value: states[0]?.shows || '—', color: 'var(--cyan)' },
+        ].map((k,i) => (
+          <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
+            <div className="kpi-value" style={{ color: k.color }}>{k.value}</div>
+            <div className="kpi-label">{k.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="panel">
+        <div className="panel-title">YOUR STATES RANKED</div>
+        {!states.length ? <div className="empty-state">RATE SOME SHOWS FIRST</div> : states.map((s,i) => {
+          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.35)';
+          return (
+            <div key={s.state} style={{
+              display: 'grid', gridTemplateColumns: '24px 1fr auto auto',
+              alignItems: 'center', gap: 10,
+              padding: '10px 0', borderBottom: i < states.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
+            }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)' }}>{i+1}.</span>
+              <div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--white)', letterSpacing: '2px', marginBottom: 2 }}>{s.state}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>Top: {s.topVenue}</div>
+              </div>
+              <div style={{ width: 50, height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
+                <div style={{ width: `${Math.min(((parseFloat(s.avg)-3)/2)*100,100)}%`, height: '100%', background: accent, borderRadius: 2 }}/>
+              </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: accent, letterSpacing: 1, textAlign: 'right', minWidth: 32 }}>{s.avg}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -2103,6 +2256,11 @@ function MyStatesTab({ api, showMessage, showError }) {
 // ============================================================
 function ProfileModal({ user, api, onClose }) {
   const [sec, setSec] = React.useState('info');
+  const [profile, setProfile] = React.useState(null);
+
+  React.useEffect(() => {
+    api.get('/user/profile').then(setProfile).catch(() => {});
+  }, []);
 
   return (
     <div className="profile-modal" onClick={onClose}>
@@ -2132,10 +2290,19 @@ function ProfileModal({ user, api, onClose }) {
           {sec === 'info' && (
             <div className="panel" style={{ marginBottom: 12 }}>
               <div className="profile-section">
-                <div className="profile-field-row"><div className="profile-field-label">PHISH.NET HANDLE</div><div className="profile-field-val">{user?.phishnet_username || '—'}</div></div>
-                <div className="profile-field-row"><div className="profile-field-label">FAVORITE SONG</div><div className="profile-field-val">{user?.favorite_song || '—'}</div></div>
-                <div className="profile-field-row"><div className="profile-field-label">FAVORITE VENUE</div><div className="profile-field-val">{user?.favorite_venue || '—'}</div></div>
-                <div className="profile-field-row"><div className="profile-field-label">FIRST SHOW</div><div className="profile-field-val">{user?.favorite_show_date || '—'}</div></div>
+                {[
+                  ['PHISH.NET HANDLE', profile?.phishnet_username],
+                  ['FAVORITE SONG',    profile?.favorite_song],
+                  ['FAVORITE VENUE',   profile?.favorite_venue],
+                  ['FIRST SHOW',       profile?.favorite_show_date ? formatDate(profile.favorite_show_date) : null],
+                ].map(([label, val]) => (
+                  <div key={label} className="profile-field-row">
+                    <div className="profile-field-label">{label}</div>
+                    <div className="profile-field-val" style={{ color: val ? 'var(--white)' : 'var(--text-muted)', fontSize: val ? '0.92rem' : '0.8rem' }}>
+                      {val || (profile ? '—' : '...')}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -2423,6 +2590,7 @@ export default function App() {
                         <div className="avatar-menu">
                           <div className="avatar-menu-user">◈ {user.username}</div>
                           <button className="avatar-menu-item" onClick={() => { setShowProfileModal(true); setAvatarOpen(false); }}>PROFILE</button>
+                          <a className="avatar-menu-item" href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer" style={{ display:'block', textDecoration:'none', color:'var(--orange)' }}>◈ SUPPORT THE PHREEZER</a>
                           <button className="avatar-menu-item avatar-menu-signout" onClick={handleLogout}>SIGN OUT</button>
                         </div>
                       </>
