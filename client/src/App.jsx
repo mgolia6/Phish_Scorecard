@@ -662,7 +662,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
         {user ? (
           <>
             <div className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}>
-              <div className="sidebar-avatar">{user.username?.[0]?.toUpperCase() || '?'}</div>
+              <div className="sidebar-avatar" style={{ fontSize: user.avatar_icon ? '1rem' : undefined }}>{user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}</div>
               {expanded && <span className="sidebar-username">{user.username}</span>}
             </div>
             {expanded && (
@@ -3256,13 +3256,36 @@ function BadgesSection({ api }) {
 // ============================================================
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
-function ProfileModal({ user, api, onClose }) {
+const AVATAR_ICONS = ['❄','◈','⚡','✦','⬡','◉','▦','✎','🔥','🐟','🌀','🎸','💯','★','✍','🏔'];
+
+function ProfileModal({ user, api, onClose, onAvatarChange }) {
   const [sec, setSec] = React.useState('info');
   const [profile, setProfile] = React.useState(null);
+  const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
+  const [savingIcon, setSavingIcon] = React.useState(false);
 
   React.useEffect(() => {
-    api.get('/user/profile').then(setProfile).catch(() => {});
+    api.get('/user/profile').then(d => {
+      setProfile(d);
+      if (d.avatar_icon) setSelectedIcon(d.avatar_icon);
+    }).catch(() => {});
   }, []);
+
+  const handleSaveIcon = async (icon) => {
+    setSelectedIcon(icon);
+    setSavingIcon(true);
+    try {
+      await api.post('/user/profile', {
+        phishnet_username: profile?.phishnet_username || null,
+        favorite_song: profile?.favorite_song || null,
+        favorite_venue: profile?.favorite_venue || null,
+        favorite_show_date: profile?.favorite_show_date || null,
+        avatar_icon: icon,
+      });
+      onAvatarChange && onAvatarChange(icon);
+    } catch (e) {}
+    finally { setSavingIcon(false); }
+  };
 
   return (
     <div className="profile-modal" onClick={onClose}>
@@ -3313,10 +3336,34 @@ function ProfileModal({ user, api, onClose }) {
           )}
           {sec === 'settings' && (
             <div>
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {/* Avatar icon picker */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 10 }}>
+                  ◈ CHOOSE YOUR ICON
+                  {savingIcon && <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>SAVING...</span>}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 8 }}>
+                  {AVATAR_ICONS.map(icon => (
+                    <button key={icon} onClick={() => handleSaveIcon(icon)} style={{
+                      width: '100%', aspectRatio: '1', border: `2px solid ${selectedIcon === icon ? 'var(--cyan)' : 'rgba(51,255,51,0.15)'}`,
+                      background: selectedIcon === icon ? 'rgba(0,224,208,0.12)' : 'var(--bg-elevated)',
+                      fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: selectedIcon === icon ? '0 0 12px rgba(0,224,208,0.35)' : 'none',
+                      transition: 'all 0.15s',
+                    }}>
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+                {selectedIcon && (
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2px', marginTop: 8, textAlign: 'center' }}>
+                    ACTIVE: {selectedIcon}
+                  </div>
+                )}
+              </div>
+              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-                  className="btn-glow-cyan" style={{ marginBottom:8 }}>◈ SUPPORT THE PHREEZER</a>
-                <button className="btn-glow-orange" style={{ marginBottom:8 }}>✎ EDIT PROFILE</button>
+                  className="btn-glow-cyan" style={{ marginBottom: 4 }}>◈ SUPPORT THE PHREEZER</a>
                 <button className="btn-glow-red">SIGN OUT</button>
               </div>
             </div>
@@ -3585,8 +3632,9 @@ export default function App() {
                       className="avatar-btn"
                       onClick={() => setAvatarOpen(o => !o)}
                       aria-label="Account menu"
+                      style={{ fontSize: user.avatar_icon ? '1.1rem' : undefined }}
                     >
-                      {user.username.slice(0,2).toUpperCase()}
+                      {user.avatar_icon || user.username.slice(0,2).toUpperCase()}
                     </button>
                     {avatarOpen && (
                       <>
@@ -3641,7 +3689,7 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
-      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} />}
+      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} />}
 
       {showFirstShowPrompt && (
         <div className="modal-overlay" style={{ zIndex: 750 }}>
