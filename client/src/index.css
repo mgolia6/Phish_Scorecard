@@ -1003,8 +1003,8 @@ select option { background: var(--bg); color: var(--green); }
 /* Fullpage loader */
 .fullpage-loader       { position: fixed; inset: 0; background: var(--bg); z-index: 9998; display: flex; align-items: center; justify-content: center; }
 .fullpage-loader-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.fullpage-snowflake    { font-size: 3rem; color: var(--cyan); animation: spin 3s linear infinite; }
-.fullpage-loader-text  { font-family: var(--font-display); font-size: 0.75rem; color: var(--cyan); letter-spacing: 4px; animation: blink 1.5s step-end infinite; }
+.fullpage-snowflake    { font-size: 4rem; color: var(--cyan); animation: spin 1.8s linear infinite; text-shadow: 0 0 24px rgba(0,224,208,0.7), 0 0 48px rgba(0,224,208,0.3); }
+.fullpage-loader-text  { font-family: var(--font-display); font-size: 0.55rem; color: var(--cyan); letter-spacing: 4px; opacity: 0.7; animation: blink 1.5s step-end infinite; }
 
 /* Admin */
 .admin-section    { margin-bottom: 32px; }
