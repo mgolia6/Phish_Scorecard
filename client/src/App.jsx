@@ -719,6 +719,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
 function KPICards({ api }) {
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     api.get('/user/kpi')
@@ -730,118 +731,102 @@ function KPICards({ api }) {
   if (loading) return <div className="kpi-row kpi-loading">LOADING STATS...</div>;
   if (!kpi) return null;
 
-  const cards = [
-    { label: 'SHOWS ATTENDED', value: kpi.shows_attended, color: 'cyan' },
-    { label: 'SHOWS RATED', value: kpi.shows_rated, color: 'orange' },
-    { label: 'AVG SCORE', value: kpi.avg_score ?? '—', color: 'green' },
-    { label: 'REVIEWS', value: kpi.shows_with_reviews, color: 'cyan' },
-  ];
+  const rated = kpi.shows_rated || 0;
+  const attended = kpi.shows_attended || 0;
+  const ratedMilestones = [10, 25, 50, 100, 250];
+  const attendedMilestones = [25, 50, 100, 200, 500];
+  const nextRated = ratedMilestones.find(m => m > rated) || ratedMilestones[ratedMilestones.length - 1];
+  const nextAttended = attendedMilestones.find(m => m > attended) || attendedMilestones[attendedMilestones.length - 1];
+  const ratedPct = Math.min((rated / nextRated) * 100, 100);
+  const attendedPct = Math.min((attended / nextAttended) * 100, 100);
 
   return (
-    <div className="kpi-section">
-      <div className="kpi-grid">
-        {cards.map(c => (
-          <div key={c.label} className="kpi-card" style={{ borderTopColor: `var(--${c.color})` }}>
-            <div className={`kpi-value`} style={{ color: `var(--${c.color})` }}>{c.value}</div>
-            <div className="kpi-label">{c.label}</div>
+    <div style={{ marginBottom: 10 }}>
+      {/* Compact summary row — always visible, tap to expand */}
+      <button onClick={() => setExpanded(e => !e)} style={{
+        width: '100%', background: 'var(--bg-elevated)', border: '1px solid var(--border)',
+        padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 0, cursor: 'pointer',
+      }}>
+        {[
+          { val: attended,                  lbl: 'ATT',   col: 'var(--cyan)'   },
+          { val: rated,                     lbl: 'RATED', col: 'var(--orange)' },
+          { val: kpi.avg_score ?? '—',     lbl: 'AVG',   col: 'var(--green)'  },
+          { val: kpi.shows_with_reviews,    lbl: 'REV',   col: 'var(--cyan)'   },
+        ].map(({ val, lbl, col }, i) => (
+          <div key={lbl} style={{ flex: 1, textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(51,255,51,0.1)' : 'none', padding: '0 4px' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: col, lineHeight: 1, letterSpacing: 1 }}>{val}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{lbl}</div>
           </div>
         ))}
-      </div>
-      {kpi.login_streak > 1 && (
-        <div className="kpi-streak">
-          ⚡ {kpi.login_streak}-DAY LOGIN STREAK
+        {kpi.login_streak > 1 && (
+          <div style={{ paddingLeft: 10, borderLeft: '1px solid rgba(51,255,51,0.1)', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: 'var(--orange)', lineHeight: 1 }}>⚡{kpi.login_streak}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 3 }}>STREAK</div>
+          </div>
+        )}
+        <div style={{ marginLeft: 10, fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+          {expanded ? '▲' : '▼'}
         </div>
-      )}
+      </button>
 
-      {/* Quick stats card — mock v6: TOP SONG / MOST VISITED / FIRST SHOW */}
-      {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
-        <div style={{ border: '1px solid var(--border)', borderLeft: '3px solid var(--orange)', padding: '4px 14px 8px', marginBottom: 10, background: 'var(--bg-panel)' }}>
-          {[
-            kpi.top_song ? ['TOP SONG', `${kpi.top_song.song_name}`, `(${kpi.top_song.avg})`, 'var(--orange)'] : null,
-            kpi.top_venue ? ['MOST VISITED', `${kpi.top_venue.venue}`, `(${kpi.top_venue.shows}x)`, 'var(--cyan)'] : null,
-            kpi.first_show ? ['FIRST SHOW', formatDate(kpi.first_show), '', 'var(--cyan)'] : null,
-          ].filter(Boolean).map(([l, v, s, col], i, arr) => (
-            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '7px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.08)' : 'none' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {v} <span style={{ color: col, fontSize: '0.75rem' }}>{s}</span>
-              </span>
+      {/* Expanded detail */}
+      {expanded && (
+        <div style={{ border: '1px solid var(--border)', borderTop: 'none', padding: '12px 14px', background: 'var(--bg-panel)' }}>
+          {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
+            <div style={{ borderLeft: '3px solid var(--orange)', paddingLeft: 10, marginBottom: 12 }}>
+              {[
+                kpi.top_song   ? ['TOP SONG',    kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
+                kpi.top_venue  ? ['MOST VISITED', kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
+                kpi.first_show ? ['FIRST SHOW',   formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
+              ].filter(Boolean).map(([l, v, s, col], i, arr) => (
+                <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {v} <span style={{ color: col, fontSize: '0.7rem' }}>{s}</span>
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Milestone progress bars — from mock v6 */}
-      {(kpi.shows_rated != null || kpi.shows_attended != null) && (() => {
-        const rated = kpi.shows_rated || 0;
-        const attended = kpi.shows_attended || 0;
-        const ratedMilestones = [10, 25, 50, 100, 250];
-        const attendedMilestones = [25, 50, 100, 200, 500];
-        const nextRated = ratedMilestones.find(m => m > rated) || ratedMilestones[ratedMilestones.length - 1];
-        const nextAttended = attendedMilestones.find(m => m > attended) || attendedMilestones[attendedMilestones.length - 1];
-        const ratedPct = Math.min((rated / nextRated) * 100, 100);
-        const attendedPct = Math.min((attended / nextAttended) * 100, 100);
-        return (
-          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
-            {/* Rated progress */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>Shows rated</span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{rated} / {nextRated}</span>
-              </div>
-              <div style={{ height: 4, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
-                <div style={{ width: `${ratedPct}%`, height: '100%', background: 'var(--cyan)', boxShadow: '0 0 8px rgba(0,255,255,0.55)', borderRadius: 2, transition: 'width 0.6s' }} />
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 4 }}>
-                NEXT: {nextRated} SHOWS RATED
-              </div>
+          )}
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--white)' }}>Shows rated</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{rated} / {nextRated}</span>
             </div>
-            {/* Attended progress */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>Shows attended</span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--orange)', letterSpacing: '1px' }}>{attended} / {nextAttended}</span>
-              </div>
-              <div style={{ height: 4, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
-                <div style={{ width: `${attendedPct}%`, height: '100%', background: 'var(--orange)', boxShadow: '0 0 8px rgba(255,140,0,0.55)', borderRadius: 2, transition: 'width 0.6s' }} />
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 4 }}>
-                NEXT: {nextAttended} SHOWS ATTENDED
-              </div>
+            <div style={{ height: 3, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
+              <div style={{ width: `${ratedPct}%`, height: '100%', background: 'var(--cyan)', boxShadow: '0 0 6px rgba(0,255,255,0.5)', borderRadius: 2, transition: 'width 0.6s' }} />
             </div>
           </div>
-        );
-      })()}
-      {kpi.badges && kpi.badges.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
-          {kpi.badges.map(b => (
-            <div key={b.id} title={b.desc} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '4px 9px',
-              border: '1px solid rgba(51,255,51,0.22)',
-              background: 'var(--bg-elevated)',
-              fontFamily: 'var(--font-display)', fontSize: '0.46rem',
-              color: 'var(--green)', letterSpacing: '1.5px',
-              cursor: 'default',
-            }}>
-              <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--white)' }}>Shows attended</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--orange)', letterSpacing: '1px' }}>{attended} / {nextAttended}</span>
             </div>
-          ))}
+            <div style={{ height: 3, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
+              <div style={{ width: `${attendedPct}%`, height: '100%', background: 'var(--orange)', boxShadow: '0 0 6px rgba(255,140,0,0.5)', borderRadius: 2, transition: 'width 0.6s' }} />
+            </div>
+          </div>
+          {kpi.badges && kpi.badges.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+              {kpi.badges.map(b => (
+                <div key={b.id} title={b.desc} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', border: '1px solid rgba(51,255,51,0.22)', background: 'var(--bg-elevated)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--green)', letterSpacing: '1.5px' }}>
+                  <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
+                </div>
+              ))}
+            </div>
+          )}
+          {kpi.last_sync && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>Last rated: {kpi.last_sync}</span>
+              <a href="https://phish.net" target="_blank" rel="noopener noreferrer" style={{ background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', padding: '3px 8px', textDecoration: 'none' }}>↓ SYNC</a>
+            </div>
+          )}
         </div>
       )}
-
-      {/* Last synced + SYNC bar — from mock v6 */}
-      {kpi.last_sync && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '8px 12px', border: '1px solid rgba(51,255,51,0.12)', background: 'var(--bg-elevated)' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.67rem', color: 'var(--text-label)' }}>Last rated: {kpi.last_sync}</span>
-          <a href="https://phish.net" target="_blank" rel="noopener noreferrer"
-            style={{ background: 'transparent', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', padding: '4px 10px', cursor: 'pointer', textDecoration: 'none' }}>↓ SYNC</a>
-        </div>
-      )}
-
     </div>
   );
 }
+
 
 // ============================================================
 // SCORECARD TAB
