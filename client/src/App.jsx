@@ -21,7 +21,7 @@ function useApi() {
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data;
   }, []);
-  return { get: p => request('GET', p), post: (p, b) => request('POST', p, b) };
+  return { get: p => request('GET', p), post: (p, b) => request('POST', p, b), delete: (p, b) => request('DELETE', p, b) };
 }
 
 function formatDate(d) {
@@ -808,6 +808,9 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
   const [attendanceType, setAttendanceType] = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
+  const [phriends, setPhriends] = useState({ tagged: [], also_attended: [] });
+  const [phriendInput, setPhriendInput] = useState('');
+  const [phriendLoading, setPhriendLoading] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
@@ -878,14 +881,18 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
     setRatings({});
     setAudioTracks({});
     setSaved(false);
+    setPhriends({ tagged: [], also_attended: [] });
+    setPhriendInput('');
     try {
-      const [showData, ratingsResp, audioData] = await Promise.all([
+      const [showData, ratingsResp, audioData, phriendData] = await Promise.all([
         api.get(`/shows/${date}`),
         api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })),
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
+        api.get(`/shows/companions?date=${date}`).catch(() => ({ tagged: [], also_attended: [] })),
       ]);
       setSongs(showData.songs || []);
       setCurrentShow(showData);
+      setPhriends(phriendData || { tagged: [], also_attended: [] });
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
       const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : 'listened';
       setAttendanceType(savedAttendance);
@@ -907,6 +914,43 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
   };
 
   const selectShow = (show) => { setQuery(''); setResults([]); loadShow(show.showdate); };
+
+  const handleTagPhriend = async () => {
+    if (!phriendInput.trim() || !currentShow) return;
+    setPhriendLoading(true);
+    try {
+      const res = await api.post('/shows/companions', { show_date: currentShow.showdate, companion_username: phriendInput.trim() });
+      if (res.ok) {
+        setPhriends(p => ({
+          tagged: [...p.tagged, { user_id: res.companion.user_id, username: res.companion.username, their_score: null }],
+          also_attended: p.also_attended.filter(c => c.user_id !== res.companion.user_id),
+        }));
+        setPhriendInput('');
+      }
+    } catch (e) { showError(e.message || 'User not found'); }
+    finally { setPhriendLoading(false); }
+  };
+
+  const handleTagPhriendById = async (companion) => {
+    if (!currentShow) return;
+    try {
+      const res = await api.post('/shows/companions', { show_date: currentShow.showdate, companion_username: companion.username });
+      if (res.ok) {
+        setPhriends(p => ({
+          tagged: [...p.tagged, { user_id: companion.user_id, username: companion.username, their_score: null }],
+          also_attended: p.also_attended.filter(c => c.user_id !== companion.user_id),
+        }));
+      }
+    } catch (e) { showError(e.message || 'Could not tag user'); }
+  };
+
+  const handleUntagPhriend = async (companionUserId) => {
+    if (!currentShow) return;
+    try {
+      await api.delete('/shows/companions', { show_date: currentShow.showdate, companion_user_id: companionUserId });
+      setPhriends(p => ({ ...p, tagged: p.tagged.filter(c => c.user_id !== companionUserId) }));
+    } catch (e) { showError('Could not remove tag'); }
+  };
 
   const handleYearBtn = (yr) => {
     const isActive = query === yr;
@@ -1124,7 +1168,85 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
             </div>
           </div>
 
-          {currentShow.soundcheck && (
+          {/* ── PHRIENDS AT THIS SHOW — only when attended ── */}
+          {attendanceType === 'attended' && (
+            <div style={{
+              border: '1px solid rgba(0,224,208,0.28)',
+              background: 'linear-gradient(135deg, rgba(0,224,208,0.04), rgba(5,18,5,0.98))',
+              marginBottom: 12, padding: 14,
+            }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                ◈ PHRIENDS AT THIS SHOW
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(0,224,208,0.25), transparent)' }} />
+              </div>
+
+              {/* Tag input */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <input
+                  value={phriendInput}
+                  onChange={e => setPhriendInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleTagPhriend()}
+                  placeholder="search phreezer username..."
+                  style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
+                />
+                <button onClick={handleTagPhriend} disabled={phriendLoading || !phriendInput.trim()}
+                  style={{ background: 'rgba(0,224,208,0.07)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
+                  {phriendLoading ? '...' : '+ TAG'}
+                </button>
+              </div>
+
+              {/* Tagged phriends */}
+              {phriends.tagged.length > 0 && (
+                <div style={{ marginBottom: phriends.also_attended.length ? 10 : 0 }}>
+                  {phriends.tagged.map(c => (
+                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(0,224,208,0.28)', background: 'rgba(0,224,208,0.04)', marginBottom: 6 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--cyan)', flexShrink: 0 }}>
+                        {c.username.slice(0,2).toUpperCase()}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--cyan)' }}>{c.username}</div>
+                        {c.their_score != null && (
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--orange)', letterSpacing: '1px', marginTop: 2 }}>★ {c.their_score}</div>
+                        )}
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', padding: '2px 5px', border: '1px solid rgba(0,224,208,0.4)', color: 'var(--cyan)', flexShrink: 0 }}>TAGGED</span>
+                      <button onClick={() => handleUntagPhriend(c.user_id)} style={{ background: 'none', border: 'none', color: 'rgba(255,51,51,0.45)', cursor: 'pointer', fontSize: '0.7rem', padding: '0 2px', flexShrink: 0 }} title="Remove tag">✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Auto-detected */}
+              {phriends.also_attended.length > 0 && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '10px 0 10px' }}>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '2px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>ALSO ON PHREEZER</span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                  </div>
+                  {phriends.also_attended.map(c => (
+                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(51,255,51,0.15)', background: 'rgba(51,255,51,0.02)', marginBottom: 6 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(51,255,51,0.2)', background: 'rgba(51,255,51,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+                        {c.username.slice(0,2).toUpperCase()}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-label)' }}>{c.username}</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 2 }}>attended · not yet tagged</div>
+                      </div>
+                      <button onClick={() => handleTagPhriendById(c)}
+                        style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px', padding: '5px 8px', cursor: 'pointer', flexShrink: 0 }}>
+                        + TAG
+                      </button>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {phriends.tagged.length === 0 && phriends.also_attended.length === 0 && (
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0' }}>NO OTHER PHREEZERS AT THIS ONE</div>
+              )}
+            </div>
+          )}
             <div className="soundcheck-bar">
               <span className="soundcheck-label">SOUNDCHECK:</span> {currentShow.soundcheck}
             </div>
@@ -1289,8 +1411,11 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
     Promise.all([
       api.get('/user/shows').catch(() => []),
       api.get('/user/attendance').catch(() => ({ shows: [] })),
-    ]).then(([ratedShows, attendanceData]) => {
-      setShows(ratedShows);
+      api.get('/user/companions').catch(() => ({ by_date: {} })),
+    ]).then(([ratedShows, attendanceData, companionsData]) => {
+      const byDate = companionsData.by_date || {};
+      const enriched = ratedShows.map(s => ({ ...s, companions: byDate[s.show_date] || [] }));
+      setShows(enriched);
       setAttended(attendanceData.shows || []);
     }).catch(err => showError(err.message)).finally(() => setLoading(false));
   };
@@ -1640,6 +1765,18 @@ function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasReview, revi
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
               {show.city}{show.state ? `, ${show.state}` : ''}
             </div>
+            {/* Phriend chips */}
+            {show.companions && show.companions.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 7, flexWrap: 'wrap' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: 'var(--text-muted)' }}>PHRIENDS:</span>
+                {show.companions.slice(0, 3).map(c => (
+                  <span key={c.user_id} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--cyan)', padding: '1px 6px', border: '1px solid rgba(0,224,208,0.28)', background: 'rgba(0,224,208,0.05)' }}>{c.username}</span>
+                ))}
+                {show.companions.length > 3 && (
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1px', padding: '1px 5px', border: '1px solid var(--border)' }}>+{show.companions.length - 3} MORE</span>
+                )}
+              </div>
+            )}
             {/* Set bars — only visible once data loaded */}
             {cardData && <SetBars />}
           </div>
@@ -2047,6 +2184,114 @@ function CommKPIGrid({ items }) {
 }
 
 // ============================================================
+// PHRIEND OVERLAP — community surface (unintentional overlap)
+// ============================================================
+function PhriendOverlapCommunity({ api }) {
+  const [searchInput, setSearchInput] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSearch = async () => {
+    if (!searchInput.trim()) return;
+    setLoading(true); setResult(null); setError('');
+    try {
+      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(searchInput.trim())}`);
+      setResult(data);
+    } catch (e) { setError(e.message || 'User not found'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ paddingBottom: 20 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 12 }}>
+        FIND SHOWS YOU BOTH ATTENDED — INTENTIONAL OR NOT
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+        <input
+          value={searchInput}
+          onChange={e => setSearchInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSearch()}
+          placeholder="enter phreezer username..."
+          style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
+        />
+        <button onClick={handleSearch} disabled={loading}
+          style={{ background: 'rgba(255,140,0,0.07)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
+          {loading ? '...' : 'SEARCH'}
+        </button>
+      </div>
+
+      {error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--red)', marginBottom: 10 }}>{error}</div>}
+
+      {result && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--orange)', flexShrink: 0 }}>
+              {result.target.username.slice(0,2).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                {result.total_shared} shared shows · {result.unique_venues} venues · {result.unique_years} years
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 12 }}>
+            {[
+              { v: result.total_shared, l: 'SHOWS TOGETHER' },
+              { v: result.unique_venues, l: 'VENUES' },
+              { v: result.unique_years, l: 'YEARS' },
+            ].map(({ v, l }) => (
+              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(255,140,0,0.2)', background: 'rgba(255,140,0,0.04)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--orange)', lineHeight: 1, marginBottom: 4 }}>{v}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.3rem', letterSpacing: '1.5px', color: 'rgba(255,140,0,0.5)' }}>{l}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 2px', marginBottom: 6 }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SHOW</span>
+            <div style={{ display: 'flex', gap: 20 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: 'var(--cyan)' }}>YOU</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: 'var(--orange)' }}>THEM</span>
+            </div>
+          </div>
+
+          {result.shows.map((s, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.3)', marginBottom: 5 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
+                  {(() => { const [y,m,d]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+d}, ${y}`; })()}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {s.venue}{s.city ? ` — ${s.city}` : ''}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 30, textAlign: 'center' }}>{s.my_score || '—'}</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 30, textAlign: 'center' }}>{s.their_score || '—'}</span>
+              </div>
+            </div>
+          ))}
+
+          {result.shows.length === 0 && (
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0' }}>NO SHARED SHOWS FOUND</div>
+          )}
+        </>
+      )}
+
+      {!result && !loading && !error && (
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
+          SEARCH A USERNAME TO SEE SHOWS<br/>
+          <span style={{ color: 'rgba(255,140,0,0.4)', marginTop: 6, display: 'block' }}>YOU BOTH ATTENDED</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // COMMUNITY TAB — all sub-tabs
 // ============================================================
 function CommunityTab({ api, subTab = "leaderboard" }) {
@@ -2191,6 +2436,10 @@ function CommunityTab({ api, subTab = "leaderboard" }) {
         <CommStateRows states={states} />
       </div>
     );
+  }
+
+  if (subTab === 'phriend-overlap') {
+    return <PhriendOverlapCommunity api={api} />;
   }
 
   return null;
@@ -2670,6 +2919,118 @@ function MyStatesTab({ api, showMessage, showError }) {
 
 
 // ============================================================
+// MY PHRIENDS TAB
+// ============================================================
+function MyPhriends({ api, showMessage, showError }) {
+  const [searchInput, setSearchInput] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async () => {
+    if (!searchInput.trim()) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(searchInput.trim())}`);
+      setResult(data);
+    } catch (e) { showError(e.message || 'User not found'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ padding: '0 0 20px' }}>
+      {/* Search bar */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <input
+          value={searchInput}
+          onChange={e => setSearchInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSearch()}
+          placeholder="enter phreezer username..."
+          style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
+        />
+        <button onClick={handleSearch} disabled={loading}
+          style={{ background: 'rgba(255,140,0,0.07)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+          {loading ? '...' : 'SEARCH'}
+        </button>
+      </div>
+
+      {result && (
+        <>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--orange)', flexShrink: 0 }}>
+              {result.target.username.slice(0,2).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)' }}>{result.target.username}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                {result.total_shared} shows together · {result.unique_venues} venues · {result.unique_years} years
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 14 }}>
+            {[
+              { v: result.total_shared, l: 'SHOWS TOGETHER' },
+              { v: result.unique_venues, l: 'VENUES' },
+              { v: result.unique_years, l: 'YEARS' },
+            ].map(({ v, l }) => (
+              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(255,140,0,0.2)', background: 'rgba(255,140,0,0.04)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', lineHeight: 1, marginBottom: 5 }}>{v}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.32rem', letterSpacing: '1.5px', color: 'rgba(255,140,0,0.5)' }}>{l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Shared shows list */}
+          {result.shows.length > 0 ? (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, padding: '0 2px' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SHOW</span>
+                <div style={{ display: 'flex', gap: 22 }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px', color: 'var(--cyan)' }}>YOU</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px', color: 'var(--orange)' }}>THEM</span>
+                </div>
+              </div>
+              {result.shows.map((s, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.3)', marginBottom: 5 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
+                      {(() => { const [y,m,d]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+d}, ${y}`; })()}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.venue}{s.city ? ` — ${s.city}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 32, textAlign: 'center' }}>
+                      {s.my_score || '—'}
+                    </span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 32, textAlign: 'center' }}>
+                      {s.their_score || '—'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0' }}>NO SHARED SHOWS FOUND</div>
+          )}
+        </>
+      )}
+
+      {!result && !loading && (
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
+          SEARCH A PHREEZER USERNAME TO SEE<br/>
+          <span style={{ color: 'rgba(255,140,0,0.4)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // BADGES SECTION — used in ProfileModal
 // ============================================================
 const ALL_BADGES_DEF = [
@@ -2956,14 +3317,16 @@ export default function App() {
         />
       )}
       {tab === 'analytics'  && user && <AnalyticsTab  api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'my-songs'   && user && <MySongsTab   api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'my-venues'  && user && <MyVenuesTab  api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'my-states'  && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'community'  && <CommunityTab  api={api} subTab="leaderboard" />}
-      {tab === 'top-shows'  && <CommunityTab  api={api} subTab="top-shows"   />}
-      {tab === 'top-songs'  && <CommunityTab  api={api} subTab="top-songs"   />}
-      {tab === 'top-venues' && <CommunityTab  api={api} subTab="top-venues"  />}
-      {tab === 'top-states' && <CommunityTab  api={api} subTab="top-states"  />}
+      {tab === 'my-songs'      && user && <MySongsTab   api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-venues'     && user && <MyVenuesTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-states'     && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-phriends'   && user && <MyPhriends   api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'community'         && <CommunityTab  api={api} subTab="leaderboard" />}
+      {tab === 'top-shows'         && <CommunityTab  api={api} subTab="top-shows"   />}
+      {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"   />}
+      {tab === 'top-venues'        && <CommunityTab  api={api} subTab="top-venues"  />}
+      {tab === 'top-states'        && <CommunityTab  api={api} subTab="top-states"  />}
+      {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" />}
       {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
@@ -3084,21 +3447,23 @@ export default function App() {
           <nav className="tab-nav">
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
             {user && <>
-              <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
-              <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
+              <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','my-phriends','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
+              <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
             </>}
           </nav>
-          {user && ['my-shows','my-songs','my-venues','my-states','analytics'].includes(tab) && (
+          {user && ['my-shows','my-songs','my-venues','my-states','my-phriends','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'my-shows'  ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
               <button className={`sub-tab-btn ${tab === 'my-songs'  ? 'active' : ''}`} onClick={() => setTab('my-songs')}>MY SONGS</button>
               <button className={`sub-tab-btn ${tab === 'my-venues' ? 'active' : ''}`} onClick={() => setTab('my-venues')}>MY VENUES</button>
               <button className={`sub-tab-btn ${tab === 'my-states' ? 'active' : ''}`} onClick={() => setTab('my-states')}>MY STATES</button>
+              <button className={`sub-tab-btn ${tab === 'my-phriends' ? 'active' : ''}`} onClick={() => setTab('my-phriends')}>MY PHRIENDS</button>
             </div>
           )}
-          {['community','leaderboard','top-shows','top-songs','top-venues','top-states'].includes(tab) && (
+          {['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) && (
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'community'   ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+              <button className={`sub-tab-btn ${tab === 'phriend-overlap' ? 'active' : ''}`} onClick={() => setTab('phriend-overlap')}>PHRIEND OVERLAP</button>
               <button className={`sub-tab-btn ${tab === 'top-shows'   ? 'active' : ''}`} onClick={() => setTab('top-shows')}>TOP SHOWS</button>
               <button className={`sub-tab-btn ${tab === 'top-songs'   ? 'active' : ''}`} onClick={() => setTab('top-songs')}>TOP SONGS</button>
               <button className={`sub-tab-btn ${tab === 'top-venues'  ? 'active' : ''}`} onClick={() => setTab('top-venues')}>TOP VENUES</button>
