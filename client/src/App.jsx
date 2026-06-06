@@ -4006,6 +4006,9 @@ export default function App() {
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
+      } else if (!u.onboarding_complete) {
+        // Onboarding was reset — re-trigger T&C → profile setup flow
+        setShowTandC(true);
       } else if (!sessionStorage.getItem('phreezer_welcomed')) {
         sessionStorage.setItem('phreezer_welcomed', '1');
         setShowWelcome(true);
@@ -4035,6 +4038,9 @@ export default function App() {
       }
     } else if (isNewUser && !u.onboarding_complete) {
       setShowOnboarding(true);
+    } else if (!u.onboarding_complete) {
+      // Returning user who reset onboarding — re-trigger profile setup
+      setShowTandC(true);
     } else if (!isNewUser) {
       setShowWelcome(true);
     }
