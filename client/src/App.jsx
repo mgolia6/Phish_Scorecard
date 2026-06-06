@@ -822,7 +822,7 @@ function KPICards({ api }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="kpi-row kpi-loading">LOADING STATS...</div>;
+  if (loading) return <FullPageLoader text="LOADING STATS..." />;
   if (!kpi) return null;
 
   const rated = kpi.shows_rated || 0;
@@ -836,10 +836,10 @@ function KPICards({ api }) {
 
   return (
     <div style={{ marginBottom: 10 }}>
-      {/* Compact summary row — always visible, tap to expand */}
-      <button onClick={() => setExpanded(e => !e)} style={{
+      {/* Compact summary row */}
+      <div style={{
         width: '100%', background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-        padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 0, cursor: 'pointer',
+        borderBottom: 'none', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 0,
       }}>
         {[
           { val: attended,                  lbl: 'ATT',   col: 'var(--cyan)'   },
@@ -858,14 +858,27 @@ function KPICards({ api }) {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 3 }}>STREAK</div>
           </div>
         )}
-        <div style={{ marginLeft: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>
-            {expanded ? 'CLOSE' : 'DIVE DEEP'}
-          </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)' }}>
-            {expanded ? '▲' : '▼'}
-          </div>
-        </div>
+      </div>
+
+      {/* DIVE DEEP — full-width glowing tab below stats */}
+      <button onClick={() => setExpanded(e => !e)} style={{
+        width: '100%', cursor: 'pointer',
+        background: expanded ? 'rgba(0,224,208,0.08)' : 'rgba(0,224,208,0.04)',
+        border: '1px solid rgba(0,224,208,0.35)',
+        borderTop: expanded ? '1px solid rgba(0,224,208,0.35)' : 'none',
+        padding: '7px 14px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        boxShadow: expanded ? 'none' : '0 0 12px rgba(0,224,208,0.15)',
+        transition: 'all 0.2s',
+      }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--cyan)', letterSpacing: '2.5px' }}>
+          {expanded ? '▲ CLOSE' : '❄ DIVE DEEP'}
+        </span>
+        {!expanded && (
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '1px' }}>
+            — TAP FOR FULL STATS
+          </span>
+        )}
       </button>
 
       {/* Expanded detail */}
