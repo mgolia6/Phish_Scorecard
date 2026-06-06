@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     { name: 'show_companions.idx_user', sql: 'CREATE INDEX IF NOT EXISTS idx_sc_user ON show_companions(user_id)' },
     { name: 'show_companions.idx_companion', sql: 'CREATE INDEX IF NOT EXISTS idx_sc_companion ON show_companions(companion_user_id)' },
     { name: 'show_companions.idx_show_date', sql: 'CREATE INDEX IF NOT EXISTS idx_sc_show_date ON show_companions(show_date)' },
+    { name: 'users.avatar_icon', sql: "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_icon VARCHAR(10)" },
   ];
 
   for (const m of migrations) {
