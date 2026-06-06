@@ -1418,25 +1418,61 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
         )}
       </div>
 
-      {/* On This Day */}
+      {/* On This Day — distinct from show cards */}
       {(() => {
         const today = new Date();
         const todayStr = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
         const otdShow = attended.find(s => s.show_date && s.show_date.slice(5) === todayStr);
         if (!otdShow) return null;
-        const scoreColor = otdShow.phreezer_avg >= 4.7 ? 'var(--orange)' : otdShow.phreezer_avg ? 'var(--cyan)' : 'var(--text-muted)';
+        const yr = parseInt(otdShow.show_date);
+        const yearsAgo = new Date().getFullYear() - yr;
+        const scoreColor = otdShow.phreezer_avg >= 4.7 ? 'var(--orange)' : otdShow.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
         return (
-          <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderTop: '2px solid var(--cyan)', borderLeft: '3px solid var(--cyan)', padding: '12px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '2px', marginBottom: 5 }}>◈ ON THIS DAY</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: 'var(--white)', marginBottom: 2 }}>{formatDate(otdShow.show_date)} · {otdShow.venue}</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>
-                {otdShow.phreezer_avg ? <>Your score: <span style={{ color: scoreColor }}>{otdShow.phreezer_avg}</span></> : 'Not yet rated'}
-                {' · '}{new Date().getFullYear() - parseInt(otdShow.show_date)} years ago
+          <div style={{
+            marginBottom: 14,
+            background: 'linear-gradient(135deg, rgba(0,255,255,0.06), rgba(0,255,255,0.02))',
+            border: '1px solid rgba(0,255,255,0.35)',
+            borderRadius: 0,
+            padding: 0,
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            {/* Accent bar top */}
+            <div style={{ height: 2, background: 'linear-gradient(90deg, var(--cyan), transparent)', marginBottom: 0 }} />
+            <div style={{ padding: '12px 14px' }}>
+              {/* Header row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--cyan)', letterSpacing: '3px', opacity: 0.9 }}>◈ THIS DAY IN PHISHTORY</span>
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(0,255,255,0.2), transparent)' }} />
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,255,255,0.45)', letterSpacing: '2px' }}>{yearsAgo}Y AGO</span>
+              </div>
+              {/* Show info */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--cyan)', letterSpacing: '1.5px', marginBottom: 4 }}>
+                    {otdShow.show_date ? otdShow.show_date.slice(0,4) : ''}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {otdShow.venue}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(51,255,51,0.55)' }}>
+                    {otdShow.city}{otdShow.state ? `, ${otdShow.state}` : ''}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  {otdShow.phreezer_avg ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: scoreColor, textShadow: `0 0 14px ${scoreColor}66`, letterSpacing: 1, lineHeight: 1 }}>{otdShow.phreezer_avg}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>MY SCORE</div>
+                    </div>
+                  ) : (
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,255,255,0.4)', letterSpacing: '1.5px', textAlign: 'center' }}>NOT<br/>RATED</div>
+                  )}
+                  <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, border: '1px solid rgba(0,255,255,0.45)', background: 'rgba(0,255,255,0.08)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', boxShadow: '0 0 10px rgba(0,255,255,0.25)' }}>▶</a>
+                </div>
               </div>
             </div>
-            <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none', boxShadow: '0 0 8px rgba(0,255,255,0.2)', flexShrink: 0 }}>▶</a>
           </div>
         );
       })()}
