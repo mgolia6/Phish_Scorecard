@@ -106,7 +106,7 @@ function SaveCelebration({ onDone }) {
 function WelcomeCelebration({ username, onDone }) {
   const lyrics = [
     "We're glad, glad, glad that you've arrived!",
-    "Glad glad glad that you've arrived.",
+    "We're glad glad glad that you've arrived.",
     "Welcome. This is our farmhouse. We have cluster flies, alas.",
     "You're already there.",
     "It took me a long time to get back on the train.",
