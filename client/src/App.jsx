@@ -3546,9 +3546,22 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('phish_token');
     if (!token) return;
-    api.get('/auth/me').then(u => {
+
+    // Use raw fetch — never clear token unless server explicitly returns 401
+    fetch(`${API}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+    }).then(async res => {
+      if (res.status === 401) {
+        // Explicit auth rejection — token is invalid, clear it
+        localStorage.removeItem('phish_token');
+        return;
+      }
+      if (!res.ok) {
+        // Server error, cold start, network issue — keep token, try again next load
+        return;
+      }
+      const u = await res.json();
       setUser(u);
-      // Smart default: My Shows for any logged-in user, Scorecard only for brand new
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
@@ -3556,12 +3569,8 @@ export default function App() {
         sessionStorage.setItem('phreezer_welcomed', '1');
         setShowWelcome(true);
       }
-    }).catch(err => {
-      // Only clear token on explicit 401 — not network errors or cold starts
-      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
-        localStorage.removeItem('phish_token');
-      }
-      // Otherwise keep token — user stays logged in on retry
+    }).catch(() => {
+      // Network failure — keep token, user stays logged in
     });
   }, []);
 
