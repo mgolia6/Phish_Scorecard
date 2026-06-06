@@ -766,6 +766,48 @@ function KPICards({ api }) {
           )}
         </div>
       )}
+
+      {/* Milestone progress bars — from mock v6 */}
+      {(kpi.shows_rated != null || kpi.shows_attended != null) && (() => {
+        const rated = kpi.shows_rated || 0;
+        const attended = kpi.shows_attended || 0;
+        const ratedMilestones = [10, 25, 50, 100, 250];
+        const attendedMilestones = [25, 50, 100, 200, 500];
+        const nextRated = ratedMilestones.find(m => m > rated) || ratedMilestones[ratedMilestones.length - 1];
+        const nextAttended = attendedMilestones.find(m => m > attended) || attendedMilestones[attendedMilestones.length - 1];
+        const ratedPct = Math.min((rated / nextRated) * 100, 100);
+        const attendedPct = Math.min((attended / nextAttended) * 100, 100);
+        return (
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+            {/* Rated progress */}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>Shows rated</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{rated} / {nextRated}</span>
+              </div>
+              <div style={{ height: 4, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
+                <div style={{ width: `${ratedPct}%`, height: '100%', background: 'var(--cyan)', boxShadow: '0 0 8px rgba(0,255,255,0.55)', borderRadius: 2, transition: 'width 0.6s' }} />
+              </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 4 }}>
+                NEXT: {nextRated} SHOWS RATED
+              </div>
+            </div>
+            {/* Attended progress */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>Shows attended</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--orange)', letterSpacing: '1px' }}>{attended} / {nextAttended}</span>
+              </div>
+              <div style={{ height: 4, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
+                <div style={{ width: `${attendedPct}%`, height: '100%', background: 'var(--orange)', boxShadow: '0 0 8px rgba(255,140,0,0.55)', borderRadius: 2, transition: 'width 0.6s' }} />
+              </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 4 }}>
+                NEXT: {nextAttended} SHOWS ATTENDED
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {kpi.badges && kpi.badges.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
           {kpi.badges.map(b => (
@@ -1247,6 +1289,8 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
               )}
             </div>
           )}
+
+          {currentShow.soundcheck && (
             <div className="soundcheck-bar">
               <span className="soundcheck-label">SOUNDCHECK:</span> {currentShow.soundcheck}
             </div>
@@ -1552,61 +1596,39 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
         const yr = parseInt(otdShow.show_date);
         const yearsAgo = new Date().getFullYear() - yr;
         const scoreColor = otdShow.phreezer_avg >= 4.7 ? 'var(--orange)' : otdShow.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+        const [y, m, day] = otdShow.show_date.split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
         return (
           <div style={{
-            marginBottom: 14,
-            background: 'linear-gradient(135deg, rgba(0,255,255,0.06), rgba(0,255,255,0.02))',
-            border: '1px solid rgba(0,255,255,0.35)',
-            borderRadius: 0,
-            padding: 0,
-            position: 'relative',
-            overflow: 'hidden',
+            marginBottom: 12,
+            background: 'var(--bg-panel)',
+            border: '1px solid var(--border)',
+            borderLeft: '3px solid var(--cyan)',
+            borderTop: '2px solid var(--cyan)',
+            padding: '12px 14px',
           }}>
-            {/* Accent bar top */}
-            <div style={{ height: 2, background: 'linear-gradient(90deg, var(--cyan), transparent)', marginBottom: 0 }} />
-            <div style={{ padding: '12px 14px' }}>
-              {/* Header row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--cyan)', letterSpacing: '3px', opacity: 0.9 }}>◈ THIS DAY IN PHISHTORY</span>
-                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(0,255,255,0.2), transparent)' }} />
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,255,255,0.45)', letterSpacing: '2px' }}>{yearsAgo}Y AGO</span>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 8 }}>◈ ON THIS DAY</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {fullDate} · {otdShow.venue}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>
+                  {otdShow.phreezer_avg
+                    ? <span>Your score: <span style={{ color: scoreColor }}>{otdShow.phreezer_avg}</span> · {yearsAgo} years ago</span>
+                    : <span style={{ color: 'var(--text-muted)' }}>Not yet rated · {yearsAgo} years ago</span>
+                  }
+                </div>
               </div>
-              {/* Show info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--cyan)', letterSpacing: '1.5px', marginBottom: 4 }}>
-                    {otdShow.show_date ? (() => {
-                      const [y, m, day] = otdShow.show_date.split('-');
-                      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-                      return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
-                    })() : ''}
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {otdShow.venue}
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(51,255,51,0.55)' }}>
-                    {otdShow.city}{otdShow.state ? `, ${otdShow.state}` : ''}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  {otdShow.phreezer_avg ? (
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: scoreColor, textShadow: `0 0 14px ${scoreColor}66`, letterSpacing: 1, lineHeight: 1 }}>{otdShow.phreezer_avg}</div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>MY SCORE</div>
-                    </div>
-                  ) : (
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,255,255,0.4)', letterSpacing: '1.5px', textAlign: 'center' }}>NOT<br/>RATED</div>
-                  )}
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, border: '1px solid rgba(0,255,255,0.45)', background: 'rgba(0,255,255,0.08)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', boxShadow: '0 0 10px rgba(0,255,255,0.25)' }}>▶</a>
-                    <button
-                      onClick={() => { setActiveTab('scorecard'); loadShow(otdShow.show_date); }}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, padding: '0 8px', border: '1px solid rgba(255,140,0,0.55)', background: 'rgba(255,140,0,0.08)', color: 'var(--orange)', fontSize: '0.48rem', fontFamily: 'var(--font-display)', letterSpacing: '1.5px', cursor: 'pointer', boxShadow: '0 0 10px rgba(255,140,0,0.2)', whiteSpace: 'nowrap' }}>
-                      ◈ RATE
-                    </button>
-                  </div>
-                </div>
+              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(0,255,255,0.38)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.7rem', textDecoration: 'none', paddingLeft: 2 }}
+                  title="Stream this show">▶</a>
+                <button onClick={() => onRateShow(otdShow.show_date)}
+                  style={{ height: 34, padding: '0 10px', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.07)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 0 8px rgba(255,140,0,0.18)' }}>
+                  ◈ RATE
+                </button>
               </div>
             </div>
           </div>
