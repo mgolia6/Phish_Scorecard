@@ -2139,10 +2139,10 @@ function MyVenuesTab({ api, showMessage, showError }) {
           { label: 'UNIQUE VENUES', value: venues.length, color: 'var(--cyan)' },
           { label: 'TOP VENUE AVG', value: venues[0]?.average_rating || '—', color: 'var(--orange)' },
           { label: 'TOTAL SHOWS', value: venues.reduce((s,v) => s + parseInt(v.total_shows||0), 0), color: 'var(--green)' },
-          { label: 'TOP VENUE', value: venues[0]?.venue?.split(' ').slice(0,2).join(' ') || '—', color: 'var(--cyan)' },
+          { label: 'TOP VENUE', value: venues[0]?.venue || '—', color: 'var(--cyan)', small: true },
         ].map((k,i) => (
           <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
-            <div className="kpi-value" style={{ color: k.color, fontSize: k.label === 'TOP VENUE' ? '0.9rem' : '1.55rem' }}>{k.value}</div>
+            <div className="kpi-value" style={{ color: k.color, fontSize: k.small ? '0.72rem' : '1.55rem', lineHeight: 1.2, textAlign: 'center', wordBreak: 'break-word' }}>{k.value}</div>
             <div className="kpi-label">{k.label}</div>
           </div>
         ))}
