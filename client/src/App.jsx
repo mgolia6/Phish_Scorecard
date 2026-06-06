@@ -752,18 +752,22 @@ function KPICards({ api }) {
           ⚡ {kpi.login_streak}-DAY LOGIN STREAK
         </div>
       )}
-      {kpi.top_song && (
-        <div className="kpi-highlights">
-          <div className="kpi-highlight-item">
-            <span className="kpi-hl-label">TOP SONG</span>
-            <span className="kpi-hl-val">{kpi.top_song.song_name} <span className="kpi-hl-score">({kpi.top_song.avg})</span></span>
-          </div>
-          {kpi.top_venue && (
-            <div className="kpi-highlight-item">
-              <span className="kpi-hl-label">MOST VISITED</span>
-              <span className="kpi-hl-val">{kpi.top_venue.venue} <span className="kpi-hl-score">({kpi.top_venue.shows}x)</span></span>
+
+      {/* Quick stats card — mock v6: TOP SONG / MOST VISITED / FIRST SHOW */}
+      {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
+        <div style={{ border: '1px solid var(--border)', borderLeft: '3px solid var(--orange)', padding: '4px 14px 8px', marginBottom: 10, background: 'var(--bg-panel)' }}>
+          {[
+            kpi.top_song ? ['TOP SONG', `${kpi.top_song.song_name}`, `(${kpi.top_song.avg})`, 'var(--orange)'] : null,
+            kpi.top_venue ? ['MOST VISITED', `${kpi.top_venue.venue}`, `(${kpi.top_venue.shows}x)`, 'var(--cyan)'] : null,
+            kpi.first_show ? ['FIRST SHOW', formatDate(kpi.first_show), '', 'var(--cyan)'] : null,
+          ].filter(Boolean).map(([l, v, s, col], i, arr) => (
+            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '7px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.08)' : 'none' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {v} <span style={{ color: col, fontSize: '0.75rem' }}>{s}</span>
+              </span>
             </div>
-          )}
+          ))}
         </div>
       )}
 
@@ -823,6 +827,15 @@ function KPICards({ api }) {
               <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Last synced + SYNC bar — from mock v6 */}
+      {kpi.last_sync && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '8px 12px', border: '1px solid rgba(51,255,51,0.12)', background: 'var(--bg-elevated)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.67rem', color: 'var(--text-label)' }}>Last rated: {kpi.last_sync}</span>
+          <a href="https://phish.net" target="_blank" rel="noopener noreferrer"
+            style={{ background: 'transparent', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', padding: '4px 10px', cursor: 'pointer', textDecoration: 'none' }}>↓ SYNC</a>
         </div>
       )}
 
@@ -2422,6 +2435,9 @@ function CommunityTab({ api, subTab = "leaderboard" }) {
   // ── TOP VENUES ────────────────────────────────────────────
   if (subTab === 'top-venues') {
     const s = topVenues?.stats;
+    // Build state map for heatmap from states array
+    const stateMap = {};
+    (topVenues?.states || []).forEach(st => { if (st.state) stateMap[st.state] = st.avg_score; });
     return (
       <div>
         <CommKPIGrid items={[
@@ -2430,6 +2446,7 @@ function CommunityTab({ api, subTab = "leaderboard" }) {
           { label: 'TOP VENUE AVG', value: topVenues?.venues?.[0]?.avg_score || '—', color: 'var(--green)' },
           { label: 'TOP VENUE', value: topVenues?.venues?.[0]?.venue || '—', color: 'var(--cyan)', small: true },
         ]} />
+        <Heatmap data={stateMap} title="COMMUNITY RATINGS BY STATE" />
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>TOP VENUES — TAP FOR TOP SHOWS</div>
         {(topVenues?.venues || []).map((venue, i) => (
           <CommExpandCard key={venue.venue} name={venue.venue}
@@ -2447,6 +2464,8 @@ function CommunityTab({ api, subTab = "leaderboard" }) {
   if (subTab === 'top-states') {
     const s = topStates?.stats;
     const states = topStates?.states || [];
+    const stateMap = {};
+    states.forEach(st => { if (st.state) stateMap[st.state] = st.avg_score; });
     return (
       <div>
         <CommKPIGrid items={[
@@ -2455,7 +2474,35 @@ function CommunityTab({ api, subTab = "leaderboard" }) {
           { label: 'TOP STATE AVG', value: s?.top_state?.avg_score || '—', color: 'var(--green)' },
           { label: 'BOTTOM STATE', value: s?.bottom_state?.state || '—', color: 'var(--cyan)' },
         ]} />
-        <CommStateRows states={states} />
+        <Heatmap data={stateMap} title="COMMUNITY RATINGS BY STATE" />
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>STATE RANKINGS — TAP TO EXPAND</div>
+        {states.map((st, i) => {
+          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+          return (
+            <CommExpandCard key={st.state} name={st.state}
+              avg={st.avg_score} count={st.show_count} countLabel="SHOWS"
+              sub={`${st.show_count} shows · top: ${st.top_venue || '—'}`}
+              accent={accent}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>TOP VENUE</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--cyan)' }}>{st.top_venue || '—'}</div>
+                </div>
+                {st.top_show && (
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>HIGHEST RATED SHOW</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <a href={`https://phish.in/${st.top_show.show_date}`} target="_blank" rel="noopener noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.5rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)' }}>{formatDate(st.top_show.show_date)}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: parseFloat(st.top_show.avg_score) >= 4.7 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{st.top_show.avg_score}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CommExpandCard>
+          );
+        })}
       </div>
     );
   }
@@ -2753,6 +2800,70 @@ function AdminTab({ api, showMessage, showError }) {
 }
 
 
+
+// ============================================================
+// HEATMAP — reusable state grid (My Venues, My States, Comm)
+// ============================================================
+const HEATMAP_POS = {
+  WA:{r:0,c:0},OR:{r:1,c:0},CA:{r:3,c:0},NV:{r:2,c:1},ID:{r:1,c:1},MT:{r:0,c:2},
+  WY:{r:1,c:2},UT:{r:2,c:2},AZ:{r:3,c:2},CO:{r:2,c:3},NM:{r:3,c:3},ND:{r:0,c:3},
+  SD:{r:1,c:3},NE:{r:2,c:4},KS:{r:3,c:4},OK:{r:4,c:4},TX:{r:4,c:5},MN:{r:0,c:4},
+  IA:{r:1,c:4},MO:{r:2,c:5},AR:{r:3,c:5},LA:{r:4,c:6},WI:{r:0,c:5},IL:{r:1,c:5},
+  MS:{r:3,c:6},MI:{r:0,c:6},IN:{r:1,c:6},TN:{r:2,c:6},AL:{r:3,c:7},KY:{r:1,c:7},
+  OH:{r:0,c:7},WV:{r:1,c:8},GA:{r:3,c:8},FL:{r:4,c:8},VA:{r:0,c:8},NC:{r:1,c:9},
+  SC:{r:2,c:9},MD:{r:0,c:9},DE:{r:0,c:10},NJ:{r:0,c:11},PA:{r:0,c:10},NY:{r:0,c:12},
+  CT:{r:1,c:11},RI:{r:1,c:12},MA:{r:0,c:13},VT:{r:1,c:13},NH:{r:0,c:14},ME:{r:0,c:15},
+};
+const hmColor = s => {
+  if (!s) return 'rgba(51,255,51,0.08)';
+  const n = parseFloat(s);
+  if (n >= 4.7) return 'rgba(255,102,0,0.9)';
+  if (n >= 4.4) return 'rgba(255,140,0,0.75)';
+  if (n >= 4.1) return 'rgba(0,200,200,0.75)';
+  if (n >= 3.8) return 'rgba(0,180,180,0.45)';
+  return 'rgba(51,255,51,0.22)';
+};
+function Heatmap({ data, title }) {
+  const [hov, setHov] = useState(null);
+  const rows = 5, cols = 16;
+  const cells = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => {
+      const st = Object.entries(HEATMAP_POS).find(([, v]) => v.r === r && v.c === c);
+      return st ? { abbr: st[0], score: data[st[0]] || null } : null;
+    })
+  );
+  return (
+    <div style={{ marginBottom: 14 }}>
+      {title && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 9, textTransform: 'uppercase' }}>{title}</div>}
+      <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={{ display: 'grid', gridTemplateRows: `repeat(${rows},28px)`, gridTemplateColumns: `repeat(${cols},1fr)`, gap: 2, minWidth: 300 }}>
+          {cells.flat().map((cell, i) => (
+            <div key={i}
+              style={{ background: cell ? hmColor(cell.score) : 'transparent', border: cell ? (hov === cell.abbr ? '1px solid var(--cyan)' : '1px solid rgba(51,255,51,0.15)') : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: cell ? 'pointer' : 'default', transition: 'all 0.12s' }}
+              onMouseEnter={() => cell && setHov(cell.abbr)}
+              onMouseLeave={() => setHov(null)}>
+              {cell && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: '#ffffff', fontWeight: 900, textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>{cell.abbr}</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+        {[['rgba(255,102,0,0.9)','4.7+'],['rgba(255,140,0,0.75)','4.4+'],['rgba(0,200,200,0.75)','4.1+'],['rgba(0,180,180,0.45)','3.8+'],['rgba(51,255,51,0.22)','<3.8'],['rgba(51,255,51,0.08)','N/A']].map(([col,lbl]) => (
+          <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ width: 10, height: 10, background: col, border: '1px solid rgba(255,255,255,0.15)' }} />
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-label)', letterSpacing: '1px' }}>{lbl}</span>
+          </div>
+        ))}
+      </div>
+      {hov && data[hov] && (
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', color: 'var(--cyan)', letterSpacing: '2px', marginTop: 7 }}>
+          {hov} — AVG {data[hov]}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ============================================================
 // MY SONGS TAB
 // ============================================================
@@ -2761,51 +2872,61 @@ function MySongsTab({ api, showMessage, showError }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/analytics/songs')
-      .then(setSongs)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    api.get('/analytics/songs').then(setSongs).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <FullPageLoader text="LOADING YOUR SONGS..." />;
+
+  const totalRatings = songs.reduce((s, r) => s + parseInt(r.total_ratings || 0), 0);
+  const perfect5s = songs.filter(s => parseFloat(s.average_rating) === 5).length;
+  const overallAvg = songs.length ? (songs.reduce((s, r) => s + parseFloat(r.average_rating || 0), 0) / songs.length).toFixed(2) : '—';
 
   return (
     <div>
       <div className="kpi-grid" style={{ marginBottom: 14 }}>
         {[
-          { label: 'SONGS RATED', value: songs.reduce((s,r) => s + parseInt(r.total_ratings||0), 0), color: 'var(--cyan)' },
+          { label: 'SONGS RATED', value: totalRatings, color: 'var(--cyan)' },
           { label: 'UNIQUE SONGS', value: songs.length, color: 'var(--orange)' },
-          { label: 'AVG SONG SCORE', value: songs.length ? (songs.reduce((s,r) => s + parseFloat(r.average_rating||0), 0) / songs.length).toFixed(2) : '—', color: 'var(--green)' },
-          { label: 'PERFECT 5s', value: songs.filter(s => parseFloat(s.average_rating) === 5).length, color: 'var(--orange)' },
-        ].map((k,i) => (
+          { label: 'AVG SONG SCORE', value: overallAvg, color: 'var(--green)' },
+          { label: 'PERFECT 5s', value: perfect5s, color: 'var(--orange)' },
+        ].map((k, i) => (
           <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
             <div className="kpi-value" style={{ color: k.color }}>{k.value}</div>
             <div className="kpi-label">{k.label}</div>
           </div>
         ))}
       </div>
-      <div className="panel">
-        <div className="panel-title">YOUR TOP RATED SONGS</div>
-        {!songs.length ? <div className="empty-state">RATE SOME SONGS FIRST</div> : songs.slice(0,25).map((s,i) => (
-          <div key={s.song_name} style={{
-            display: 'grid', gridTemplateColumns: '22px 1fr auto',
-            alignItems: 'center', gap: 10,
-            padding: '10px 0', borderBottom: i < songs.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
-          }}>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)' }}>{i+1}.</span>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>YOUR TOP SONGS — TAP FOR YOUR VERSIONS</div>
+      {!songs.length ? (
+        <div className="empty-state">RATE SOME SONGS FIRST</div>
+      ) : songs.slice(0, 25).map((s, i) => {
+        const accent = i === 0 ? 'var(--orange)' : 'var(--cyan)';
+        return (
+          <CommExpandCard key={s.song_name} name={s.song_name}
+            sub={`${s.total_ratings} versions · avg ${s.average_rating}`}
+            avg={s.average_rating} count={s.total_ratings} countLabel="HEARD"
+            accent={accent}>
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 3 }}>{s.song_name}</div>
-              <div style={{ height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
-                <div style={{ width: `${(parseFloat(s.average_rating)/5)*100}%`, height: '100%', background: parseFloat(s.average_rating) >= 4.5 ? 'var(--orange)' : 'var(--cyan)', borderRadius: 2 }}/>
-              </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>YOUR VERSIONS</div>
+              {(s.versions || []).map((v, vi) => (
+                <div key={vi} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: vi < s.versions.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                  <a href={`https://phish.in/${v.show_date}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>{formatDate(v.show_date)}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{v.venue}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                    {[1,2,3,4,5].map(n => (
+                      <span key={n} style={{ fontSize: '0.7rem', color: n <= parseInt(v.rating) ? 'var(--orange)' : 'rgba(51,255,51,0.18)' }}>{n <= parseInt(v.rating) ? '★' : '·'}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.92rem', color: parseFloat(s.average_rating) >= 4.5 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.average_rating}</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px' }}>{s.total_ratings}x</div>
-            </div>
-          </div>
-        ))}
-      </div>
+          </CommExpandCard>
+        );
+      })}
     </div>
   );
 }
@@ -2818,52 +2939,63 @@ function MyVenuesTab({ api, showMessage, showError }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/analytics/venues')
-      .then(setVenues)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    api.get('/analytics/venues').then(setVenues).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <FullPageLoader text="LOADING YOUR VENUES..." />;
+
+  // Build state map for heatmap
+  const stateMap = {};
+  venues.forEach(v => {
+    const st = v.state;
+    if (!st) return;
+    if (!stateMap[st] || parseFloat(v.average_rating) > parseFloat(stateMap[st])) {
+      stateMap[st] = v.average_rating;
+    }
+  });
+
+  const totalShows = venues.reduce((s, v) => s + parseInt(v.total_shows || 0), 0);
 
   return (
     <div>
       <div className="kpi-grid" style={{ marginBottom: 14 }}>
         {[
           { label: 'UNIQUE VENUES', value: venues.length, color: 'var(--cyan)' },
-          { label: 'TOP VENUE AVG', value: venues[0]?.average_rating || '—', color: 'var(--orange)' },
-          { label: 'TOTAL SHOWS', value: venues.reduce((s,v) => s + parseInt(v.total_shows||0), 0), color: 'var(--green)' },
-          { label: 'TOP VENUE', value: venues[0]?.venue || '—', color: 'var(--cyan)', small: true },
-        ].map((k,i) => (
+          { label: 'STATES VISITED', value: Object.keys(stateMap).length, color: 'var(--orange)' },
+          { label: 'TOP VENUE AVG', value: venues[0]?.average_rating || '—', color: 'var(--green)' },
+          { label: 'HOME VENUE', value: venues[0]?.venue || '—', color: 'var(--cyan)', small: true },
+        ].map((k, i) => (
           <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
             <div className="kpi-value" style={{ color: k.color, fontSize: k.small ? '0.72rem' : '1.55rem', lineHeight: 1.2, textAlign: 'center', wordBreak: 'break-word' }}>{k.value}</div>
             <div className="kpi-label">{k.label}</div>
           </div>
         ))}
       </div>
-      <div className="panel">
-        <div className="panel-title">YOUR TOP VENUES</div>
-        {!venues.length ? <div className="empty-state">RATE SOME SHOWS FIRST</div> : venues.slice(0,20).map((v,i) => {
-          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.35)';
-          return (
-            <div key={`${v.venue}-${i}`} style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '12px 0', borderBottom: i < venues.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
-              borderLeft: i < 3 ? `2px solid ${accent}` : 'none',
-              paddingLeft: i < 3 ? 10 : 0,
-            }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.venue}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{v.city}{v.state ? `, ${v.state}` : ''} · {v.total_shows} shows rated</div>
-              </div>
-              <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: accent, textShadow: `0 0 10px ${accent}55`, letterSpacing: 1, lineHeight: 1 }}>{v.average_rating}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{v.total_ratings} SONGS</div>
-              </div>
+      <Heatmap data={stateMap} title="MY RATINGS BY STATE" />
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>MY VENUES — TAP FOR TOP SHOWS</div>
+      {!venues.length ? (
+        <div className="empty-state">RATE SOME SHOWS FIRST</div>
+      ) : venues.slice(0, 20).map((v, i) => {
+        const accent = i === 0 ? 'var(--orange)' : i === 1 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+        return (
+          <CommExpandCard key={`${v.venue}-${i}`} name={v.venue}
+            sub={`${v.city ? v.city + ', ' : ''}${v.state || ''} · ${v.total_shows} shows`}
+            avg={v.average_rating || '—'} count={v.total_shows} countLabel="SHOWS"
+            accent={accent}>
+            <div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>TOP SHOWS HERE</div>
+              {(v.top_shows || []).map((s, si) => (
+                <div key={si} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: si < v.top_shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                  <a href={`https://phish.in/${s.show_date}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', flex: 1 }}>{formatDate(s.show_date)}</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(s.avg_score) >= 4.7 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.avg_score}</span>
+                </div>
+              ))}
             </div>
-          );
-        })}
-      </div>
+          </CommExpandCard>
+        );
+      })}
     </div>
   );
 }
@@ -2876,26 +3008,32 @@ function MyStatesTab({ api, showMessage, showError }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/analytics/venues')
-      .then(setVenues)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    api.get('/analytics/venues').then(setVenues).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <FullPageLoader text="LOADING YOUR STATES..." />;
 
-  // Aggregate by state
+  // Aggregate by state from venues data
   const byState = {};
   venues.forEach(v => {
-    const st = v.state || v.country || 'Unknown';
-    if (!byState[st]) byState[st] = { state: st, shows: 0, totalRating: 0, venueCount: 0, topVenue: v.venue };
-    byState[st].shows    += parseInt(v.total_shows || 0);
-    byState[st].totalRating += parseFloat(v.average_rating || 0) * parseInt(v.total_shows || 0);
-    byState[st].venueCount++;
+    const st = v.state || 'Unknown';
+    if (!byState[st]) byState[st] = { state: st, shows: 0, totalRating: 0, ratedShows: 0, topVenue: v.venue };
+    byState[st].shows += parseInt(v.total_shows || 0);
+    if (v.average_rating) {
+      byState[st].totalRating += parseFloat(v.average_rating) * parseInt(v.total_shows || 0);
+      byState[st].ratedShows += parseInt(v.total_shows || 0);
+    }
+    if (parseInt(v.total_shows || 0) > (byState[st].topVenueShows || 0)) {
+      byState[st].topVenue = v.venue;
+      byState[st].topVenueShows = parseInt(v.total_shows || 0);
+    }
   });
   const states = Object.values(byState)
-    .map(s => ({ ...s, avg: s.shows > 0 ? (s.totalRating / s.shows).toFixed(2) : '—' }))
-    .sort((a,b) => parseFloat(b.avg) - parseFloat(a.avg));
+    .map(s => ({ ...s, avg: s.ratedShows > 0 ? (s.totalRating / s.ratedShows).toFixed(2) : null }))
+    .sort((a, b) => parseFloat(b.avg || 0) - parseFloat(a.avg || 0));
+
+  const stateMap = {};
+  states.forEach(s => { if (s.avg) stateMap[s.state] = s.avg; });
 
   return (
     <div>
@@ -2905,40 +3043,42 @@ function MyStatesTab({ api, showMessage, showError }) {
           { label: 'TOP STATE', value: states[0]?.state || '—', color: 'var(--orange)' },
           { label: 'TOP STATE AVG', value: states[0]?.avg || '—', color: 'var(--green)' },
           { label: 'SHOWS IN TOP', value: states[0]?.shows || '—', color: 'var(--cyan)' },
-        ].map((k,i) => (
+        ].map((k, i) => (
           <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
             <div className="kpi-value" style={{ color: k.color }}>{k.value}</div>
             <div className="kpi-label">{k.label}</div>
           </div>
         ))}
       </div>
-      <div className="panel">
-        <div className="panel-title">YOUR STATES RANKED</div>
-        {!states.length ? <div className="empty-state">RATE SOME SHOWS FIRST</div> : states.map((s,i) => {
-          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.35)';
-          return (
-            <div key={s.state} style={{
-              display: 'grid', gridTemplateColumns: '24px 1fr auto auto',
-              alignItems: 'center', gap: 10,
-              padding: '10px 0', borderBottom: i < states.length-1 ? '1px solid rgba(51,255,51,0.06)' : 'none',
-            }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)' }}>{i+1}.</span>
+      <Heatmap data={stateMap} title="MY RATINGS BY STATE" />
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>MY STATES — TAP TO EXPAND</div>
+      {!states.length ? (
+        <div className="empty-state">RATE SOME SHOWS FIRST</div>
+      ) : states.map((s, i) => {
+        const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+        return (
+          <CommExpandCard key={s.state} name={s.state}
+            avg={s.avg || '—'} count={s.shows} countLabel="SHOWS"
+            sub={`${s.shows} shows · top: ${s.topVenue}`}
+            accent={accent}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--white)', letterSpacing: '2px', marginBottom: 2 }}>{s.state}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>Top: {s.topVenue}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>TOP VENUE IN {s.state}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.92rem', color: 'var(--cyan)' }}>{s.topVenue}</div>
               </div>
-              <div style={{ width: 50, height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
-                <div style={{ width: `${Math.min(((parseFloat(s.avg)-3)/2)*100,100)}%`, height: '100%', background: accent, borderRadius: 2 }}/>
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: accent, letterSpacing: 1, textAlign: 'right', minWidth: 32 }}>{s.avg}</div>
+              {s.avg && (
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>YOUR AVG SCORE</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: parseFloat(s.avg) >= 4.7 ? 'var(--orange)' : 'var(--cyan)', textShadow: `0 0 10px ${parseFloat(s.avg) >= 4.7 ? 'rgba(255,102,0,0.5)' : 'rgba(0,255,255,0.5)'}` }}>{s.avg}</div>
+                </div>
+              )}
             </div>
-          );
-        })}
-      </div>
+          </CommExpandCard>
+        );
+      })}
     </div>
   );
 }
-
 
 // ============================================================
 // MY PHRIENDS TAB
