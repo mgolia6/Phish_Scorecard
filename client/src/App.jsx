@@ -2006,6 +2006,9 @@ export default function App() {
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showFirstShowPrompt, setShowFirstShowPrompt] = useState(false);
   const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(132);
+  const stickyHeaderRef = useRef(null);
   const api = useApi();
 
   const showMessage = useCallback((text, type = 'info') => {
@@ -2057,8 +2060,20 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
+  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); setAvatarOpen(false); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
+
+  // Measure sticky header height dynamically
+  useEffect(() => {
+    const el = stickyHeaderRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setHeaderHeight(el.offsetHeight);
+    });
+    ro.observe(el);
+    setHeaderHeight(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
 
   // Navigate from My Shows → Scorecard with a specific show pre-loaded
   const handleRateShow = (showDate) => {
@@ -2185,7 +2200,7 @@ export default function App() {
 
       {/* MOBILE LAYOUT: original header + tabs */}
       <div className="mobile-layout">
-        <div className="mobile-sticky-header">
+        <div className="mobile-sticky-header" ref={stickyHeaderRef}>
           <div className="marquee-bar">
             <span className="marquee-track">
               DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
@@ -2216,7 +2231,25 @@ export default function App() {
             <div className="header-right">
               <div className="header-auth">
                 {user ? (
-                  <><span className="user-badge">◈ {user.username}</span><button className="btn-danger" onClick={handleLogout}>LOGOUT</button></>
+                  <div className="avatar-wrap">
+                    <button
+                      className="avatar-btn"
+                      onClick={() => setAvatarOpen(o => !o)}
+                      aria-label="Account menu"
+                    >
+                      {user.username.slice(0,2).toUpperCase()}
+                    </button>
+                    {avatarOpen && (
+                      <>
+                        <div className="avatar-backdrop" onClick={() => setAvatarOpen(false)} />
+                        <div className="avatar-menu">
+                          <div className="avatar-menu-user">◈ {user.username}</div>
+                          <button className="avatar-menu-item" onClick={() => { setTab('profile'); setAvatarOpen(false); }}>PROFILE</button>
+                          <button className="avatar-menu-item avatar-menu-signout" onClick={handleLogout}>SIGN OUT</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 ) : (
                   <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
                 )}
@@ -2243,7 +2276,7 @@ export default function App() {
             </div>
           )}
         </div>
-        <div className="mobile-scroll-body">
+        <div className="mobile-scroll-body" style={{ paddingTop: headerHeight }}>
           <div className="container">
             {renderMain(true)}
           </div>
