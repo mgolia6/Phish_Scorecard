@@ -59,6 +59,14 @@
 - [ ] Desktop layout UAT — full walkthrough with new nav, sidebar, all sub-tabs
 - [ ] Deep Phreeze tab — stat lover section: longest song rated, highest single rating, most versions heard, biggest set gap, most complete show, rarest song, longest attendance streak, longest gap between shows
 
+- [ ] **OTD Vibe Check — Anthropic proxy** — AI review synthesis calls Anthropic directly from browser (works in Claude.ai artifacts, fails on standalone deploy). Need: (1) add `ANTHROPIC_API_KEY` to Vercel env vars from console.anthropic.com, (2) `npm install @anthropic-ai/sdk`, (3) create `/api/ai/vibe-check.js` proxy endpoint, (4) update OTDCard to call `/api/ai/vibe-check` instead of hitting Anthropic directly.
+
+- [ ] **Nav overhaul** — Tab order becomes MY PHREEZER | COMMUNITY | SCORECARD. My Phreezer is the home for returning users. Smart default: if user has no shows, land on Scorecard; if they have shows, land on My Phreezer. Scorecard moves to utility tab on the right.
+
+- [ ] **Scorecard as full-screen overlay** — Any RATE button in the app (My Shows, OTD card, Community, phriend overlap) opens Scorecard as a full-screen overlay with ◀ BACK button instead of navigating away. User stays in context. Overlay slides in, X/back returns to origin. Scorecard tab still works for direct nav. All `setTab('scorecard')` + `setRateShowDate()` calls replaced with `openScorecardOverlay(date)`.
+
+- [ ] **Avatar menu cleanup** — Currently: PROFILE / SUPPORT THE PHREEZER / SIGN OUT. Simplify: avatar opens ProfileModal directly (no dropdown). Support link lives in Profile modal Settings tab only. Sign out in Profile modal Settings tab only. Removes one tap and clutter from the header.
+
 ---
 
 ## POST-LAUNCH (after July 4)
