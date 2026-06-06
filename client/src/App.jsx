@@ -739,10 +739,10 @@ function KPICards({ api }) {
 
   return (
     <div className="kpi-section">
-      <div className="kpi-row">
+      <div className="kpi-grid">
         {cards.map(c => (
-          <div key={c.label} className="kpi-card">
-            <div className={`kpi-value kpi-${c.color}`}>{c.value}</div>
+          <div key={c.label} className="kpi-card" style={{ borderTopColor: `var(--${c.color})` }}>
+            <div className={`kpi-value`} style={{ color: `var(--${c.color})` }}>{c.value}</div>
             <div className="kpi-label">{c.label}</div>
           </div>
         ))}
@@ -754,15 +754,15 @@ function KPICards({ api }) {
       )}
       {kpi.top_song && (
         <div className="kpi-highlights">
-          <span className="kpi-highlight-item">
+          <div className="kpi-highlight-item">
             <span className="kpi-hl-label">TOP SONG</span>
             <span className="kpi-hl-val">{kpi.top_song.song_name} <span className="kpi-hl-score">({kpi.top_song.avg})</span></span>
-          </span>
+          </div>
           {kpi.top_venue && (
-            <span className="kpi-highlight-item">
+            <div className="kpi-highlight-item">
               <span className="kpi-hl-label">MOST VISITED</span>
               <span className="kpi-hl-val">{kpi.top_venue.venue} <span className="kpi-hl-score">({kpi.top_venue.shows}x)</span></span>
-            </span>
+            </div>
           )}
         </div>
       )}
@@ -1661,7 +1661,7 @@ function ProfileTab({ api, user }) {
 // ============================================================
 // COMMUNITY TAB — Leaderboard
 // ============================================================
-function CommunityTab({ api }) {
+function CommunityTab({ api, subTab = "leaderboard" }) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -1672,7 +1672,25 @@ function CommunityTab({ api }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <FullPageLoader text="LOADING LEADERBOARD..." />;
+  if (loading) return <FullPageLoader text="LOADING..." />;
+
+  // Non-leaderboard sub-tabs — stubs until Phase 3 builds them out
+  if (subTab !== 'leaderboard') {
+    const labels = {
+      'top-shows':  'TOP SHOWS',
+      'top-songs':  'TOP SONGS',
+      'top-venues': 'TOP VENUES',
+      'top-states': 'TOP STATES',
+    };
+    return (
+      <div className="panel">
+        <div className="panel-title">{labels[subTab] || subTab.toUpperCase()}</div>
+        <div className="empty-state" style={{ marginTop: 24 }}>
+          COMING SOON — PHASE 3
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="panel">
@@ -1680,31 +1698,33 @@ function CommunityTab({ api }) {
       {!rows.length ? (
         <div className="lb-empty">NO DATA YET — RATE SOME SHOWS</div>
       ) : (
-        <>
-          <div className="leaderboard-header-row">
-            <div className="lb-col-label">#</div>
-            <div className="lb-col-label">USER</div>
-            <div className="lb-col-label">ATTENDED</div>
-            <div className="lb-col-label">RATED</div>
-            <div className="lb-col-label">AVG</div>
-            <div className="lb-col-label lb-streak-col">STREAK</div>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {rows.map(row => (
-            <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}>
-              <div className={`lb-rank ${row.rank <= 3 ? 'top3' : ''}`}>
-                {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : `#${row.rank}`}
-              </div>
-              <div className="lb-username">
-                {row.username}
-                {row.is_me && <span className="lb-me-tag">YOU</span>}
-              </div>
-              <div className="lb-val cyan">{row.shows_attended}</div>
-              <div className="lb-val orange">{row.shows_rated}</div>
-              <div className="lb-val green">{row.avg_score ?? '—'}</div>
-              <div className="lb-val lb-streak-col">{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</div>
+            <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '28px 1fr auto auto auto',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '11px 14px',
+                borderBottom: '1px solid rgba(51,255,51,0.06)',
+                borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none',
+                background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent',
+              }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem',
+                color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>
+                {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem',
+                color: row.is_me ? 'var(--cyan)' : 'var(--white)' }}>
+                {row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.45rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>{row.shows_rated}</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--orange)', letterSpacing: 1 }}>{row.avg_score ?? '—'}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'var(--text-label)' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
             </div>
           ))}
-        </>
+        </div>
       )}
     </div>
   );
