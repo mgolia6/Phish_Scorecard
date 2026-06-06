@@ -15,8 +15,6 @@ export default async function handler(req, res) {
       `SELECT
         TO_CHAR(a.show_date, 'YYYY-MM-DD') as show_date,
         a.venue, a.city, a.state, a.country, a.source,
-        s.tour_name,
-        s.pnet_score as phishnet_score,
         ROUND(AVG(r.rating)::numeric, 2) as phreezer_avg,
         COUNT(DISTINCT r.id) as songs_rated,
         JSON_AGG(
@@ -30,11 +28,10 @@ export default async function handler(req, res) {
           ORDER BY ur.posted_date ASC
         ) FILTER (WHERE ur.id IS NOT NULL) as reviews
        FROM attendance a
-       LEFT JOIN shows s ON s.show_date = a.show_date
        LEFT JOIN ratings r ON r.user_id = a.user_id AND r.show_date = a.show_date
        LEFT JOIN user_reviews ur ON ur.user_id = a.user_id AND ur.show_date = a.show_date
        WHERE a.user_id = $1
-       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source, s.tour_name, s.pnet_score
+       GROUP BY a.show_date, a.venue, a.city, a.state, a.country, a.source
        ORDER BY a.show_date DESC`,
       [user.id]
     );
