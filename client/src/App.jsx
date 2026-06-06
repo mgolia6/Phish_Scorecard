@@ -3512,7 +3512,7 @@ function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
 // ROOT APP
 // ============================================================
 export default function App() {
-  const [tab, setTab] = useState('scorecard');
+  const [tab, setTab] = useState('scorecard'); // will be overridden on user load
   const [user, setUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -3525,8 +3525,11 @@ export default function App() {
   const [pendingImportOnMyShows, setPendingImportOnMyShows] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showFirstShowPrompt, setShowFirstShowPrompt] = useState(false);
-  const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
-  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [rateShowDate, setRateShowDate] = useState(null);
+  // Scorecard overlay — replaces tab navigation for rating
+  const [scorecardOverlay, setScorecardOverlay] = useState(false);
+  const [scorecardOverlayDate, setScorecardOverlayDate] = useState(null);
+  const [scorecardOverlayOrigin, setScorecardOverlayOrigin] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(132);
   const stickyHeaderRef = useRef(null);
@@ -3545,6 +3548,8 @@ export default function App() {
     if (!token) return;
     api.get('/auth/me').then(u => {
       setUser(u);
+      // Smart default: My Shows for returning users, Scorecard for new
+      setTab(u.onboarding_complete ? 'my-shows' : 'scorecard');
       if (!u.tandc_accepted) {
         setShowTandC(true);
       } else if (!sessionStorage.getItem('phreezer_welcomed')) {
@@ -3581,7 +3586,7 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); setAvatarOpen(false); };
+  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   // Measure sticky header height dynamically
@@ -3596,10 +3601,17 @@ export default function App() {
     return () => ro.disconnect();
   }, []);
 
-  // Navigate from My Shows → Scorecard with a specific show pre-loaded
+  // Open scorecard as overlay — keeps user in their current tab
   const handleRateShow = (showDate) => {
-    setRateShowDate(showDate);
-    setTab('scorecard');
+    setScorecardOverlayDate(showDate);
+    setScorecardOverlayOrigin(tab);
+    setScorecardOverlay(true);
+  };
+
+  const closeScorecardOverlay = () => {
+    setScorecardOverlay(false);
+    setScorecardOverlayDate(null);
+    setScorecardOverlayOrigin(null);
   };
 
   // After onboarding, navigate to My Shows with import panel open
@@ -3626,7 +3638,7 @@ export default function App() {
       await api.post('/auth/accept?field=onboarding', {});
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
-    setTab('scorecard');
+    setTab('scorecard'); // New users go to scorecard to rate their first show
   };
 
   const handleOnboardingComplete = async () => {
@@ -3761,27 +3773,14 @@ export default function App() {
             <div className="header-right">
               <div className="header-auth">
                 {user ? (
-                  <div className="avatar-wrap">
-                    <button
-                      className="avatar-btn"
-                      onClick={() => setAvatarOpen(o => !o)}
-                      aria-label="Account menu"
-                      style={{ fontSize: user.avatar_icon ? '1.1rem' : undefined }}
-                    >
-                      {user.avatar_icon || user.username.slice(0,2).toUpperCase()}
-                    </button>
-                    {avatarOpen && (
-                      <>
-                        <div className="avatar-backdrop" onClick={() => setAvatarOpen(false)} />
-                        <div className="avatar-menu">
-                          <div className="avatar-menu-user">◈ {user.username}</div>
-                          <button className="avatar-menu-item" onClick={() => { setShowProfileModal(true); setAvatarOpen(false); }}>PROFILE</button>
-                          <a className="avatar-menu-item" href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer" style={{ display:'block', textDecoration:'none', color:'var(--orange)' }}>◈ SUPPORT THE PHREEZER</a>
-                          <button className="avatar-menu-item avatar-menu-signout" onClick={handleLogout}>SIGN OUT</button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  <button
+                    className="avatar-btn"
+                    onClick={() => setShowProfileModal(true)}
+                    aria-label="Profile"
+                    style={{ fontSize: user.avatar_icon ? '1.1rem' : undefined }}
+                  >
+                    {user.avatar_icon || user.username.slice(0,2).toUpperCase()}
+                  </button>
                 ) : (
                   <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
                 )}
@@ -3789,11 +3788,11 @@ export default function App() {
             </div>
           </header>
           <nav className="tab-nav">
-            <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
             {user && <>
               <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','my-phriends','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
               <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
             </>}
+            <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
           </nav>
           {user && ['my-shows','my-songs','my-venues','my-states','my-phriends','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
@@ -3823,6 +3822,43 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
+      {/* Scorecard overlay — full screen, preserves tab context */}
+      {scorecardOverlay && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 400,
+          background: 'var(--bg)', overflowY: 'auto',
+          display: 'flex', flexDirection: 'column',
+        }}>
+          {/* Back bar */}
+          <div style={{
+            position: 'sticky', top: 0, zIndex: 10,
+            background: 'var(--bg)', borderBottom: '1px solid rgba(51,255,51,0.15)',
+            padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <button onClick={closeScorecardOverlay} style={{
+              background: 'transparent', border: '1px solid rgba(51,255,51,0.25)',
+              color: 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.48rem',
+              letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>◀ BACK</button>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>
+              SCORECARD
+            </span>
+          </div>
+          {/* Scorecard content */}
+          <div style={{ flex: 1, padding: '12px 12px 100px' }}>
+            <ScorecardTab
+              api={api}
+              showMessage={showMessage}
+              showError={showError}
+              onAuthRequired={() => openAuth('login')}
+              initialShowDate={scorecardOverlayDate}
+              onShowLoaded={() => setScorecardOverlayDate(null)}
+            />
+          </div>
+        </div>
+      )}
+
       {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
 
       {showFirstShowPrompt && (
@@ -3839,7 +3875,8 @@ export default function App() {
                 style={{ width: '100%', padding: '13px' }}
                 onClick={() => {
                   setShowFirstShowPrompt(false);
-                  setTab('scorecard');
+                  setScorecardOverlay(true);
+                  setScorecardOverlayOrigin('my-shows');
                 }}
               >
                 ◈ RATE MY FIRST SHOW
