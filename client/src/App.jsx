@@ -571,7 +571,10 @@ function filterByQuery(shows, q) {
 function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }) {
   const navItems = [
     { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
-    { id: 'my-shows', label: 'MY SHOWS', glyph: '◉', section: null, authRequired: true },
+    { id: 'my-shows',  label: 'MY SHOWS',  glyph: '◉', section: null, authRequired: true },
+    { id: 'my-songs',  label: 'MY SONGS',  glyph: '♪', section: null, authRequired: true },
+    { id: 'my-venues', label: 'MY VENUES', glyph: '⌖', section: null, authRequired: true },
+    { id: 'my-states', label: 'MY STATES', glyph: '⬡', section: null, authRequired: true },
     { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
     { id: 'community', label: 'LEADERBOARD', glyph: '★', section: 'COMMUNITY' },
   ];
@@ -1992,6 +1995,104 @@ function AdminTab({ api, showMessage, showError }) {
   );
 }
 
+
+// ============================================================
+// MY SONGS TAB — stub (Phase 2)
+// ============================================================
+function MySongsTab({ api, showMessage, showError }) {
+  return (
+    <div className="panel">
+      <div className="panel-title">MY SONGS</div>
+      <div className="loading">LOADING YOUR SONG DATA...</div>
+    </div>
+  );
+}
+
+// ============================================================
+// MY VENUES TAB — stub (Phase 2)
+// ============================================================
+function MyVenuesTab({ api, showMessage, showError }) {
+  return (
+    <div className="panel">
+      <div className="panel-title">MY VENUES</div>
+      <div className="loading">LOADING YOUR VENUE DATA...</div>
+    </div>
+  );
+}
+
+// ============================================================
+// MY STATES TAB — stub (Phase 2)
+// ============================================================
+function MyStatesTab({ api, showMessage, showError }) {
+  return (
+    <div className="panel">
+      <div className="panel-title">MY STATES</div>
+      <div className="loading">LOADING YOUR STATE DATA...</div>
+    </div>
+  );
+}
+
+
+// ============================================================
+// PROFILE MODAL — launched from avatar (Phase 1)
+// ============================================================
+function ProfileModal({ user, api, onClose }) {
+  const [sec, setSec] = React.useState('info');
+
+  return (
+    <div className="profile-modal" onClick={onClose}>
+      <div className="profile-modal-inner" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="profile-modal-header">
+          <div style={{ fontFamily:'var(--font-display)', fontSize:'0.62rem', color:'var(--cyan)', letterSpacing:'3px' }}>◈ PROFILE</div>
+          <button onClick={onClose} style={{ background:'transparent', border:'1px solid rgba(51,255,51,0.25)', color:'var(--text-label)', fontFamily:'var(--font-display)', fontSize:'0.52rem', letterSpacing:'2px', padding:'5px 10px', cursor:'pointer' }}>
+            ✕ CLOSE
+          </button>
+        </div>
+        {/* Identity hero */}
+        <div className="profile-modal-hero">
+          <div className="profile-username-label">USERNAME</div>
+          <div className="profile-username">{user?.username}</div>
+          <div className="profile-email">{user?.email}</div>
+        </div>
+        {/* Section tabs */}
+        <div className="profile-modal-tabs">
+          {[['info','INFO'],['badges','BADGES'],['settings','SETTINGS']].map(([k,l]) => (
+            <button key={k} onClick={() => setSec(k)}
+              className={`profile-modal-tab ${sec === k ? 'active' : ''}`}>{l}</button>
+          ))}
+        </div>
+        {/* Body */}
+        <div className="profile-modal-body">
+          {sec === 'info' && (
+            <div className="panel" style={{ marginBottom: 12 }}>
+              <div className="profile-section">
+                <div className="profile-field-row"><div className="profile-field-label">PHISH.NET HANDLE</div><div className="profile-field-val">{user?.phishnet_username || '—'}</div></div>
+                <div className="profile-field-row"><div className="profile-field-label">FAVORITE SONG</div><div className="profile-field-val">{user?.favorite_song || '—'}</div></div>
+                <div className="profile-field-row"><div className="profile-field-label">FAVORITE VENUE</div><div className="profile-field-val">{user?.favorite_venue || '—'}</div></div>
+                <div className="profile-field-row"><div className="profile-field-label">FIRST SHOW</div><div className="profile-field-val">{user?.favorite_show_date || '—'}</div></div>
+              </div>
+            </div>
+          )}
+          {sec === 'badges' && (
+            <div className="empty-state">BADGES COMING IN PHASE 2</div>
+          )}
+          {sec === 'settings' && (
+            <div>
+              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+                  className="btn-glow-cyan" style={{ marginBottom:8 }}>◈ SUPPORT THE PHREEZER</a>
+                <button className="btn-glow-orange" style={{ marginBottom:8 }}>✎ EDIT PROFILE</button>
+                <button className="btn-glow-red">SIGN OUT</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============================================================
 // ROOT APP
 // ============================================================
@@ -2011,6 +2112,7 @@ export default function App() {
   const [showFirstShowPrompt, setShowFirstShowPrompt] = useState(false);
   const [rateShowDate, setRateShowDate] = useState(null); // set when navigating from My Shows to Scorecard
   const [avatarOpen, setAvatarOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(132);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
@@ -2142,9 +2244,16 @@ export default function App() {
           openImportOnMount={pendingImportOnMyShows}
         />
       )}
-      {tab === 'analytics' && user && <AnalyticsTab api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'community' && <CommunityTab api={api} />}
-      {tab === 'profile' && user && <ProfileTab api={api} user={user} />}
+      {tab === 'analytics'  && user && <AnalyticsTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-songs'   && user && <MySongsTab   api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-venues'  && user && <MyVenuesTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-states'  && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'community'  && <CommunityTab  api={api} subTab="leaderboard" />}
+      {tab === 'top-shows'  && <CommunityTab  api={api} subTab="top-shows"   />}
+      {tab === 'top-songs'  && <CommunityTab  api={api} subTab="top-songs"   />}
+      {tab === 'top-venues' && <CommunityTab  api={api} subTab="top-venues"  />}
+      {tab === 'top-states' && <CommunityTab  api={api} subTab="top-states"  />}
+      {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
   );
@@ -2248,7 +2357,7 @@ export default function App() {
                         <div className="avatar-backdrop" onClick={() => setAvatarOpen(false)} />
                         <div className="avatar-menu">
                           <div className="avatar-menu-user">◈ {user.username}</div>
-                          <button className="avatar-menu-item" onClick={() => { setTab('profile'); setAvatarOpen(false); }}>PROFILE</button>
+                          <button className="avatar-menu-item" onClick={() => { setShowProfileModal(true); setAvatarOpen(false); }}>PROFILE</button>
                           <button className="avatar-menu-item avatar-menu-signout" onClick={handleLogout}>SIGN OUT</button>
                         </div>
                       </>
@@ -2263,20 +2372,25 @@ export default function App() {
           <nav className="tab-nav">
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
             {user && <>
-              <button className={`tab-btn ${['my-shows','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
-              <button className={`tab-btn ${['community','leaderboard'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
-              <button className={`tab-btn ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>PROFILE</button>
+              <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
+              <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
             </>}
           </nav>
-          {user && ['my-shows','analytics'].includes(tab) && (
+          {user && ['my-shows','my-songs','my-venues','my-states','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
-              <button className={`sub-tab-btn ${tab === 'my-shows' ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
-              <button className={`sub-tab-btn ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>ANALYTICS</button>
+              <button className={`sub-tab-btn ${tab === 'my-shows'  ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
+              <button className={`sub-tab-btn ${tab === 'my-songs'  ? 'active' : ''}`} onClick={() => setTab('my-songs')}>MY SONGS</button>
+              <button className={`sub-tab-btn ${tab === 'my-venues' ? 'active' : ''}`} onClick={() => setTab('my-venues')}>MY VENUES</button>
+              <button className={`sub-tab-btn ${tab === 'my-states' ? 'active' : ''}`} onClick={() => setTab('my-states')}>MY STATES</button>
             </div>
           )}
-          {user && ['community','leaderboard'].includes(tab) && (
+          {['community','leaderboard','top-shows','top-songs','top-venues','top-states'].includes(tab) && (
             <div className="sub-tab-nav">
-              <button className={`sub-tab-btn ${tab === 'community' ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+              <button className={`sub-tab-btn ${tab === 'community'   ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+              <button className={`sub-tab-btn ${tab === 'top-shows'   ? 'active' : ''}`} onClick={() => setTab('top-shows')}>TOP SHOWS</button>
+              <button className={`sub-tab-btn ${tab === 'top-songs'   ? 'active' : ''}`} onClick={() => setTab('top-songs')}>TOP SONGS</button>
+              <button className={`sub-tab-btn ${tab === 'top-venues'  ? 'active' : ''}`} onClick={() => setTab('top-venues')}>TOP VENUES</button>
+              <button className={`sub-tab-btn ${tab === 'top-states'  ? 'active' : ''}`} onClick={() => setTab('top-states')}>TOP STATES</button>
             </div>
           )}
         </div>
@@ -2288,6 +2402,7 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
+      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} />}
 
       {showFirstShowPrompt && (
         <div className="modal-overlay" style={{ zIndex: 750 }}>
