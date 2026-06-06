@@ -3547,17 +3547,36 @@ export default function App() {
     const token = localStorage.getItem('phish_token');
     if (!token) return;
 
-    // Use raw fetch — never clear token unless server explicitly returns 401
+    // Decode JWT payload client-side as immediate fallback (no signature verify — just for UI state)
+    const tryDecodeToken = (t) => {
+      try {
+        const payload = JSON.parse(atob(t.split('.')[1]));
+        // Check not expired
+        if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+        return payload;
+      } catch { return null; }
+    };
+
+    // Set user from token immediately so UI doesn't flash logged-out
+    const decoded = tryDecodeToken(token);
+    if (decoded) {
+      setUser({ id: decoded.id, email: decoded.email, is_admin: !!decoded.is_admin });
+      setTab('my-shows');
+    }
+
+    // Then verify with server and get full user object
     fetch(`${API}/auth/me`, {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
     }).then(async res => {
       if (res.status === 401) {
-        // Explicit auth rejection — token is invalid, clear it
+        // Explicit auth rejection — token is invalid
         localStorage.removeItem('phish_token');
+        setUser(null);
+        setTab('scorecard');
         return;
       }
       if (!res.ok) {
-        // Server error, cold start, network issue — keep token, try again next load
+        // Server error / cold start — keep decoded user, try again next load
         return;
       }
       const u = await res.json();
@@ -3570,7 +3589,7 @@ export default function App() {
         setShowWelcome(true);
       }
     }).catch(() => {
-      // Network failure — keep token, user stays logged in
+      // Network failure — keep decoded user from token, stay logged in
     });
   }, []);
 
