@@ -3554,7 +3554,16 @@ export default function App() {
         setUser(null);
         return;
       }
-      if (!res.ok) return; // cold start / 500 — keep token, stay logged in
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        // Show error in page title temporarily for mobile debugging
+        document.title = `AUTH ERR ${res.status}: ${err.debug || err.error || 'unknown'}`;
+        if (res.status === 401) {
+          localStorage.removeItem('phish_token');
+          setUser(null);
+        }
+        return;
+      }
       const u = await res.json();
       setUser(u);
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
