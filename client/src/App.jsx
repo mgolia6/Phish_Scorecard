@@ -949,7 +949,7 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
       setCurrentShow(showData);
       setPhriends(phriendData || { tagged: [], also_attended: [] });
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
-      const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : 'listened';
+      const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : null;
       setAttendanceType(savedAttendance);
       const rMap = {};
       for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
@@ -1223,8 +1223,8 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
             </div>
           </div>
 
-          {/* ── PHRIENDS AT THIS SHOW — only when attended ── */}
-          {attendanceType === 'attended' && (
+          {/* ── PHRIENDS AT THIS SHOW — when attended, or when phriends already tagged ── */}
+          {(attendanceType === 'attended' || phriends.tagged.length > 0) && (
             <div style={{
               border: '1px solid rgba(0,224,208,0.28)',
               background: 'linear-gradient(135deg, rgba(0,224,208,0.04), rgba(5,18,5,0.98))',
