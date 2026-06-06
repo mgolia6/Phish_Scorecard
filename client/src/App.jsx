@@ -1327,6 +1327,7 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
     if (filterBy === 'has_review') return Array.isArray(show.reviews) && show.reviews.length > 0;
     if (filterBy === 'has_phreezer') return show.phreezer_avg != null;
     if (filterBy === 'no_phreezer') return show.phreezer_avg == null;
+    if (filterBy === 'favorites') return show.favorited;
     return true;
   });
 
@@ -1394,7 +1395,7 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
         {/* Filter pills */}
         {activeView === 'attended' && (
           <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-            {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED']].map(([k,l]) => (
+            {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED'],['favorites','★ FAV']].map(([k,l]) => (
               <button key={k} onClick={() => setFilterBy(k)} style={{
                 padding: '6px 10px',
                 border: `1px solid ${filterBy === k ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
@@ -1416,6 +1417,29 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
           </div>
         )}
       </div>
+
+      {/* On This Day */}
+      {(() => {
+        const today = new Date();
+        const todayStr = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+        const otdShow = attended.find(s => s.show_date && s.show_date.slice(5) === todayStr);
+        if (!otdShow) return null;
+        const scoreColor = otdShow.phreezer_avg >= 4.7 ? 'var(--orange)' : otdShow.phreezer_avg ? 'var(--cyan)' : 'var(--text-muted)';
+        return (
+          <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderTop: '2px solid var(--cyan)', borderLeft: '3px solid var(--cyan)', padding: '12px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '2px', marginBottom: 5 }}>◈ ON THIS DAY</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: 'var(--white)', marginBottom: 2 }}>{formatDate(otdShow.show_date)} · {otdShow.venue}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>
+                {otdShow.phreezer_avg ? <>Your score: <span style={{ color: scoreColor }}>{otdShow.phreezer_avg}</span></> : 'Not yet rated'}
+                {' · '}{new Date().getFullYear() - parseInt(otdShow.show_date)} years ago
+              </div>
+            </div>
+            <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none', boxShadow: '0 0 8px rgba(0,255,255,0.2)', flexShrink: 0 }}>▶</a>
+          </div>
+        );
+      })()}
 
       {showImport && (
         <div className="import-panel">
@@ -1513,6 +1537,11 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
                       style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, lineHeight: 1, color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.4)', transition: 'all 0.2s' }}
                       title="My review">✎</button>
                   )}
+                  <button
+                    onClick={() => setShows(ss => ss.map(s2 => s2.show_date === show.show_date ? { ...s2, favorited: !s2.favorited } : s2))}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, lineHeight: 1, color: show.favorited ? 'var(--orange)' : 'rgba(51,255,51,0.2)', filter: show.favorited ? 'drop-shadow(0 0 4px rgba(255,102,0,0.7))' : 'none', transition: 'all 0.2s' }}
+                    title={show.favorited ? 'Unfavorite' : 'Favorite'}
+                  >{show.favorited ? '★' : '☆'}</button>
                   <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
                     style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,255,255,0.38)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.6rem', textDecoration: 'none', paddingLeft: 2, boxShadow: '0 0 4px rgba(0,255,255,0.15)' }}
                     title="Stream on Phish.in">▶</a>
@@ -1702,75 +1731,271 @@ function ProfileTab({ api, user }) {
 }
 
 // ============================================================
-// COMMUNITY TAB — Leaderboard
+// COMMUNITY HELPERS
+// ============================================================
+function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', accent = 'var(--cyan)', children }) {
+  const [open, setOpen] = useState(false);
+  const scoreColor = parseFloat(avg) >= 4.7 ? 'var(--orange)' : 'var(--cyan)';
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderLeft: `3px solid ${accent}` }}>
+        <div style={{ padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+            {sub && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', color: scoreColor, textShadow: `0 0 12px ${scoreColor}55`, letterSpacing: 1, lineHeight: 1 }}>{avg}</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{count} {countLabel}</div>
+            </div>
+            <button onClick={() => setOpen(o => !o)} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>
+              {open ? '▲' : '▼'}
+            </button>
+          </div>
+        </div>
+        {open && (
+          <div style={{ borderTop: '1px solid rgba(51,255,51,0.07)', padding: '12px 14px', background: 'var(--bg-elevated)' }}>
+            {children}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CommShowRows({ shows, label = 'TOP SHOWS' }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
+      {shows.map((s, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+          <a href={`https://phish.in/${s.show_date}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', flex: 1 }}>{formatDate(s.show_date)}</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(s.avg_score) >= 4.9 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.avg_score}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommVersionRows({ versions, label = 'TOP VERSIONS' }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
+      {versions.map((v, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < versions.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+          <a href={`https://phish.in/${v.show_date}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>{formatDate(v.show_date)}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{v.venue}{v.city ? `, ${v.city}` : ''}</div>
+          </div>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(v.avg_score) >= 4.9 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1, flexShrink: 0 }}>{v.avg_score}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommSongRows({ songs, label = 'TOP SONGS IN THIS SHOW' }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
+      {songs.map((s, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < songs.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', flex: 1 }}>{s.song_name}</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(s.avg_score) >= 4.9 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.avg_score}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommStateRows({ states, label = 'STATE RANKINGS' }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
+      {states.map((s, i) => (
+        <div key={s.state} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < states.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', minWidth: 22 }}>{i + 1}.</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--white)', letterSpacing: '2px', marginBottom: 2 }}>{s.state}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>Top: {s.top_venue} · {s.show_count} shows</div>
+          </div>
+          <div style={{ width: 50, height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
+            <div style={{ width: `${Math.min(((parseFloat(s.avg_score) - 3) / 2) * 100, 100)}%`, height: '100%', background: i === 0 ? 'var(--orange)' : 'var(--cyan)', borderRadius: 2 }} />
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: i === 0 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1, textAlign: 'right', minWidth: 36 }}>{s.avg_score}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommKPIGrid({ items }) {
+  return (
+    <div className="kpi-grid" style={{ marginBottom: 14 }}>
+      {items.map((k, i) => (
+        <div key={i} className="kpi-card" style={{ borderTopColor: k.color }}>
+          <div className="kpi-value" style={{ color: k.color, fontSize: k.small ? '0.72rem' : '1.55rem', lineHeight: 1.2, textAlign: 'center', wordBreak: 'break-word' }}>{k.value}</div>
+          <div className="kpi-label">{k.label}</div>
+          {k.sub && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', textAlign: 'center' }}>{k.sub}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================
+// COMMUNITY TAB — all sub-tabs
 // ============================================================
 function CommunityTab({ api, subTab = "leaderboard" }) {
-  const [rows, setRows] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [topShows, setTopShows] = useState(null);
+  const [topSongs, setTopSongs] = useState(null);
+  const [topVenues, setTopVenues] = useState(null);
+  const [topStates, setTopStates] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/community/leaderboard')
-      .then(setRows)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    setLoading(true);
+    let req;
+    if (subTab === 'leaderboard') req = api.get('/community/leaderboard').then(setLeaderboard);
+    else if (subTab === 'top-shows')  req = api.get('/community/top-shows').then(setTopShows);
+    else if (subTab === 'top-songs')  req = api.get('/community/top-songs').then(setTopSongs);
+    else if (subTab === 'top-venues') req = api.get('/community/top-venues').then(setTopVenues);
+    else if (subTab === 'top-states') req = api.get('/community/top-states').then(setTopStates);
+    if (req) req.catch(() => {}).finally(() => setLoading(false));
+    else setLoading(false);
+  }, [subTab]);
 
   if (loading) return <FullPageLoader text="LOADING..." />;
 
-  // Non-leaderboard sub-tabs — stubs until Phase 3 builds them out
-  if (subTab !== 'leaderboard') {
-    const labels = {
-      'top-shows':  'TOP SHOWS',
-      'top-songs':  'TOP SONGS',
-      'top-venues': 'TOP VENUES',
-      'top-states': 'TOP STATES',
-    };
+  // ── LEADERBOARD ──────────────────────────────────────────
+  if (subTab === 'leaderboard') {
     return (
       <div className="panel">
-        <div className="panel-title">{labels[subTab] || subTab.toUpperCase()}</div>
-        <div className="empty-state" style={{ marginTop: 24 }}>
-          COMING SOON — PHASE 3
-        </div>
+        <div className="panel-title">LEADERBOARD</div>
+        {!leaderboard.length ? (
+          <div className="lb-empty">NO DATA YET — RATE SOME SHOWS</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {leaderboard.map(row => (
+              <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
+                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto', alignItems: 'center', gap: '10px', padding: '11px 14px', borderBottom: '1px solid rgba(51,255,51,0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>
+                  {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}
+                </span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)' }}>
+                  {row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.45rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}
+                </span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>{row.shows_rated}</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--orange)', letterSpacing: 1 }}>{row.avg_score ?? '—'}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'var(--text-label)' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
 
-  return (
-    <div className="panel">
-      <div className="panel-title">LEADERBOARD</div>
-      {!rows.length ? (
-        <div className="lb-empty">NO DATA YET — RATE SOME SHOWS</div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {rows.map(row => (
-            <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '28px 1fr auto auto auto',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '11px 14px',
-                borderBottom: '1px solid rgba(51,255,51,0.06)',
-                borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none',
-                background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent',
-              }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem',
-                color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>
-                {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}
-              </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem',
-                color: row.is_me ? 'var(--cyan)' : 'var(--white)' }}>
-                {row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.45rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}
-              </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>{row.shows_rated}</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--orange)', letterSpacing: 1 }}>{row.avg_score ?? '—'}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'var(--text-label)' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
+  // ── TOP SHOWS ─────────────────────────────────────────────
+  if (subTab === 'top-shows') {
+    const s = topShows?.stats;
+    return (
+      <div>
+        <CommKPIGrid items={[
+          { label: 'SHOWS COVERED', value: s?.shows_covered || '—', color: 'var(--cyan)' },
+          { label: 'OVERALL AVG', value: s?.overall_avg || '—', color: 'var(--orange)' },
+          { label: 'MOST RATED', value: s?.most_rated?.raters ? `${s.most_rated.raters} RATERS` : '—', color: 'var(--green)', small: true },
+          { label: 'TOP SHOW', value: s?.most_rated?.show_date ? formatDate(s.most_rated.show_date) : '—', color: 'var(--cyan)', small: true },
+        ]} />
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>TOP RATED SHOWS — TAP FOR SONGS</div>
+        {(topShows?.shows || []).map((show, i) => (
+          <CommExpandCard key={show.show_date} name={formatDate(show.show_date)}
+            sub={`${show.venue}${show.city ? ` · ${show.city}` : ''}${show.state ? `, ${show.state}` : ''} · ${show.rater_count} raters`}
+            avg={show.avg_score} count={show.rater_count} countLabel="RATERS"
+            accent={i === 0 ? 'var(--orange)' : 'var(--cyan)'}>
+            <CommSongRows songs={show.top_songs || []} />
+            <div style={{ marginTop: 12 }}>
+              <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none' }}>▶</a>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </CommExpandCard>
+        ))}
+      </div>
+    );
+  }
+
+  // ── TOP SONGS ─────────────────────────────────────────────
+  if (subTab === 'top-songs') {
+    const s = topSongs?.stats;
+    return (
+      <div>
+        <CommKPIGrid items={[
+          { label: 'SONGS RATED', value: s?.songs_rated || '—', color: 'var(--cyan)' },
+          { label: 'HIGHEST RATED', value: topSongs?.songs?.[0]?.avg_score || '—', color: 'var(--orange)' },
+          { label: 'TOTAL RATINGS', value: s?.total_ratings ? `${(s.total_ratings / 1000).toFixed(1)}K` : '—', color: 'var(--green)' },
+          { label: 'MOST RATED', value: s?.most_rated?.song_name || '—', color: 'var(--cyan)', small: true },
+        ]} />
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>TOP SONGS — TAP FOR TOP VERSIONS</div>
+        {(topSongs?.songs || []).map((song, i) => (
+          <CommExpandCard key={song.song_name} name={song.song_name}
+            sub={`${song.total_ratings} ratings · ${song.unique_raters} raters`}
+            avg={song.avg_score} count={song.total_ratings} countLabel="RATINGS"
+            accent={i === 0 ? 'var(--orange)' : 'var(--cyan)'}>
+            <CommVersionRows versions={song.top_versions || []} />
+          </CommExpandCard>
+        ))}
+      </div>
+    );
+  }
+
+  // ── TOP VENUES ────────────────────────────────────────────
+  if (subTab === 'top-venues') {
+    const s = topVenues?.stats;
+    return (
+      <div>
+        <CommKPIGrid items={[
+          { label: 'VENUES RATED', value: s?.venues_rated || '—', color: 'var(--cyan)' },
+          { label: 'STATES COVERED', value: s?.states_covered || '—', color: 'var(--orange)' },
+          { label: 'TOP VENUE AVG', value: topVenues?.venues?.[0]?.avg_score || '—', color: 'var(--green)' },
+          { label: 'TOP VENUE', value: topVenues?.venues?.[0]?.venue || '—', color: 'var(--cyan)', small: true },
+        ]} />
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>TOP VENUES — TAP FOR TOP SHOWS</div>
+        {(topVenues?.venues || []).map((venue, i) => (
+          <CommExpandCard key={venue.venue} name={venue.venue}
+            sub={`${venue.city ? `${venue.city}, ` : ''}${venue.state || ''} · ${venue.show_count} shows`}
+            avg={venue.avg_score} count={venue.show_count} countLabel="SHOWS"
+            accent={i === 0 ? 'var(--orange)' : i === 1 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)'}>
+            <CommShowRows shows={venue.top_shows || []} />
+          </CommExpandCard>
+        ))}
+      </div>
+    );
+  }
+
+  // ── TOP STATES ────────────────────────────────────────────
+  if (subTab === 'top-states') {
+    const s = topStates?.stats;
+    const states = topStates?.states || [];
+    return (
+      <div>
+        <CommKPIGrid items={[
+          { label: 'STATES COVERED', value: s?.states_covered || '—', color: 'var(--cyan)' },
+          { label: 'TOP STATE', value: s?.top_state?.state || '—', color: 'var(--orange)' },
+          { label: 'TOP STATE AVG', value: s?.top_state?.avg_score || '—', color: 'var(--green)' },
+          { label: 'BOTTOM STATE', value: s?.bottom_state?.state || '—', color: 'var(--cyan)' },
+        ]} />
+        <CommStateRows states={states} />
+      </div>
+    );
+  }
+
+  return null;
 }
 
 
@@ -2247,6 +2472,67 @@ function MyStatesTab({ api, showMessage, showError }) {
 
 
 // ============================================================
+// BADGES SECTION — used in ProfileModal
+// ============================================================
+const ALL_BADGES_DEF = [
+  { id: 'century',    label: 'CENTURY CLUB',    desc: 'Attended 100 shows',     glyph: '💯', color: 'var(--orange)' },
+  { id: 'fifty',      label: 'HALF-CENTURY',    desc: 'Attended 50 shows',      glyph: '★',  color: 'var(--cyan)'   },
+  { id: 'quarter',    label: 'QUARTER-CENTURY', desc: 'Attended 25 shows',      glyph: '◉',  color: 'var(--cyan)'   },
+  { id: 'ten',        label: 'DOUBLE DIGITS',   desc: 'Attended 10 shows',      glyph: '◈',  color: 'var(--cyan)'   },
+  { id: 'rated_100',  label: 'HALL OF PHAME',   desc: 'Rated 100 shows',        glyph: '🏆', color: 'var(--orange)' },
+  { id: 'rated_50',   label: 'ARCHIVIST',       desc: 'Rated 50 shows',         glyph: '⬡',  color: 'var(--green)'  },
+  { id: 'rated_25',   label: 'PHISH SCHOLAR',   desc: 'Rated 25 shows',         glyph: '▦',  color: 'var(--cyan)'   },
+  { id: 'rated_10',   label: 'PHAN OF 10',      desc: 'Rated 10 shows',         glyph: '✦',  color: 'var(--cyan)'   },
+  { id: 'rated_1',    label: 'FIRST PHREEZE',   desc: 'Rated your first show',  glyph: '❄',  color: 'var(--cyan)'   },
+  { id: 'critic',     label: 'PHISH CRITIC',    desc: 'Imported 10+ reviews',   glyph: '✍',  color: 'var(--green)'  },
+  { id: 'reviewer',   label: 'REVIEWER',        desc: 'Imported phish.net reviews', glyph: '✎', color: 'var(--green)' },
+  { id: 'streak_30',  label: 'ON FIRE',         desc: '30-day login streak',    glyph: '🔥', color: 'var(--orange)' },
+  { id: 'streak_7',   label: 'ON A STREAK',     desc: '7-day login streak',     glyph: '⚡', color: 'var(--orange)' },
+];
+
+function BadgesSection({ api }) {
+  const [kpi, setKpi] = useState(null);
+  useEffect(() => { api.get('/user/kpi').then(setKpi).catch(() => {}); }, []);
+
+  if (!kpi) return <div className="empty-state">LOADING BADGES...</div>;
+
+  const earnedIds = new Set((kpi.badges || []).map(b => b.id));
+  const earned = ALL_BADGES_DEF.filter(b => earnedIds.has(b.id));
+  const locked = ALL_BADGES_DEF.filter(b => !earnedIds.has(b.id));
+
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-label)', letterSpacing: '3px', marginBottom: 12 }}>
+        {earned.length} OF {ALL_BADGES_DEF.length} EARNED
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+        {earned.map((b, i) => (
+          <div key={i} style={{ background: 'var(--bg-elevated)', border: `1px solid ${b.color}55`, borderTop: `2px solid ${b.color}`, padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: `0 0 16px ${b.color}22` }}>
+            <span style={{ fontSize: '1.4rem', filter: `drop-shadow(0 0 6px ${b.color}99)` }}>{b.glyph}</span>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: b.color, letterSpacing: '1.5px', textAlign: 'center' }}>{b.label}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-label)', textAlign: 'center', lineHeight: 1.4 }}>{b.desc}</div>
+          </div>
+        ))}
+      </div>
+      {locked.length > 0 && (
+        <>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 8 }}>LOCKED</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {locked.map((b, i) => (
+              <div key={i} style={{ background: 'var(--bg-panel)', border: '1px solid rgba(51,255,51,0.08)', padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, opacity: 0.4 }}>
+                <span style={{ fontSize: '1.4rem', filter: 'grayscale(1)' }}>{b.glyph}</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-label)', letterSpacing: '1.5px', textAlign: 'center' }}>{b.label}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.4 }}>{b.desc}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
 function ProfileModal({ user, api, onClose }) {
@@ -2302,7 +2588,7 @@ function ProfileModal({ user, api, onClose }) {
             </div>
           )}
           {sec === 'badges' && (
-            <div className="empty-state">BADGES COMING IN PHASE 2</div>
+            <BadgesSection api={api} />
           )}
           {sec === 'settings' && (
             <div>
