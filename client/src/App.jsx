@@ -276,7 +276,7 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
       glyph: '◈',
       title: 'KEEP IT GOING',
       sub: 'If the spirit moves you.',
-      body: 'Phreezer will always be free. But it takes real time and real overhead to keep it running. If you like what you see, consider buying a coffee. No pressure. No guilt. Just appreciation if the spirit moves you.',
+      body: 'Phreezer will always be free. But it takes real time and real overhead to keep it running. If you like what you see, consider keeping the Phreezer stocked. No pressure. No guilt. Just appreciation if the spirit moves you.',
       cta: null,
       bmc: true,
     },
@@ -299,14 +299,13 @@ function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecard }) {
         </div>
         {isLast ? (
           <div className="onboarding-actions" style={{ flexDirection: 'column' }}>
-            <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-              className="btn-primary"
-              style={{ width: '100%', padding: '14px', marginBottom: 10, display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box' }}>
-              ☕ BUY A COFFEE
-            </a>
-            <button style={{ width: '100%', padding: '12px' }} onClick={() => { onGoToScorecard(); }}>
+            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10 }} onClick={() => { onGoToScorecard(); }}>
               LET'S GO
             </button>
+            <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+              style={{ width: '100%', padding: '12px', display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px' }}>
+              ☕ KEEP THE PHREEZER STOCKED
+            </a>
           </div>
         ) : (
           <button className="btn-primary" style={{ width: '100%', padding: '12px' }} onClick={() => setStep(s => s + 1)}>
@@ -4037,7 +4036,7 @@ export default function App() {
       await api.post('/auth/accept?field=onboarding', {});
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
-    setTab('scorecard'); // New users go to scorecard to rate their first show
+    setTab('my-shows'); // Go home — My Shows is the landing for returning users
   };
 
   const handleOnboardingComplete = async () => {
