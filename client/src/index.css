@@ -185,6 +185,17 @@ body::before {
 .header-title h1 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; color: var(--orange); text-shadow: var(--glow-orange); letter-spacing: 3px; text-transform: uppercase; line-height: 1; }
 .header-title .tagline { color: var(--cyan); font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 3px; opacity: 0.7; }
 .header-auth { display: flex; align-items: center; gap: 8px; }
+.avatar-wrap { position: relative; }
+.avatar-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--cyan); background: var(--bg-elevated); color: var(--cyan); font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; padding: 0; }
+.avatar-btn:hover, .avatar-btn:focus { border-color: var(--orange); box-shadow: 0 0 8px rgba(255,138,0,0.4); color: var(--orange); background: var(--bg-elevated); }
+.avatar-backdrop { position: fixed; inset: 0; z-index: 299; }
+.avatar-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 300; background: var(--bg-panel); border: 1px solid var(--cyan); min-width: 160px; box-shadow: 0 4px 24px rgba(0,0,0,0.6); }
+.avatar-menu-user { padding: 10px 14px 8px; font-family: var(--font-display); font-size: 0.6rem; color: var(--cyan); letter-spacing: 2px; border-bottom: 1px solid var(--border); opacity: 0.8; }
+.avatar-menu-item { display: block; width: 100%; text-align: left; padding: 11px 14px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--green); font-family: var(--font-display); font-size: 0.65rem; letter-spacing: 2px; cursor: pointer; }
+.avatar-menu-item:last-child { border-bottom: none; }
+.avatar-menu-item:hover { background: rgba(51,255,51,0.06); color: var(--cyan); box-shadow: none; }
+.avatar-menu-signout { color: var(--red); }
+.avatar-menu-signout:hover { background: rgba(255,51,51,0.08); color: var(--red); }
 .user-badge { font-size: 0.75rem; color: var(--cyan); border: 1px solid var(--border); padding: 4px 8px; background: var(--bg-elevated); }
 
 /* ====== BUTTONS ====== */
@@ -1153,11 +1164,7 @@ select option { background: var(--bg); color: var(--green); }
     background: var(--bg);
   }
   .mobile-scroll-body {
-    /* pushed down by fixed header — marquee(28) + header(~64) + tabnav(~40) = ~132px */
-    padding-top: 132px;
-  }
-  /* when sub-tabs are showing, add more room */
-  .mobile-scroll-body.has-subtabs {
-    padding-top: 166px;
+    /* padding-top set dynamically via JS ResizeObserver — see App.jsx headerHeight state */
+    padding-top: 132px; /* fallback if JS hasn't measured yet */
   }
 }
