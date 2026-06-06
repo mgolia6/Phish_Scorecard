@@ -51,6 +51,16 @@
 
 ---
 
+## PRE-LAUNCH POLISH (before post on Phish.net)
+
+- [ ] **Admin panel user card** — labels running into values, no spacing or separators. Needs proper grid layout: label left (muted), value right (white), divider rows between fields. Match the rest of the app's panel aesthetic.
+- [ ] Delete `/api/debug/reviews.js` — exposed endpoint, pre-launch blocker
+- [ ] Profile modal BADGES tab — wire to KPI badges array (currently placeholder if not loading)
+- [ ] Desktop layout UAT — full walkthrough with new nav, sidebar, all sub-tabs
+- [ ] Deep Phreeze tab — stat lover section: longest song rated, highest single rating, most versions heard, biggest set gap, most complete show, rarest song, longest attendance streak, longest gap between shows
+
+---
+
 ## POST-LAUNCH (after July 4)
 
 - [ ] Global leaderboard / community ratings
