@@ -764,8 +764,13 @@ function KPICards({ api }) {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 3 }}>STREAK</div>
           </div>
         )}
-        <div style={{ marginLeft: 10, fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-          {expanded ? '▲' : '▼'}
+        <div style={{ marginLeft: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>
+            {expanded ? 'CLOSE' : 'DIVE DEEP'}
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)' }}>
+            {expanded ? '▲' : '▼'}
+          </div>
         </div>
       </button>
 
