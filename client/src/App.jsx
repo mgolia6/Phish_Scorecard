@@ -1155,17 +1155,21 @@ function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShow
                       return (
                         <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
                           <div className="song-info">
-                            <span className="song-num-inline">{song.position || idx + 1}.</span>
-                            <a
-                              href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
-                              target="_blank" rel="noopener noreferrer"
-                              className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
-                              onClick={e => e.stopPropagation()}
-                            >{song.song}</a>
-                            {duration && <span className="song-duration">{duration}</span>}
-                            {song.isjam && <span className="badge jam-badge">JAM</span>}
-                            {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
-                            {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
+                            <div className="song-name-with-num">
+                              <span className="song-num-inline">{song.position || idx + 1}.</span>
+                              <a
+                                href={`${PNET}/song/${song.slug || song.song.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}`}
+                                target="_blank" rel="noopener noreferrer"
+                                className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
+                                onClick={e => e.stopPropagation()}
+                              >{song.song}</a>
+                            </div>
+                            <div className="song-meta">
+                              {duration && <span className="song-duration">{duration}</span>}
+                              {song.isjam && <span className="badge jam-badge">JAM</span>}
+                              {song.isreprise && <span className="badge reprise-badge">REPRISE</span>}
+                              {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
+                            </div>
                           </div>
                           <span className="song-transition">
                             {song.transition === '>' ? <span className="segue-soft">&gt;</span>
