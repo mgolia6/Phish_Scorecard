@@ -1373,37 +1373,52 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
       {/* KPI Cards */}
       <KPICards api={api} />
 
-      <div className="my-shows-header">
-        <div className="my-shows-tabs">
-          <button className={`my-shows-tab-btn ${activeView === 'attended' ? 'active' : ''}`} onClick={() => setActiveView('attended')}>
-            ATTENDED ({attended.length})
-          </button>
-          <button className={`my-shows-tab-btn ${activeView === 'rated' ? 'active' : ''}`} onClick={() => setActiveView('rated')}>
-            RATED ({shows.length})
-          </button>
+      {/* Controls: view tabs + filter + sort in one clean bar */}
+      <div style={{ marginBottom: 10 }}>
+        {/* View toggle */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          {[['attended', `ATTENDED (${attended.length})`], ['rated', `RATED (${shows.length})`]].map(([v, l]) => (
+            <button key={v} onClick={() => setActiveView(v)} style={{
+              flex: 1, padding: '9px 6px',
+              border: `1px solid ${activeView === v ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
+              background: activeView === v ? 'rgba(0,255,255,0.06)' : 'transparent',
+              color: activeView === v ? 'var(--cyan)' : 'var(--text-label)',
+              fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', cursor: 'pointer',
+            }}>{l}</button>
+          ))}
+          <button onClick={() => setShowImport(!showImport)} style={{
+            padding: '9px 12px',
+            border: '1px solid rgba(255,102,0,0.45)',
+            background: 'transparent', color: 'var(--orange)',
+            fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', cursor: 'pointer',
+            boxShadow: '0 0 6px rgba(255,102,0,0.15)',
+          }}>↓ IMPORT</button>
         </div>
-        <button className="import-btn" onClick={() => setShowImport(!showImport)}>
-          ↓ IMPORT
-        </button>
-      </div>
-
-      {activeView === 'attended' && (
-        <div className="shows-controls">
-          <div className="shows-filter-row">
-            <button className={`filter-pill ${filterBy === 'all' ? 'active' : ''}`} onClick={() => setFilterBy('all')}>ALL</button>
-            <button className={`filter-pill ${filterBy === 'has_review' ? 'active' : ''}`} onClick={() => setFilterBy('has_review')}>REVIEWED</button>
-            <button className={`filter-pill ${filterBy === 'has_phreezer' ? 'active' : ''}`} onClick={() => setFilterBy('has_phreezer')}>RATED</button>
-            <button className={`filter-pill ${filterBy === 'no_phreezer' ? 'active' : ''}`} onClick={() => setFilterBy('no_phreezer')}>UNRATED</button>
+        {/* Filter pills */}
+        {activeView === 'attended' && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+            {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED']].map(([k,l]) => (
+              <button key={k} onClick={() => setFilterBy(k)} style={{
+                padding: '6px 10px',
+                border: `1px solid ${filterBy === k ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
+                background: filterBy === k ? 'rgba(0,255,255,0.06)' : 'transparent',
+                color: filterBy === k ? 'var(--cyan)' : 'var(--text-muted)',
+                fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer',
+              }}>{l}</button>
+            ))}
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
+              marginLeft: 'auto', background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
+              color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.46rem',
+              letterSpacing: '1px', padding: '6px 8px', cursor: 'pointer', outline: 'none',
+            }}>
+              <option value="date_desc">DATE ↓</option>
+              <option value="date_asc">DATE ↑</option>
+              <option value="phreezer_desc">SCORE ↓</option>
+              <option value="no_phreezer">UNRATED FIRST</option>
+            </select>
           </div>
-          <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-            <option value="date_desc">DATE ↓</option>
-            <option value="date_asc">DATE ↑</option>
-            <option value="phreezer_desc">PHREEZER ↓</option>
-            <option value="phishnet_desc">PHISH.NET ↓</option>
-            <option value="no_phreezer">UNRATED FIRST</option>
-          </select>
-        </div>
-      )}
+        )}
+      </div>
 
       {showImport && (
         <div className="import-panel">
@@ -1439,63 +1454,93 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
         const reviews = show.reviews || [];
         const hasReview = reviews.length > 0;
         const phreezerScore = show.phreezer_avg ?? show.overall_rating ?? null;
+        const scoreColor = phreezerScore >= 4.7 ? 'var(--orange)' : phreezerScore != null ? 'var(--cyan)' : 'var(--text-muted)';
+        const cardAccent = phreezerScore >= 4.7 ? 'var(--orange)' : phreezerScore != null ? 'var(--cyan)' : 'rgba(51,255,51,0.3)';
+
         return (
-          <div key={show.show_date} className="show-card">
-            <div className="show-card-top">
-              <div className="show-card-left">
-                <div className="show-card-datestr">{formatDate(show.show_date)}</div>
-                <div className="show-card-venue">{show.venue}</div>
-                <div className="show-card-loc">{show.city}{show.state ? `, ${show.state}` : ''}</div>
-              </div>
-              <div className="show-scores-col">
-                <div className="show-score-row">
-                  <span className="show-score-label">PHREEZER</span>
-                  <span className="show-score-val cyan">{phreezerScore != null ? phreezerScore : '—'}</span>
+          <div key={show.show_date} style={{
+            background: 'var(--bg-panel)',
+            border: '1px solid var(--border)',
+            borderLeft: `3px solid ${cardAccent}`,
+            marginBottom: 10,
+          }}>
+            {/* Main row */}
+            <div style={{ padding: '13px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              {/* Left: identity */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {show.tour_name && (
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 3, textTransform: 'uppercase' }}>
+                    {show.tour_name}
+                  </div>
+                )}
+                {/* DATE — Playfair serif italic */}
+                <div className="show-date-serif show-date-serif-md" style={{ marginBottom: 4 }}>
+                  {formatDate(show.show_date)}
                 </div>
-                {hasReview && (
-                  <div className="show-score-row">
-                    <span className="show-score-label">MY REVIEW</span>
-                    <span className="show-score-val orange">✎</span>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {show.venue}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  {show.city}{show.state ? `, ${show.state}` : ''}
+                </div>
+                {hasReview && reviewExpanded && (
+                  <div style={{ marginTop: 10, padding: '8px 10px', background: 'var(--bg)', border: '1px solid rgba(51,255,51,0.12)', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>
+                    {reviews.map((rev, i) => (
+                      <div key={rev.review_id || i} style={{ marginBottom: i < reviews.length - 1 ? 8 : 0 }}>
+                        "{rev.review_text}"
+                        {rev.posted_date && <div style={{ fontSize: '0.6rem', marginTop: 4, color: 'var(--text-muted)' }}>{rev.posted_date}</div>}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
-            </div>
-            <div className="show-card-bottom">
-              <div className="show-card-links">
-                <button
-                  className="show-link-sm rate-btn"
-                  onClick={() => onRateShow(show.show_date)}
-                  title="Rate this show in Scorecard"
-                >
-                  {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
-                </button>
-                <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer" className="show-link-sm audio">▶ RELISTEN</a>
-                <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.NET</a>
-                <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer" className="show-link-sm">PHISH.IN</a>
-                {hasReview && (
-                  <button className="show-link-sm review-toggle" onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}>
-                    {reviewExpanded ? '▲ MY REVIEW' : '▼ MY REVIEW'}
-                  </button>
-                )}
-                <a
-                  href={`https://phish.net/setlists/?d=${show.show_date}#addreview`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="show-link-sm"
-                  title="Write a review on Phish.net"
-                >✎ REVIEW ON .NET</a>
-              </div>
-            </div>
-            {reviewExpanded && hasReview && (
-              <div className="show-review-expanded">
-                {reviews.map((rev, i) => (
-                  <div key={rev.review_id || i} className={`review-entry ${i > 0 ? 'review-entry-divider' : ''}`}>
-                    {reviews.length > 1 && <div className="review-entry-num">REVIEW {i + 1} OF {reviews.length}</div>}
-                    <div className="show-review-text">{rev.review_text}</div>
-                    {rev.posted_date && <div className="show-review-date">Posted {rev.posted_date}</div>}
+
+              {/* Right: score + actions */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
+                {/* Score */}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: scoreColor, textShadow: `0 0 14px ${scoreColor}55`, letterSpacing: 1, lineHeight: 1 }}>
+                    {phreezerScore != null ? phreezerScore : '—'}
                   </div>
-                ))}
+                  {phreezerScore != null && (
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>
+                      MY SCORE
+                    </div>
+                  )}
+                </div>
+                {/* Stream + Review indicator */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {hasReview && (
+                    <button onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0, lineHeight: 1, color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.4)', transition: 'all 0.2s' }}
+                      title="My review">✎</button>
+                  )}
+                  <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,255,255,0.38)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.6rem', textDecoration: 'none', paddingLeft: 2, boxShadow: '0 0 4px rgba(0,255,255,0.15)' }}
+                    title="Stream on Phish.in">▶</a>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Action bar */}
+            <div style={{ display: 'flex', borderTop: '1px solid rgba(51,255,51,0.08)', gap: 0 }}>
+              <button onClick={() => onRateShow(show.show_date)}
+                style={{ flex: 1, padding: '9px 8px', background: 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: phreezerScore != null ? 'var(--cyan)' : 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', cursor: 'pointer', transition: 'all 0.15s' }}
+                onMouseEnter={e => e.target.style.background = 'rgba(0,255,255,0.04)'}
+                onMouseLeave={e => e.target.style.background = 'transparent'}>
+                {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
+              </button>
+              <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer"
+                style={{ flex: 1, padding: '9px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2px', textDecoration: 'none', transition: 'all 0.15s' }}
+                onMouseEnter={e => e.target.style.color = 'var(--green)'}
+                onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>
+                PHISH.NET
+              </a>
+              <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer"
+                style={{ flex: 1, padding: '9px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2px', textDecoration: 'none', transition: 'all 0.15s' }}>
+                RELISTEN
+              </a>
+            </div>
           </div>
         );
       })}
