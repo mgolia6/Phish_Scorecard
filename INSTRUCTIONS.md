@@ -7,10 +7,11 @@ Full-stack Phish show rating app. Stack: React + Vite frontend (`/client`), Verc
 At the start of every session, before anything else:
 1. Pull this file (INSTRUCTIONS.md) from the repo via GitHub API
 2. Pull SESSION_LOG.md from the same repo
-3. Pull STYLE_GUIDE.md from the same repo
-4. Read all three — weight actual code over session log if there's a conflict
-5. Surface current state, open issues, what was last worked on
-6. Then ask Matthew where he wants to start — or if he's already said, get into it
+3. Pull ROADMAP.md from the same repo
+4. Pull STYLE_GUIDE.md from the same repo
+5. Read all four — weight actual code over session log if there's a conflict
+6. Surface current state, open issues, what was last worked on
+7. Then ask Matthew where he wants to start — or if he's already said, get into it
 
 ## Context Window Management
 - At ~75% context window, stop mid-task if needed and write a full SESSION_LOG.md update before continuing
@@ -89,3 +90,19 @@ After each session, update SESSION_LOG.md with:
 - Decisions made and why
 - Known issues or open debt
 - Next session priorities
+
+## Session Wrap Protocol (REQUIRED — do not skip)
+Before ending any session, in this order:
+1. **Update SESSION_LOG.md** — what shipped, decisions, open debt, next priorities
+2. **Update ROADMAP.md** — mark completed items, add any new items raised during the session, remove anything that's no longer relevant
+3. **Validate ROADMAP against session** — explicitly check: did anything get discussed or requested this session that isn't captured? Did we complete anything that's still marked open? Surface any gaps to Matthew before closing.
+4. **Confirm with Matthew** — say explicitly "roadmap and session log are updated — anything missing?" Do not assume the session is done until Matthew confirms.
+
+The failure mode this prevents: Matthew asks for the roadmap, Claude gives stale information because the update hasn't happened yet. The roadmap must reflect the current session before the session ends.
+
+## Roadmap Hygiene Rules
+- If Matthew asks about the roadmap mid-session, pull ROADMAP.md fresh from the repo before answering — never answer from memory
+- Any feature, fix, or idea raised during a session that isn't already on the roadmap gets added before wrap
+- Completed items get marked ✅ with the session date
+- Do not let the roadmap drift more than one session behind
+
