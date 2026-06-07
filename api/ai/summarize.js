@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     if (!showDate) return res.status(400).json({ error: 'showDate required' });
     try {
       const pool = getPool();
+      await pool.query(`CREATE TABLE IF NOT EXISTS vibe_checks (show_date VARCHAR(10) PRIMARY KEY, structured JSONB, review_count INT, generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, model VARCHAR(50))`).catch(() => {});
       const result = await pool.query(
         'SELECT structured, review_count, generated_at FROM vibe_checks WHERE show_date = $1',
         [showDate]
@@ -34,6 +35,12 @@ export default async function handler(req, res) {
   const { reviews, showDate, venue, city, yearsAgo } = req.body;
 
   if (!showDate) return res.status(400).json({ error: 'showDate required' });
+
+  // Ensure table exists
+  try {
+    const pool = getPool();
+    await pool.query(`CREATE TABLE IF NOT EXISTS vibe_checks (show_date VARCHAR(10) PRIMARY KEY, structured JSONB, review_count INT, generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, model VARCHAR(50))`);
+  } catch (e) {}
 
   // Check cache first
   try {
