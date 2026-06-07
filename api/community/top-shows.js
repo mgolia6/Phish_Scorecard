@@ -24,7 +24,6 @@ export default async function handler(req, res) {
       LIMIT 25
     `);
 
-    // For each show, get top-rated songs
     const rows = await Promise.all(result.rows.map(async (show) => {
       const songs = await pool.query(`
         SELECT song_name,
@@ -38,21 +37,18 @@ export default async function handler(req, res) {
       `, [show.show_date]);
       return {
         ...show,
-        avg_score: show.avg_score,
         rater_count: parseInt(show.rater_count),
         top_songs: songs.rows,
       };
     }));
 
-    // Stats for KPIs
+    // Fixed stats — no cross join
     const statsRes = await pool.query(`
       SELECT
         COUNT(DISTINCT show_date) as shows_covered,
-        ROUND(AVG(rating)::numeric, 2) as overall_avg,
-        MAX(sub.raters) as most_rated_count
-      FROM ratings,
-        (SELECT show_date, COUNT(DISTINCT user_id) as raters FROM ratings GROUP BY show_date) sub
-      WHERE ratings.rating IS NOT NULL
+        ROUND(AVG(rating)::numeric, 2) as overall_avg
+      FROM ratings
+      WHERE rating IS NOT NULL
     `);
 
     const mostRatedRes = await pool.query(`
@@ -63,12 +59,22 @@ export default async function handler(req, res) {
       ORDER BY raters DESC LIMIT 1
     `);
 
+    const topShowRes = await pool.query(`
+      SELECT TO_CHAR(show_date, 'YYYY-MM-DD') as show_date,
+        ROUND(AVG(rating)::numeric, 2) as avg_score
+      FROM ratings
+      WHERE rating IS NOT NULL
+      GROUP BY show_date
+      ORDER BY avg_score DESC LIMIT 1
+    `);
+
     res.json({
       shows: rows,
       stats: {
         shows_covered: parseInt(statsRes.rows[0]?.shows_covered || 0),
         overall_avg: statsRes.rows[0]?.overall_avg || null,
         most_rated: mostRatedRes.rows[0] || null,
+        top_show: topShowRes.rows[0] || null,
       }
     });
   } catch (err) {
