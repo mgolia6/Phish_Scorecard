@@ -193,7 +193,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                   </div>
                 ) : (
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                    {aiData?.detail || aiData?.error || 'Could not generate synthesis.'}
+                    {aiData?.detail || aiData?.raw || aiData?.error || 'Could not generate synthesis.'}
                   </div>
                 )}
               </div>
