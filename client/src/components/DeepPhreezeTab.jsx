@@ -118,17 +118,32 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     return inner;
   };
 
-  const Row = ({ label, value, color = D.white, mono = false, href, onClick }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8 }}>
-      <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
-      {onClick
-        ? <button onClick={onClick} style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right', textDecoration: 'underline', textDecorationColor: `${color}44` }}>{value} ▶</button>
-        : href
-          ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'underline', textDecorationColor: `${color}44`, textAlign: 'right' }}>{value} ↗</a>
-          : <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right' }}>{value}</span>
-      }
-    </div>
-  );
+  const Row = ({ label, value, color = D.white, mono = false, href, onClick }) => {
+    const isLink = !!(onClick || href);
+    const content_inner = (
+      <>
+        <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
+        <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right', textDecoration: isLink ? 'underline' : 'none', textDecorationColor: `${color}44` }}>
+          {value}{isLink ? ' ▶' : ''}
+        </span>
+      </>
+    );
+    if (onClick) return (
+      <div onClick={onClick} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '10px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8, cursor: 'pointer' }}>
+        {content_inner}
+      </div>
+    );
+    if (href) return (
+      <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '10px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8, textDecoration: 'none' }}>
+        {content_inner}
+      </a>
+    );
+    return (
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8 }}>
+        {content_inner}
+      </div>
+    );
+  };
 
   const RankedList = ({ title, items, renderRow, emptyMsg = 'NOT ENOUGH DATA YET' }) => (
     <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
@@ -287,8 +302,16 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
               <Row label="AVG SHOW LENGTH" value={s.avg_show_duration_seconds ? fmtSeconds(s.avg_show_duration_seconds) : s.avg_songs_per_show ? `~${Math.round(s.avg_songs_per_show * 6)} min (est.)` : '—'} color={D.white} />
               <Row label="AVG ENCORE LENGTH" value={s.avg_encore_duration_seconds ? fmtSeconds(s.avg_encore_duration_seconds) : s.avg_set1_length ? `~${Math.round((s.total_encore_songs / Math.max(s.total_attended,1)) * 6)} min (est.)` : '—'} color={D.green} />
-              <Row label="AVG SET I LENGTH" value={s.avg_set1_length ? `${s.avg_set1_length} songs (~${Math.round(s.avg_set1_length * 6)} min)` : '—'} color={D.cyan} />
-              <Row label="AVG SET II LENGTH" value={s.avg_set2_length ? `${s.avg_set2_length} songs (~${Math.round(s.avg_set2_length * 6)} min)` : '—'} color={D.orange} />
+              <Row label="AVG SET I LENGTH"
+                value={s.avg_set1_duration_seconds
+                  ? `${fmtSeconds(s.avg_set1_duration_seconds)} · ${s.avg_set1_length} songs`
+                  : s.avg_set1_length ? `${s.avg_set1_length} songs` : '—'}
+                color={D.cyan} />
+              <Row label="AVG SET II LENGTH"
+                value={s.avg_set2_duration_seconds
+                  ? `${fmtSeconds(s.avg_set2_duration_seconds)} · ${s.avg_set2_length} songs`
+                  : s.avg_set2_length ? `${s.avg_set2_length} songs` : '—'}
+                color={D.orange} />
               <Row label="AVG SONGS / SHOW" value={s.avg_songs_per_show || '—'} color={D.muted} />
               {s.first_song_ever && (
                 <Row label="FIRST SONG YOU EVER HEARD" value={s.first_song_ever} color={D.orange} mono />
@@ -306,6 +329,61 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
               <Tile value={s.unique_states || '—'} label="STATES / REGIONS" color={D.orange} />
             </div>
           </Section>
+
+          {/* ── WHEN YOU SEE PHISH ── */}
+          {(s.shows_by_dow || s.shows_by_month) && (
+            <Section icon="◈" label="WHEN YOU SEE PHISH" color={D.cyan}>
+              {s.shows_by_dow && (() => {
+                const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                const max = Math.max(...DAYS.map(d => s.shows_by_dow[d] || 0), 1);
+                const top = DAYS.reduce((a, b) => (s.shows_by_dow[b] || 0) > (s.shows_by_dow[a] || 0) ? b : a);
+                return (
+                  <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
+                    <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY DAY OF WEEK</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 60, marginBottom: 8 }}>
+                      {DAYS.map(day => {
+                        const count = s.shows_by_dow[day] || 0;
+                        const h = Math.max(4, (count / max) * 100);
+                        const isTop = day === top;
+                        return (
+                          <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%', justifyContent: 'flex-end' }}>
+                            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: isTop ? D.orange : D.muted }}>{count || ''}</div>
+                            <div style={{ width: '100%', height: `${h}%`, background: isTop ? D.orange : D.cyan, opacity: isTop ? 1 : 0.45, borderRadius: '1px 1px 0 0' }} />
+                            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: isTop ? D.orange : D.muted }}>{day}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <Row label="YOUR MOST COMMON SHOW DAY" value={`${top} (${s.shows_by_dow[top]}x)`} color={D.orange} />
+                  </div>
+                );
+              })()}
+              {s.shows_by_month && (() => {
+                const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                const max = Math.max(...MONTHS.map(m => s.shows_by_month[m] || 0), 1);
+                const top = MONTHS.reduce((a, b) => (s.shows_by_month[b] || 0) > (s.shows_by_month[a] || 0) ? b : a);
+                return (
+                  <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
+                    <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY MONTH</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 60, marginBottom: 8 }}>
+                      {MONTHS.map(mon => {
+                        const count = s.shows_by_month[mon] || 0;
+                        const h = Math.max(2, (count / max) * 100);
+                        const isTop = mon === top;
+                        return (
+                          <div key={mon} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
+                            <div style={{ width: '100%', height: `${h}%`, background: isTop ? D.green : D.cyan, opacity: isTop ? 1 : 0.45, borderRadius: '1px 1px 0 0' }} />
+                            <div style={{ fontFamily: D.disp, fontSize: '0.36rem', color: isTop ? D.green : D.muted }}>{mon}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <Row label="YOUR BUSIEST MONTH" value={`${top} (${s.shows_by_month[top]}x)`} color={D.green} />
+                  </div>
+                );
+              })()}
+            </Section>
+          )}
 
           {/* ── LONGEST MOMENTS ── */}
           <Section icon="⏱" label="LONGEST SHOWS" color={D.cyan}>
@@ -609,6 +687,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 // ============================================================
 // MY PHRIENDS TAB
 // ============================================================
+
 
 
 
