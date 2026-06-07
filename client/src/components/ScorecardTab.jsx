@@ -107,7 +107,13 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
         api.get(`/shows/companions?date=${date}`).catch(() => ({ tagged: [], also_attended: [] })),
       ]);
-      setSongs(showData.songs || []);
+      // Annotate songs with globalIdx and posKey to handle sandwiched/reprised songs
+      const annotated = (showData.songs || []).map((s, globalIdx) => ({
+        ...s,
+        globalIdx,
+        posKey: `pos_${globalIdx}`,
+      }));
+      setSongs(annotated);
       setCurrentShow(showData);
       // Fetch vibe check (cached or generate)
       if (showData.reviews?.count > 0) {
@@ -145,7 +151,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : null;
       setAttendanceType(savedAttendance);
       const rMap = {};
-      for (const r of savedRatings) rMap[r.song_name] = { rating: r.rating, notes: r.notes || '' };
+      for (const r of savedRatings) {
+        // Key by position if available, fall back to song_name for legacy ratings
+        const key = r.song_position != null ? `pos_${r.song_position}` : r.song_name;
+        rMap[key] = { rating: r.rating, notes: r.notes || '', song_name: r.song_name, song_position: r.song_position };
+      }
       setRatings(rMap);
       const aMap = {};
       for (const t of (audioData.tracks || [])) {
@@ -262,7 +272,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
     return `SET ${k}`;
   };
 
-  const totalRated = songs.filter(s => ratings[s.song]?.rating);
+  const totalRated = songs.filter(s => ratings[s.posKey || s.song]?.rating);
   const overallAvg = totalRated.length
     ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / totalRated.length).toFixed(2)
     : null;
@@ -531,7 +541,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       const audio = getAudioForSong(song.song);
                       const duration = formatDuration(audio?.duration);
                       return (
-                        <div key={idx} className={`song-row ${ratings[song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
+                        <div key={idx} className={`song-row ${ratings[song.posKey || song.song]?.rating ? 'rated' : ''} ${song.isjam ? 'jam' : ''}`}>
                           <div className="song-info">
                             <div className="song-name-with-num">
                               <span className="song-num-inline">{idx + 1}.</span>
@@ -562,21 +572,21 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                             ) : (
                               <span style={{ width: 32, display: 'inline-block', flexShrink: 0 }} />
                             )}
-                            <SongRating value={parseInt(ratings[song.song]?.rating) || 0} onChange={val => updateRating(song.song, 'rating', val)} />
+                            <SongRating value={parseInt(ratings[song.posKey || song.song]?.rating) || 0} onChange={val => updateRating(song.posKey || song.song, 'rating', val)} />
                           </div>
-                          {ratings[song.song]?.notesOpen ? (
+                          {ratings[song.posKey || song.song]?.notesOpen ? (
                             <div className="song-notes-expanded">
                               <input className="notes-input" type="text" placeholder="Add a note..."
-                                value={ratings[song.song]?.notes || ''}
+                                value={ratings[song.posKey || song.song]?.notes || ''}
                                 autoFocus
                                 onChange={e => updateRating(song.song, 'notes', e.target.value)}
-                                onBlur={() => { if (!ratings[song.song]?.notes) updateRating(song.song, 'notesOpen', false); }}
+                                onBlur={() => { if (!ratings[song.posKey || song.song]?.notes) updateRating(song.posKey || song.song, 'notesOpen', false); }}
                               />
                             </div>
                           ) : (
                             <button className="song-notes-toggle" onClick={() => updateRating(song.song, 'notesOpen', true)}>
-                              {ratings[song.song]?.notes
-                                ? <span className="song-notes-preview">✎ {ratings[song.song].notes}</span>
+                              {ratings[song.posKey || song.song]?.notes
+                                ? <span className="song-notes-preview">✎ {ratings[song.posKey || song.song].notes}</span>
                                 : <span className="song-notes-add">+ NOTE</span>}
                             </button>
                           )}
