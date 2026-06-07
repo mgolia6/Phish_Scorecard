@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useApi } from './useApi';
-import { RELISTEN, formatDate } from './utils';
+import { useApi } from '../useApi';
+import { RELISTEN, formatDate } from '../utils';
 
 export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasReview, reviews, reviewExpanded, setExpandedReview, onFavorite, onRateShow }) {
   const [expanded, setExpanded] = useState(false);
