@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function KPICards({ api, onDeepPhreeze }) {
   const [kpi, setKpi] = useState(null);
