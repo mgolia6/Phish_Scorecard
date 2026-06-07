@@ -5,8 +5,15 @@ import { getPool } from '../_db.js';
 function parseStructured(raw) {
   if (!raw) return null;
   if (typeof raw === 'object') return raw; // already parsed (JSONB from Postgres)
-  const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
-  try { return JSON.parse(cleaned); } catch { return null; }
+  // Try direct parse first
+  try { return JSON.parse(raw.trim()); } catch {}
+  // Strip markdown fences
+  const stripped = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/g, '').trim();
+  try { return JSON.parse(stripped); } catch {}
+  // Extract first {...} block from anywhere in the string
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (match) { try { return JSON.parse(match[0]); } catch {} }
+  return null;
 }
 
 export default async function handler(req, res) {
