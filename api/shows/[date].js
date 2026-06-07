@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     const reviews = rawReviews.map(r => {
       // Try all known field name variants
       const author = r.author || r.username || r.uid || 'Anonymous';
-      const text = r.review || r.body || r.text || '';
+      const text = r.review_text || r.review || r.body || r.text || '';
       const rawScore = r.score;
       // phish.net scores 0-10 scale; normalize to 0-5
       let score = null;
