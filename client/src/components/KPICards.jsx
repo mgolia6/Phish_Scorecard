@@ -159,7 +159,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
       </div>
 
       {/* ── QUICK PHREEZE ── */}
-      <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderBottom: '2px solid rgba(255,102,0,0.25)' }}>
+      <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderBottom: '2px solid rgba(255,102,0,0.25)' }}>
 
         {/* Section header */}
         <div style={{
@@ -252,4 +252,5 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
     </div>
   );
 }
+
 
