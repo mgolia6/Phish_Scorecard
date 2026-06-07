@@ -228,14 +228,108 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     }
   });
 
+  // ── EXTENDED STATS ──────────────────────────────────────
+  // Total songs heard across all attended shows
+  let totalSongsHeard = 0, totalSet1Songs = 0, totalSet2Songs = 0, totalEncoreSongs = 0;
+  const uniqueSongsSet = new Set();
+  const uniqueVenuesSet = new Set();
+  const uniqueStatesSet = new Set();
+  const showsByYear = {};
+  const encoreFreq = {};
+  let longestEncore = null, longestEncoreCount = 0;
+  let firstSongEver = null, lastSongEver = null;
+  let totalSet1Count = 0, totalSet2Count = 0, set1ShowCount = 0, set2ShowCount = 0;
+
+  showsWithCache.forEach(d => {
+    const c = cache[d];
+    totalSongsHeard += c.song_count || 0;
+    totalSet1Songs += c.set1_count || 0;
+    totalSet2Songs += c.set2_count || 0;
+    totalEncoreSongs += c.encore_count || 0;
+    if (c.set1_count > 0) { totalSet1Count += c.set1_count; set1ShowCount++; }
+    if (c.set2_count > 0) { totalSet2Count += c.set2_count; set2ShowCount++; }
+    if (c.venue) uniqueVenuesSet.add(c.venue);
+    if (c.state) uniqueStatesSet.add(c.state);
+    const yr = d.slice(0, 4);
+    showsByYear[yr] = (showsByYear[yr] || 0) + 1;
+    (c.setlist || []).forEach(s => {
+      if (s.song) uniqueSongsSet.add(s.song);
+      if (s.set === 'e' || s.set === 'E') {
+        if (!encoreFreq[s.song]) encoreFreq[s.song] = 0;
+        encoreFreq[s.song]++;
+      }
+    });
+    if ((c.encore_count || 0) > longestEncoreCount) {
+      longestEncoreCount = c.encore_count;
+      longestEncore = { date: d, venue: c.venue, count: c.encore_count };
+    }
+  });
+
+  // First and last songs from sorted attended shows
+  if (showsWithCache.length) {
+    const firstShow = cache[sortedDates.find(d => cache[d])];
+    const lastShow = cache[[...sortedDates].reverse().find(d => cache[d])];
+    if (firstShow?.setlist?.length) firstSongEver = firstShow.setlist[0].song;
+    if (lastShow?.setlist?.length) lastSongEver = lastShow.setlist[lastShow.setlist.length - 1].song;
+  }
+
+  const mostCommonEncore = Object.entries(encoreFreq)
+    .sort(([,a],[,b]) => b - a).slice(0, 5)
+    .map(([song, count]) => ({ song, count }));
+
+  // Consecutive years
+  const yearNums = years.map(Number).sort((a,b)=>a-b);
+  let maxConsecYears = 1, currentConsec = 1, consecStart = yearNums[0], bestConsecStart = yearNums[0];
+  for (let i = 1; i < yearNums.length; i++) {
+    if (yearNums[i] === yearNums[i-1] + 1) {
+      currentConsec++;
+      if (currentConsec > maxConsecYears) { maxConsecYears = currentConsec; bestConsecStart = consecStart; }
+    } else {
+      currentConsec = 1;
+      consecStart = yearNums[i];
+    }
+  }
+
+  // Days since first show
+  const daysSinceFirst = sortedDates[0]
+    ? Math.round((Date.now() - new Date(sortedDates[0])) / 86400000)
+    : 0;
+
+  // Total time in shows — rough estimate: avg Phish show ~3hrs
+  const estHours = totalSongsHeard * 6; // ~6 min per song average
+  
+  // Shows per year avg
+  const avgShowsPerYear = years.length > 0 ? (attendedDates.length / years.length).toFixed(1) : 0;
+
   return {
     // Attendance
     total_attended: attendedDates.length,
     years_active: years.length,
+    years_list: years,
     first_show: sortedDates[0],
     latest_show: sortedDates[sortedDates.length - 1],
+    days_since_first: daysSinceFirst,
     longest_gap: { days: longestGap, from: longestGapFrom, to: longestGapTo },
     longest_run: { shows: maxRun, start: bestRunStart },
+    consecutive_years: { count: maxConsecYears, start: bestConsecStart },
+    avg_shows_per_year: avgShowsPerYear,
+    shows_by_year: showsByYear,
+    // Setlist counts
+    total_songs_heard: totalSongsHeard,
+    total_set1_songs: totalSet1Songs,
+    total_set2_songs: totalSet2Songs,
+    total_encore_songs: totalEncoreSongs,
+    unique_songs_heard: uniqueSongsSet.size,
+    unique_venues: uniqueVenuesSet.size,
+    unique_states: uniqueStatesSet.size,
+    avg_songs_per_show: showsWithCache.length ? (totalSongsHeard / showsWithCache.length).toFixed(1) : 0,
+    avg_set1_length: set1ShowCount ? (totalSet1Count / set1ShowCount).toFixed(1) : 0,
+    avg_set2_length: set2ShowCount ? (totalSet2Count / set2ShowCount).toFixed(1) : 0,
+    est_hours_of_phish: estHours,
+    most_common_encore: mostCommonEncore,
+    longest_encore: longestEncore,
+    first_song_ever: firstSongEver,
+    last_song_ever: lastSongEver,
     // Setlist (attended)
     longest_show: longestShow,
     longest_set1: longestSet1,
@@ -354,3 +448,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
