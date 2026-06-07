@@ -631,12 +631,13 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       {vibeExpanded ? ' ▲' : ' ▼'}
                     </span>
                   </button>
-                  {vibeExpanded && (vibeError ? (
+                  {vibeExpanded && vibeError && (
                     <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,102,0,0.15)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
                       Could not synthesize reviews for this show.<br/>
                       <span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.48rem' }}>Reviews are still available below ↓</span>
                     </div>
-                  ) : vibeCheck?.structured && (
+                  )}
+                  {vibeExpanded && !vibeError && vibeCheck?.structured && (
                     <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,140,0,0.15)' }}>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 12, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
                         {vibeCheck.structured.overall}
@@ -694,6 +695,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
 
 
