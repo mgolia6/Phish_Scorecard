@@ -1,6 +1,14 @@
 import { cors } from '../_auth.js';
 import { getPool } from '../_db.js';
 
+// Strips markdown fences and parses JSON — handles both string and object inputs
+function parseStructured(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw; // already parsed (JSONB from Postgres)
+  const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
+  try { return JSON.parse(cleaned); } catch { return null; }
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -17,8 +25,14 @@ export default async function handler(req, res) {
         [showDate]
       );
       if (result.rows.length) {
+        const structured = parseStructured(result.rows[0].structured);
+        // Bad cache entry — delete it so it regenerates
+        if (!structured || !structured.overall) {
+          await pool.query('DELETE FROM vibe_checks WHERE show_date = $1', [showDate]).catch(() => {});
+          return res.status(404).json({ error: 'No vibe check cached' });
+        }
         return res.status(200).json({
-          structured: result.rows[0].structured,
+          structured,
           reviewCount: result.rows[0].review_count,
           cached: true,
           generatedAt: result.rows[0].generated_at,
@@ -50,11 +64,12 @@ export default async function handler(req, res) {
       [showDate]
     );
     if (cached.rows.length) {
-      return res.status(200).json({
-        structured: cached.rows[0].structured,
-        reviewCount: cached.rows[0].review_count,
-        cached: true,
-      });
+      const structured = parseStructured(cached.rows[0].structured);
+      if (structured && structured.overall) {
+        return res.status(200).json({ structured, reviewCount: cached.rows[0].review_count, cached: true });
+      }
+      // Bad cache — delete and regenerate
+      await pool.query('DELETE FROM vibe_checks WHERE show_date = $1', [showDate]).catch(() => {});
     }
   } catch (e) {
     // DB error — proceed to generate anyway
@@ -108,14 +123,9 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
     const text = data?.content?.[0]?.text || null;
     if (!text) return res.status(500).json({ error: 'No response from AI' });
 
-    // Strip markdown fences if model ignored instructions
-    const cleaned = text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-
-    let structured;
-    try {
-      structured = JSON.parse(cleaned);
-    } catch (e) {
-      return res.status(200).json({ summary: text });
+    const structured = parseStructured(text);
+    if (!structured || !structured.overall) {
+      return res.status(500).json({ error: 'AI returned unparseable response', raw: text });
     }
 
     // Store in cache
@@ -132,7 +142,6 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
         [showDate, JSON.stringify(structured), validReviews.length, 'claude-haiku-4-5-20251001']
       );
     } catch (e) {
-      // Cache write failed — still return result
       console.error('Cache write failed:', e.message);
     }
 
