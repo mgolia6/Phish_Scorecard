@@ -1,59 +1,51 @@
 # SESSION LOG — Phreezer
 
-## Session: 2026-06-07
+## Session: 2026-06-07 (continued)
 
 ### Shipped
-- Full monolith refactor: App.jsx (4,424 lines) -> 26 component files in client/src/components/
-- Mock design: compact ShowCard, KPICards with IMPORT in header, MyShowsTab cleanup
-- Sub-nav fix: flex-shrink:0 so tabs scroll instead of truncate
-- ShowCard: expand restored with placeholder for unrated shows, action bar always visible
-- Heatmap: HEATMAP_POS and hmColor constants restored (missing, caused black screen on MyVenues/MyStates/MySongs)
-- Vibe Check: server-side AI synthesis via api/ai/summarize.js (Haiku)
-- Vibe Check: structured JSON (overall, themes, sentiment badge FIRE/SOLID/MIXED/SLEEPER)
-- Vibe Check: caching in vibe_checks table (auto-creates), GET cache + POST generate+store
-- Vibe Check: review field fixed (review_text not review), all reviews returned not just 3
-- Vibe Check: added to ScorecardTab on every show load
-- ScorecardTab: hides search/instructions when pre-loading a show via RATE button
-- Uncle Ebenezer: floating AI agent (snowflake button, orange glow, bottom-right, every tab)
-  - api/ai/ebenezer.js: pulls user show history from DB, 10-turn fading memory, Claude Sonnet
-  - EbenezerDrawer.jsx: slide-up drawer, suggestion prompts, CLEAR, session memory
-- KPI refresh: closes scorecard overlay increments kpiRefreshKey, forces KPI + show list re-fetch
-- Search panel fix: removed onShowLoaded callback that was nulling initialShowDate immediately
-- Mobile song-row CSS: horizontal layout — name+meta left, play+stars right (was stacking vertically)
-- Setlist data fix: filter non-Phish artists by artistid !== 1
-  - Phish.net returns ALL artists for a date — Dude of Life shows, openers, etc bleed in without this
-  - Secondary dedup by set+position for benefit shows where guest songs share position numbers
-- Custom song filter removed in favor of artistid filter (was catching some but not all guest songs)
+- KPI card flip: CSS 3D rotateY, one-at-a-time, data source attribution on back
+- KPI labels: SHOWS / PHROZEN / AVG SCORE / REVIEWED
+- KPI layout restructure: bare grid on top, QUICK PHREEZE section below with IMPORT moved in
+- Font system standardized across KPI card: 2rem value, 0.52rem label, 0.6rem section title, 0.54rem body — no more ad-hoc rem values
+- Badge labels fixed: BADGE_LABELS map now uses actual API IDs (century, rated_1, critic, etc.)
+- Badge labels shortened: 100 CLUB, 1ST FREEZE, CRITIC, ON FIRE, etc.
+- FIRST SHOW label corrected (was FIRST FREEZE — that's attendance date, not rating date)
+- TOP RATED SONG / TOP VENUE labels clarified
+- Stars → X.X★ format in ShowCard and MySongsTab (★ glyph, not asterisk)
+- Filter buttons: orange active / cyan-dim inactive, labels PHROZEN / UNPHROZEN
+- Sort buttons: cyan active / cyan-dim inactive
+- ShowCard PHISH.NET link: contrast bumped from text-muted to cyan 70%
+- KPICards TAP TO FLIP hint: 0.52rem bold, 75% opacity (was tiny and invisible)
+- Deep Phreeze CTA: 80% opacity + underline affordance
+- Vibe Check: proper error state (vibeError), clean fallback message pointing to raw reviews
+- Vibe Check: bad cache detection — if stored structured data doesn't parse, purge and regenerate
+- HOW TO USE PHREEZER copy: updated to reflect current state (stars, Vibe Check, MY PHREEZER)
+- STYLE_GUIDE.md added to repo — design tokens, font system, component patterns, badge map, vocabulary
+- INSTRUCTIONS.md updated — 75% context wrap rule, STYLE_GUIDE reference, current architecture
+- Avatar direction decided: Option C (SVG geometric Phreeze pattern) — not yet implemented
 
-### How the setlist filter works
-- Phish.net v5 setlist API: every song entry has artistid field. Phish = 1.
-- Filter: if artistid exists and is not '1', drop the song
-- Secondary: if two songs share the same set+position (benefit show format), keep the first
-- This handles: Dude of Life co-bills, benefit show openers, any other non-Phish artist on same date
+### Decisions
+- Avatars: geometric SVG (snowflake geometry, cyan) as default, Orbitron initials if display name set. No emoji, no uploads.
+- Profile questions: tap-to-select buttons only, no free text — better data quality
+- Star display: always X.X★ in compact contexts, never individual star glyphs
+- Filter color convention: orange = filter (user-set state), cyan = sort (temporal/data ordering)
+- RATED/UNRATED → PHROZEN/UNPHROZEN to stay on-brand vocabulary
+
+### Roadmap items added
+- Star rating scale definition: what 1★–5★ actually means in Phreezer context — needs design decision before implementing (currently inaccurate in any documentation)
+- Profile questions: vantage point (Mike's Side / Page's Side), GA or Seats, show style (Dance / Chill / Both) — tap-to-select, needs DB columns + API update + UI
+- Avatar implementation: SVG geometric Phreeze pattern component, seeded from username
+- COMMUNITY tab: still placeholder
+- Phishook/Phreezer logo integration: not yet applied to codebase
+
+### Open issues
+- Vibe Check "could not generate" on some shows — error state now shows cleanly but root cause unclear; likely ANTHROPIC_API_KEY env var or Haiku model string needs verification
+- Profile modal INFO tab is read-only — no edit UI yet for any profile fields
+- MySongsTab KPI tiles still use old square tile design, different from MY SHOWS — should unify
 
 ### Next session priorities
-- Confirm Ebenezer works end-to-end (check localStorage token key is phreezer_token)
-- Confirm Vibe Check renders correctly with real review text
-- Rate limiting on auth endpoints (Priority 1 security item)
-- Lock down admin/migrate endpoint
-- COMMUNITY tab still placeholder
-- Phishook/Phreezer rename + logo not yet applied
-
-### Security backlog (see previous session log entry for full detail)
-1. Rate limiting on /api/auth/login and /api/auth/register — brute force risk
-2. Email verification + one-account-per-email enforcement (use Resend, already wired)
-3. Disposable email domain blocklist on register
-4. Lock /api/admin/migrate — no auth check currently
-5. JWT hardening — shorten to 7d + revocation mechanism
-6. Verify no API keys leak into client bundle (grep process.env in client/src/)
-
-### Key learnings
-- Phish.net v5 review field: review_text (not review)
-- Phish.net v5 artistid: Phish = 1. Always filter by this before processing setlists.
-- Phish.net returns multi-artist setlists for same date — co-bills, DOL shows, etc
-- Haiku wraps JSON in markdown fences despite instructions -- always strip + harden prompt
-- HEATMAP_POS must live in Heatmap.jsx -- cannot rely on monolith scope
-- Never touch files with string manipulation for deploy triggers
-- DB connection times out from bash_tool -- use auto-create pattern instead
-- Claude Haiku for Vibe Check (fast/cheap), Claude Sonnet for Ebenezer (needs to reason)
-- KPICards useEffect must include refreshKey in deps array or it never re-fetches after rating
+1. Implement profile tap-to-select questions (DB + API + UI)
+2. Implement geometric SVG avatar
+3. Investigate Vibe Check generation failure (check ANTHROPIC_API_KEY in Vercel env)
+4. COMMUNITY tab scaffold
+5. Rate limiting on auth endpoints (security backlog)
