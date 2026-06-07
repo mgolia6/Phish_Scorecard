@@ -2,6 +2,18 @@ import React, { useState } from 'react';
 import { useApi } from '../useApi';
 import { RELISTEN, formatDate } from '../utils';
 
+const stripBBCode = (text) => {
+  if (!text) return '';
+  return text
+    .replace(/\[url=[^\]]*\]/gi, '')
+    .replace(/\[\/url\]/gi, '')
+    .replace(/\[b\]/gi, '').replace(/\[\/b\]/gi, '')
+    .replace(/\[i\]/gi, '').replace(/\[\/i\]/gi, '')
+    .replace(/\[quote[^\]]*\]/gi, '').replace(/\[\/quote\]/gi, '')
+    .replace(/\[[^\]]*\]/g, '')
+    .trim();
+};
+
 export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasReview, reviews, reviewExpanded, setExpandedReview, onFavorite, onRateShow }) {
   const [expanded, setExpanded] = useState(false);
   const [cardData, setCardData] = useState(null);
@@ -57,13 +69,10 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
       <div style={{ padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
 
         {/* Date */}
-        <div style={{ flexShrink: 0, minWidth: 58 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 700, color: '#fff', lineHeight: 1.1 }}>
-            {compactMonth} {compactDay}
-          </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 3 }}>
-            {compactYear}
-          </div>
+        <div style={{ flexShrink: 0, minWidth: 44, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactMonth}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '2px 0' }}>{compactDay}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactYear}</div>
         </div>
 
         {/* Venue + city */}
@@ -87,40 +96,22 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
         </div>
 
         {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          {hasReview && (
-            <button onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: 0, lineHeight: 1, color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.3)' }}
-              title="My review">✎</button>
-          )}
-          <button onClick={onFavorite}
-            style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: 0, lineHeight: 1, color: show.favorited ? 'var(--orange)' : 'rgba(255,255,255,0.35)', filter: show.favorited ? 'drop-shadow(0 0 4px rgba(255,102,0,0.6))' : 'none' }}
-          >{show.favorited ? '★' : '☆'}</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.06)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none', paddingLeft: 2 }}>▶</a>
-          <div style={{ textAlign: 'right', minWidth: 36 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: phreezerScore != null ? '1.2rem' : '0.85rem', fontWeight: 900, color: phreezerScore != null ? scoreColor : 'var(--text-muted)', textShadow: phreezerScore != null ? `0 0 10px ${scoreColor}66` : 'none', lineHeight: 1 }}>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.06)', color: 'var(--cyan)', fontSize: '0.7rem', textDecoration: 'none', paddingLeft: 2 }}>▶</a>
+          <div style={{ textAlign: 'right', minWidth: 40 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: phreezerScore != null ? '1.3rem' : '0.85rem', fontWeight: 900, color: phreezerScore != null ? scoreColor : 'var(--text-muted)', textShadow: phreezerScore != null ? `0 0 10px ${scoreColor}66` : 'none', lineHeight: 1 }}>
               {phreezerScore != null ? phreezerScore : '—'}
             </div>
           </div>
           <button onClick={handleExpand}
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.65rem', cursor: 'pointer', padding: '4px', lineHeight: 1 }}>
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.7rem', cursor: 'pointer', padding: '4px', lineHeight: 1 }}>
             {expanded ? '▲' : '▼'}
           </button>
         </div>
       </div>
 
-      {/* Review text inline */}
-      {hasReview && reviewExpanded && (
-        <div style={{ padding: '8px 14px 10px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(51,255,51,0.08)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>
-          {reviews.map((rev, i) => (
-            <div key={rev.review_id || i} style={{ marginBottom: i < reviews.length - 1 ? 8 : 0 }}>
-              "{rev.review_text}"
-              {rev.posted_date && <div style={{ fontSize: '0.65rem', marginTop: 4 }}>{rev.posted_date}</div>}
-            </div>
-          ))}
-        </div>
-      )}
+
 
       {/* Expanded detail panel */}
       {expanded && (
@@ -180,6 +171,25 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                   ))}
                 </div>
               )}
+              {/* My Review — deduped, bbcode stripped */}
+              {hasReview && reviewExpanded && (() => {
+                const seen = new Set();
+                const unique = reviews.filter(r => {
+                  const key = (r.review_text || '').slice(0, 80);
+                  if (seen.has(key)) return false;
+                  seen.add(key); return true;
+                });
+                return unique.length > 0 ? (
+                  <div style={{ marginTop: 12, padding: '10px 12px', background: 'rgba(255,102,0,0.04)', border: '1px solid rgba(255,102,0,0.2)', borderLeft: '2px solid var(--orange)' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 8 }}>MY REVIEW</div>
+                    {unique.map((rev, i) => (
+                      <div key={rev.review_id || i} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7, marginBottom: i < unique.length - 1 ? 10 : 0 }}>
+                        "{stripBBCode(rev.review_text)}"
+                      </div>
+                    ))}
+                  </div>
+                ) : null;
+              })()}
             </>
           ) : null}
         </div>
@@ -187,10 +197,20 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
 
       {/* ── ACTION BAR — always visible ── */}
       <div style={{ display: 'flex', borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+        <button onClick={onFavorite}
+          style={{ padding: '11px 14px', background: show.favorited ? 'rgba(255,102,0,0.08)' : 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: show.favorited ? 'var(--orange)' : 'rgba(255,255,255,0.4)', fontSize: '1.2rem', lineHeight: 1, cursor: 'pointer', filter: show.favorited ? 'drop-shadow(0 0 6px rgba(255,102,0,0.7))' : 'none', flexShrink: 0 }}>
+          {show.favorited ? '★' : '☆'}
+        </button>
         <button onClick={() => onRateShow(show.show_date)}
           style={{ flex: 1, padding: '11px 8px', background: 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: phreezerScore != null ? 'var(--cyan)' : 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer' }}>
           {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
         </button>
+        {hasReview && (
+          <button onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}
+            style={{ flex: 1, padding: '11px 8px', background: reviewExpanded ? 'rgba(255,102,0,0.06)' : 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}>
+            MY REVIEW
+          </button>
+        )}
         <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer"
           style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
           PHISH.NET
