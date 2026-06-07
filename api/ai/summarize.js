@@ -120,8 +120,15 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      console.error('Anthropic API error:', response.status, JSON.stringify(data));
+      return res.status(500).json({ error: 'Anthropic API error', status: response.status, detail: data?.error?.message || JSON.stringify(data) });
+    }
     const text = data?.content?.[0]?.text || null;
-    if (!text) return res.status(500).json({ error: 'No response from AI' });
+    if (!text) {
+      console.error('No text in Anthropic response:', JSON.stringify(data));
+      return res.status(500).json({ error: 'No response from AI', detail: JSON.stringify(data) });
+    }
 
     const structured = parseStructured(text);
     if (!structured || !structured.overall) {
@@ -150,3 +157,4 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
     return res.status(500).json({ error: e.message });
   }
 }
+
