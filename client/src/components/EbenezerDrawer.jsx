@@ -103,7 +103,7 @@ export function EbenezerDrawer({ api }) {
         }}
         title="Uncle Ebenezer"
       >
-        {open ? '✕' : '☯'}
+        {open ? '✕' : '❄'}
       </button>
 
       {/* ── Drawer ── */}
