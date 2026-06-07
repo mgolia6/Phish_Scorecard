@@ -168,13 +168,16 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           borderBottom: '1px solid rgba(255,102,0,0.2)',
           background: 'rgba(255,102,0,0.04)',
         }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 12px rgba(255,102,0,0.6)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', fontWeight: 700, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 8px rgba(255,140,0,0.7)) drop-shadow(0 0 2px rgba(255,215,0,0.4))' }}>
             ◈ QUICK PHREEZE
           </span>
           <button onClick={onImport} style={{
             padding: '7px 14px', fontFamily: 'var(--font-display)', fontSize: '0.5rem',
-            letterSpacing: '2px', border: '1px solid rgba(255,102,0,0.5)',
-            color: 'var(--orange)', background: 'transparent', cursor: 'pointer',
+            letterSpacing: '2px', border: '1px solid rgba(255,140,0,0.5)',
+            background: 'transparent', cursor: 'pointer',
+            background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
           }}>↓ IMPORT</button>
         </div>
 
