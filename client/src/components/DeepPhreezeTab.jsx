@@ -5,6 +5,14 @@ import { formatDate } from '../utils';
 const PHISH_IN = 'https://phish.in';
 const PHISH_NET_SONG = 'https://phish.net/song';
 
+function fmtSeconds(seconds) {
+  if (!seconds) return '—';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
 function fmtLiveTime(totalMinutes) {
   if (!totalMinutes) return '—';
   const h = Math.floor(totalMinutes / 60);
@@ -114,9 +122,9 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8 }}>
       <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
       {onClick
-        ? <button onClick={onClick} style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}>{value} ▶</button>
+        ? <button onClick={onClick} style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right', textDecoration: 'underline', textDecorationColor: `${color}44` }}>{value} ▶</button>
         : href
-          ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'none', textAlign: 'right' }}>{value} ↗</a>
+          ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'underline', textDecorationColor: `${color}44`, textAlign: 'right' }}>{value} ↗</a>
           : <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right' }}>{value}</span>
       }
     </div>
@@ -235,13 +243,13 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
               <Row label="FIRST SHOW"
                 value={s.first_show ? formatDate(s.first_show) : '—'}
                 color={D.cyan} mono
-                onClick={s.first_show && onOpenScorecard ? () => onOpenScorecard(s.first_show) : null}
-                href={s.first_show && !onOpenScorecard ? `${PHISH_IN}/${s.first_show}` : null} />
+                onClick={s.first_show ? () => onOpenScorecard && onOpenScorecard(s.first_show) : null}
+                href={s.first_show ? `${PHISH_IN}/${s.first_show}` : null} />
               <Row label="MOST RECENT SHOW"
                 value={s.latest_show ? formatDate(s.latest_show) : '—'}
                 color={D.cyan} mono
-                onClick={s.latest_show && onOpenScorecard ? () => onOpenScorecard(s.latest_show) : null}
-                href={s.latest_show && !onOpenScorecard ? `${PHISH_IN}/${s.latest_show}` : null} />
+                onClick={s.latest_show ? () => onOpenScorecard && onOpenScorecard(s.latest_show) : null}
+                href={s.latest_show ? `${PHISH_IN}/${s.latest_show}` : null} />
               <Row label="DAYS SINCE FIRST SHOW" value={s.days_since_first ? s.days_since_first.toLocaleString() : '—'} color={D.white} />
               <Row label="CONSECUTIVE YEARS"
                 value={s.consecutive_years ? `${s.consecutive_years.count} YRS (from ${s.consecutive_years.start})` : '—'}
@@ -277,9 +285,11 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
               <Tile value={s.total_encore_songs || '—'} label="ENCORE SONGS" color={D.green} />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
+              <Row label="AVG SHOW LENGTH" value={s.avg_show_duration_seconds ? fmtSeconds(s.avg_show_duration_seconds) : s.avg_songs_per_show ? `~${Math.round(s.avg_songs_per_show * 6)} min (est.)` : '—'} color={D.white} />
+              <Row label="AVG ENCORE LENGTH" value={s.avg_encore_duration_seconds ? fmtSeconds(s.avg_encore_duration_seconds) : s.avg_set1_length ? `~${Math.round((s.total_encore_songs / Math.max(s.total_attended,1)) * 6)} min (est.)` : '—'} color={D.green} />
               <Row label="AVG SET I LENGTH" value={s.avg_set1_length ? `${s.avg_set1_length} songs (~${Math.round(s.avg_set1_length * 6)} min)` : '—'} color={D.cyan} />
               <Row label="AVG SET II LENGTH" value={s.avg_set2_length ? `${s.avg_set2_length} songs (~${Math.round(s.avg_set2_length * 6)} min)` : '—'} color={D.orange} />
-              <Row label="AVG SONGS / SHOW" value={s.avg_songs_per_show || '—'} color={D.white} />
+              <Row label="AVG SONGS / SHOW" value={s.avg_songs_per_show || '—'} color={D.muted} />
               {s.first_song_ever && (
                 <Row label="FIRST SONG YOU EVER HEARD" value={s.first_song_ever} color={D.orange} mono />
               )}
@@ -305,16 +315,16 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 label="LONGEST SHOW"
                 sub={s.longest_show ? `${s.longest_show.venue} · ${formatDate(s.longest_show.date)}` : ''}
                 color={D.cyan} size="1.2rem"
-                onClick={s.longest_show?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_show.date) : null}
-                href={s.longest_show?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_show.date}` : null}
+                onClick={s.longest_show?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_show.date) : null}
+                href={s.longest_show?.date ? `${PHISH_IN}/${s.longest_show.date}` : null}
               />
               <Tile
                 value={s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—'}
                 label="LONGEST ENCORE"
                 sub={s.longest_encore ? `${s.longest_encore.venue} · ${formatDate(s.longest_encore.date)}` : ''}
                 color={D.orange} size="1.2rem"
-                onClick={s.longest_encore?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_encore.date) : null}
-                href={s.longest_encore?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_encore.date}` : null}
+                onClick={s.longest_encore?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_encore.date) : null}
+                href={s.longest_encore?.date ? `${PHISH_IN}/${s.longest_encore.date}` : null}
               />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
@@ -323,23 +333,19 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 label="LONGEST SET I"
                 sub={s.longest_set1 ? `${s.longest_set1.venue} · ${formatDate(s.longest_set1.date)}` : ''}
                 color={D.cyan} size="1.2rem"
-                onClick={s.longest_set1?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_set1.date) : null}
-                href={s.longest_set1?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_set1.date}` : null}
+                onClick={s.longest_set1?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_set1.date) : null}
+                href={s.longest_set1?.date ? `${PHISH_IN}/${s.longest_set1.date}` : null}
               />
               <Tile
                 value={s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—'}
                 label="LONGEST SET II"
                 sub={s.longest_set2 ? `${s.longest_set2.venue} · ${formatDate(s.longest_set2.date)}` : ''}
                 color={D.orange} size="1.2rem"
-                onClick={s.longest_set2?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_set2.date) : null}
-                href={s.longest_set2?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_set2.date}` : null}
+                onClick={s.longest_set2?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_set2.date) : null}
+                href={s.longest_set2?.date ? `${PHISH_IN}/${s.longest_set2.date}` : null}
               />
             </div>
-            <div style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.1)', padding: '8px 14px', marginBottom: 6 }}>
-              <div style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.muted, letterSpacing: '2px' }}>
-                ◈ Song counts are used as a proxy for show length. Phish.net doesn't publish set durations.
-              </div>
-            </div>
+
           </Section>
 
           {/* ── STREAKS & GAPS ── */}
@@ -603,6 +609,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 // ============================================================
 // MY PHRIENDS TAB
 // ============================================================
+
 
 
 
