@@ -1,5 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatDate } from '../utils';
+
+// ============================================================
+// PHREEZER AVATAR — geometric SVG, seeded by avatar id
+// ============================================================
+const AVATAR_OPTIONS = [
+  { id: 'phreeze',    label: 'PHREEZE'    },
+  { id: 'crosshair',  label: 'CROSSHAIR'  },
+  { id: 'waveform',   label: 'WAVEFORM'   },
+  { id: 'hexagon',    label: 'HEXAGON'    },
+];
+
+export function PhreezerAvatar({ seed, size = 52, color = '#00ffff' }) {
+  const s = size;
+  const cx = s / 2;
+  const cy = s / 2;
+  const r = s * 0.35;
+
+  if (seed === 'crosshair') return (
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{ display: 'block' }}>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={s*0.025} opacity="0.5"/>
+      <circle cx={cx} cy={cy} r={r*0.45} fill="none" stroke={color} strokeWidth={s*0.03} opacity="0.85"/>
+      <circle cx={cx} cy={cy} r={s*0.04} fill={color}/>
+      <line x1={cx - r*1.1} y1={cy} x2={cx - r*0.55} y2={cy} stroke={color} strokeWidth={s*0.025} opacity="0.7"/>
+      <line x1={cx + r*0.55} y1={cy} x2={cx + r*1.1} y2={cy} stroke={color} strokeWidth={s*0.025} opacity="0.7"/>
+      <line x1={cx} y1={cy - r*1.1} x2={cx} y2={cy - r*0.55} stroke={color} strokeWidth={s*0.025} opacity="0.7"/>
+      <line x1={cx} y1={cy + r*0.55} x2={cx} y2={cy + r*1.1} stroke={color} strokeWidth={s*0.025} opacity="0.7"/>
+    </svg>
+  );
+
+  if (seed === 'waveform') {
+    const bars = [0.3, 0.6, 1, 0.6, 0.3, 0.15];
+    const bw = s * 0.09;
+    const gap = s * 0.04;
+    const totalW = bars.length * bw + (bars.length - 1) * gap;
+    const startX = (s - totalW) / 2;
+    return (
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{ display: 'block' }}>
+        {bars.map((h, i) => {
+          const bh = h * s * 0.7;
+          const x = startX + i * (bw + gap);
+          return <rect key={i} x={x} y={cy - bh/2} width={bw} height={bh} rx={bw*0.3} fill={color} opacity={0.2 + h * 0.8}/>;
+        })}
+      </svg>
+    );
+  }
+
+  if (seed === 'hexagon') {
+    const pts = (radius) => Array.from({length:6}, (_,i) => {
+      const a = (Math.PI/180)*(60*i - 30);
+      return `${cx + radius*Math.cos(a)},${cy + radius*Math.sin(a)}`;
+    }).join(' ');
+    return (
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{ display: 'block' }}>
+        <polygon points={pts(r)} fill="none" stroke={color} strokeWidth={s*0.025} opacity="0.4"/>
+        <polygon points={pts(r*0.6)} fill="none" stroke={color} strokeWidth={s*0.03} opacity="0.75"/>
+        <circle cx={cx} cy={cy} r={s*0.05} fill={color}/>
+      </svg>
+    );
+  }
+
+  // Default: phreeze (snowflake geometry)
+  return (
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{ display: 'block' }}>
+      <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} stroke={color} strokeWidth={s*0.025} opacity="0.55"/>
+      <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke={color} strokeWidth={s*0.025} opacity="0.55"/>
+      <line x1={cx - r*0.7} y1={cy - r*0.7} x2={cx + r*0.7} y2={cy + r*0.7} stroke={color} strokeWidth={s*0.02} opacity="0.38"/>
+      <line x1={cx + r*0.7} y1={cy - r*0.7} x2={cx - r*0.7} y2={cy + r*0.7} stroke={color} strokeWidth={s*0.02} opacity="0.38"/>
+      <circle cx={cx} cy={cy} r={r*0.22} fill="none" stroke={color} strokeWidth={s*0.03} opacity="0.9"/>
+      <circle cx={cx} cy={cy} r={s*0.04} fill={color}/>
+      {[[0,-1],[0,1],[-1,0],[1,0]].map(([dx,dy],i) => (
+        <circle key={i} cx={cx + dx*r} cy={cy + dy*r} r={s*0.035} fill={color} opacity="0.65"/>
+      ))}
+    </svg>
+  );
+}
 
 export function BadgesSection({ api }) {
   const [kpi, setKpi] = useState(null);
@@ -46,8 +121,6 @@ export function BadgesSection({ api }) {
 // ============================================================
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
-const AVATAR_ICONS = ['❄','◈','⚡','✦','⬡','◉','▦','✎','🔥','🐟','🌀','🎸','💯','★','✍','🏔'];
-
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
   const [sec, setSec] = React.useState('info');
   const [profile, setProfile] = React.useState(null);
@@ -126,30 +199,26 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
           )}
           {sec === 'settings' && (
             <div>
-              {/* Avatar icon picker */}
+              {/* Avatar — geometric SVG options */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 10 }}>
-                  ◈ CHOOSE YOUR ICON
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 12 }}>
+                  ◈ CHOOSE YOUR AVATAR
                   {savingIcon && <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>SAVING...</span>}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 8 }}>
-                  {AVATAR_ICONS.map(icon => (
-                    <button key={icon} onClick={() => handleSaveIcon(icon)} style={{
-                      width: '100%', aspectRatio: '1', border: `2px solid ${selectedIcon === icon ? 'var(--cyan)' : 'rgba(51,255,51,0.15)'}`,
-                      background: selectedIcon === icon ? 'rgba(0,224,208,0.12)' : 'var(--bg-elevated)',
-                      fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: selectedIcon === icon ? '0 0 12px rgba(0,224,208,0.35)' : 'none',
-                      transition: 'all 0.15s',
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  {AVATAR_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => handleSaveIcon(opt.id)} style={{
+                      aspectRatio: '1', border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(51,255,51,0.15)'}`,
+                      background: selectedIcon === opt.id ? 'rgba(0,224,208,0.08)' : 'var(--bg-elevated)',
+                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 8,
+                      boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(0,224,208,0.3)' : 'none',
+                      transition: 'all 0.2s',
                     }}>
-                      {icon}
+                      <PhreezerAvatar seed={opt.id} size={44} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(0,224,208,0.5)'} />
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: selectedIcon === opt.id ? 'var(--cyan)' : 'var(--text-muted)', letterSpacing: '1px' }}>{opt.label}</span>
                     </button>
                   ))}
                 </div>
-                {selectedIcon && (
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2px', marginTop: 8, textAlign: 'center' }}>
-                    ACTIVE: {selectedIcon}
-                  </div>
-                )}
               </div>
               <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
