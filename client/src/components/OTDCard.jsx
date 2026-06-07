@@ -29,19 +29,28 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
       if (items.length > 0) {
         setLoadingAI(true);
         try {
-          const res = await fetch('/api/ai/summarize', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              reviews: items,
-              showDate: fullDate,
-              venue: otdShow.venue,
-              city: otdShow.city,
-              yearsAgo,
-            }),
-          });
-          const result = await res.json();
-          setAiData(result);
+          // Try cache first
+          const cached = await fetch(`/api/ai/summarize?showDate=${otdShow.show_date}`);
+          if (cached.ok) {
+            const result = await cached.json();
+            setAiData(result);
+          } else {
+            // Cache miss — generate
+            const res = await fetch('/api/ai/summarize', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reviews: items,
+                showDate: fullDate,
+                venue: otdShow.venue,
+                city: otdShow.city,
+                yearsAgo,
+                showDate: otdShow.show_date,
+              }),
+            });
+            const result = await res.json();
+            setAiData(result);
+          }
         } catch (e) {
           setAiData(null);
         } finally {
