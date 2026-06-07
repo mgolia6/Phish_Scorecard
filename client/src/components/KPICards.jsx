@@ -180,25 +180,44 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
 
         <div style={{ padding: '12px 14px' }}>
           {/* Progress bars */}
-          {[
-            { lbl: 'SHOWS RATED',    val: rated,                  total: attended, col: 'var(--orange)' },
-            { lbl: 'SHOWS REVIEWED', val: kpi.shows_with_reviews, total: attended, col: 'var(--cyan)'   },
-            ...(kpi.login_streak > 1 ? [{ lbl: 'LOGIN STREAK', val: `⚡ ${kpi.login_streak} DAYS`, pct: streakPct, col: 'var(--green)' }] : []),
-          ].map(({ lbl, val, total, pct, col }) => {
-            const fillPct  = pct !== undefined ? pct : Math.min((val / Math.max(total, 1)) * 100, 100);
-            const display  = pct !== undefined ? val : `${val} / ${total}`;
-            return (
-              <div key={lbl} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '1.5px', color: 'var(--text-label)', marginBottom: 6 }}>
-                  <span>{lbl}</span>
-                  <span style={{ color: col }}>{display}</span>
+          {(() => {
+            const milestones = [5, 10, 25, 50, 100, 150, 200, 300, 500];
+            const nextMilestone = (val) => milestones.find(m => m > val) || milestones[milestones.length - 1];
+            const rows = [
+              { lbl: 'SHOWS RATED',    val: rated,                  col: 'var(--orange)' },
+              { lbl: 'SHOWS REVIEWED', val: kpi.shows_with_reviews, col: 'var(--cyan)'   },
+              ...(kpi.login_streak > 1 ? [{ lbl: 'LOGIN STREAK', val: kpi.login_streak, col: 'var(--green)', isStreak: true }] : []),
+            ];
+            return rows.map(({ lbl, val, col, isStreak }) => {
+              let fillPct, display, sub;
+              if (isStreak) {
+                const streakMilestones = [3, 7, 14, 30, 60, 100];
+                const next = streakMilestones.find(m => m > val) || 100;
+                fillPct = Math.min((val / next) * 100, 100);
+                display = `⚡ ${val} DAYS`;
+                sub = val >= 100 ? 'MAX STREAK' : `${next - val} TO ${next}`;
+              } else {
+                const next = nextMilestone(val);
+                fillPct = Math.min((val / next) * 100, 100);
+                display = `${val}`;
+                sub = val >= next ? 'MILESTONE HIT' : `${next - val} TO ${next}`;
+              }
+              return (
+                <div key={lbl} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '1.5px', color: 'var(--text-label)', marginBottom: 6 }}>
+                    <span>{lbl}</span>
+                    <span style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      <span style={{ color: col, fontSize: '0.7rem' }}>{display}</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.46rem' }}>{sub}</span>
+                    </span>
+                  </div>
+                  <div style={{ height: 4, background: 'rgba(51,255,51,0.08)' }}>
+                    <div style={{ width: `${fillPct}%`, height: '100%', background: col, boxShadow: `0 0 6px ${col}`, transition: 'width 0.6s' }} />
+                  </div>
                 </div>
-                <div style={{ height: 4, background: 'rgba(51,255,51,0.08)' }}>
-                  <div style={{ width: `${fillPct}%`, height: '100%', background: col, boxShadow: `0 0 6px ${col}`, transition: 'width 0.6s' }} />
-                </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
 
           {/* Badges */}
           {kpi.badges && kpi.badges.length > 0 && (
@@ -252,5 +271,6 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
     </div>
   );
 }
+
 
 
