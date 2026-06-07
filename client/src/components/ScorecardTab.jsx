@@ -652,7 +652,6 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       </div>
                     </div>
                   )}
-                  )}
                 </div>
               )}
 
@@ -695,6 +694,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
 
 
