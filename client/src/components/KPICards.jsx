@@ -4,7 +4,6 @@ import { formatDate } from '../utils';
 
 const SHOW_KPIS = [
   {
-    key: 'attended',
     lbl: 'SHOWS',
     col: 'var(--cyan)',
     tipTitle: 'ATTENDED',
@@ -12,7 +11,6 @@ const SHOW_KPIS = [
     source: '↗ phish.net',
   },
   {
-    key: 'rated',
     lbl: 'PHROZEN',
     col: 'var(--orange)',
     tipTitle: 'PHROZEN',
@@ -20,7 +18,6 @@ const SHOW_KPIS = [
     source: '↗ Phreezer',
   },
   {
-    key: 'avg',
     lbl: 'AVG SCORE',
     col: 'var(--green)',
     tipTitle: 'AVG SCORE',
@@ -28,7 +25,6 @@ const SHOW_KPIS = [
     source: '↗ Phreezer',
   },
   {
-    key: 'reviewed',
     lbl: 'REVIEWED',
     col: 'var(--cyan)',
     tipTitle: 'REVIEWED',
@@ -73,77 +69,48 @@ function KPICard({ val, lbl, col, tip, tipTitle, source, isLast, flipped, onFlip
         borderRight: isLast ? 'none' : '1px solid var(--border)',
         cursor: 'pointer',
         perspective: '600px',
-        height: 96,
+        height: 88,
         position: 'relative',
         userSelect: 'none',
       }}
     >
       <div className={`kpi-card-inner${flipped ? ' flipped' : ''}`}>
         {/* FRONT */}
-        <div className="kpi-face" style={{ padding: '16px 6px' }}>
-          <div style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            fontWeight: 900,
-            color: col,
-            lineHeight: 1,
-            textShadow: '0 0 16px currentColor',
-          }}>
+        <div className="kpi-face" style={{ padding: '14px 6px' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: col, lineHeight: 1, textShadow: '0 0 16px currentColor' }}>
             {val}
           </div>
-          <div style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.42rem',
-            color: 'var(--text-muted)',
-            letterSpacing: '2px',
-            marginTop: 6,
-          }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 6 }}>
             {lbl}
           </div>
         </div>
-
         {/* BACK */}
-        <div className="kpi-face kpi-face-back" style={{
-          background: 'var(--bg-elevated)',
-          padding: '10px 8px',
-          gap: 6,
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.55rem',
-            fontWeight: 700,
-            color: col,
-            letterSpacing: '2px',
-            textShadow: '0 0 10px currentColor',
-            textAlign: 'center',
-          }}>
+        <div className="kpi-face kpi-face-back" style={{ background: 'var(--bg-elevated)', padding: '10px 8px', gap: 5 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', fontWeight: 700, color: col, letterSpacing: '2px', textShadow: '0 0 10px currentColor', textAlign: 'center' }}>
             {tipTitle}
           </div>
-          <div style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.52rem',
-            color: 'var(--white)',
-            letterSpacing: '0.5px',
-            lineHeight: 1.5,
-            textAlign: 'center',
-          }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--white)', lineHeight: 1.5, textAlign: 'center' }}>
             {tip}
           </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.48rem',
-            color: col,
-            opacity: 0.6,
-            textAlign: 'center',
-            letterSpacing: '0.5px',
-            marginTop: 2,
-          }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.46rem', color: col, opacity: 0.6, textAlign: 'center', marginTop: 2 }}>
             {source}
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+// Short badge labels
+function badgeLabel(b) {
+  const map = {
+    'century_club': '100 CLUB',
+    'first_freeze': '1ST FREEZE',
+    'phish_critic': 'CRITIC',
+    'streak_7': '7-DAY STREAK',
+    'streak_30': '30-DAY STREAK',
+  };
+  return map[b.id] || b.label?.toUpperCase() || b.id?.toUpperCase();
 }
 
 export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
@@ -174,56 +141,50 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
     { ...SHOW_KPIS[3], val: kpi.shows_with_reviews },
   ];
 
-  const handleFlip = (i) => {
-    setFlippedIndex(prev => prev === i ? null : i);
-  };
-
   return (
     <div>
       <style>{flipStyle}</style>
 
-      {/* ── QUICK STATS HEADER + IMPORT ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-panel)', padding: '10px 14px', borderBottom: '1px solid rgba(255,102,0,0.2)' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)' }}>◈ QUICK STATS</span>
-        <button
-          onClick={onImport}
-          style={{ padding: '7px 14px', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', border: '1px solid rgba(255,102,0,0.5)', color: 'var(--orange)', background: 'transparent', cursor: 'pointer', boxShadow: '0 0 10px rgba(255,102,0,0.2)' }}
-        >↓ IMPORT</button>
-      </div>
-
-      {/* ── KPI ROW ── */}
+      {/* ── KPI GRID — no header, just data ── */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr 1fr',
         background: 'var(--bg-panel)',
         border: '1px solid var(--border)',
-        borderTop: '1px solid rgba(255,102,0,0.2)',
+        borderTop: '2px solid rgba(0,224,208,0.25)',
       }}>
         {cardData.map(({ val, lbl, col, tip, tipTitle, source }, i) => (
           <KPICard
             key={lbl}
-            val={val}
-            lbl={lbl}
-            col={col}
-            tip={tip}
-            tipTitle={tipTitle}
-            source={source}
+            val={val} lbl={lbl} col={col}
+            tip={tip} tipTitle={tipTitle} source={source}
             isLast={i === cardData.length - 1}
             flipped={flippedIndex === i}
-            onFlip={() => handleFlip(i)}
+            onFlip={() => setFlippedIndex(prev => prev === i ? null : i)}
           />
         ))}
       </div>
 
       {/* ── TAP HINT ── */}
-      <div style={{ background: 'var(--bg-panel)', padding: '5px', textAlign: 'center', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '2px' }}>
-          ↕ TAP ANY STAT TO FLIP
+      <div style={{ background: 'var(--bg-panel)', padding: '4px 0', textAlign: 'center', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,224,208,0.45)', letterSpacing: '2px' }}>
+          ↕ TAP TO FLIP
         </span>
       </div>
 
-      {/* ── PROGRESS + STATS ── */}
-      <div style={{ background: 'var(--bg-elevated)', padding: '14px', borderBottom: '2px solid rgba(255,102,0,0.15)' }}>
+      {/* ── QUICK PHREEZE ── */}
+      <div style={{ background: 'var(--bg-elevated)', padding: '12px 14px', borderBottom: '2px solid rgba(255,102,0,0.15)', marginTop: 10 }}>
+
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)' }}>◈ QUICK PHREEZE</span>
+          <button
+            onClick={onImport}
+            style={{ padding: '6px 12px', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', border: '1px solid rgba(255,102,0,0.5)', color: 'var(--orange)', background: 'transparent', cursor: 'pointer' }}
+          >↓ IMPORT</button>
+        </div>
+
+        {/* Progress bars */}
         {[
           { lbl: 'SHOWS RATED',    val: rated,                  total: attended, col: 'var(--orange)' },
           { lbl: 'SHOWS REVIEWED', val: kpi.shows_with_reviews, total: attended, col: 'var(--cyan)'   },
@@ -244,12 +205,12 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           );
         })}
 
-        {/* Badges */}
+        {/* Badges — compact single row */}
         {kpi.badges && kpi.badges.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
             {kpi.badges.map(b => (
-              <div key={b.id} title={b.desc} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', border: '1px solid rgba(51,255,51,0.22)', background: 'var(--bg-elevated)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--green)', letterSpacing: '1.5px' }}>
-                <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
+              <div key={b.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid rgba(51,255,51,0.22)', background: 'var(--bg-elevated)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--green)', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '0.7rem' }}>{b.glyph}</span>{badgeLabel(b)}
               </div>
             ))}
           </div>
