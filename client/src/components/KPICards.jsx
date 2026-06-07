@@ -153,7 +153,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
         borderTop: 'none',
         marginBottom: 10,
       }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2.5px' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.75)', letterSpacing: '2.5px', fontWeight: 700 }}>
           ↕ TAP ANY STAT TO FLIP
         </span>
       </div>
@@ -243,7 +243,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           {/* Deep Phreeze */}
           <div
             onClick={() => onDeepPhreeze && onDeepPhreeze()}
-            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '3px', color: 'rgba(0,224,208,0.5)', cursor: 'pointer' }}
+            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '3px', color: 'rgba(0,224,208,0.8)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
           >
             ❄ DIVE INTO DEEP PHREEZE ▶
           </div>
