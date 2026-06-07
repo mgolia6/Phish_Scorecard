@@ -7,12 +7,19 @@ function parseStructured(raw) {
   if (typeof raw === 'object') return raw; // already parsed (JSONB from Postgres)
   // Try direct parse first
   try { return JSON.parse(raw.trim()); } catch {}
-  // Strip markdown fences
-  const stripped = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/g, '').trim();
+  // Strip all markdown fence variants (with or without newline after)
+  const stripped = raw.trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/g, '')
+    .trim();
   try { return JSON.parse(stripped); } catch {}
-  // Extract first {...} block from anywhere in the string
-  const match = raw.match(/\{[\s\S]*\}/);
+  // Extract first {...} block from anywhere in the string (handles inline fences)
+  const match = raw.match(/\{[\s\S]*?\}(?=[^}]*$)/s) || raw.match(/\{[\s\S]*\}/);
   if (match) { try { return JSON.parse(match[0]); } catch {} }
+  // Last resort: find { and grab everything from there to end of string
+  const brace = raw.indexOf('{');
+  if (brace !== -1) { try { return JSON.parse(raw.slice(brace)); } catch {} }
   return null;
 }
 
