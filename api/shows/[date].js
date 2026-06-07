@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       reviews: {
         count:     reviews.length,
         avg_score: avgReviewScore,
-        items:     reviews.slice(0, 3),
+        items:     reviews,
       },
     });
   } catch (err) {
