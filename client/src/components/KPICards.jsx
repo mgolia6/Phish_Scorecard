@@ -243,7 +243,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           {/* Deep Phreeze */}
           <div
             onClick={() => onDeepPhreeze && onDeepPhreeze()}
-            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '3px', color: 'rgba(0,224,208,0.8)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
+            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2.5px', fontWeight: 700, color: 'rgba(0,224,208,0.75)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
           >
             ❄ DIVE INTO DEEP PHREEZE ▶
           </div>
@@ -252,3 +252,4 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
     </div>
   );
 }
+
