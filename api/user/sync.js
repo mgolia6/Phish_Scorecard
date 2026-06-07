@@ -13,16 +13,41 @@ const RECENT_DAYS = 60; // always re-fetch recent shows
 
 async function fetchPhishInDuration(date) {
   try {
+    // phish.in v2 API
     const res = await fetch(`${PHISH_IN}/shows/${date}`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) return null;
     const data = await res.json();
-    // phish.in returns tracks array with duration in seconds
-    const tracks = data?.tracks || data?.data?.tracks || [];
+
+    // Handle multiple possible response shapes from phish.in
+    // Shape 1: { tracks: [...] }
+    // Shape 2: { data: { tracks: [...] } }
+    // Shape 3: { data: [...] } where each item has duration
+    let tracks = [];
+    if (Array.isArray(data?.tracks)) tracks = data.tracks;
+    else if (Array.isArray(data?.data?.tracks)) tracks = data.data.tracks;
+    else if (Array.isArray(data?.data)) tracks = data.data;
+
     if (!tracks.length) return null;
-    const totalSeconds = tracks.reduce((sum, t) => sum + (parseInt(t.duration) || 0), 0);
-    return totalSeconds > 0 ? totalSeconds : null;
+
+    // duration field may be in seconds (integer) or "mm:ss" string or milliseconds
+    const totalSeconds = tracks.reduce((sum, t) => {
+      const raw = t.duration ?? t.length ?? t.run_time ?? 0;
+      if (!raw) return sum;
+      if (typeof raw === 'number') {
+        // If > 10000 assume milliseconds
+        return sum + (raw > 10000 ? Math.round(raw / 1000) : raw);
+      }
+      if (typeof raw === 'string' && raw.includes(':')) {
+        const parts = raw.split(':').map(Number);
+        if (parts.length === 2) return sum + parts[0] * 60 + parts[1];
+        if (parts.length === 3) return sum + parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      return sum + (parseInt(raw) || 0);
+    }, 0);
+
+    return totalSeconds > 60 ? totalSeconds : null;
   } catch (e) {
     return null;
   }
