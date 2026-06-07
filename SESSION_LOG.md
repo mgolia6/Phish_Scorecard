@@ -17,80 +17,43 @@
 - Uncle Ebenezer: floating AI agent (snowflake button, orange glow, bottom-right, every tab)
   - api/ai/ebenezer.js: pulls user show history from DB, 10-turn fading memory, Claude Sonnet
   - EbenezerDrawer.jsx: slide-up drawer, suggestion prompts, CLEAR, session memory
-- Security review completed (see below)
+- KPI refresh: closes scorecard overlay increments kpiRefreshKey, forces KPI + show list re-fetch
+- Search panel fix: removed onShowLoaded callback that was nulling initialShowDate immediately
+- Mobile song-row CSS: horizontal layout — name+meta left, play+stars right (was stacking vertically)
+- Setlist data fix: filter non-Phish artists by artistid !== 1
+  - Phish.net returns ALL artists for a date — Dude of Life shows, openers, etc bleed in without this
+  - Secondary dedup by set+position for benefit shows where guest songs share position numbers
+- Custom song filter removed in favor of artistid filter (was catching some but not all guest songs)
+
+### How the setlist filter works
+- Phish.net v5 setlist API: every song entry has artistid field. Phish = 1.
+- Filter: if artistid exists and is not '1', drop the song
+- Secondary: if two songs share the same set+position (benefit show format), keep the first
+- This handles: Dude of Life co-bills, benefit show openers, any other non-Phish artist on same date
 
 ### Next session priorities
 - Confirm Ebenezer works end-to-end (check localStorage token key is phreezer_token)
 - Confirm Vibe Check renders correctly with real review text
-- Implement security backlog (see below) -- do rate limiting first
+- Rate limiting on auth endpoints (Priority 1 security item)
+- Lock down admin/migrate endpoint
 - COMMUNITY tab still placeholder
 - Phishook/Phreezer rename + logo not yet applied
 
+### Security backlog (see previous session log entry for full detail)
+1. Rate limiting on /api/auth/login and /api/auth/register — brute force risk
+2. Email verification + one-account-per-email enforcement (use Resend, already wired)
+3. Disposable email domain blocklist on register
+4. Lock /api/admin/migrate — no auth check currently
+5. JWT hardening — shorten to 7d + revocation mechanism
+6. Verify no API keys leak into client bundle (grep process.env in client/src/)
+
 ### Key learnings
 - Phish.net v5 review field: review_text (not review)
+- Phish.net v5 artistid: Phish = 1. Always filter by this before processing setlists.
+- Phish.net returns multi-artist setlists for same date — co-bills, DOL shows, etc
 - Haiku wraps JSON in markdown fences despite instructions -- always strip + harden prompt
 - HEATMAP_POS must live in Heatmap.jsx -- cannot rely on monolith scope
 - Never touch files with string manipulation for deploy triggers
 - DB connection times out from bash_tool -- use auto-create pattern instead
 - Claude Haiku for Vibe Check (fast/cheap), Claude Sonnet for Ebenezer (needs to reason)
-
----
-
-## SECURITY BACKLOG
-
-### What is solid right now
-- Passwords: bcrypt hashed, cost factor 10. Never stored plain text. Correct.
-- Login: returns same error message for bad email and bad password -- does not leak which one is wrong. Correct.
-- JWTs: signed with JWT_SECRET env var, 30-day expiry. Correct.
-- HTTPS: enforced by Vercel automatically. Correct.
-- DB credentials + API keys: in Vercel env vars, not in repo. Correct.
-- SQL: using parameterized queries throughout (_db.js pattern). Not vulnerable to SQL injection. Correct.
-
-### Priority 1 -- Rate limiting on auth endpoints (do this first)
-- Problem: no limit on login or register attempts. Someone can brute-force passwords or spam account creation.
-- Fix: install express-rate-limit or use upstash/ratelimit (works with Vercel edge).
-  Simple version: track attempts by IP in memory or a redis store.
-  Suggested limits: 10 login attempts per IP per 15 minutes, 5 register attempts per IP per hour.
-- Files to touch: api/auth/login.js, api/auth/register.js
-- Effort: ~1 hour
-
-### Priority 2 -- One account per email (enforce + fraud detection)
-- Problem: email uniqueness is checked at register but there is no email verification.
-  Someone can create 50 accounts with fake emails like fake1@gmail.com, fake2@gmail.com.
-- Fix part A -- email verification:
-  Use Resend (already integrated -- re_aPxWcAKa_59QDytBpxDobhnqBZjVXtqXp) to send a
-  verification email on register. Add email_verified boolean and verification_token to users table.
-  Block login until verified. Token expires in 24 hours.
-- Fix part B -- disposable email detection:
-  Check the domain against a blocklist of known disposable email providers
-  (mailinator.com, tempmail.com, guerrillamail.com, etc -- list of ~2000 domains available as npm package).
-  Reject registration from those domains.
-- Fix part C -- duplicate detection beyond email:
-  On register, also check for same username variations (case-insensitive).
-  Consider flagging accounts that register within seconds of each other from same IP.
-- Files to touch: api/auth/register.js, api/auth/verify.js (new), users table (add email_verified, verification_token, verification_expires)
-- Effort: ~3 hours
-
-### Priority 3 -- Lock down admin endpoint
-- Problem: /api/admin/migrate has no auth check. Anyone who knows the URL can POST and run migrations.
-- Fix: add verifyToken check + is_admin check at top of migrate.js, same pattern as other admin routes.
-- Files to touch: api/admin/migrate.js
-- Effort: 15 minutes
-
-### Priority 4 -- JWT hardening
-- Current: 30-day expiry, no refresh token, no revocation mechanism.
-  If a token is stolen it works for up to 30 days with no way to invalidate it.
-- Fix: shorten to 7-day expiry + add a refresh token flow, OR add a token_version column
-  to users table and increment on password change/logout so old tokens become invalid.
-- Effort: ~2 hours, medium complexity
-
-### Priority 5 -- API key exposure in client
-- The Phish.net API key is used server-side (correct) but double-check no API keys
-  are being imported into any client/src/ file. Vite will bundle them into the JS payload.
-- Quick check: grep -r "process.env" client/src/ -- should return nothing.
-- Effort: 10 minutes to verify
-
-### Not a concern for this app at current scale
-- DDOS protection: Vercel handles this at the edge
-- XSS: React escapes by default, no dangerouslySetInnerHTML usage observed
-- CSRF: stateless JWT auth is not vulnerable to CSRF
+- KPICards useEffect must include refreshKey in deps array or it never re-fetches after rating
