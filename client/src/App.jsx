@@ -285,7 +285,7 @@ function FullPageLoader({ text }) {
   return (
     <div className="fullpage-loader">
       <div className="fullpage-loader-inner">
-        <div className="fullpage-snowflake">❄</div>
+        <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="fullpage-snowflake" />
         <div className="fullpage-loader-text">{text || 'LOADING...'}</div>
       </div>
     </div>
