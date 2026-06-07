@@ -20,7 +20,9 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
+  const [syncStatus, setSyncStatus] = useState('');
   const [toggle, setToggle] = useState('attended');
+  const [expandedSong, setExpandedSong] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -35,11 +37,19 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
   const handleSync = async () => {
     setSyncing(true);
     setSyncResult(null);
+    setSyncStatus('Fetching your attended shows...');
     try {
+      setSyncStatus('Pulling setlists from Phish.net...');
+      await new Promise(r => setTimeout(r, 400));
+      setSyncStatus('Fetching precise timing from Phish.in...');
+      await new Promise(r => setTimeout(r, 400));
+      setSyncStatus('Computing your lifetime stats...');
       const res = await api.post('/user/sync', {});
-      setSyncResult(`✓ SYNCED ${res.synced} SHOWS`);
+      setSyncStatus('');
+      setSyncResult(`✓ SYNCED — ${res.synced} shows updated, precise timing for ${res.stats?.precise_show_count || 0} shows`);
       setData({ needs_sync: false, stats: res.stats, computed_at: new Date().toISOString() });
     } catch (e) {
+      setSyncStatus('');
       setSyncResult(`✗ ${e.message}`);
     } finally {
       setSyncing(false);
@@ -122,7 +132,7 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
     </a>
   ) : <span style={style}>{children || song}</span>;
 
-  if (loading) return <FullPageLoader text="LOADING DEEP PHREEZE..." />;
+  if (loading) return <FullPageLoader text="LOADING DEEP PHREEZE..." subtext="Pulling your lifetime stats from the vault." />;
 
   if (!data || data.needs_sync) return (
     <div style={{ padding: '20px 0' }}>
@@ -143,7 +153,12 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
 
   const s = data.stats || {};
   const isAttended = toggle === 'attended';
-  const liveTime = fmtLiveTime(s.est_live_minutes_total);
+  const liveTime = fmtLiveTime(s.live_duration_minutes);
+  const preciseCount = s.precise_show_count || 0;
+  const totalAttended = s.total_attended || 0;
+  const timingNote = preciseCount > 0
+    ? `Precise for ${preciseCount}/${totalAttended} shows, ~3hr est. for rest`
+    : `~3hr avg per show × ${totalAttended} shows`;
 
   return (
     <div style={{ paddingBottom: 24 }}>
@@ -168,7 +183,13 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
           {syncing ? '◈ ...' : '↺ SYNC'}
         </button>
       </div>
-      {syncResult && <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: syncResult.startsWith('✓') ? D.green : 'var(--red)', marginBottom: 8 }}>{syncResult}</div>}
+      {syncing && syncStatus && (
+        <div style={{ background: 'rgba(0,224,208,0.06)', border: '1px solid rgba(0,224,208,0.2)', padding: '10px 14px', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: D.cyan, boxShadow: `0 0 8px ${D.cyan}`, animation: 'pulse 1s infinite', flexShrink: 0 }} />
+          <span style={{ fontFamily: D.mono, fontSize: '0.74rem', color: D.cyan }}>{syncStatus}</span>
+        </div>
+      )}
+      {syncResult && <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: syncResult.startsWith('✓') ? D.green : 'var(--red)', marginBottom: 8, padding: '8px 0' }}>{syncResult}</div>}
 
       {isAttended ? (
         <>
@@ -181,7 +202,7 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Tile value={liveTime} label="LIVE PHISH TIME" size="1.1rem"
-                sub={`~3 hrs/show × ${s.total_attended || 0} shows`} color={D.cyan} />
+                sub={timingNote} color={D.cyan} />
               <Tile value={s.avg_shows_per_year || '—'} label="AVG SHOWS / YEAR" color={D.orange}
                 sub={s.busiest_year ? `Best: ${s.busiest_year.year} (${s.busiest_year.count} shows)` : ''} />
             </div>
@@ -482,22 +503,53 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
 
           {/* ── MOST RATED VERSIONS ── */}
           <Section icon="◉" label="MOST RATED VERSIONS" color={D.cyan}>
-            <RankedList
-              title="SONGS YOU'VE RATED THE MOST"
-              items={(s.most_heard_rated || []).slice(0, 10)}
-              renderRow={(item, i) => (
-                <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <SongLink song={item.song}>{item.song}</SongLink>
-                  </div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0, minWidth: 38, textAlign: 'right' }}>avg {item.avg}</div>
-                </>
-              )}
-            />
-            {!s.most_heard_rated?.length && (
+            {!s.most_heard_rated?.length ? (
               <div style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.muted, padding: '12px 0', lineHeight: 1.6 }}>
-                No rated songs yet. Rate shows in MY SHOWS to populate your song ratings.
+                No rated songs yet. Rate shows in MY SHOWS to see your top song versions here.
+              </div>
+            ) : (
+              <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
+                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>
+                  YOUR MOST RATED SONGS — TAP FOR TOP VERSIONS
+                </div>
+                {(s.most_heard_rated || []).slice(0, 10).map((item, i) => {
+                  const isOpen = expandedSong === item.song;
+                  return (
+                    <div key={item.song}>
+                      <div
+                        onClick={() => setExpandedSong(isOpen ? null : item.song)}
+                        style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.06)`, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: isOpen ? 'rgba(0,224,208,0.04)' : 'transparent' }}
+                      >
+                        <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                        <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
+                        <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
+                        <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0, minWidth: 38, textAlign: 'right' }}>avg {item.avg}</div>
+                        <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
+                      </div>
+                      {isOpen && (
+                        <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(51,255,51,0.06)` }}>
+                          <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.48rem', color: D.muted, letterSpacing: '2px' }}>
+                            YOUR TOP VERSIONS
+                          </div>
+                          {(item.versions || []).length > 0 ? item.versions.map((v, vi) => (
+                            <div key={vi} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderTop: `1px solid rgba(51,255,51,0.04)` }}>
+                              <PlayLink date={v.date} />
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.white }}>{formatDate(v.date)}</div>
+                                <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.venue}</div>
+                              </div>
+                              <div style={{ fontFamily: D.disp, fontSize: '1rem', color: v.rating >= 4.5 ? D.orange : D.cyan, flexShrink: 0 }}>{v.rating.toFixed(1)}</div>
+                            </div>
+                          )) : (
+                            <div style={{ padding: '10px 14px', fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>
+                              Rate individual songs in MY SHOWS to see version history.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </Section>
@@ -516,4 +568,5 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
 // ============================================================
 // MY PHRIENDS TAB
 // ============================================================
+
 
