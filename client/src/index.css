@@ -564,18 +564,18 @@ select option { background: var(--bg); color: var(--green); }
   margin-top: 3px;
 }
 
-/* ── SHOW DATE — PLAYFAIR SERIF ──────────────────────── */
-/* The ONE place we use the serif — show dates on cards */
+/* ── SHOW DATE — DISPLAY FONT ──────────────────────── */
 .show-date-serif {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-display);
+  font-style: normal;
   font-weight: 700;
   color: var(--white);
   line-height: 1.15;
+  letter-spacing: 2px;
 }
-.show-date-serif-sm  { font-size: 1rem;  }
-.show-date-serif-md  { font-size: 1.2rem; }
-.show-date-serif-lg  { font-size: 1.4rem; }
+.show-date-serif-sm  { font-size: 0.9rem;  }
+.show-date-serif-md  { font-size: 1.05rem; }
+.show-date-serif-lg  { font-size: 1.2rem; }
 
 /* Show card new design */
 .show-card-v2 {
