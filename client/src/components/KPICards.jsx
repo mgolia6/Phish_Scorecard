@@ -192,7 +192,13 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
       </div>
 
       {/* ── KPI ROW ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr 1fr',
+        background: 'var(--bg-panel)',
+        border: '1px solid var(--border)',
+        borderTop: '1px solid rgba(255,102,0,0.2)',
+      }}>
         {cardData.map(({ val, lbl, col, tip, tipTitle, source }, i) => (
           <KPICard
             key={lbl}
@@ -210,9 +216,9 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
       </div>
 
       {/* ── TAP HINT ── */}
-      <div style={{ background: 'var(--bg-panel)', padding: '4px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(0,224,208,0.35)', letterSpacing: '2px' }}>
-          TAP ANY STAT TO FLIP
+      <div style={{ background: 'var(--bg-panel)', padding: '5px', textAlign: 'center', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '2px' }}>
+          ↕ TAP ANY STAT TO FLIP
         </span>
       </div>
 
@@ -253,9 +259,9 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
         {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)', borderLeft: '3px solid var(--orange)', paddingLeft: 10 }}>
             {[
-              kpi.top_song   ? ['TOP SONG',    kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
-              kpi.top_venue  ? ['MOST VISITED', kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
-              kpi.first_show ? ['FIRST SHOW',   formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
+              kpi.top_song   ? ['TOP RATED SONG', kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
+              kpi.top_venue  ? ['TOP VENUE',       kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
+              kpi.first_show ? ['FIRST FREEZE',    formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
             ].filter(Boolean).map(([l, v, s, col], i, arr) => (
               <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
