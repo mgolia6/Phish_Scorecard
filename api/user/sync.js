@@ -295,11 +295,17 @@ function computeStats(attendedDates, cachedShows, userRatings) {
   const uniqueVenuesSet = new Set();
   const uniqueStatesSet = new Set();
   const showsByYear = {};
+  const showsByMonth = { Jan:0,Feb:0,Mar:0,Apr:0,May:0,Jun:0,Jul:0,Aug:0,Sep:0,Oct:0,Nov:0,Dec:0 };
+  const showsByDow = { Sun:0,Mon:0,Tue:0,Wed:0,Thu:0,Fri:0,Sat:0 };
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const encoreFreq = {};
   let longestEncore = null, longestEncoreCount = 0;
   let firstSongEver = null, lastSongEver = null;
   let totalSet1Count = 0, totalSet2Count = 0, set1ShowCount = 0, set2ShowCount = 0;
   let totalDurSeconds = 0, durCount = 0;
+  let totalSet1DurSeconds = 0, set1DurCount = 0;
+  let totalSet2DurSeconds = 0, set2DurCount = 0;
   let totalEncoreDur = 0, encoreDurCount = 0;
 
   showsWithCache.forEach(d => {
@@ -314,6 +320,11 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     if (c.state) uniqueStatesSet.add(c.state);
     const yr = d.slice(0, 4);
     showsByYear[yr] = (showsByYear[yr] || 0) + 1;
+    const dt = new Date(d + 'T12:00:00');
+    const mon = MONTHS[dt.getMonth()];
+    showsByMonth[mon] = (showsByMonth[mon] || 0) + 1;
+    const dow = DAYS[dt.getDay()];
+    showsByDow[dow] = (showsByDow[dow] || 0) + 1;
     (c.setlist || []).forEach(s => {
       if (s.song) uniqueSongsSet.add(s.song);
       if (s.set === 'e' || s.set === 'E') {
@@ -326,14 +337,24 @@ function computeStats(attendedDates, cachedShows, userRatings) {
       longestEncore = { date: d, venue: c.venue, count: c.encore_count };
     }
     if (c.duration_seconds && c.duration_seconds > 0) {
-      totalDurSeconds += parseInt(c.duration_seconds);
+      const dur = parseInt(c.duration_seconds);
+      totalDurSeconds += dur;
       durCount++;
-    }
-    // Estimate encore duration: encore songs / total songs * show duration
-    if (c.duration_seconds && c.song_count && c.encore_count) {
-      const encoreEst = Math.round((c.encore_count / c.song_count) * c.duration_seconds);
-      totalEncoreDur += encoreEst;
-      encoreDurCount++;
+      // Estimate set durations proportionally from song counts
+      if (c.song_count > 0) {
+        if (c.set1_count) {
+          totalSet1DurSeconds += Math.round((c.set1_count / c.song_count) * dur);
+          set1DurCount++;
+        }
+        if (c.set2_count) {
+          totalSet2DurSeconds += Math.round((c.set2_count / c.song_count) * dur);
+          set2DurCount++;
+        }
+        if (c.encore_count) {
+          totalEncoreDur += Math.round((c.encore_count / c.song_count) * dur);
+          encoreDurCount++;
+        }
+      }
     }
   });
 
@@ -440,6 +461,8 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     consecutive_years: { count: maxConsecYears, start: bestConsecStart },
     avg_shows_per_year: avgShowsPerYear,
     shows_by_year: showsByYear,
+    shows_by_month: showsByMonth,
+    shows_by_dow: showsByDow,
     // Setlist counts
     total_songs_heard: totalSongsHeard,
     total_set1_songs: totalSet1Songs,
@@ -457,6 +480,8 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     live_duration_days: totalDays,
     precise_show_count: preciseCount,
     avg_show_duration_seconds: durCount > 0 ? Math.round(totalDurSeconds / durCount) : null,
+    avg_set1_duration_seconds: set1DurCount > 0 ? Math.round(totalSet1DurSeconds / set1DurCount) : null,
+    avg_set2_duration_seconds: set2DurCount > 0 ? Math.round(totalSet2DurSeconds / set2DurCount) : null,
     avg_encore_duration_seconds: encoreDurCount > 0 ? Math.round(totalEncoreDur / encoreDurCount) : null,
     precise_show_count: preciseCount,
     most_common_encore: mostCommonEncore,
@@ -594,6 +619,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 
 
 
