@@ -27,7 +27,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [clearing, setClearing] = useState(false);
+
   const [syncResult, setSyncResult] = useState(null);
   const [syncStatus, setSyncStatus] = useState('');
   const [toggle, setToggle] = useState('attended');
@@ -43,19 +43,22 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 
   useEffect(() => { load(); }, []);
 
-  const handleSync = async () => {
+  const handleSync = async (forceRefresh = false) => {
     setSyncing(true);
     setSyncResult(null);
-    setSyncStatus('Fetching your attended shows...');
     try {
+      if (forceRefresh) {
+        setSyncStatus('Clearing cached show data...');
+        await api.post('/admin/clear-cache', {});
+      }
       setSyncStatus('Pulling setlists from Phish.net...');
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       setSyncStatus('Fetching precise timing from Phish.in...');
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       setSyncStatus('Computing your lifetime stats...');
       const res = await api.post('/user/sync', {});
       setSyncStatus('');
-      setSyncResult(`✓ SYNCED — ${res.synced} shows updated, precise timing for ${res.stats?.precise_show_count || 0} shows`);
+      setSyncResult(`✓ ${res.synced} shows updated · precise timing for ${res.stats?.precise_show_count || 0} shows`);
       setData({ needs_sync: false, stats: res.stats, computed_at: new Date().toISOString() });
     } catch (e) {
       setSyncStatus('');
@@ -65,19 +68,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     }
   };
 
-  const handleClearCache = async () => {
-    setClearing(true);
-    setSyncResult(null);
-    try {
-      const res = await api.post('/admin/clear-cache', {});
-      setSyncResult(`✓ Cleared ${res.cleared_show_cache} shows, ${res.cleared_stats} stats row. Now hit SYNC.`);
-      setData({ needs_sync: true });
-    } catch (e) {
-      setSyncResult(`✗ Clear failed: ${e.message}`);
-    } finally {
-      setClearing(false);
-    }
-  };
+
 
   const D = {
     bg: 'var(--bg-panel)', border: 'var(--border)',
@@ -214,7 +205,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
             fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
           }}>{l}</button>
         ))}
-        <button onClick={handleSync} disabled={syncing || clearing} style={{
+        <button onClick={() => handleSync(false)} disabled={syncing} style={{
           padding: '11px 14px', background: 'transparent', border: 'none',
           borderLeft: `1px solid ${D.border}`,
           color: syncing ? D.muted : D.green,
@@ -222,13 +213,13 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
         }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
         </button>
-        <button onClick={handleClearCache} disabled={syncing || clearing} style={{
+        <button onClick={() => handleSync(true)} disabled={syncing} style={{
           padding: '11px 10px', background: 'transparent', border: 'none',
           borderLeft: `1px solid ${D.border}`,
-          color: clearing ? D.muted : 'rgba(255,50,50,0.6)',
+          color: syncing ? D.muted : 'rgba(255,140,0,0.7)',
           fontFamily: D.disp, fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer', flexShrink: 0,
-        }} title="Clear cached show data and re-sync from scratch">
-          {clearing ? '...' : '✕ CLEAR'}
+        }} title="Wipe cache and rebuild from scratch">
+          {syncing ? '' : '↺↺ FULL'}
         </button>
       </div>
       {syncing && syncStatus && (
