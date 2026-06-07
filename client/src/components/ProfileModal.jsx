@@ -240,6 +240,25 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
                     { val: 'no-preference', label: 'ALL OF IT' },
                   ]
                 },
+                {
+                  label: 'MIKE SIDE OR PAGE SIDE?',
+                  field: 'stage_side',
+                  options: [
+                    { val: 'mike', label: 'MIKE SIDE' },
+                    { val: 'page', label: 'PAGE SIDE' },
+                    { val: 'center', label: 'CENTER' },
+                    { val: 'no-preference', label: 'WHEREVER' },
+                  ]
+                },
+                {
+                  label: 'DO YOU DANCE OR CHILL?',
+                  field: 'show_vibe',
+                  options: [
+                    { val: 'dance', label: 'I DANCE' },
+                    { val: 'chill', label: 'I CHILL' },
+                    { val: 'depends', label: 'DEPENDS ON THE JAM' },
+                  ]
+                },
               ].map(({ label, field, options }) => (
                 <div key={field} style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '12px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-label)', letterSpacing: '2px', marginBottom: 10 }}>{label}</div>
