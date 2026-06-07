@@ -4,105 +4,31 @@
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
   "rewrites": [
-    {
-      "source": "/api/auth/register",
-      "destination": "/api/auth/register"
-    },
-    {
-      "source": "/api/auth/login",
-      "destination": "/api/auth/login"
-    },
-    {
-      "source": "/api/auth/me",
-      "destination": "/api/auth/me"
-    },
-    {
-      "source": "/api/auth/accept",
-      "destination": "/api/auth/accept"
-    },
-    {
-      "source": "/api/shows",
-      "destination": "/api/shows/index"
-    },
-    {
-      "source": "/api/shows/:date",
-      "destination": "/api/shows/[date]"
-    },
-    {
-      "source": "/api/ratings/:showDate",
-      "destination": "/api/ratings/[showDate]"
-    },
-    {
-      "source": "/api/user/shows",
-      "destination": "/api/user/shows"
-    },
-    {
-      "source": "/api/user/attendance",
-      "destination": "/api/user/attendance"
-    },
-    {
-      "source": "/api/user/kpi",
-      "destination": "/api/user/kpi"
-    },
-    {
-      "source": "/api/user/profile",
-      "destination": "/api/user/profile"
-    },
-    {
-      "source": "/api/analytics/songs",
-      "destination": "/api/analytics/songs"
-    },
-    {
-      "source": "/api/analytics/venues",
-      "destination": "/api/analytics/venues"
-    },
-    {
-      "source": "/api/random-show",
-      "destination": "/api/random-show"
-    },
-    {
-      "source": "/api/audio/:date",
-      "destination": "/api/audio/[date]"
-    },
-    {
-      "source": "/api/import/phishnet",
-      "destination": "/api/import/phishnet"
-    },
-    {
-      "source": "/api/import/phishnet-reviews",
-      "destination": "/api/import/phishnet-reviews"
-    },
-    {
-      "source": "/api/admin/users",
-      "destination": "/api/admin/users"
-    },
-    {
-      "source": "/api/admin/user",
-      "destination": "/api/admin/user"
-    },
-    {
-      "source": "/api/admin/migrate",
-      "destination": "/api/admin/migrate"
-    },
-    {
-      "source": "/api/community/leaderboard",
-      "destination": "/api/community/leaderboard"
-    },
-    {
-      "source": "/api/user/profile-options",
-      "destination": "/api/user/profile-options"
-    },
-    {
-      "source": "/api/ai/summarize",
-      "destination": "/api/ai/summarize"
-    },
-    {
-      "source": "/api/ai/ebenezer",
-      "destination": "/api/ai/ebenezer"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/auth/register", "destination": "/api/auth/register" },
+    { "source": "/api/auth/login", "destination": "/api/auth/login" },
+    { "source": "/api/auth/me", "destination": "/api/auth/me" },
+    { "source": "/api/auth/accept", "destination": "/api/auth/accept" },
+    { "source": "/api/shows", "destination": "/api/shows/index" },
+    { "source": "/api/shows/:date", "destination": "/api/shows/[date]" },
+    { "source": "/api/ratings/:showDate", "destination": "/api/ratings/[showDate]" },
+    { "source": "/api/user/shows", "destination": "/api/user/shows" },
+    { "source": "/api/user/attendance", "destination": "/api/user/attendance" },
+    { "source": "/api/user/kpi", "destination": "/api/user/kpi" },
+    { "source": "/api/user/profile", "destination": "/api/user/profile" },
+    { "source": "/api/analytics/songs", "destination": "/api/analytics/songs" },
+    { "source": "/api/analytics/venues", "destination": "/api/analytics/venues" },
+    { "source": "/api/random-show", "destination": "/api/random-show" },
+    { "source": "/api/audio/:date", "destination": "/api/audio/[date]" },
+    { "source": "/api/import/phishnet", "destination": "/api/import/phishnet" },
+    { "source": "/api/import/phishnet-reviews", "destination": "/api/import/phishnet-reviews" },
+    { "source": "/api/admin/users", "destination": "/api/admin/users" },
+    { "source": "/api/admin/user", "destination": "/api/admin/user" },
+    { "source": "/api/admin/migrate", "destination": "/api/admin/migrate" },
+    { "source": "/api/community/leaderboard", "destination": "/api/community/leaderboard" },
+    { "source": "/api/user/profile-options", "destination": "/api/user/profile-options" },
+    { "source": "/api/ai/summarize", "destination": "/api/ai/summarize" },
+    { "source": "/api/ai/ebenezer", "destination": "/api/ai/ebenezer" },
+    { "source": "/api/shows/companions", "destination": "/api/shows/companions" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
