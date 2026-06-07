@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { CommExpandCard } from './CommunityTab';
 import { Heatmap } from './Heatmap';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function MyVenuesTab({ api, showMessage, showError }) {
   const [venues, setVenues] = useState([]);
