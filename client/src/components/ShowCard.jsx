@@ -193,7 +193,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
         </button>
         <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer"
-          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
+          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
           PHISH.NET
         </a>
         <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer"
@@ -204,4 +204,5 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
     </div>
   );
 }
+
 
