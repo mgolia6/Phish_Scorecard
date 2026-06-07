@@ -23,7 +23,9 @@ export default async function handler(req, res) {
 
     const first = setlistData.data[0];
 
-    const songs = setlistData.data.map(entry => ({
+    const songs = setlistData.data
+      .filter(entry => entry.slug !== 'custom' && entry.songid !== 765 && entry.songid !== '765')
+      .map(entry => ({
       songid:     entry.songid,
       song:       entry.song,
       slug:       entry.slug,
