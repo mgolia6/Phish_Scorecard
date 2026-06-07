@@ -1,5 +1,26 @@
 import React, { useState } from 'react';
 
+const HEATMAP_POS = {
+  WA:{r:0,c:0},OR:{r:1,c:0},CA:{r:3,c:0},NV:{r:2,c:1},ID:{r:1,c:1},MT:{r:0,c:2},
+  WY:{r:1,c:2},UT:{r:2,c:2},AZ:{r:3,c:2},CO:{r:2,c:3},NM:{r:3,c:3},ND:{r:0,c:3},
+  SD:{r:1,c:3},NE:{r:2,c:4},KS:{r:3,c:4},OK:{r:4,c:4},TX:{r:4,c:5},MN:{r:0,c:4},
+  IA:{r:1,c:4},MO:{r:2,c:5},AR:{r:3,c:5},LA:{r:4,c:6},WI:{r:0,c:5},IL:{r:1,c:5},
+  MS:{r:3,c:6},MI:{r:0,c:6},IN:{r:1,c:6},TN:{r:2,c:6},AL:{r:3,c:7},KY:{r:1,c:7},
+  OH:{r:0,c:7},WV:{r:1,c:8},GA:{r:3,c:8},FL:{r:4,c:8},VA:{r:0,c:8},NC:{r:1,c:9},
+  SC:{r:2,c:9},MD:{r:0,c:9},DE:{r:0,c:10},NJ:{r:0,c:11},PA:{r:0,c:10},NY:{r:0,c:12},
+  CT:{r:1,c:11},RI:{r:1,c:12},MA:{r:0,c:13},VT:{r:1,c:13},NH:{r:0,c:14},ME:{r:0,c:15},
+};
+
+const hmColor = s => {
+  if (!s) return 'rgba(51,255,51,0.08)';
+  const n = parseFloat(s);
+  if (n >= 4.7) return 'rgba(255,102,0,0.9)';
+  if (n >= 4.4) return 'rgba(255,140,0,0.75)';
+  if (n >= 4.1) return 'rgba(0,200,200,0.75)';
+  if (n >= 3.8) return 'rgba(0,180,180,0.45)';
+  return 'rgba(51,255,51,0.22)';
+};
+
 export function Heatmap({ data, title }) {
   const [hov, setHov] = useState(null);
   const rows = 5, cols = 16;
@@ -40,7 +61,3 @@ export function Heatmap({ data, title }) {
     </div>
   );
 }
-
-// ============================================================
-// MY SONGS TAB
-// ============================================================
