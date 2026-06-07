@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function DeepPhreezeTab({ api, showMessage, showError }) {
   const [data, setData] = useState(null);
