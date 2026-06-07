@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { formatDate } from '../utils';
 
-export function KPICards({ api, onDeepPhreeze, onImport }) {
+export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     api.get('/user/kpi')
       .then(setKpi)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   if (loading) return <FullPageLoader text="LOADING STATS..." />;
   if (!kpi) return null;
