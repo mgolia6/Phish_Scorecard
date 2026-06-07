@@ -212,25 +212,29 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     <div style={{ paddingBottom: 24 }}>
 
       {/* Toggle + Re-sync */}
-      <div style={{ display: 'flex', marginBottom: 6, border: `1px solid ${D.border}` }}>
-        {[['attended', `ATTENDED (${s.total_attended || 0})`], ['rated', `RATED (${s.total_rated || 0})`]].map(([k, l]) => (
-          <button key={k} onClick={() => setToggle(k)} style={{
-            flex: 1, padding: '11px 6px',
-            background: toggle === k ? 'rgba(0,224,208,0.07)' : 'transparent',
-            border: 'none', borderBottom: `2px solid ${toggle === k ? D.cyan : 'transparent'}`,
-            color: toggle === k ? D.cyan : D.muted,
-            fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
-          }}>{l}</button>
-        ))}
+      <div style={{ display: 'flex', marginBottom: 6 }}>
+        <div style={{ display: 'flex', flex: 1, border: `1px solid ${D.border}` }}>
+          {[['attended', `ATTENDED (${s.total_attended || 0})`], ['rated', `RATED (${s.total_rated || 0})`]].map(([k, l]) => (
+            <button key={k} onClick={() => setToggle(k)} style={{
+              flex: 1, padding: '11px 6px',
+              background: toggle === k ? 'rgba(0,224,208,0.07)' : 'transparent',
+              border: 'none', borderBottom: `2px solid ${toggle === k ? D.cyan : 'transparent'}`,
+              color: toggle === k ? D.cyan : D.muted,
+              fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
+            }}>{l}</button>
+          ))}
+        </div>
         <button
           onMouseDown={handleSyncPressStart} onMouseUp={handleSyncPressEnd} onMouseLeave={handleSyncPressEnd}
           onTouchStart={handleSyncPressStart} onTouchEnd={handleSyncPressEnd}
           disabled={syncing}
           style={{
-            padding: '11px 14px', background: 'transparent', border: 'none',
-            borderLeft: `1px solid ${D.border}`,
+            marginLeft: 8, padding: '0 16px',
+            background: syncing ? 'transparent' : 'rgba(51,255,51,0.06)',
+            border: `1px solid ${syncing ? D.border : 'rgba(51,255,51,0.3)'}`,
             color: syncing ? D.muted : D.green,
             fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
+            boxShadow: syncing ? 'none' : '0 0 8px rgba(51,255,51,0.1)',
           }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
         </button>
