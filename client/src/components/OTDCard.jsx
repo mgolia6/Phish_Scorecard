@@ -49,9 +49,13 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
               }),
             });
             const result = await res.json();
+            if (!res.ok) {
+              console.error('Vibe check error:', result);
+            }
             setAiData(result);
           }
         } catch (e) {
+          console.error('Vibe check fetch error:', e);
           setAiData(null);
         } finally {
           setLoadingAI(false);
@@ -228,3 +232,4 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
     </div>
   );
 }
+
