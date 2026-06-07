@@ -140,7 +140,16 @@ export function EbenezerDrawer({ api }) {
               textShadow: 'none',
               filter: 'drop-shadow(0 0 8px rgba(255,140,0,0.7)) drop-shadow(0 0 2px rgba(255,215,0,0.4))',
             }}>
-              UNCLE EBENEZER · JADED VET
+              UNCLE EBENEZER
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-display)', fontSize: '0.46rem', fontWeight: 700,
+              letterSpacing: '3px', marginTop: 2,
+              background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.6))',
+            }}>
+              JADED VET
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>
               show analyst · discovery engine
@@ -196,7 +205,8 @@ export function EbenezerDrawer({ api }) {
                 </div>
               ) : (
                 <div style={{ maxWidth: '92%' }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 5, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.6))' }}>UNCLE EBENEZER · JADED VET</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 1, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.6))' }}>UNCLE EBENEZER</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.32rem', letterSpacing: '2px', marginBottom: 4, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 4px rgba(255,140,0,0.5))' }}>JADED VET</div>
                   <div style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.82rem',
@@ -215,7 +225,8 @@ export function EbenezerDrawer({ api }) {
 
           {loading && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 5, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.6))' }}>UNCLE EBENEZER · JADED VET</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 1, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.6))' }}>UNCLE EBENEZER</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.32rem', letterSpacing: '2px', marginBottom: 4, background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 0 4px rgba(255,140,0,0.5))' }}>JADED VET</div>
               <div style={{ borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10 }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
               </div>
