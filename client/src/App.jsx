@@ -217,7 +217,7 @@ export default function App() {
       {tab === 'my-venues'     && user && <MyVenuesTab  api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-states'     && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-phriends'      && user && <MyPhriends      api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'my-deep-phreeze'  && user && <DeepPhreezeTab  api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'my-deep-phreeze'  && user && <DeepPhreezeTab  api={api} showMessage={showMessage} showError={showError} onOpenScorecard={handleRateShow} />}
       {tab === 'community'         && <CommunityTab  api={api} subTab="leaderboard" />}
       {tab === 'top-shows'         && <CommunityTab  api={api} subTab="top-shows"   />}
       {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"   />}
@@ -440,4 +440,5 @@ export default function App() {
     </div>
   );
 }
+
 
