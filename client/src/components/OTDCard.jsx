@@ -1,9 +1,16 @@
 import React, { useState, useRef } from 'react';
 
+const SENTIMENT_COLORS = {
+  FIRE: 'var(--orange)',
+  SOLID: 'var(--cyan)',
+  MIXED: 'rgba(51,255,51,0.5)',
+  SLEEPER: 'var(--text-muted)',
+};
+
 export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, api }) {
   const [expanded, setExpanded] = useState(false);
   const [reviews, setReviews] = useState(null);
-  const [aiSummary, setAiSummary] = useState(null);
+  const [aiData, setAiData] = useState(null); // { structured } or { summary }
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [loadingAI, setLoadingAI] = useState(false);
   const fetched = useRef(false);
@@ -33,10 +40,10 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
               yearsAgo,
             }),
           });
-          const aiData = await res.json();
-          setAiSummary(aiData.summary || null);
+          const result = await res.json();
+          setAiData(result);
         } catch (e) {
-          setAiSummary(null);
+          setAiData(null);
         } finally {
           setLoadingAI(false);
         }
@@ -47,6 +54,9 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
       setLoadingReviews(false);
     }
   };
+
+  const structured = aiData?.structured;
+  const fallbackSummary = aiData?.summary;
 
   return (
     <div style={{
@@ -98,7 +108,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
         </div>
       </div>
 
-      {/* ── Vibe Check toggle ── */}
+      {/* ── Toggle ── */}
       <button onClick={handleExpand} style={{
         width: '100%', padding: '10px 16px', background: 'rgba(0,224,208,0.04)', border: 'none',
         borderTop: '1px solid rgba(0,224,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -109,53 +119,92 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
       {/* ── Expanded ── */}
       {expanded && (
-        <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(0,224,208,0.1)', background: 'rgba(0,0,0,0.3)' }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(0,224,208,0.1)', background: 'rgba(0,0,0,0.3)' }}>
           {loadingReviews ? (
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '12px 0' }}>
               PULLING REVIEWS...
             </div>
           ) : reviews && reviews.length > 0 ? (
             <>
-              {/* AI Summary */}
-              <div style={{ marginBottom: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--orange)', letterSpacing: '2px' }}>◈ THE VIBE</span>
-                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(255,140,0,0.3), transparent)' }} />
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>AI SYNTHESIS</span>
+              {/* ── AI Synthesis ── */}
+              <div style={{ marginBottom: 16 }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--orange)', letterSpacing: '2px' }}>◈ VIBE CHECK</span>
+                    {structured?.sentiment && (
+                      <span style={{
+                        fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px',
+                        color: SENTIMENT_COLORS[structured.sentiment] || 'var(--text-muted)',
+                        border: `1px solid ${SENTIMENT_COLORS[structured.sentiment] || 'var(--border)'}`,
+                        padding: '2px 8px',
+                      }}>{structured.sentiment}</span>
+                    )}
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>
+                    AI · {structured?.reviewCount || reviews.length} PHISH.NET REVIEWS
+                  </span>
                 </div>
+
                 {loadingAI ? (
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                     Synthesizing {reviews.length} reviews...
                   </div>
-                ) : aiSummary ? (
+                ) : structured ? (
+                  <div>
+                    {/* Overall verdict */}
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 14, borderLeft: '2px solid rgba(255,140,0,0.5)', paddingLeft: 12 }}>
+                      {structured.overall}
+                    </div>
+
+                    {/* Themes */}
+                    {structured.themes && structured.themes.map((theme, i) => (
+                      <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < structured.themes.length - 1 ? '1px solid rgba(51,255,51,0.07)' : 'none' }}>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>
+                          {theme.label}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.65 }}>
+                          {theme.text}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Attribution */}
+                    <div style={{ marginTop: 12, fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '1.5px', borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 10 }}>
+                      AI SYNTHESIS OF {structured.reviewCount} PHISH.NET REVIEWS · NOT A SUBSTITUTE FOR READING THEM
+                    </div>
+                  </div>
+                ) : fallbackSummary ? (
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.65, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
-                    {aiSummary}
+                    {fallbackSummary}
                   </div>
                 ) : (
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Could not generate summary.</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    Could not generate synthesis.
+                  </div>
                 )}
               </div>
 
-              {/* Raw reviews */}
-              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 12 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>
+              {/* ── Raw reviews ── */}
+              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 12 }}>
                   PHISH.NET REVIEWS ({reviews.length})
                 </div>
-                {reviews.slice(0, 3).map((r, i) => (
-                  <div key={i} style={{ marginBottom: i < Math.min(reviews.length,3)-1 ? 12 : 0, paddingBottom: i < Math.min(reviews.length,3)-1 ? 12 : 0, borderBottom: i < Math.min(reviews.length,3)-1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{r.author}</span>
+                {reviews.slice(0, 4).map((r, i) => (
+                  <div key={i} style={{ marginBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, paddingBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, borderBottom: i < Math.min(reviews.length, 4) - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{r.author}</span>
                       {r.posted && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{r.posted}</span>}
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.6, fontStyle: 'italic' }}>
-                      "{r.review?.substring(0, 280)}{r.review?.length > 280 ? '...' : ''}"
+                      "{r.review?.substring(0, 300)}{r.review?.length > 300 ? '...' : ''}"
                     </div>
                   </div>
                 ))}
-                {reviews.length > 3 && (
+                {reviews.length > 4 && (
                   <a href={`https://phish.net/setlists/?d=${otdShow.show_date}#reviews`} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', marginTop: 10, fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none', opacity: 0.7 }}>
-                    + {reviews.length - 3} MORE ON PHISH.NET →
+                    style={{ display: 'block', marginTop: 12, fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none', opacity: 0.7 }}>
+                    + {reviews.length - 4} MORE ON PHISH.NET →
                   </a>
                 )}
               </div>
