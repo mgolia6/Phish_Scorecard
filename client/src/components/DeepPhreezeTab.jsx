@@ -32,6 +32,8 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
   const [syncStatus, setSyncStatus] = useState('');
   const [toggle, setToggle] = useState('attended');
   const [expandedSong, setExpandedSong] = useState(null);
+  const [longestToggle, setLongestToggle] = useState('songs'); // 'songs' | 'time'
+  const [expandedMostHeard, setExpandedMostHeard] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -246,16 +248,14 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 sub={s.busiest_year ? `Best: ${s.busiest_year.year} (${s.busiest_year.count} shows)` : ''} />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-              <Row label="FIRST SHOW"
+              <Row label="FIRST SHOW ◈"
                 value={s.first_show ? formatDate(s.first_show) : '—'}
                 color={D.cyan} mono
-                onClick={s.first_show ? () => onOpenScorecard && onOpenScorecard(s.first_show) : null}
-                href={s.first_show ? `${PHISH_IN}/${s.first_show}` : null} />
-              <Row label="MOST RECENT SHOW"
+                onClick={s.first_show ? () => onOpenScorecard && onOpenScorecard(s.first_show) : null} />
+              <Row label="MOST RECENT SHOW ◈"
                 value={s.latest_show ? formatDate(s.latest_show) : '—'}
                 color={D.cyan} mono
-                onClick={s.latest_show ? () => onOpenScorecard && onOpenScorecard(s.latest_show) : null}
-                href={s.latest_show ? `${PHISH_IN}/${s.latest_show}` : null} />
+                onClick={s.latest_show ? () => onOpenScorecard && onOpenScorecard(s.latest_show) : null} />
               <Row label="DAYS SINCE FIRST SHOW" value={s.days_since_first ? s.days_since_first.toLocaleString() : '—'} color={D.white} />
               <Row label="CONSECUTIVE YEARS"
                 value={s.consecutive_years ? `${s.consecutive_years.count} YRS (from ${s.consecutive_years.start})` : '—'}
@@ -378,40 +378,60 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 
           {/* ── LONGEST MOMENTS ── */}
           <Section icon="⏱" label="LONGEST SHOWS" color={D.cyan}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+              <div style={{ display: 'inline-flex', border: `1px solid ${D.border}` }}>
+                {[['songs', 'SONGS'], ['time', 'TIME']].map(([k, l]) => (
+                  <button key={k} onClick={() => setLongestToggle(k)} style={{
+                    padding: '5px 12px', background: longestToggle === k ? 'rgba(0,224,208,0.08)' : 'transparent',
+                    border: 'none', borderBottom: `2px solid ${longestToggle === k ? D.cyan : 'transparent'}`,
+                    color: longestToggle === k ? D.cyan : D.muted,
+                    fontFamily: D.disp, fontSize: '0.48rem', letterSpacing: '1.5px', cursor: 'pointer',
+                  }}>{l}</button>
+                ))}
+              </div>
+            </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Tile
-                value={s.longest_show?.song_count ? `${s.longest_show.song_count} songs` : '—'}
+                value={longestToggle === 'songs'
+                  ? (s.longest_show?.song_count ? `${s.longest_show.song_count} songs` : '—')
+                  : (s.longest_show?.duration_seconds ? fmtSeconds(s.longest_show.duration_seconds) : s.longest_show?.song_count ? `${s.longest_show.song_count} songs` : '—')
+                }
                 label="LONGEST SHOW"
                 sub={s.longest_show ? `${s.longest_show.venue} · ${formatDate(s.longest_show.date)}` : ''}
                 color={D.cyan} size="1.2rem"
                 onClick={s.longest_show?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_show.date) : null}
-                href={s.longest_show?.date ? `${PHISH_IN}/${s.longest_show.date}` : null}
               />
               <Tile
-                value={s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—'}
+                value={longestToggle === 'songs'
+                  ? (s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—')
+                  : (s.longest_encore?.duration_seconds ? fmtSeconds(s.longest_encore.duration_seconds) : s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—')
+                }
                 label="LONGEST ENCORE"
                 sub={s.longest_encore ? `${s.longest_encore.venue} · ${formatDate(s.longest_encore.date)}` : ''}
                 color={D.orange} size="1.2rem"
                 onClick={s.longest_encore?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_encore.date) : null}
-                href={s.longest_encore?.date ? `${PHISH_IN}/${s.longest_encore.date}` : null}
               />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Tile
-                value={s.longest_set1?.count ? `${s.longest_set1.count} songs` : '—'}
+                value={longestToggle === 'songs'
+                  ? (s.longest_set1?.count ? `${s.longest_set1.count} songs` : '—')
+                  : (s.longest_set1?.duration_seconds ? fmtSeconds(s.longest_set1.duration_seconds) : s.longest_set1?.count ? `${s.longest_set1.count} songs` : '—')
+                }
                 label="LONGEST SET I"
                 sub={s.longest_set1 ? `${s.longest_set1.venue} · ${formatDate(s.longest_set1.date)}` : ''}
                 color={D.cyan} size="1.2rem"
                 onClick={s.longest_set1?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_set1.date) : null}
-                href={s.longest_set1?.date ? `${PHISH_IN}/${s.longest_set1.date}` : null}
               />
               <Tile
-                value={s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—'}
+                value={longestToggle === 'songs'
+                  ? (s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—')
+                  : (s.longest_set2?.duration_seconds ? fmtSeconds(s.longest_set2.duration_seconds) : s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—')
+                }
                 label="LONGEST SET II"
                 sub={s.longest_set2 ? `${s.longest_set2.venue} · ${formatDate(s.longest_set2.date)}` : ''}
                 color={D.orange} size="1.2rem"
                 onClick={s.longest_set2?.date ? () => onOpenScorecard && onOpenScorecard(s.longest_set2.date) : null}
-                href={s.longest_set2?.date ? `${PHISH_IN}/${s.longest_set2.date}` : null}
               />
             </div>
 
@@ -430,72 +450,144 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 color={D.cyan} size="1.1rem" />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-              <Row label="LONGEST GAP"
-                value={s.longest_gap?.days ? `${Math.round(s.longest_gap.days / 30.5)} months (${s.longest_gap.days} days)` : '—'}
-                color={D.muted} />
-              {s.longest_gap?.from && (
-                <Row label="GAP FROM"
-                  value={formatDate(s.longest_gap.from)}
-                  color={D.muted} mono
-                  href={`${PHISH_IN}/${s.longest_gap.from}`} />
+              {s.longest_run?.start && (
+                <Row label="RUN STARTED" value={formatDate(s.longest_run.start)} color={D.orange} mono
+                  onClick={onOpenScorecard ? () => onOpenScorecard(s.longest_run.start) : null} />
               )}
-              {s.longest_gap?.to && (
-                <Row label="GAP TO"
-                  value={formatDate(s.longest_gap.to)}
-                  color={D.muted} mono
-                  href={`${PHISH_IN}/${s.longest_gap.to}`} />
+              {s.longest_run?.end && (
+                <Row label="RUN ENDED" value={formatDate(s.longest_run.end)} color={D.orange} mono
+                  onClick={onOpenScorecard ? () => onOpenScorecard(s.longest_run.end) : null} />
               )}
+              {s.longest_run?.songs_heard != null && (
+                <Row label="SONGS HEARD DURING RUN" value={(s.longest_run.songs_heard || 0).toLocaleString()} color={D.cyan} />
+              )}
+              {s.longest_run?.unique_songs != null && (
+                <Row label="UNIQUE SONGS" value={s.longest_run.unique_songs || 0} color={D.cyan} />
+              )}
+              {s.longest_run?.states?.length > 0 && (
+                <Row label="STATES COVERED" value={s.longest_run.states.join(', ')} color={D.muted} mono />
+              )}
+              <div style={{ borderTop: `1px solid rgba(51,255,51,0.06)`, marginTop: 8, paddingTop: 8 }}>
+                <Row label="LONGEST GAP"
+                  value={s.longest_gap?.days ? `${Math.round(s.longest_gap.days / 30.5)} months (${s.longest_gap.days} days)` : '—'}
+                  color={D.muted} />
+                {s.longest_gap?.from && (
+                  <Row label="GAP FROM"
+                    value={formatDate(s.longest_gap.from)}
+                    color={D.muted} mono
+                    onClick={onOpenScorecard ? () => onOpenScorecard(s.longest_gap.from) : null} />
+                )}
+                {s.longest_gap?.to && (
+                  <Row label="GAP TO"
+                    value={formatDate(s.longest_gap.to)}
+                    color={D.muted} mono
+                    onClick={onOpenScorecard ? () => onOpenScorecard(s.longest_gap.to) : null} />
+                )}
+              </div>
             </div>
           </Section>
 
           {/* ── MOST HEARD ── */}
           <Section icon="◉" label="MOST HEARD" color={D.green}>
-            <RankedList
-              title="SONGS YOU'VE SEEN THE MOST — TAP TO LISTEN"
-              items={(s.most_heard_attended || []).slice(0, 10)}
-              renderRow={(item, i) => (
-                <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <SongLink song={item.song}>{item.song}</SongLink>
+            <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
+              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>
+                SONGS YOU'VE SEEN THE MOST — TAP TO EXPAND
+              </div>
+              {(s.most_heard_attended || []).slice(0, 10).length ? (s.most_heard_attended || []).slice(0, 10).map((item, i) => {
+                const isOpen = expandedMostHeard === item.song;
+                return (
+                  <div key={item.song}>
+                    <div
+                      onClick={() => setExpandedMostHeard(isOpen ? null : item.song)}
+                      style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.06)`, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: isOpen ? 'rgba(0,224,208,0.04)' : 'transparent' }}
+                    >
+                      <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                      <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.song}
+                      </div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, letterSpacing: 1, flexShrink: 0 }}>{item.count}x</div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
+                    </div>
+                    {isOpen && (
+                      <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(51,255,51,0.06)` }}>
+                        <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.48rem', color: D.muted, letterSpacing: '2px' }}>
+                          TOP 5 VERSIONS YOU'VE SEEN
+                        </div>
+                        {(item.versions || []).length > 0 ? item.versions.slice(0, 5).map((v, vi) => (
+                          <div key={vi} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderTop: `1px solid rgba(51,255,51,0.04)` }}>
+                            <PlayLink date={v.date} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.white }}>{formatDate(v.date)}</div>
+                              <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.venue}</div>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); onOpenScorecard && onOpenScorecard(v.date); }}
+                              style={{ padding: '4px 8px', border: `1px solid rgba(0,224,208,0.3)`, background: 'transparent', color: D.cyan, fontFamily: D.disp, fontSize: '0.42rem', letterSpacing: '1px', cursor: 'pointer', flexShrink: 0 }}
+                            >GO TO SHOW</button>
+                          </div>
+                        )) : (
+                          <div style={{ padding: '10px 14px', fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>
+                            Rate individual songs in MY SHOWS to see version history.
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, letterSpacing: 1, flexShrink: 0 }}>{item.count}x</div>
-                </>
+                );
+              }) : (
+                <div style={{ padding: '14px', fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '2px' }}>NOT ENOUGH DATA YET</div>
               )}
-            />
+            </div>
           </Section>
 
           {/* ── ENCORE PATTERNS ── */}
           {s.most_common_encore?.length > 0 && (
             <Section icon="★" label="ENCORE PATTERNS" color={D.orange}>
-              <RankedList
-                title="YOUR MOST COMMON ENCORE SONGS"
-                items={(s.most_common_encore || []).slice(0, 5)}
-                renderRow={(item, i) => (
-                  <>
-                    <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <SongLink song={item.song}>{item.song}</SongLink>
+              <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
+                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>YOUR MOST COMMON ENCORE SONGS</div>
+                {(s.most_common_encore || []).slice(0, 5).map((item, i) => (
+                  <div key={item.song} style={{ padding: '10px 14px', borderBottom: i < 4 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <SongLink song={item.song}>{item.song}</SongLink>
+                      </div>
+                      {item.last_date && (
+                        <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 2 }}>
+                          Last: {formatDate(item.last_date)} · {item.last_venue || ''}
+                        </div>
+                      )}
                     </div>
                     <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
-                  </>
-                )}
-              />
+                    {item.last_date && <PlayLink date={item.last_date} />}
+                  </div>
+                ))}
+              </div>
             </Section>
           )}
 
           {/* ── RAREST CATCHES ── */}
           <Section icon="⬡" label="RAREST CATCHES" color={D.muted}>
-            <RankedList
-              title="SONGS YOU'VE ONLY SEEN ONCE"
-              items={(s.rarest_caught || []).slice(0, 8)}
-              renderRow={(item) => (
-                <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <SongLink song={item.song}>{item.song}</SongLink>
+            <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
+              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>SONGS YOU'VE ONLY SEEN ONCE</div>
+              {(s.rarest_caught || []).slice(0, 8).map((item, i) => (
+                <div key={item.song} style={{ padding: '10px 14px', borderBottom: i < 7 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <SongLink song={item.song}>{item.song}</SongLink>
+                    </div>
+                    {item.date && (
+                      <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 2 }}>
+                        {formatDate(item.date)}{item.venue ? ` · ${item.venue}` : ''}
+                      </div>
+                    )}
                   </div>
                   <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1px', flexShrink: 0 }}>ONCE</div>
-                </>
-              )}
-            />
+                  {item.date && <PlayLink date={item.date} />}
+                </div>
+              ))}
+            </div>
           </Section>
         </>
       ) : (
@@ -678,6 +770,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 // ============================================================
 // MY PHRIENDS TAB
 // ============================================================
+
 
 
 
