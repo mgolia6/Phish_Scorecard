@@ -17,9 +17,9 @@ export function SongRating({ value, onChange }) {
 }
 
 export function SetScore({ label, songs, ratings }) {
-  const rated = songs.filter(s => ratings[s.song]?.rating);
+  const rated = songs.filter(s => ratings[s.posKey || s.song]?.rating);
   if (!rated.length) return null;
-  const avg = rated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / rated.length;
+  const avg = rated.reduce((sum, s) => sum + parseInt(ratings[s.posKey || s.song].rating), 0) / rated.length;
   const pct = (avg / 5) * 100;
   return (
     <div className="set-score">
