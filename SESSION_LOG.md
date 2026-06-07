@@ -1,51 +1,59 @@
 # SESSION LOG — Phreezer
 
-## Session: 2026-06-07 (continued)
+## Session: 2026-06-07 (final update)
 
 ### Shipped
 - KPI card flip: CSS 3D rotateY, one-at-a-time, data source attribution on back
 - KPI labels: SHOWS / PHROZEN / AVG SCORE / REVIEWED
 - KPI layout restructure: bare grid on top, QUICK PHREEZE section below with IMPORT moved in
-- Font system standardized across KPI card: 2rem value, 0.52rem label, 0.6rem section title, 0.54rem body — no more ad-hoc rem values
+- Font system standardized across KPI card: 2rem value, 0.52rem label, 0.6rem section title, 0.54rem body
 - Badge labels fixed: BADGE_LABELS map now uses actual API IDs (century, rated_1, critic, etc.)
 - Badge labels shortened: 100 CLUB, 1ST FREEZE, CRITIC, ON FIRE, etc.
-- FIRST SHOW label corrected (was FIRST FREEZE — that's attendance date, not rating date)
+- FIRST SHOW label corrected (was FIRST FREEZE — that's attendance date not rating date)
 - TOP RATED SONG / TOP VENUE labels clarified
 - Stars → X.X★ format in ShowCard and MySongsTab (★ glyph, not asterisk)
 - Filter buttons: orange active / cyan-dim inactive, labels PHROZEN / UNPHROZEN
 - Sort buttons: cyan active / cyan-dim inactive
 - ShowCard PHISH.NET link: contrast bumped from text-muted to cyan 70%
-- KPICards TAP TO FLIP hint: 0.52rem bold, 75% opacity (was tiny and invisible)
+- KPICards TAP TO FLIP hint: 0.52rem bold, 75% opacity
 - Deep Phreeze CTA: 80% opacity + underline affordance
-- Vibe Check: proper error state (vibeError), clean fallback message pointing to raw reviews
-- Vibe Check: bad cache detection — if stored structured data doesn't parse, purge and regenerate
-- HOW TO USE PHREEZER copy: updated to reflect current state (stars, Vibe Check, MY PHREEZER)
+- Vibe Check: proper vibeError state, clean fallback message pointing to raw reviews below
+- Vibe Check: bad cache detection — purge and regenerate on corrupt stored data
+- HOW TO USE PHREEZER copy: updated — stars, Vibe Check, MY PHREEZER refs; Leaderboard removed
 - STYLE_GUIDE.md added to repo — design tokens, font system, component patterns, badge map, vocabulary
-- INSTRUCTIONS.md updated — 75% context wrap rule, STYLE_GUIDE reference, current architecture
-- Avatar direction decided: Option C (SVG geometric Phreeze pattern) — not yet implemented
+- INSTRUCTIONS.md updated — 75% context wrap rule, STYLE_GUIDE ref, current architecture
+- Badge black screen fixed — BadgesSection was missing useState/useEffect imports, crashed silently
+- Geometric SVG avatar implemented: PhreezerAvatar component, 4 options (PHREEZE/CROSSHAIR/WAVEFORM/HEXAGON)
+- Avatar picker replaced emoji grid with 2×2 SVG geometric picker in ProfileModal
+- Header avatar button replaced with PhreezerAvatar component (44px circle, cyan border)
+- App.jsx updated to import and render PhreezerAvatar
 
 ### Decisions
-- Avatars: geometric SVG (snowflake geometry, cyan) as default, Orbitron initials if display name set. No emoji, no uploads.
-- Profile questions: tap-to-select buttons only, no free text — better data quality
+- Avatars: geometric SVG (4 options seeded by id), exported from ProfileModal.jsx, used in App.jsx header
+- Profile questions: tap-to-select buttons only — better data quality
 - Star display: always X.X★ in compact contexts, never individual star glyphs
-- Filter color convention: orange = filter (user-set state), cyan = sort (temporal/data ordering)
-- RATED/UNRATED → PHROZEN/UNPHROZEN to stay on-brand vocabulary
+- Filter color convention: orange = filter, cyan = sort
+- RATED/UNRATED → PHROZEN/UNPHROZEN on-brand vocabulary
+- Vibe Check intermittent failure: ANTHROPIC_API_KEY confirmed present; likely rate limit or cold start timeout — error state handles it gracefully, not blocking
 
-### Roadmap items added
-- Star rating scale definition: what 1★–5★ actually means in Phreezer context — needs design decision before implementing (currently inaccurate in any documentation)
-- Profile questions: vantage point (Mike's Side / Page's Side), GA or Seats, show style (Dance / Chill / Both) — tap-to-select, needs DB columns + API update + UI
-- Avatar implementation: SVG geometric Phreeze pattern component, seeded from username
-- COMMUNITY tab: still placeholder
-- Phishook/Phreezer logo integration: not yet applied to codebase
+### Roadmap
+- **Star rating scale definition** — what does 1★–5★ mean in Phreezer? Needs Matthew's rubric before adding anywhere
+- **Profile tap-to-select questions** — vantage point (Mike's Side / Page's Side), GA or Seats, show style (Dance / Chill / Both) — needs DB ALTER + API update + UI
+- **Welcome email** — send on registration via Resend; personalized, on-brand
+- **Weekly reminder email** — "log in and rate a show"; if user has imported shows, personalize with one of their unrated shows; cadence TBD
+- **Email infrastructure** — Resend already wired; need email templates + trigger logic in auth/register.js and a scheduled job or cron for weekly
+- **COMMUNITY tab** — still placeholder
+- **Phishook/Phreezer logo integration** — not yet applied to codebase
+- **Rate limiting on auth endpoints** — security backlog, Priority 1
+- **MySongsTab KPI tiles** — still old square tile design, different from MY SHOWS KPI grid — unify
+- **Vibe Check reliability** — investigate rate limits / cold start timeout on Haiku; consider bumping max_tokens or adding retry logic
 
 ### Open issues
-- Vibe Check "could not generate" on some shows — error state now shows cleanly but root cause unclear; likely ANTHROPIC_API_KEY env var or Haiku model string needs verification
 - Profile modal INFO tab is read-only — no edit UI yet for any profile fields
-- MySongsTab KPI tiles still use old square tile design, different from MY SHOWS — should unify
+- Vibe Check intermittent generation failure — error state surfaces cleanly but root cause not fully resolved
 
 ### Next session priorities
-1. Implement profile tap-to-select questions (DB + API + UI)
-2. Implement geometric SVG avatar
-3. Investigate Vibe Check generation failure (check ANTHROPIC_API_KEY in Vercel env)
-4. COMMUNITY tab scaffold
-5. Rate limiting on auth endpoints (security backlog)
+1. Profile tap-to-select questions (DB ALTER + API + modal UI)
+2. Email: welcome + weekly reminder (Resend templates + trigger)
+3. COMMUNITY tab scaffold
+4. Rate limiting on /api/auth/login + /api/auth/register
