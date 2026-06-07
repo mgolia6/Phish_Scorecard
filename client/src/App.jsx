@@ -809,7 +809,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
         <div className="sidebar-logo">
           {expanded ? (
             <img
-              src="/assets/phreezer-logo.svg"
+              src="/assets/phreezer-logo.png"
               alt="The Phreezer"
               className="sidebar-logo-img-expanded"
               onClick={() => {
@@ -823,7 +823,7 @@ function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }
               style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
             />
           ) : (
-            <img src="/assets/phreezer-snowflake.svg" alt="Phreezer" className="sidebar-logo-img-collapsed" />
+            <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
           )}
         </div>
 
@@ -4303,7 +4303,7 @@ export default function App() {
             <div className="header-left">
               <div className="header-title">
                 <img
-                  src="/assets/phreezer-logo.svg"
+                  src="/assets/phreezer-logo.png"
                   alt="The Phreezer"
                   className="mobile-header-logo"
                   onClick={() => {
