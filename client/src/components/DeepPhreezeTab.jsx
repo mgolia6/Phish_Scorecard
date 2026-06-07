@@ -19,6 +19,7 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
   const [syncStatus, setSyncStatus] = useState('');
   const [toggle, setToggle] = useState('attended');
@@ -53,6 +54,20 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
       setSyncResult(`✗ ${e.message}`);
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleClearCache = async () => {
+    setClearing(true);
+    setSyncResult(null);
+    try {
+      const res = await api.post('/admin/clear-cache', {});
+      setSyncResult(`✓ ${res.message}`);
+      setData({ needs_sync: true });
+    } catch (e) {
+      setSyncResult(`✗ Clear failed: ${e.message}`);
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -174,13 +189,21 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
             fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
           }}>{l}</button>
         ))}
-        <button onClick={handleSync} disabled={syncing} style={{
+        <button onClick={handleSync} disabled={syncing || clearing} style={{
           padding: '11px 14px', background: 'transparent', border: 'none',
           borderLeft: `1px solid ${D.border}`,
           color: syncing ? D.muted : D.green,
           fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
         }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
+        </button>
+        <button onClick={handleClearCache} disabled={syncing || clearing} style={{
+          padding: '11px 10px', background: 'transparent', border: 'none',
+          borderLeft: `1px solid ${D.border}`,
+          color: clearing ? D.muted : 'rgba(255,50,50,0.6)',
+          fontFamily: D.disp, fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer', flexShrink: 0,
+        }} title="Clear cached show data and re-sync from scratch">
+          {clearing ? '...' : '✕ CLEAR'}
         </button>
       </div>
       {syncing && syncStatus && (
