@@ -3,7 +3,9 @@ import React, { useState, useRef } from 'react';
 export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, api }) {
   const [expanded, setExpanded] = useState(false);
   const [reviews, setReviews] = useState(null);
+  const [aiSummary, setAiSummary] = useState(null);
   const [loadingReviews, setLoadingReviews] = useState(false);
+  const [loadingAI, setLoadingAI] = useState(false);
   const fetched = useRef(false);
 
   const handleExpand = async () => {
@@ -14,7 +16,31 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
     setLoadingReviews(true);
     try {
       const data = await api.get(`/shows/${otdShow.show_date}`);
-      setReviews(data?.reviews?.items || []);
+      const items = data?.reviews?.items || [];
+      setReviews(items);
+
+      if (items.length > 0) {
+        setLoadingAI(true);
+        try {
+          const res = await fetch('/api/ai/summarize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reviews: items,
+              showDate: fullDate,
+              venue: otdShow.venue,
+              city: otdShow.city,
+              yearsAgo,
+            }),
+          });
+          const aiData = await res.json();
+          setAiSummary(aiData.summary || null);
+        } catch (e) {
+          setAiSummary(null);
+        } finally {
+          setLoadingAI(false);
+        }
+      }
     } catch (e) {
       setReviews([]);
     } finally {
@@ -78,10 +104,10 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
         borderTop: '1px solid rgba(0,224,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: 8, cursor: 'pointer', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2px',
       }}>
-        {expanded ? '▲ HIDE REVIEWS' : '▼ PHISH.NET REVIEWS'}
+        {expanded ? '▲ HIDE VIBE CHECK' : '▼ VIBE CHECK — WHAT DID THE PHANS SAY?'}
       </button>
 
-      {/* ── Reviews (no AI) ── */}
+      {/* ── Expanded ── */}
       {expanded && (
         <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(0,224,208,0.1)', background: 'rgba(0,0,0,0.3)' }}>
           {loadingReviews ? (
@@ -90,23 +116,49 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
             </div>
           ) : reviews && reviews.length > 0 ? (
             <>
-              {reviews.slice(0, 3).map((r, i) => (
-                <div key={i} style={{ marginBottom: i < Math.min(reviews.length, 3) - 1 ? 14 : 0, paddingBottom: i < Math.min(reviews.length, 3) - 1 ? 14 : 0, borderBottom: i < Math.min(reviews.length, 3) - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{r.author}</span>
-                    {r.posted && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{r.posted}</span>}
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.65, fontStyle: 'italic' }}>
-                    "{r.review?.substring(0, 280)}{r.review?.length > 280 ? '...' : ''}"
-                  </div>
+              {/* AI Summary */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--orange)', letterSpacing: '2px' }}>◈ THE VIBE</span>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(255,140,0,0.3), transparent)' }} />
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>AI SYNTHESIS</span>
                 </div>
-              ))}
-              {reviews.length > 3 && (
-                <a href={`https://phish.net/setlists/?d=${otdShow.show_date}#reviews`} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'block', marginTop: 12, fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none', opacity: 0.7 }}>
-                  + {reviews.length - 3} MORE ON PHISH.NET →
-                </a>
-              )}
+                {loadingAI ? (
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    Synthesizing {reviews.length} reviews...
+                  </div>
+                ) : aiSummary ? (
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.65, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
+                    {aiSummary}
+                  </div>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Could not generate summary.</div>
+                )}
+              </div>
+
+              {/* Raw reviews */}
+              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 12 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>
+                  PHISH.NET REVIEWS ({reviews.length})
+                </div>
+                {reviews.slice(0, 3).map((r, i) => (
+                  <div key={i} style={{ marginBottom: i < Math.min(reviews.length,3)-1 ? 12 : 0, paddingBottom: i < Math.min(reviews.length,3)-1 ? 12 : 0, borderBottom: i < Math.min(reviews.length,3)-1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{r.author}</span>
+                      {r.posted && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{r.posted}</span>}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.6, fontStyle: 'italic' }}>
+                      "{r.review?.substring(0, 280)}{r.review?.length > 280 ? '...' : ''}"
+                    </div>
+                  </div>
+                ))}
+                {reviews.length > 3 && (
+                  <a href={`https://phish.net/setlists/?d=${otdShow.show_date}#reviews`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', marginTop: 10, fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none', opacity: 0.7 }}>
+                    + {reviews.length - 3} MORE ON PHISH.NET →
+                  </a>
+                )}
+              </div>
             </>
           ) : (
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0' }}>
