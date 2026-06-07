@@ -149,15 +149,15 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
 
         {/* Filter + Sort — combined, scrollable row */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
-          {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED'],['favorites','★ FAV']].map(([k,l]) => (
+          {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','PHROZEN'],['no_phreezer','UNPHROZEN'],['favorites','★ FAV']].map(([k,l]) => (
             <button key={k} onClick={() => setFilterBy(k)} style={{
               flexShrink: 0,
               padding: '9px 14px',
-              border: `1px solid ${filterBy === k ? 'var(--green)' : 'rgba(51,255,51,0.2)'}`,
-              background: filterBy === k ? 'rgba(51,255,51,0.07)' : 'transparent',
-              color: filterBy === k ? 'var(--green)' : 'var(--text-muted)',
+              border: `1px solid ${filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.3)'}`,
+              background: filterBy === k ? 'rgba(255,102,0,0.1)' : 'transparent',
+              color: filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.65)',
               fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '1.5px', cursor: 'pointer',
-              boxShadow: filterBy === k ? '0 0 8px rgba(51,255,51,0.2)' : 'none',
+              boxShadow: filterBy === k ? '0 0 8px rgba(255,102,0,0.25)' : 'none',
               whiteSpace: 'nowrap',
             }}>{l}</button>
           ))}
@@ -166,13 +166,13 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
         {/* Sort row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid var(--border)' }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: 'var(--text-muted)', flexShrink: 0 }}>SORT:</span>
-          {[['date_desc','DATE ↓'],['date_asc','DATE ↑'],['phreezer_desc','SCORE'],['no_phreezer','UNRATED']].map(([k,l]) => (
+          {[['date_desc','DATE ↓'],['date_asc','DATE ↑'],['phreezer_desc','SCORE'],['no_phreezer','UNPHROZEN']].map(([k,l]) => (
             <button key={k} onClick={() => setSortBy(k)} style={{
               flexShrink: 0,
               padding: '7px 12px',
-              border: `1px solid ${sortBy === k ? 'var(--green)' : 'rgba(51,255,51,0.2)'}`,
-              background: sortBy === k ? 'rgba(51,255,51,0.07)' : 'transparent',
-              color: sortBy === k ? 'var(--green)' : 'var(--text-muted)',
+              border: `1px solid ${sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.3)'}`,
+              background: sortBy === k ? 'rgba(0,224,208,0.08)' : 'transparent',
+              color: sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.65)',
               fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1.5px', cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}>{l}</button>
@@ -210,3 +210,4 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
