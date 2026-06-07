@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { Heatmap } from './Heatmap';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', accent = 'var(--cyan)', children }) {
   const [open, setOpen] = useState(false);
