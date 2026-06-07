@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const PASSIVE_SECTIONS = [
   'Onboarding', 'Scorecard / Rating', 'My Phreezer', 'Deep Phreeze',
   'On This Day', 'Import / phish.net sync', 'Stats & Analytics',
-  'Community', 'Account / Profile', 'Other'
+  'Community', 'Account / Profile', 'Bug Report', 'Other'
 ];
 
 export function FeedbackModal({ type, api, onClose }) {
