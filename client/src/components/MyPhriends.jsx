@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function MyPhriends({ api, showMessage, showError }) {
   const [searchInput, setSearchInput] = useState('');
