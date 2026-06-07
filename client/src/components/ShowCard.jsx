@@ -61,7 +61,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 700, color: '#fff', lineHeight: 1.1 }}>
             {compactMonth} {compactDay}
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 3 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 3 }}>
             {compactYear}
           </div>
         </div>
@@ -87,7 +87,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
         </div>
 
         {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           {hasReview && (
             <button onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}
               style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: 0, lineHeight: 1, color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.3)' }}
@@ -145,11 +145,12 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                   {Object.entries(cardData.setAvgs)
                     .filter(([k]) => !['S','s'].includes(k))
                     .map(([k, v]) => {
-                      const col = v && parseFloat(v) >= 4.5 ? 'var(--orange)' : 'var(--cyan)';
+                      const setColors = { '1': 'var(--cyan)', '2': 'var(--orange)', 'e': 'var(--green)', 'E': 'var(--green)', 'e2': 'var(--green)' };
+                      const col = setColors[k] || 'var(--cyan)';
                       return (
                         <div key={k} style={{ textAlign: 'center' }}>
-                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: col, letterSpacing: 1, lineHeight: 1 }}>{v || '—'}</div>
-                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 5 }}>{setLabel(k)}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: col, letterSpacing: 1, lineHeight: 1, textShadow: `0 0 10px ${col}66` }}>{v || '—'}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: col, opacity: 0.7, letterSpacing: '2px', marginTop: 5 }}>{setLabel(k)}</div>
                         </div>
                       );
                     })}
@@ -165,7 +166,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.song_name}</span>
                       <span style={{ flexShrink: 0 }}>
-                        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--orange)', letterSpacing: '1px' }}>{parseFloat(s.rating).toFixed(1)}</span><span style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', color: 'var(--orange)' }}>★</span>
+                        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--orange)', letterSpacing: '1px' }}>{parseFloat(s.rating).toFixed(1)}</span><span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.3rem', color: 'var(--orange)', lineHeight: 1 }}>★</span>
                       </span>
                     </div>
                   ))}
@@ -204,6 +205,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
     </div>
   );
 }
+
 
 
 
