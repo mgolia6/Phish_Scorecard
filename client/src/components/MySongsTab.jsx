@@ -54,7 +54,9 @@ export function MySongsTab({ api, showMessage, showError }) {
                   </div>
                   <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
                     {[1,2,3,4,5].map(n => (
-                      <span key={n} style={{ fontSize: '0.7rem', color: n <= parseInt(v.rating) ? 'var(--orange)' : 'rgba(51,255,51,0.18)' }}>{n <= parseInt(v.rating) ? '★' : '·'}</span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', color: 'var(--orange)', letterSpacing: '1px' }}>
+                        {parseFloat(v.rating).toFixed(1)}★
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -70,3 +72,4 @@ export function MySongsTab({ api, showMessage, showError }) {
 // ============================================================
 // MY VENUES TAB
 // ============================================================
+
