@@ -295,11 +295,49 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     ? Math.round((Date.now() - new Date(sortedDates[0])) / 86400000)
     : 0;
 
-  // Total time in shows — rough estimate: avg Phish show ~3hrs
-  const estHours = totalSongsHeard * 6; // ~6 min per song average
-  
+  // Actual live Phish time: avg show ~3hrs, broken into h/m/s
+  const estShowMinutes = attendedDates.length * 180; // 3 hrs per show in minutes
+  const estShowHours = Math.floor(estShowMinutes / 60);
+  const estShowMinutesRem = estShowMinutes % 60;
+
   // Shows per year avg
   const avgShowsPerYear = years.length > 0 ? (attendedDates.length / years.length).toFixed(1) : 0;
+
+  // Busiest year
+  let busiestYear = null, busiestYearCount = 0;
+  Object.entries(showsByYear).forEach(([yr, ct]) => {
+    if (ct > busiestYearCount) { busiestYearCount = ct; busiestYear = yr; }
+  });
+
+  // Era breakdown (1.0: pre-2000, 2.0: 2002-2004, hiatus 2005-2007, 3.0: 2009-2019, 4.0: 2021+)
+  const eras = { '1.0': 0, '2.0': 0, '3.0': 0, '4.0': 0 };
+  attendedDates.forEach(d => {
+    const yr = parseInt(d.slice(0,4));
+    if (yr < 2000) eras['1.0']++;
+    else if (yr <= 2004) eras['2.0']++;
+    else if (yr >= 2009 && yr <= 2019) eras['3.0']++;
+    else if (yr >= 2021) eras['4.0']++;
+  });
+
+  // Set I vs Set II personal avg (from ratings)
+  let set1Total = 0, set1Count = 0, set2Total = 0, set2Count = 0;
+  ratedDates.forEach(d => {
+    ratings[d].forEach(r => {
+      if (!r.rating) return;
+      if (r.set_number === '1') { set1Total += parseFloat(r.rating); set1Count++; }
+      if (r.set_number === '2') { set2Total += parseFloat(r.rating); set2Count++; }
+    });
+  });
+  const set1PersonalAvg = set1Count > 0 ? (set1Total / set1Count).toFixed(2) : null;
+  const set2PersonalAvg = set2Count > 0 ? (set2Total / set2Count).toFixed(2) : null;
+  const preferredSet = set1PersonalAvg && set2PersonalAvg
+    ? (parseFloat(set2PersonalAvg) > parseFloat(set1PersonalAvg) ? 'SET II' : 'SET I')
+    : null;
+
+  // Show density: shows per year you've been a phan
+  const showDensity = daysSinceFirst > 0
+    ? (attendedDates.length / (daysSinceFirst / 365)).toFixed(1)
+    : 0;
 
   return {
     // Attendance
@@ -325,7 +363,9 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     avg_songs_per_show: showsWithCache.length ? (totalSongsHeard / showsWithCache.length).toFixed(1) : 0,
     avg_set1_length: set1ShowCount ? (totalSet1Count / set1ShowCount).toFixed(1) : 0,
     avg_set2_length: set2ShowCount ? (totalSet2Count / set2ShowCount).toFixed(1) : 0,
-    est_hours_of_phish: estHours,
+    est_live_hours: estShowHours,
+    est_live_minutes_rem: estShowMinutesRem,
+    est_live_minutes_total: estShowMinutes,
     most_common_encore: mostCommonEncore,
     longest_encore: longestEncore,
     first_song_ever: firstSongEver,
@@ -336,6 +376,12 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     longest_set2: longestSet2,
     most_heard_attended: mostHeardAttended,
     rarest_caught: rarestCaught,
+    busiest_year: busiestYear ? { year: busiestYear, count: busiestYearCount } : null,
+    eras,
+    set1_personal_avg: set1PersonalAvg,
+    set2_personal_avg: set2PersonalAvg,
+    preferred_set: preferredSet,
+    show_density: showDensity,
     // Ratings
     total_rated: ratedDates.length,
     perfect_5s: perfect5s,
@@ -448,4 +494,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 
