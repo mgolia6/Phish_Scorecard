@@ -19,6 +19,10 @@ async function ensureMigration(pool) {
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_attendance_user_id ON user_show_attendance(user_id)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_attendance_show_date ON user_show_attendance(show_date)`);
+
+    // Add song_position column if it doesn't exist
+    await pool.query(`ALTER TABLE ratings ADD COLUMN IF NOT EXISTS song_position INTEGER`);
+
     migrated = true;
   } catch (err) {
     console.error('Migration error (non-fatal):', err.message);
@@ -38,26 +42,23 @@ export default async function handler(req, res) {
   const pool = getPool();
   await ensureMigration(pool);
 
-  // GET — fetch ratings + attendance for this show
   if (req.method === 'GET') {
     try {
       const [ratingsResult, attendanceResult, importedAttendance] = await Promise.all([
         pool.query(
-          'SELECT * FROM ratings WHERE user_id = $1 AND show_date = $2 ORDER BY set_number, id',
+          'SELECT * FROM ratings WHERE user_id = $1 AND show_date = $2 ORDER BY set_number, song_position, id',
           [user.id, showDate]
         ),
         pool.query(
           'SELECT attendance_type FROM user_show_attendance WHERE user_id = $1 AND show_date = $2',
           [user.id, showDate]
         ),
-        // Check if user imported this show as attended from phish.net
         pool.query(
           'SELECT 1 FROM attendance WHERE user_id = $1 AND show_date = $2 LIMIT 1',
           [user.id, showDate]
         ),
       ]);
 
-      // Priority: saved preference > phish.net import (attended) > null
       let attendance_type = attendanceResult.rows[0]?.attendance_type || null;
       if (!attendance_type && importedAttendance.rows.length > 0) {
         attendance_type = 'attended';
@@ -72,7 +73,6 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST — submit ratings + attendance
   if (req.method === 'POST') {
     const { ratings, showDetails, attendance_type } = req.body;
 
@@ -84,7 +84,6 @@ export default async function handler(req, res) {
     const attendanceType = validAttendance.includes(attendance_type) ? attendance_type : 'listened';
 
     try {
-      // Upsert show record
       await pool.query(
         `INSERT INTO shows (show_date, venue, city, state, country)
          VALUES ($1, $2, $3, $4, $5)
@@ -92,7 +91,6 @@ export default async function handler(req, res) {
         [showDate, showDetails?.venue, showDetails?.city, showDetails?.state, showDetails?.country]
       );
 
-      // Upsert attendance
       await pool.query(
         `INSERT INTO user_show_attendance (user_id, show_date, attendance_type)
          VALUES ($1, $2, $3)
@@ -101,16 +99,29 @@ export default async function handler(req, res) {
         [user.id, showDate, attendanceType]
       );
 
-      // Upsert each rating
       for (const r of ratings) {
         if (!r.song || r.rating == null) continue;
-        await pool.query(
-          `INSERT INTO ratings (user_id, show_date, song_name, set_number, rating, notes)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT (user_id, show_date, song_name)
-           DO UPDATE SET rating = $5, notes = $6, updated_at = NOW()`,
-          [user.id, showDate, r.song, r.set || null, r.rating, r.notes || '']
-        );
+        const position = r.position ?? null;
+
+        if (position != null) {
+          // Upsert by position — handles sandwiched/reprised songs correctly
+          await pool.query(
+            `INSERT INTO ratings (user_id, show_date, song_name, set_number, song_position, rating, notes)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (user_id, show_date, song_name)
+             DO UPDATE SET rating = $6, notes = $7, song_position = $5, updated_at = NOW()`,
+            [user.id, showDate, r.song, r.set || null, position, r.rating, r.notes || '']
+          );
+        } else {
+          // Legacy fallback — no position provided
+          await pool.query(
+            `INSERT INTO ratings (user_id, show_date, song_name, set_number, rating, notes)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             ON CONFLICT (user_id, show_date, song_name)
+             DO UPDATE SET rating = $5, notes = $6, updated_at = NOW()`,
+            [user.id, showDate, r.song, r.set || null, r.rating, r.notes || '']
+          );
+        }
       }
 
       return res.json({ success: true });
