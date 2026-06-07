@@ -299,6 +299,8 @@ function computeStats(attendedDates, cachedShows, userRatings) {
   let longestEncore = null, longestEncoreCount = 0;
   let firstSongEver = null, lastSongEver = null;
   let totalSet1Count = 0, totalSet2Count = 0, set1ShowCount = 0, set2ShowCount = 0;
+  let totalDurSeconds = 0, durCount = 0;
+  let totalEncoreDur = 0, encoreDurCount = 0;
 
   showsWithCache.forEach(d => {
     const c = cache[d];
@@ -322,6 +324,16 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     if ((c.encore_count || 0) > longestEncoreCount) {
       longestEncoreCount = c.encore_count;
       longestEncore = { date: d, venue: c.venue, count: c.encore_count };
+    }
+    if (c.duration_seconds && c.duration_seconds > 0) {
+      totalDurSeconds += parseInt(c.duration_seconds);
+      durCount++;
+    }
+    // Estimate encore duration: encore songs / total songs * show duration
+    if (c.duration_seconds && c.song_count && c.encore_count) {
+      const encoreEst = Math.round((c.encore_count / c.song_count) * c.duration_seconds);
+      totalEncoreDur += encoreEst;
+      encoreDurCount++;
     }
   });
 
@@ -443,6 +455,9 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     live_duration_minutes: totalMinutes,
     live_duration_hours: totalHours,
     live_duration_days: totalDays,
+    precise_show_count: preciseCount,
+    avg_show_duration_seconds: durCount > 0 ? Math.round(totalDurSeconds / durCount) : null,
+    avg_encore_duration_seconds: encoreDurCount > 0 ? Math.round(totalEncoreDur / encoreDurCount) : null,
     precise_show_count: preciseCount,
     most_common_encore: mostCommonEncore,
     longest_encore: longestEncore,
@@ -579,6 +594,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 
 
 
