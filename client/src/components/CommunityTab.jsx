@@ -262,16 +262,18 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {leaderboard.map(row => (
               <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
-                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto', alignItems: 'center', gap: '10px', padding: '11px 14px', borderBottom: '1px solid rgba(51,255,51,0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent' }}>
+                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto auto auto', alignItems: 'center', gap: '8px', padding: '11px 14px', borderBottom: '1px solid rgba(51,255,51,0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>
                   {row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)' }}>
-                  {row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.45rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-label)' }}>{row.shows_rated}</span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--orange)', letterSpacing: 1 }}>{row.avg_score ?? '—'}</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'var(--text-label)' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
+                <span title="Shows rated" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.shows_rated}</span>
+                <span title="Avg score" style={{ fontFamily: 'var(--font-display)', fontSize: '0.76rem', color: 'var(--orange)', letterSpacing: 1, textAlign: 'right' }}>{row.avg_score ?? '—'}</span>
+                <span title="Login streak" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
+                <span title="Feedback submitted" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: row.feedback_count > 0 ? 'var(--green)' : 'var(--text-muted)', textAlign: 'right' }}>{row.feedback_count > 0 ? `◈${row.feedback_count}` : '—'}</span>
+                <span title="Bugs reported" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: row.bugs_reported > 0 ? 'var(--orange)' : 'var(--text-muted)', textAlign: 'right' }}>{row.bugs_reported > 0 ? `⚠${row.bugs_reported}` : '—'}</span>
               </div>
             ))}
           </div>
