@@ -64,9 +64,10 @@ Only include a theme if multiple reviews mention it. Keep each theme to 1-2 tigh
     const text = data?.content?.[0]?.text || null;
     if (!text) return res.status(500).json({ error: 'No response from AI' });
 
-    // Parse JSON from response
+    // Strip markdown fences if present, then parse JSON
     try {
-      const parsed = JSON.parse(text.trim());
+      const cleaned = text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+      const parsed = JSON.parse(cleaned);
       return res.status(200).json({ structured: parsed });
     } catch (e) {
       // Fallback: return raw text if JSON parse fails
