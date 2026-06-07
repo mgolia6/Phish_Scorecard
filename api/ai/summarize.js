@@ -16,20 +16,34 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'AI not configured' });
   }
 
+  // Send all reviews, not just 8
   const reviewText = reviews
     .filter(r => r.review && r.review.trim().length > 20)
-    .slice(0, 8)
-    .map((r, i) => `Review ${i+1} (${r.author}): "${r.review.trim()}"`)
+    .map((r, i) => `[${i+1}] ${r.author}: "${r.review.trim()}"`)
     .join('\n\n');
 
-  const prompt = `You are summarizing Phish fan reviews of a concert. Be concise, vivid, capture the collective vibe. Use Phish fan language naturally. Do not mention you're summarizing reviews — just describe the show.
+  const prompt = `You are analyzing Phish fan reviews submitted to Phish.net for a specific concert. Your job is to synthesize ALL reviews into a structured breakdown by theme. Use authentic Phish fan language — jams, segues, peak, exploratory, bustout, sandwich, etc.
 
-Show: ${showDate} at ${venue}${city ? `, ${city}` : ''} — ${yearsAgo} years ago
+Show: ${showDate} at ${venue}${city ? `, ${city}` : ''}${yearsAgo ? ` (${yearsAgo} years ago)` : ''}
+Total reviews: ${reviews.filter(r => r.review && r.review.trim().length > 20).length}
 
 Fan reviews:
 ${reviewText}
 
-Write 2-3 sentences on what made this show memorable. Be specific. No fluff.`;
+Read every review carefully. Then produce a structured synthesis in this exact JSON format — no other text, just the JSON:
+
+{
+  "overall": "1-2 sentence collective verdict on the show — what the consensus is",
+  "themes": [
+    { "label": "MUSIC", "text": "What reviewers said about the playing, setlist, jams, highlights" },
+    { "label": "VIBE", "text": "Energy of the crowd, atmosphere, flow of the night" },
+    { "label": "STANDOUTS", "text": "Specific songs or moments multiple reviewers called out" }
+  ],
+  "sentiment": "FIRE | SOLID | MIXED | SLEEPER",
+  "reviewCount": ${reviews.filter(r => r.review && r.review.trim().length > 20).length}
+}
+
+Only include a theme if multiple reviews mention it. Keep each theme to 1-2 tight sentences. Be specific — name actual songs if reviewers mention them.`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -41,7 +55,7 @@ Write 2-3 sentences on what made this show memorable. Be specific. No fluff.`;
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 300,
+        max_tokens: 600,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
@@ -49,7 +63,15 @@ Write 2-3 sentences on what made this show memorable. Be specific. No fluff.`;
     const data = await response.json();
     const text = data?.content?.[0]?.text || null;
     if (!text) return res.status(500).json({ error: 'No response from AI' });
-    return res.status(200).json({ summary: text });
+
+    // Parse JSON from response
+    try {
+      const parsed = JSON.parse(text.trim());
+      return res.status(200).json({ structured: parsed });
+    } catch (e) {
+      // Fallback: return raw text if JSON parse fails
+      return res.status(200).json({ summary: text });
+    }
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
