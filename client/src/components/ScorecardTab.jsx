@@ -247,7 +247,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success');
       }} />}
 
-      <div className="instructions-panel">
+      {!initialShowDate && <div className="instructions-panel">
         <button className="instructions-toggle" onClick={() => setShowInstructions(!showInstructions)}>
           <span>HOW TO USE PHREEZER</span>
           <span className="toggle-arrow">{showInstructions ? '▲ COLLAPSE' : '▼ EXPAND'}</span>
@@ -268,9 +268,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
-      <div className="panel">
+      {!initialShowDate && <div className="panel">
         <div className="panel-title">SEARCH SHOWS</div>
         <div className="search-wrap">
           <div className="search-input-wrap">
@@ -348,7 +348,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
           </>
         )}
-      </div>
+      </div>}
 
       {loadingShow && <div className="loading">LOADING SETLIST FROM PHISH.NET...</div>}
 
