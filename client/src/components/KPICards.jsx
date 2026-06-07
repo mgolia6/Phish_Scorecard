@@ -7,59 +7,81 @@ const SHOW_KPIS = [
     key: 'attended',
     lbl: 'SHOWS',
     col: 'var(--cyan)',
-    tip: 'Total Phish shows you\'ve attended',
+    tipTitle: 'SHOWS ATTENDED',
+    tip: 'Total shows you\'ve attended.',
+    source: 'Source: phish.net',
   },
   {
     key: 'rated',
     lbl: 'PHROZEN',
     col: 'var(--orange)',
-    tip: 'Shows you\'ve rated in Phreezer',
+    tipTitle: 'SHOWS PHROZEN',
+    tip: 'Shows you\'ve rated inside Phreezer.',
+    source: 'Source: Phreezer',
   },
   {
     key: 'avg',
     lbl: 'AVG SCORE',
     col: 'var(--green)',
-    tip: 'Your average show rating (1–5 scale)',
+    tipTitle: 'YOUR AVG',
+    tip: 'Average of all your show ratings.',
+    source: 'Source: Phreezer',
   },
   {
     key: 'reviewed',
     lbl: 'REVIEWED',
     col: 'var(--cyan)',
-    tip: 'Shows where you\'ve written a review',
+    tipTitle: 'REVIEWS WRITTEN',
+    tip: 'Shows with a written review on your account.',
+    source: 'Source: phish.net',
   },
 ];
 
-function KPICard({ val, lbl, col, tip, isLast }) {
-  const [showTip, setShowTip] = useState(false);
+const flipStyle = `
+  .kpi-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1);
+  }
+  .kpi-card-inner.flipped {
+    transform: rotateY(180deg);
+  }
+  .kpi-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 6px;
+    box-sizing: border-box;
+  }
+  .kpi-face-back {
+    transform: rotateY(180deg);
+  }
+`;
 
+function KPICard({ val, lbl, col, tip, tipTitle, source, isLast, flipped, onFlip }) {
   return (
     <div
-      onClick={() => setShowTip(s => !s)}
+      onClick={onFlip}
       style={{
-        padding: '18px 6px',
-        textAlign: 'center',
         borderRight: isLast ? 'none' : '1px solid var(--border)',
         cursor: 'pointer',
+        perspective: '600px',
+        height: 90,
         position: 'relative',
         userSelect: 'none',
-        transition: 'background 0.15s',
-        background: showTip ? 'rgba(0,224,208,0.05)' : 'transparent',
       }}
     >
-      {showTip ? (
-        <div style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '0.38rem',
-          color: col,
-          letterSpacing: '1px',
-          lineHeight: 1.6,
-          padding: '4px 2px',
-          textShadow: '0 0 8px currentColor',
-        }}>
-          {tip}
-        </div>
-      ) : (
-        <>
+      <div className={`kpi-card-inner${flipped ? ' flipped' : ''}`}>
+        {/* FRONT */}
+        <div className="kpi-face">
           <div style={{
             fontFamily: 'var(--font-display)',
             fontSize: '2rem',
@@ -79,8 +101,43 @@ function KPICard({ val, lbl, col, tip, isLast }) {
           }}>
             {lbl}
           </div>
-        </>
-      )}
+        </div>
+
+        {/* BACK */}
+        <div className="kpi-face kpi-face-back" style={{ background: 'var(--bg-elevated)', padding: '10px 8px' }}>
+          <div style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.4rem',
+            color: col,
+            letterSpacing: '1.5px',
+            textShadow: '0 0 8px currentColor',
+            marginBottom: 5,
+            textAlign: 'center',
+          }}>
+            {tipTitle}
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.36rem',
+            color: 'var(--text-label)',
+            letterSpacing: '0.5px',
+            lineHeight: 1.6,
+            textAlign: 'center',
+          }}>
+            {tip}
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.32rem',
+            color: 'rgba(0,224,208,0.4)',
+            marginTop: 6,
+            textAlign: 'center',
+            letterSpacing: '0.5px',
+          }}>
+            {source}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -88,6 +145,7 @@ function KPICard({ val, lbl, col, tip, isLast }) {
 export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [flippedIndex, setFlippedIndex] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -112,8 +170,14 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
     { ...SHOW_KPIS[3], val: kpi.shows_with_reviews },
   ];
 
+  const handleFlip = (i) => {
+    setFlippedIndex(prev => prev === i ? null : i);
+  };
+
   return (
     <div>
+      <style>{flipStyle}</style>
+
       {/* ── QUICK STATS HEADER + IMPORT ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-panel)', padding: '10px 14px', borderBottom: '1px solid rgba(255,102,0,0.2)' }}>
         <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)' }}>◈ QUICK STATS</span>
@@ -125,15 +189,26 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
 
       {/* ── KPI ROW ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}>
-        {cardData.map(({ val, lbl, col, tip }, i) => (
-          <KPICard key={lbl} val={val} lbl={lbl} col={col} tip={tip} isLast={i === cardData.length - 1} />
+        {cardData.map(({ val, lbl, col, tip, tipTitle, source }, i) => (
+          <KPICard
+            key={lbl}
+            val={val}
+            lbl={lbl}
+            col={col}
+            tip={tip}
+            tipTitle={tipTitle}
+            source={source}
+            isLast={i === cardData.length - 1}
+            flipped={flippedIndex === i}
+            onFlip={() => handleFlip(i)}
+          />
         ))}
       </div>
 
       {/* ── TAP HINT ── */}
       <div style={{ background: 'var(--bg-panel)', padding: '4px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>
         <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.3)', letterSpacing: '2px' }}>
-          TAP ANY STAT FOR DETAILS
+          TAP ANY STAT TO FLIP
         </span>
       </div>
 
