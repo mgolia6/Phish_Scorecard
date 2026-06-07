@@ -5,6 +5,8 @@ const ALLOWED_ICONS = ['❄','◈','⚡','✦','⬡','◉','▦','✎','🔥','�
 const ALLOWED_VANTAGE = ['floor', 'pit', 'lower-bowl', 'upper-bowl', 'lawn', 'balcony', 'anywhere'];
 const ALLOWED_STYLE = ['attended', 'webcast', 'both'];
 const ALLOWED_ERA = ['1.0', '2.0', '3.0', '4.0', 'no-preference'];
+const ALLOWED_STAGE_SIDE = ['mike', 'page', 'center', 'no-preference'];
+const ALLOWED_VIBE = ['dance', 'chill', 'depends'];
 
 let migrated = false;
 async function ensureColumns(pool) {
@@ -13,6 +15,8 @@ async function ensureColumns(pool) {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS vantage_point VARCHAR(20)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_style VARCHAR(20)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS era_preference VARCHAR(20)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stage_side VARCHAR(20)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_vibe VARCHAR(20)`);
     migrated = true;
   } catch (err) {
     console.error('Profile migration error (non-fatal):', err.message);
@@ -32,7 +36,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const result = await pool.query(
       `SELECT phishnet_username, favorite_song, favorite_venue, favorite_show_date,
-              avatar_icon, vantage_point, show_style, era_preference
+              avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe
        FROM users WHERE id = $1`,
       [user.id]
     );
@@ -41,7 +45,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const { phishnet_username, favorite_song, favorite_venue, favorite_show_date,
-            avatar_icon, vantage_point, show_style, era_preference } = req.body;
+            avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe } = req.body;
 
     if (avatar_icon && !ALLOWED_ICONS.includes(avatar_icon)) {
       return res.status(400).json({ error: 'Invalid icon' });
@@ -55,6 +59,12 @@ export default async function handler(req, res) {
     if (era_preference && !ALLOWED_ERA.includes(era_preference)) {
       return res.status(400).json({ error: 'Invalid era preference' });
     }
+    if (stage_side && !ALLOWED_STAGE_SIDE.includes(stage_side)) {
+      return res.status(400).json({ error: 'Invalid stage side' });
+    }
+    if (show_vibe && !ALLOWED_VIBE.includes(show_vibe)) {
+      return res.status(400).json({ error: 'Invalid show vibe' });
+    }
 
     await pool.query(
       `UPDATE users SET
@@ -65,8 +75,10 @@ export default async function handler(req, res) {
          avatar_icon        = $5,
          vantage_point      = $6,
          show_style         = $7,
-         era_preference     = $8
-       WHERE id = $9`,
+         era_preference     = $8,
+         stage_side         = $9,
+         show_vibe          = $10
+       WHERE id = $11`,
       [
         phishnet_username  || null,
         favorite_song      || null,
@@ -76,6 +88,8 @@ export default async function handler(req, res) {
         vantage_point      || null,
         show_style         || null,
         era_preference     || null,
+        stage_side         || null,
+        show_vibe          || null,
         user.id,
       ]
     );
