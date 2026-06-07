@@ -164,8 +164,8 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                       <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.song_name}</span>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', color: 'var(--orange)', letterSpacing: '1px', flexShrink: 0 }}>
-                        {parseFloat(s.rating).toFixed(1)}★
+                      <span style={{ flexShrink: 0 }}>
+                        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--orange)', letterSpacing: '1px' }}>{parseFloat(s.rating).toFixed(1)}</span><span style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', color: 'var(--orange)' }}>★</span>
                       </span>
                     </div>
                   ))}
@@ -204,5 +204,6 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
     </div>
   );
 }
+
 
 
