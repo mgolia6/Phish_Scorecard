@@ -52,13 +52,9 @@ export function MySongsTab({ api, showMessage, showError }) {
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>{formatDate(v.show_date)}</div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{v.venue}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                    {[1,2,3,4,5].map(n => (
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', color: 'var(--orange)', letterSpacing: '1px' }}>
-                        {parseFloat(v.rating).toFixed(1)}★
-                      </span>
-                    ))}
-                  </div>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--orange)', letterSpacing: '1px', flexShrink: 0 }}>
+                    {parseFloat(v.rating).toFixed(1)}★
+                  </span>
                 </div>
               ))}
             </div>
@@ -72,4 +68,5 @@ export function MySongsTab({ api, showMessage, showError }) {
 // ============================================================
 // MY VENUES TAB
 // ============================================================
+
 
