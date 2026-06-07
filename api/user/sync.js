@@ -117,16 +117,32 @@ function computeStats(attendedDates, cachedShows, userRatings) {
 
   // Longest consecutive run (shows within 7 days of each other = same run)
   let maxRun = 1, currentRun = 1, runStart = sortedDates[0], bestRunStart = sortedDates[0];
+  let bestRunEnd = sortedDates[0], currentRunStart = sortedDates[0];
   for (let i = 1; i < sortedDates.length; i++) {
     const days = Math.round((new Date(sortedDates[i]) - new Date(sortedDates[i-1])) / 86400000);
     if (days <= 7) {
       currentRun++;
-      if (currentRun > maxRun) { maxRun = currentRun; bestRunStart = runStart; }
+      if (currentRun > maxRun) {
+        maxRun = currentRun;
+        bestRunStart = currentRunStart;
+        bestRunEnd = sortedDates[i];
+      }
     } else {
       currentRun = 1;
-      runStart = sortedDates[i];
+      currentRunStart = sortedDates[i];
     }
   }
+
+  // Run detail — songs, unique songs, states during the best run
+  const runDates = sortedDates.filter(d => d >= bestRunStart && d <= bestRunEnd);
+  let runSongsHeard = 0, runUniqueSongs = new Set(), runStates = new Set();
+  runDates.forEach(d => {
+    const c = cache[d];
+    if (!c) return;
+    runSongsHeard += c.song_count || 0;
+    (c.setlist || []).forEach(s => { if (s.song) runUniqueSongs.add(s.song); });
+    if (c.state) runStates.add(c.state);
+  });
 
   // Years span
   const years = [...new Set(sortedDates.map(d => d.slice(0,4)))].sort();
@@ -136,11 +152,12 @@ function computeStats(attendedDates, cachedShows, userRatings) {
   
   // Longest show (by song count as proxy — we don't have duration from pnet)
   let longestShow = null, longestShowCount = 0;
+  let longestShowDur = null, longestShowDurSec = 0;
   showsWithCache.forEach(d => {
     const c = cache[d];
     if (c.song_count > longestShowCount) {
       longestShowCount = c.song_count;
-      longestShow = { date: d, venue: c.venue, city: c.city, song_count: c.song_count };
+      longestShow = { date: d, venue: c.venue, city: c.city, song_count: c.song_count, duration_seconds: c.duration_seconds || null };
     }
   });
 
@@ -149,13 +166,14 @@ function computeStats(attendedDates, cachedShows, userRatings) {
   let longestSet2 = null, longestSet2Count = 0;
   showsWithCache.forEach(d => {
     const c = cache[d];
+    const durPerSong = c.duration_seconds && c.song_count ? c.duration_seconds / c.song_count : null;
     if ((c.set1_count || 0) > longestSet1Count) {
       longestSet1Count = c.set1_count;
-      longestSet1 = { date: d, venue: c.venue, count: c.set1_count };
+      longestSet1 = { date: d, venue: c.venue, count: c.set1_count, duration_seconds: durPerSong ? Math.round(durPerSong * c.set1_count) : null };
     }
     if ((c.set2_count || 0) > longestSet2Count) {
       longestSet2Count = c.set2_count;
-      longestSet2 = { date: d, venue: c.venue, count: c.set2_count };
+      longestSet2 = { date: d, venue: c.venue, count: c.set2_count, duration_seconds: durPerSong ? Math.round(durPerSong * c.set2_count) : null };
     }
   });
 
@@ -169,16 +187,42 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     });
   });
 
+  // Build attended song versions (dates + venues, sorted desc)
+  const songAttendedVersions = {};
+  showsWithCache.forEach(d => {
+    const c = cache[d];
+    (c.setlist || []).forEach(s => {
+      if (!s.song) return;
+      if (!songAttendedVersions[s.song]) songAttendedVersions[s.song] = [];
+      // Only add once per show date
+      if (!songAttendedVersions[s.song].find(v => v.date === d)) {
+        songAttendedVersions[s.song].push({ date: d, venue: c.venue });
+      }
+    });
+  });
+
   const mostHeardAttended = Object.entries(songFreq)
     .sort(([,a],[,b]) => b - a)
     .slice(0, 10)
-    .map(([song, count]) => ({ song, count }));
+    .map(([song, count]) => ({
+      song, count,
+      versions: (songAttendedVersions[song] || [])
+        .sort((a,b) => b.date.localeCompare(a.date))
+        .slice(0, 5),
+    }));
 
   // Rarest songs — catch songs you've seen that are rarely played
-  // (low frequency in YOUR history but we flag them)
+  // Track date and venue for each song (first occurrence)
+  const songFirstSeen = {};
+  showsWithCache.forEach(d => {
+    const c = cache[d];
+    (c.setlist || []).forEach(s => {
+      if (!songFirstSeen[s.song]) songFirstSeen[s.song] = { date: d, venue: c.venue };
+    });
+  });
   const rarestCaught = Object.entries(songFreq)
     .filter(([,count]) => count === 1)
-    .map(([song]) => ({ song, times_caught: 1 }))
+    .map(([song]) => ({ song, times_caught: 1, date: songFirstSeen[song]?.date || null, venue: songFirstSeen[song]?.venue || null }))
     .slice(0, 10);
 
   // ── RATED STATS ───────────────────────────────────────────
@@ -328,13 +372,17 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     (c.setlist || []).forEach(s => {
       if (s.song) uniqueSongsSet.add(s.song);
       if (s.set === 'e' || s.set === 'E') {
-        if (!encoreFreq[s.song]) encoreFreq[s.song] = 0;
-        encoreFreq[s.song]++;
+        if (!encoreFreq[s.song]) encoreFreq[s.song] = { count: 0, last_date: null, last_venue: null };
+        encoreFreq[s.song].count++;
+        // d is sorted ascending so last occurrence wins
+        encoreFreq[s.song].last_date = d;
+        encoreFreq[s.song].last_venue = c.venue;
       }
     });
     if ((c.encore_count || 0) > longestEncoreCount) {
       longestEncoreCount = c.encore_count;
-      longestEncore = { date: d, venue: c.venue, count: c.encore_count };
+      const durPerSong = c.duration_seconds && c.song_count ? c.duration_seconds / c.song_count : null;
+      longestEncore = { date: d, venue: c.venue, count: c.encore_count, duration_seconds: durPerSong ? Math.round(durPerSong * c.encore_count) : null };
     }
     if (c.duration_seconds && c.duration_seconds > 0) {
       const dur = parseInt(c.duration_seconds);
@@ -367,8 +415,8 @@ function computeStats(attendedDates, cachedShows, userRatings) {
   }
 
   const mostCommonEncore = Object.entries(encoreFreq)
-    .sort(([,a],[,b]) => b - a).slice(0, 5)
-    .map(([song, count]) => ({ song, count }));
+    .sort(([,a],[,b]) => b.count - a.count).slice(0, 5)
+    .map(([song, data]) => ({ song, count: data.count, last_date: data.last_date, last_venue: data.last_venue }));
 
   // Consecutive years
   const yearNums = years.map(Number).sort((a,b)=>a-b);
@@ -457,7 +505,7 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     latest_show: sortedDates[sortedDates.length - 1],
     days_since_first: daysSinceFirst,
     longest_gap: { days: longestGap, from: longestGapFrom, to: longestGapTo },
-    longest_run: { shows: maxRun, start: bestRunStart },
+    longest_run: { shows: maxRun, start: bestRunStart, end: bestRunEnd, songs_heard: runSongsHeard, unique_songs: runUniqueSongs.size, states: [...runStates] },
     consecutive_years: { count: maxConsecYears, start: bestConsecStart },
     avg_shows_per_year: avgShowsPerYear,
     shows_by_year: showsByYear,
