@@ -128,7 +128,7 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 600,
+        max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
