@@ -989,16 +989,16 @@ function KPICards({ api }) {
         background: expanded ? 'rgba(0,224,208,0.08)' : 'rgba(0,224,208,0.04)',
         border: '1px solid rgba(0,224,208,0.35)',
         borderTop: expanded ? '1px solid rgba(0,224,208,0.35)' : 'none',
-        padding: '7px 14px',
+        padding: '22px 14px',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        boxShadow: expanded ? 'none' : '0 0 12px rgba(0,224,208,0.15)',
+        boxShadow: expanded ? '0 0 10px rgba(0,224,208,0.2)' : '0 0 22px rgba(0,224,208,0.5), inset 0 0 20px rgba(0,224,208,0.06)',
         transition: 'all 0.2s',
       }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--cyan)', letterSpacing: '2.5px' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.72rem', color: 'var(--cyan)', letterSpacing: '3px', textShadow: '0 0 14px rgba(0,224,208,0.9)' }}>
           {expanded ? '▲ CLOSE' : '❄ DIVE DEEP'}
         </span>
         {!expanded && (
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '1px' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.65)', letterSpacing: '2px' }}>
             — TAP FOR FULL STATS
           </span>
         )}
