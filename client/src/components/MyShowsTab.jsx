@@ -5,7 +5,7 @@ import { OTDCard } from './OTDCard';
 import { ShowCard } from './ShowCard';
 import { formatDate } from '../utils';
 
-export function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount, onDeepPhreeze }) {
+export function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount, onDeepPhreeze, kpiRefreshKey }) {
   const [shows, setShows] = useState([]);
   const [attended, setAttended] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     }).catch(err => showError(err.message)).finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [kpiRefreshKey]);
 
   useEffect(() => {
     if (openImportOnMount) setShowImport(true);
@@ -96,7 +96,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       })()}
 
       {/* ── SECTION A: QUICK STATS + KPIs — IMPORT button lives here ── */}
-      <KPICards api={api} onDeepPhreeze={onDeepPhreeze} onImport={() => setShowImport(v => !v)} />
+      <KPICards api={api} onDeepPhreeze={onDeepPhreeze} onImport={() => setShowImport(v => !v)} refreshKey={kpiRefreshKey} />
 
       {/* Import panel */}
       {showImport && (
