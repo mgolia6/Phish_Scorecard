@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApi } from './useApi';
+import { useApi } from '../useApi';
 
 export function TandCModal({ onAccept }) {
   const [scrolled, setScrolled] = React.useState(false);
