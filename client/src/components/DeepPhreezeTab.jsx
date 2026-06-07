@@ -33,6 +33,8 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
   const [toggle, setToggle] = useState('attended');
   const [expandedSong, setExpandedSong] = useState(null);
   const [longestToggle, setLongestToggle] = useState('songs'); // 'songs' | 'time'
+  const [expandedCard, setExpandedCard] = useState(null);
+  const toggleCard = (id) => setExpandedCard(prev => prev === id ? null : id);
   const [expandedMostHeard, setExpandedMostHeard] = useState(null);
   const longPressTimer = React.useRef(null);
 
@@ -104,26 +106,68 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     </div>
   );
 
-  const Hero = ({ value, label, sub, color = D.cyan, unit }) => (
-    <div style={{ background: D.bg, border: `1px solid ${color}33`, borderTop: `3px solid ${color}`, padding: '16px 14px', flex: 1, minWidth: 0 }}>
-      <div style={{ fontFamily: D.disp, fontSize: '2.8rem', fontWeight: 900, color, textShadow: `0 0 30px ${color}44`, lineHeight: 1, letterSpacing: 1 }}>{value}</div>
-      {unit && <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
-      <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 6 }}>{label}</div>
-      {sub && <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, marginTop: 4 }}>{sub}</div>}
-    </div>
-  );
-
-  const Tile = ({ value, label, sub, color = D.orange, size = '1.7rem', href, onClick }) => {
-    const inner = (
-      <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, padding: '12px 10px', flex: 1, minWidth: 0, cursor: (href || onClick) ? 'pointer' : 'default' }}>
-        <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
-        <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
-        {sub && <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
+  const Hero = ({ id, value, label, sub, color = D.cyan, unit, factoid }) => {
+    const isOpen = expandedCard === id;
+    return (
+      <div
+        onClick={factoid && id ? () => toggleCard(id) : undefined}
+        style={{ background: D.bg, border: `1px solid ${color}33`, borderTop: `3px solid ${color}`, flex: 1, minWidth: 0, cursor: factoid ? 'pointer' : 'default' }}
+      >
+        <div style={{ padding: '16px 14px 12px' }}>
+          <div style={{ fontFamily: D.disp, fontSize: '2.8rem', fontWeight: 900, color, textShadow: `0 0 30px ${color}44`, lineHeight: 1, letterSpacing: 1 }}>{value}</div>
+          {unit && <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 6 }}>
+            <div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px' }}>{label}</div>
+              {sub && <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, marginTop: 4 }}>{sub}</div>}
+            </div>
+            {factoid && <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 6 }}>{isOpen ? '▲' : '▼'}</div>}
+          </div>
+        </div>
+        {isOpen && factoid && (
+          <div style={{ borderTop: `1px solid ${color}22`, background: `${color}08`, padding: '10px 14px' }}>
+            {factoid.map((f, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '4px 0', borderBottom: i < factoid.length - 1 ? `1px solid ${color}11` : 'none' }}>
+                <span style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
+                <span style={{ fontFamily: D.mono, fontSize: '0.76rem', color: f.color || D.white }}>{f.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
-    if (onClick) return <div onClick={onClick} style={{ flex: 1, minWidth: 0 }}>{inner}</div>;
-    if (href) return <a href={href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none', minWidth: 0 }}>{inner}</a>;
-    return inner;
+  };
+
+  const Tile = ({ id, value, label, sub, color = D.orange, size = '1.7rem', href, onClick, factoid }) => {
+    const isOpen = expandedCard === id;
+    const hasTap = !!(onClick || href || (factoid && id));
+    const handleTap = factoid && id ? () => toggleCard(id) : onClick;
+    const inner = (
+      <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, flex: 1, minWidth: 0, cursor: hasTap ? 'pointer' : 'default' }}>
+        <div style={{ padding: '12px 10px 10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
+            {factoid && id && <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</div>}
+          </div>
+          <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
+          {sub && <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
+        </div>
+        {isOpen && factoid && (
+          <div style={{ borderTop: `1px solid ${color}22`, background: `${color}08`, padding: '8px 10px' }}>
+            {factoid.map((f, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '3px 0', borderBottom: i < factoid.length - 1 ? `1px solid ${color}11` : 'none' }}>
+                <span style={{ fontFamily: D.disp, fontSize: '0.44rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
+                <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: f.color || D.white }}>{f.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+    if (onClick && !factoid) return <div onClick={onClick} style={{ flex: 1, minWidth: 0 }}>{inner}</div>;
+    if (href && !factoid) return <a href={href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none', minWidth: 0 }}>{inner}</a>;
+    if (handleTap) return <div onClick={handleTap} style={{ flex: 1, minWidth: 0 }}>{inner}</div>;
+    return <div style={{ flex: 1, minWidth: 0 }}>{inner}</div>;
   };
 
   const Row = ({ label, value, color = D.white, mono = false, href, onClick }) => {
@@ -252,15 +296,40 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── YOUR PHISH LIFE ── */}
           <Section icon="◈" label="YOUR PHISH LIFE" color={D.cyan}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Hero value={s.total_attended || '—'} label="SHOWS ATTENDED" color={D.cyan} />
-              <Hero value={s.years_active || '—'} label="YEARS OF PHISH"
-                sub={s.first_show ? `Since ${formatDate(s.first_show)}` : ''} color={D.orange} />
+              <Hero id="shows_attended" value={s.total_attended || '—'} label="SHOWS ATTENDED" color={D.cyan}
+                factoid={[
+                  { label: 'FIRST SHOW', value: s.first_show ? formatDate(s.first_show) : '—' },
+                  { label: 'MOST RECENT', value: s.latest_show ? formatDate(s.latest_show) : '—' },
+                  { label: 'BUSIEST YEAR', value: s.busiest_year ? `${s.busiest_year.year} · ${s.busiest_year.count} shows` : '—', color: D.orange },
+                  { label: 'AVG / YEAR', value: s.avg_shows_per_year || '—' },
+                ]}
+              />
+              <Hero id="years_active" value={s.years_active || '—'} label="YEARS WITH PHISH"
+                sub={s.first_show ? `Since ${formatDate(s.first_show)}` : ''} color={D.orange}
+                factoid={[
+                  { label: 'YEARS SINCE FIRST SHOW', value: s.first_show ? `${new Date().getFullYear() - parseInt(s.first_show)} yrs` : '—', color: D.orange },
+                  { label: 'CONSECUTIVE YEARS', value: s.consecutive_years ? `${s.consecutive_years.count} yrs` : '—' },
+                  { label: 'HIATUS YEARS SKIPPED', value: s.first_show && s.years_active ? `${(new Date().getFullYear() - parseInt(s.first_show) + 1) - s.years_active}` : '—', color: D.muted },
+                ]}
+              />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={liveTime} label="LIVE PHISH TIME" size="1.1rem"
-                sub={timingNote} color={D.cyan} />
-              <Tile value={s.avg_shows_per_year || '—'} label="AVG SHOWS / YEAR" color={D.orange}
-                sub={s.busiest_year ? `Best: ${s.busiest_year.year} (${s.busiest_year.count} shows)` : ''} />
+              <Tile id="live_time" value={liveTime} label="LIVE PHISH TIME" size="1.1rem"
+                sub={timingNote} color={D.cyan}
+                factoid={[
+                  { label: 'PRECISE TIMING', value: `${preciseCount} of ${totalAttended} shows` },
+                  { label: 'EST. REMAINDER', value: `${totalAttended - preciseCount} × ~3hr` , color: D.muted },
+                  { label: 'TOTAL SONGS HEARD', value: (s.total_songs_heard || 0).toLocaleString(), color: D.cyan },
+                ]}
+              />
+              <Tile id="avg_shows_yr" value={s.avg_shows_per_year || '—'} label="AVG SHOWS / YEAR" color={D.orange}
+                sub={s.busiest_year ? `Best: ${s.busiest_year.year} (${s.busiest_year.count} shows)` : ''}
+                factoid={[
+                  { label: 'BUSIEST YEAR', value: s.busiest_year ? `${s.busiest_year.year}` : '—', color: D.orange },
+                  { label: 'SHOWS THAT YEAR', value: s.busiest_year ? `${s.busiest_year.count}` : '—' },
+                  { label: 'SHOW DENSITY', value: s.show_density ? `${s.show_density}/yr` : '—', color: D.muted },
+                ]}
+              />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
               <Row label="FIRST SHOW ◈"
@@ -283,9 +352,17 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {s.eras && (
             <Section icon="◉" label="BY ERA" color={D.orange}>
               <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                {[['1.0', 'pre-2000', D.muted], ['2.0', '2002–04', D.cyan], ['3.0', '2009–19', D.orange], ['4.0', '2021+', D.green]].map(([era, dates, col]) => (
-                  <Tile key={era} value={s.eras[era] || 0} label={`${era} ERA`} sub={dates} color={col} />
-                ))}
+                {[['1.0', 'pre-2000', D.muted], ['2.0', '2002–04', D.cyan], ['3.0', '2009–19', D.orange], ['4.0', '2021+', D.green]].map(([era, dates, col]) => {
+                  const eraCount = s.eras[era] || 0;
+                  const pct = s.total_attended ? Math.round((eraCount / s.total_attended) * 100) : 0;
+                  return (
+                    <Tile key={era} id={`era_${era}`} value={eraCount} label={`${era} ERA`} sub={dates} color={col}
+                      factoid={eraCount > 0 ? [
+                        { label: 'OF YOUR SHOWS', value: `${pct}%`, color: col },
+                      ] : null}
+                    />
+                  );
+                })}
               </div>
             </Section>
           )}
@@ -293,10 +370,22 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── SONGS YOU'VE HEARD ── */}
           <Section icon="♪" label="SONGS YOU'VE HEARD" color={D.green}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Hero value={(s.total_songs_heard || 0).toLocaleString()} label="TOTAL SONGS HEARD" color={D.green} />
-              <Hero value={s.unique_songs_heard || '—'} label="UNIQUE SONGS"
+              <Hero id="total_songs" value={(s.total_songs_heard || 0).toLocaleString()} label="TOTAL SONGS HEARD" color={D.green}
+                factoid={[
+                  { label: 'SET I SONGS', value: (s.total_set1_songs || 0).toLocaleString(), color: D.cyan },
+                  { label: 'SET II SONGS', value: (s.total_set2_songs || 0).toLocaleString(), color: D.orange },
+                  { label: 'ENCORE SONGS', value: (s.total_encore_songs || 0).toLocaleString(), color: D.green },
+                ]}
+              />
+              <Hero id="unique_songs" value={s.unique_songs_heard || '—'} label="UNIQUE SONGS"
                 sub={s.total_songs_heard ? `${Math.round((s.unique_songs_heard / s.total_songs_heard) * 100)}% variety` : ''}
-                color={D.cyan} />
+                color={D.cyan}
+                factoid={[
+                  { label: 'SONGS HEARD ONCE', value: s.rarest_caught ? `${s.rarest_caught.length}+` : '—', color: D.muted },
+                  { label: 'FIRST SONG EVER', value: s.first_song_ever || '—', color: D.orange },
+                  { label: 'LAST SONG HEARD', value: s.last_song_ever || '—', color: D.cyan },
+                ]}
+              />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Tile value={s.total_set1_songs || '—'} label="SET I SONGS TOTAL" color={D.cyan}
@@ -331,8 +420,16 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── GEOGRAPHY ── */}
           <Section icon="◉" label="GEOGRAPHY" color={D.orange}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.unique_venues || '—'} label="UNIQUE VENUES" color={D.cyan} />
-              <Tile value={s.unique_states || '—'} label="STATES / REGIONS" color={D.orange} />
+              <Tile id="unique_venues" value={s.unique_venues || '—'} label="UNIQUE VENUES" color={D.cyan}
+                factoid={[
+                  { label: 'AVG SHOWS / VENUE', value: s.unique_venues && s.total_attended ? (s.total_attended / s.unique_venues).toFixed(1) : '—', color: D.cyan },
+                ]}
+              />
+              <Tile id="unique_states" value={s.unique_states || '—'} label="STATES / REGIONS" color={D.orange}
+                factoid={[
+                  { label: 'OF 50 STATES', value: s.unique_states ? `${Math.round((s.unique_states / 50) * 100)}%` : '—', color: D.orange },
+                ]}
+              />
             </div>
           </Section>
 
@@ -455,14 +552,27 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── STREAKS & GAPS ── */}
           <Section icon="⚡" label="STREAKS & GAPS" color={D.orange}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={`${s.longest_run?.shows || '—'} shows`}
+              <Tile id="longest_run" value={`${s.longest_run?.shows || '—'} shows`}
                 label="LONGEST CONSECUTIVE RUN"
                 sub={s.longest_run?.start ? `Starting ${formatDate(s.longest_run.start)}` : ''}
-                color={D.orange} size="1.1rem" />
-              <Tile value={s.consecutive_years?.count ? `${s.consecutive_years.count} yrs` : '—'}
+                color={D.orange} size="1.1rem"
+                factoid={[
+                  { label: 'RUN ENDED', value: s.longest_run?.end ? formatDate(s.longest_run.end) : '—' },
+                  { label: 'SONGS HEARD', value: s.longest_run?.songs_heard ? s.longest_run.songs_heard.toLocaleString() : '—', color: D.orange },
+                  { label: 'UNIQUE SONGS', value: s.longest_run?.unique_songs || '—' },
+                  ...(s.longest_run?.states?.length ? [{ label: 'STATES', value: s.longest_run.states.join(', '), color: D.muted }] : []),
+                ]}
+              />
+              <Tile id="consec_years" value={s.consecutive_years?.count ? `${s.consecutive_years.count} yrs` : '—'}
                 label="CONSECUTIVE YEARS"
                 sub={s.consecutive_years?.start ? `${s.consecutive_years.start}–${s.consecutive_years.start + s.consecutive_years.count - 1}` : ''}
-                color={D.cyan} size="1.1rem" />
+                color={D.cyan} size="1.1rem"
+                factoid={[
+                  { label: 'FROM', value: s.consecutive_years?.start || '—' },
+                  { label: 'TO', value: s.consecutive_years?.start && s.consecutive_years?.count ? s.consecutive_years.start + s.consecutive_years.count - 1 : '—' },
+                  { label: 'OF YOUR TOTAL', value: s.years_active ? `${Math.round((s.consecutive_years?.count / s.years_active) * 100)}%` : '—', color: D.cyan },
+                ]}
+              />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
               {s.longest_run?.start && (
