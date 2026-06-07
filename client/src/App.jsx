@@ -144,10 +144,12 @@ export default function App() {
     setScorecardOverlay(true);
   };
 
+  const [kpiRefreshKey, setKpiRefreshKey] = useState(0);
   const closeScorecardOverlay = () => {
     setScorecardOverlay(false);
     setScorecardOverlayDate(null);
     setScorecardOverlayOrigin(null);
+    setKpiRefreshKey(k => k + 1); // force KPI refresh
   };
 
   // After onboarding, navigate to My Shows with import panel open
@@ -206,6 +208,7 @@ export default function App() {
           showError={showError}
           onRateShow={handleRateShow}
           openImportOnMount={pendingImportOnMyShows}
+          kpiRefreshKey={kpiRefreshKey}
           onDeepPhreeze={() => setTab('my-deep-phreeze')}
         />
       )}
@@ -393,7 +396,6 @@ export default function App() {
               showError={showError}
               onAuthRequired={() => openAuth('login')}
               initialShowDate={scorecardOverlayDate}
-              onShowLoaded={() => setScorecardOverlayDate(null)}
               onFeedbackTrigger={setFeedbackModal}
             />
           </div>
