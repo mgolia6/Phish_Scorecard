@@ -97,6 +97,10 @@
       "destination": "/api/ai/summarize"
     },
     {
+      "source": "/api/ai/ebenezer",
+      "destination": "/api/ai/ebenezer"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
