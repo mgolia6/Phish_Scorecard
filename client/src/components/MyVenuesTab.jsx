@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { CommExpandCard } from './CommunityTab';
-import { Heatmap } from './Heatmap';
 import { formatDate } from '../utils';
 
 export function MyVenuesTab({ api, showMessage, showError }) {
@@ -41,7 +40,6 @@ export function MyVenuesTab({ api, showMessage, showError }) {
         ))}
       </div>
 
-      <Heatmap data={stateMap} title="MY RATINGS BY STATE" />
 
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>
         ◈ MY VENUES — TAP FOR TOP SHOWS
