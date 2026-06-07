@@ -2,6 +2,89 @@ import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { formatDate } from '../utils';
 
+const SHOW_KPIS = [
+  {
+    key: 'attended',
+    lbl: 'SHOWS',
+    col: 'var(--cyan)',
+    tip: 'Total Phish shows you\'ve attended',
+  },
+  {
+    key: 'rated',
+    lbl: 'PHROZEN',
+    col: 'var(--orange)',
+    tip: 'Shows you\'ve rated in Phreezer',
+  },
+  {
+    key: 'avg',
+    lbl: 'AVG SCORE',
+    col: 'var(--green)',
+    tip: 'Your average show rating (1–5 scale)',
+  },
+  {
+    key: 'reviewed',
+    lbl: 'REVIEWED',
+    col: 'var(--cyan)',
+    tip: 'Shows where you\'ve written a review',
+  },
+];
+
+function KPICard({ val, lbl, col, tip, isLast }) {
+  const [showTip, setShowTip] = useState(false);
+
+  return (
+    <div
+      onClick={() => setShowTip(s => !s)}
+      style={{
+        padding: '18px 6px',
+        textAlign: 'center',
+        borderRight: isLast ? 'none' : '1px solid var(--border)',
+        cursor: 'pointer',
+        position: 'relative',
+        userSelect: 'none',
+        transition: 'background 0.15s',
+        background: showTip ? 'rgba(0,224,208,0.05)' : 'transparent',
+      }}
+    >
+      {showTip ? (
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.38rem',
+          color: col,
+          letterSpacing: '1px',
+          lineHeight: 1.6,
+          padding: '4px 2px',
+          textShadow: '0 0 8px currentColor',
+        }}>
+          {tip}
+        </div>
+      ) : (
+        <>
+          <div style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2rem',
+            fontWeight: 900,
+            color: col,
+            lineHeight: 1,
+            textShadow: '0 0 16px currentColor',
+          }}>
+            {val}
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.38rem',
+            color: 'var(--text-muted)',
+            letterSpacing: '2px',
+            marginTop: 5,
+          }}>
+            {lbl}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
   const [kpi, setKpi] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +105,13 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
   const streakMax = 30;
   const streakPct = Math.min((kpi.login_streak || 0) / streakMax * 100, 100);
 
+  const cardData = [
+    { ...SHOW_KPIS[0], val: attended },
+    { ...SHOW_KPIS[1], val: rated },
+    { ...SHOW_KPIS[2], val: kpi.avg_score ?? '—' },
+    { ...SHOW_KPIS[3], val: kpi.shows_with_reviews },
+  ];
+
   return (
     <div>
       {/* ── QUICK STATS HEADER + IMPORT ── */}
@@ -35,17 +125,16 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
 
       {/* ── KPI ROW ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--bg-panel)', borderBottom: '1px solid var(--border)' }}>
-        {[
-          { val: attended,               lbl: 'ATT',   col: 'var(--cyan)'   },
-          { val: rated,                  lbl: 'RATED', col: 'var(--orange)' },
-          { val: kpi.avg_score ?? '—',  lbl: 'AVG',   col: 'var(--green)'  },
-          { val: kpi.shows_with_reviews, lbl: 'REV',   col: 'var(--cyan)'   },
-        ].map(({ val, lbl, col }, i) => (
-          <div key={lbl} style={{ padding: '18px 6px', textAlign: 'center', borderRight: i < 3 ? '1px solid var(--border)' : 'none' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: col, lineHeight: 1, textShadow: '0 0 16px currentColor' }}>{val}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 5 }}>{lbl}</div>
-          </div>
+        {cardData.map(({ val, lbl, col, tip }, i) => (
+          <KPICard key={lbl} val={val} lbl={lbl} col={col} tip={tip} isLast={i === cardData.length - 1} />
         ))}
+      </div>
+
+      {/* ── TAP HINT ── */}
+      <div style={{ background: 'var(--bg-panel)', padding: '4px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.3)', letterSpacing: '2px' }}>
+          TAP ANY STAT FOR DETAILS
+        </span>
       </div>
 
       {/* ── PROGRESS + STATS ── */}
