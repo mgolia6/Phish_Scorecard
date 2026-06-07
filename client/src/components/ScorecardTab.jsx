@@ -27,6 +27,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [showInstructions, setShowInstructions] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
+  const [vibeCheck, setVibeCheck] = useState(null);
+  const [vibeExpanded, setVibeExpanded] = useState(false);
+  const [loadingVibe, setLoadingVibe] = useState(false);
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
@@ -105,6 +108,28 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       ]);
       setSongs(showData.songs || []);
       setCurrentShow(showData);
+      // Fetch vibe check (cached or generate)
+      if (showData.reviews?.count > 0) {
+        setLoadingVibe(true);
+        fetch(`/api/ai/summarize?showDate=${date}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (data?.structured) { setVibeCheck(data); }
+            else if (showData.reviews?.items?.length) {
+              // Not cached — generate in background
+              const reviewsWithText = showData.reviews.items.filter(r => r.review && r.review.trim().length > 20);
+              if (reviewsWithText.length) {
+                fetch('/api/ai/summarize', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ reviews: reviewsWithText, showDate: date, venue: showData.venue, city: showData.city }),
+                }).then(r => r.json()).then(d => { if (d?.structured) setVibeCheck(d); }).catch(() => {});
+              }
+            }
+          })
+          .catch(() => {})
+          .finally(() => setLoadingVibe(false));
+      }
       setPhriends(phriendData || { tagged: [], also_attended: [] });
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
       const savedAttendance = (!Array.isArray(ratingsResp) && ratingsResp.attendance_type) ? ratingsResp.attendance_type : null;
@@ -574,6 +599,46 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   {submitting ? 'SAVING...' : saved ? '✓ RATINGS SAVED' : 'SAVE RATINGS'}
                 </button>
               </div>
+
+              {/* ── VIBE CHECK ── */}
+              {(vibeCheck?.structured || loadingVibe) && (
+                <div style={{ marginBottom: 16, border: '1px solid rgba(255,140,0,0.25)', background: 'rgba(0,0,0,0.3)' }}>
+                  <button onClick={() => setVibeExpanded(v => !v)} style={{
+                    width: '100%', padding: '10px 14px', background: 'transparent', border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    cursor: 'pointer', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>◈ VIBE CHECK</span>
+                      {vibeCheck?.structured?.sentiment && (
+                        <span style={{ fontSize: '0.4rem', padding: '2px 7px', border: `1px solid ${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--border)'}`, color: `${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--text-muted)'}` }}>
+                          {vibeCheck.structured.sentiment}
+                        </span>
+                      )}
+                    </div>
+                    <span style={{ fontSize: '0.38rem', color: 'var(--text-muted)' }}>
+                      {loadingVibe ? 'GENERATING...' : `AI · ${vibeCheck?.reviewCount || vibeCheck?.structured?.reviewCount || ''} PHISH.NET REVIEWS`}
+                      {vibeExpanded ? ' ▲' : ' ▼'}
+                    </span>
+                  </button>
+                  {vibeExpanded && vibeCheck?.structured && (
+                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,140,0,0.15)' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 12, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
+                        {vibeCheck.structured.overall}
+                      </div>
+                      {vibeCheck.structured.themes?.map((t, i) => (
+                        <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < vibeCheck.structured.themes.length - 1 ? '1px solid rgba(51,255,51,0.07)' : 'none' }}>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>{t.label}</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.65 }}>{t.text}</div>
+                        </div>
+                      ))}
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 10, borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 8 }}>
+                        AI SYNTHESIS OF {vibeCheck.structured.reviewCount} PHISH.NET REVIEWS · {vibeCheck.cached ? 'CACHED' : 'JUST GENERATED'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {currentShow.reviews?.items?.length > 0 && (
                 <div className="reviews-section">
