@@ -387,13 +387,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 ]}
               />
             </div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.total_set1_songs || '—'} label="SET I SONGS TOTAL" color={D.cyan}
-                sub={s.avg_set1_length ? `avg ${s.avg_set1_length}/show` : ''} />
-              <Tile value={s.total_set2_songs || '—'} label="SET II SONGS TOTAL" color={D.orange}
-                sub={s.avg_set2_length ? `avg ${s.avg_set2_length}/show` : ''} />
-              <Tile value={s.total_encore_songs || '—'} label="ENCORE SONGS" color={D.green} />
-            </div>
+
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
               <Row label="AVG SHOW LENGTH" value={s.avg_show_duration_seconds ? fmtSeconds(s.avg_show_duration_seconds) : s.avg_songs_per_show ? `~${Math.round(s.avg_songs_per_show * 6)} min (est.)` : '—'} color={D.white} />
               <Row label="AVG ENCORE LENGTH" value={s.avg_encore_duration_seconds ? fmtSeconds(s.avg_encore_duration_seconds) : s.avg_set1_length ? `~${Math.round((s.total_encore_songs / Math.max(s.total_attended,1)) * 6)} min (est.)` : '—'} color={D.green} />
