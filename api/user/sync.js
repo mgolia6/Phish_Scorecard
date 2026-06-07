@@ -7,8 +7,26 @@ import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 
 const PNET = 'https://api.phish.net/v5';
+const PHISH_IN = 'https://phish.in/api/v2';
 const CACHE_DAYS = 30;
 const RECENT_DAYS = 60; // always re-fetch recent shows
+
+async function fetchPhishInDuration(date) {
+  try {
+    const res = await fetch(`${PHISH_IN}/shows/${date}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // phish.in returns tracks array with duration in seconds
+    const tracks = data?.tracks || data?.data?.tracks || [];
+    if (!tracks.length) return null;
+    const totalSeconds = tracks.reduce((sum, t) => sum + (parseInt(t.duration) || 0), 0);
+    return totalSeconds > 0 ? totalSeconds : null;
+  } catch (e) {
+    return null;
+  }
+}
 
 async function fetchSetlist(date, apiKey) {
   const res = await fetch(`${PNET}/setlists/showdate/${date}.json?apikey=${apiKey}`);
@@ -181,12 +199,29 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     });
   });
 
+  // Build per-song version details for dropdown
+  const songVersionDetails = {}; // song -> [{date, venue, rating}]
+  ratedDates.forEach(d => {
+    ratings[d].forEach(r => {
+      if (!r.rating) return;
+      if (!songVersionDetails[r.song_name]) songVersionDetails[r.song_name] = [];
+      songVersionDetails[r.song_name].push({
+        date: d,
+        venue: cache[d]?.venue || '',
+        rating: parseFloat(r.rating),
+      });
+    });
+  });
+
   const mostHeardRated = Object.entries(songVersions)
     .sort(([,a],[,b]) => b - a)
     .slice(0, 10)
     .map(([song, count]) => ({
       song, count,
-      avg: (songRatings[song].reduce((a,b)=>a+b,0)/songRatings[song].length).toFixed(2)
+      avg: (songRatings[song].reduce((a,b)=>a+b,0)/songRatings[song].length).toFixed(2),
+      versions: (songVersionDetails[song] || [])
+        .sort((a,b) => b.rating - a.rating)
+        .slice(0, 5),
     }));
 
   // Perfect 5s count
@@ -295,10 +330,26 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     ? Math.round((Date.now() - new Date(sortedDates[0])) / 86400000)
     : 0;
 
-  // Actual live Phish time: avg show ~3hrs, broken into h/m/s
-  const estShowMinutes = attendedDates.length * 180; // 3 hrs per show in minutes
-  const estShowHours = Math.floor(estShowMinutes / 60);
-  const estShowMinutesRem = estShowMinutes % 60;
+  // Precise live Phish time from phish.in durations, fallback to 3hr avg
+  let totalDurationSeconds = 0;
+  let preciseCount = 0;
+  showsWithCache.forEach(d => {
+    const c = cache[d];
+    if (c.duration_seconds && c.duration_seconds > 0) {
+      totalDurationSeconds += parseInt(c.duration_seconds);
+      preciseCount++;
+    } else {
+      // Fallback: 3 hours per show
+      totalDurationSeconds += 180 * 60;
+    }
+  });
+  // Shows with no cache at all — also use 3hr fallback
+  const uncachedCount = attendedDates.length - showsWithCache.length;
+  totalDurationSeconds += uncachedCount * 180 * 60;
+
+  const totalMinutes = Math.floor(totalDurationSeconds / 60);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const totalDays = Math.floor(totalHours / 24);
 
   // Shows per year avg
   const avgShowsPerYear = years.length > 0 ? (attendedDates.length / years.length).toFixed(1) : 0;
@@ -363,9 +414,11 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     avg_songs_per_show: showsWithCache.length ? (totalSongsHeard / showsWithCache.length).toFixed(1) : 0,
     avg_set1_length: set1ShowCount ? (totalSet1Count / set1ShowCount).toFixed(1) : 0,
     avg_set2_length: set2ShowCount ? (totalSet2Count / set2ShowCount).toFixed(1) : 0,
-    est_live_hours: estShowHours,
-    est_live_minutes_rem: estShowMinutesRem,
-    est_live_minutes_total: estShowMinutes,
+    live_duration_seconds: totalDurationSeconds,
+    live_duration_minutes: totalMinutes,
+    live_duration_hours: totalHours,
+    live_duration_days: totalDays,
+    precise_show_count: preciseCount,
     most_common_encore: mostCommonEncore,
     longest_encore: longestEncore,
     first_song_ever: firstSongEver,
@@ -427,6 +480,9 @@ export default async function handler(req, res) {
     const cached = {};
     cacheRes.rows.forEach(r => { cached[r.show_date] = r.fetched_at; });
 
+    // Ensure duration_seconds column exists (migration)
+    await pool.query(`ALTER TABLE show_cache ADD COLUMN IF NOT EXISTS duration_seconds INTEGER`).catch(() => {});
+
     const needsFetch = attendedDates.filter(d => {
       if (!cached[d]) return true; // never fetched
       const fetchedAt = new Date(cached[d]);
@@ -444,19 +500,23 @@ export default async function handler(req, res) {
         try {
           const data = await fetchSetlist(date, apiKey);
           if (!data) return;
+          // Also fetch precise duration from phish.in
+          const durationSeconds = await fetchPhishInDuration(date);
           await pool.query(`
             INSERT INTO show_cache (
               show_date, venue, city, state, country, tour_name,
-              setlist, set1_count, set2_count, encore_count, song_count, fetched_at
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
+              setlist, set1_count, set2_count, encore_count, song_count,
+              duration_seconds, fetched_at
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW())
             ON CONFLICT (show_date) DO UPDATE SET
               venue=$2, city=$3, state=$4, country=$5, tour_name=$6,
               setlist=$7, set1_count=$8, set2_count=$9, encore_count=$10,
-              song_count=$11, fetched_at=NOW()
+              song_count=$11, duration_seconds=$12, fetched_at=NOW()
           `, [
             date, data.venue, data.city, data.state, data.country, data.tour_name,
             JSON.stringify(data.songs),
-            data.set1_count, data.set2_count, data.encore_count, data.song_count
+            data.set1_count, data.set2_count, data.encore_count, data.song_count,
+            durationSeconds
           ]);
           synced++;
         } catch (e) { /* skip failed fetches */ }
@@ -466,7 +526,7 @@ export default async function handler(req, res) {
     // Get full cache for attended shows
     const fullCacheRes = await pool.query(
       `SELECT show_date::text as show_date, venue, city, state, setlist,
-              set1_count, set2_count, encore_count, song_count
+              set1_count, set2_count, encore_count, song_count, duration_seconds
        FROM show_cache WHERE show_date = ANY($1::date[])`,
       [attendedDates]
     );
@@ -494,5 +554,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
 
 
