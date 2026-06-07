@@ -23,8 +23,16 @@ export default async function handler(req, res) {
 
     const first = setlistData.data[0];
 
+    // Deduplicate by set+position: Phish.net lists guest/benefit acts at the same
+    // position as the real Phish song. Keep only the first song at each set+position.
+    const seenPositions = new Set();
     const songs = setlistData.data
-      .filter(entry => entry.slug !== 'custom' && entry.songid !== 765 && entry.songid !== '765')
+      .filter(entry => {
+        const key = `${entry.set}-${entry.position}`;
+        if (seenPositions.has(key)) return false;
+        seenPositions.add(key);
+        return true;
+      })
       .map(entry => ({
       songid:     entry.songid,
       song:       entry.song,
