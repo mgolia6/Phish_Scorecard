@@ -5,6 +5,38 @@ import { OTDCard } from './OTDCard';
 import { ShowCard } from './ShowCard';
 import { formatDate } from '../utils';
 
+function OTDCarousel({ otdShows, months, onRateShow, api }) {
+  const [idx, setIdx] = React.useState(0);
+  const show = otdShows[idx];
+  if (!show) return null;
+  const [y, m, day] = show.show_date.split('-');
+  const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+  const yearsAgo = new Date().getFullYear() - parseInt(show.show_date);
+  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+  return (
+    <div style={{ margin: '10px' }}>
+      {otdShows.length > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <button
+            onClick={() => setIdx(i => Math.max(0, i - 1))}
+            disabled={idx === 0}
+            style={{ padding: '4px 12px', background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: idx === 0 ? 'rgba(0,224,208,0.2)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', cursor: idx === 0 ? 'default' : 'pointer' }}
+          >‹</button>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>
+            ON THIS DAY — {idx + 1} / {otdShows.length}
+          </span>
+          <button
+            onClick={() => setIdx(i => Math.min(otdShows.length - 1, i + 1))}
+            disabled={idx === otdShows.length - 1}
+            style={{ padding: '4px 12px', background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: idx === otdShows.length - 1 ? 'rgba(0,224,208,0.2)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', cursor: idx === otdShows.length - 1 ? 'default' : 'pointer' }}
+          >›</button>
+        </div>
+      )}
+      <OTDCard otdShow={show} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />
+    </div>
+  );
+}
+
 export function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount, onDeepPhreeze, kpiRefreshKey }) {
   const [shows, setShows] = useState([]);
   const [attended, setAttended] = useState([]);
@@ -128,18 +160,10 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       {(() => {
         const today = new Date();
         const todayStr = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-        const otdShow = attended.find(s => s.show_date && s.show_date.slice(5) === todayStr);
-        if (!otdShow) return null;
-        const yearsAgo = new Date().getFullYear() - parseInt(otdShow.show_date);
-        const scoreColor = otdShow.phreezer_avg >= 4.7 ? 'var(--orange)' : otdShow.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
-        const [y, m, day] = otdShow.show_date.split('-');
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
-        return (
-          <div style={{ margin: '10px' }}>
-            <OTDCard otdShow={otdShow} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />
-          </div>
-        );
+        const otdShows = (attended || []).filter(s => s.show_date && s.show_date.slice(5) === todayStr);
+        if (!otdShows.length) return null;
+        return <OTDCarousel otdShows={otdShows} months={months} onRateShow={onRateShow} api={api} />;
       })()}
 
       {/* ── SECTION C: MY SHOWS ── */}
