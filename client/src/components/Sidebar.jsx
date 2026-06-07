@@ -1,0 +1,147 @@
+import React from 'react';
+
+export function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }) {
+  const navItems = [
+    { id: 'scorecard', label: 'SCORECARD', glyph: '◈', section: 'MY PHISH' },
+    { id: 'my-shows',  label: 'MY SHOWS',  glyph: '◉', section: null, authRequired: true },
+    { id: 'my-songs',  label: 'MY SONGS',  glyph: '♪', section: null, authRequired: true },
+    { id: 'my-venues', label: 'MY VENUES', glyph: '⌖', section: null, authRequired: true },
+    { id: 'my-states', label: 'MY STATES', glyph: '⬡', section: null, authRequired: true },
+    { id: 'analytics', label: 'ANALYTICS', glyph: '▦', section: null, authRequired: true },
+    { id: 'community', label: 'LEADERBOARD', glyph: '★', section: 'COMMUNITY' },
+  ];
+
+  const comingSoon = [
+    { id: 'songs', label: 'SONG RANKINGS', glyph: '♫', section: null },
+    { id: 'venues', label: 'VENUE RANKINGS', glyph: '⬡', section: null },
+    { id: 'links', label: 'NOTABLE LINKS', glyph: '⌬', section: 'LINKS' },
+  ];
+
+  return (
+    <div className="sidebar-wrapper">
+      <aside className={`sidebar ${expanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
+
+        <div className="sidebar-logo">
+          {expanded ? (
+            <img
+              src="/assets/phreezer-logo.png"
+              alt="The Phreezer"
+              className="sidebar-logo-img-expanded"
+              onClick={() => {
+                if (!user?.is_admin) return;
+                const now = Date.now();
+                if (!window._logoTaps) window._logoTaps = [];
+                window._logoTaps = window._logoTaps.filter(t => now - t < 800);
+                window._logoTaps.push(now);
+                if (window._logoTaps.length >= 3) { window._logoTaps = []; setTab('admin'); }
+              }}
+              style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
+            />
+          ) : (
+            <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
+          )}
+        </div>
+
+      <nav className="sidebar-nav">
+        {navItems.map((item, i) => {
+          const disabled = (item.authRequired && !user) || (item.adminOnly && !user?.is_admin);
+          if (item.adminOnly && !user?.is_admin) return null;
+          return (
+            <React.Fragment key={item.id}>
+              {item.section && expanded && (
+                <div className="sidebar-section-label">{item.section}</div>
+              )}
+              {item.section && !expanded && i > 0 && (
+                <div className="sidebar-divider" />
+              )}
+              <button
+                className={`sidebar-nav-btn ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                onClick={() => !disabled && setTab(item.id)}
+                title={item.label}
+                disabled={disabled}
+              >
+                <span className="sidebar-nav-glyph">{item.glyph}</span>
+                {expanded && <span className="sidebar-nav-label">{item.label}</span>}
+              </button>
+            </React.Fragment>
+          );
+        })}
+
+        <div className="sidebar-divider" style={{ margin: '8px 0' }} />
+        {comingSoon.map((item) => (
+          <React.Fragment key={item.id}>
+            {item.section && expanded && (
+              <div className="sidebar-section-label">{item.section}</div>
+            )}
+            <button
+              className="sidebar-nav-btn sidebar-nav-soon"
+              title={`${item.label} — Coming Soon`}
+              disabled
+            >
+              <span className="sidebar-nav-glyph">{item.glyph}</span>
+              {expanded && (
+                <span className="sidebar-nav-label">
+                  {item.label}
+                  <span className="soon-badge">SOON</span>
+                </span>
+              )}
+            </button>
+          </React.Fragment>
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        {user ? (
+          <>
+            <div className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}>
+              <div className="sidebar-avatar" style={{ fontSize: user.avatar_icon ? '1rem' : undefined }}>{user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}</div>
+              {expanded && <span className="sidebar-username">{user.username}</span>}
+            </div>
+            {expanded && (
+              <a
+                href="https://buymeacoffee.com/mpgink"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="sidebar-nav-btn"
+                style={{ textDecoration: 'none', color: 'var(--orange)', borderColor: 'rgba(255,102,0,0.3)', marginBottom: 4 }}
+                title="Buy Me a Coffee"
+              >
+                <span className="sidebar-nav-glyph">☕</span>
+                <span className="sidebar-nav-label">BUY A COFFEE</span>
+              </a>
+            )}
+            <button
+              className="sidebar-nav-btn sidebar-logout"
+              onClick={onLogout}
+              title="Logout"
+            >
+              <span className="sidebar-nav-glyph">⏻</span>
+              {expanded && <span className="sidebar-nav-label">LOGOUT</span>}
+            </button>
+          </>
+        ) : (
+          <>
+            <button className="sidebar-nav-btn" onClick={() => onLogin('login')} title="Login">
+              <span className="sidebar-nav-glyph">→</span>
+              {expanded && <span className="sidebar-nav-label">LOGIN</span>}
+            </button>
+            <button className="sidebar-nav-btn sidebar-register" onClick={() => onLogin('signup')} title="Register">
+              <span className="sidebar-nav-glyph">+</span>
+              {expanded && <span className="sidebar-nav-label">REGISTER</span>}
+            </button>
+          </>
+        )}
+      </div>
+      </aside>
+
+      <button
+        className="sidebar-tab"
+        onClick={() => setExpanded(e => !e)}
+        title={expanded ? 'Collapse' : 'Expand'}
+      >
+        {expanded ? '◀' : '▶'}
+      </button>
+    </div>
+  );
+}
+
