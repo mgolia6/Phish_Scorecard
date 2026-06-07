@@ -2,6 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { formatDate } from '../utils';
 
+const PHISH_IN = 'https://phish.in';
+const PHISH_NET_SONG = 'https://phish.net/song';
+
+function fmtLiveTime(totalMinutes) {
+  if (!totalMinutes) return '—';
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  const days = Math.floor(h / 24);
+  const remH = h % 24;
+  if (days > 0) return `${days}d ${remH}h ${m}m`;
+  return `${h}h ${m}m`;
+}
+
 export function DeepPhreezeTab({ api, showMessage, showError }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +46,6 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
     }
   };
 
-  // ── PRIMITIVES ────────────────────────────────────────────
   const D = {
     bg: 'var(--bg-panel)', border: 'var(--border)',
     cyan: 'var(--cyan)', orange: 'var(--orange)', green: 'var(--green)',
@@ -44,39 +56,51 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
   const Section = ({ icon, label, color = D.cyan, children }) => (
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 0 10px' }}>
-        <span style={{ fontFamily: D.disp, fontSize: '0.62rem', color, letterSpacing: '3px' }}>{icon} {label}</span>
-        <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${color}33, transparent)` }} />
+        <span style={{ fontFamily: D.disp, fontSize: '0.62rem', color, letterSpacing: '3px', flexShrink: 0 }}>{icon} {label}</span>
+        <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${color}44, transparent)` }} />
       </div>
       {children}
     </div>
   );
 
-  // Big hero number with label below
   const Hero = ({ value, label, sub, color = D.cyan, unit }) => (
-    <div style={{ background: D.bg, border: `1px solid ${color}33`, borderTop: `3px solid ${color}`, padding: '16px 14px', flex: 1 }}>
-      <div style={{ fontFamily: D.disp, fontSize: '3rem', fontWeight: 900, color, textShadow: `0 0 30px ${color}44`, lineHeight: 1, letterSpacing: 1 }}>{value}</div>
-      {unit && <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
+    <div style={{ background: D.bg, border: `1px solid ${color}33`, borderTop: `3px solid ${color}`, padding: '16px 14px', flex: 1, minWidth: 0 }}>
+      <div style={{ fontFamily: D.disp, fontSize: '2.8rem', fontWeight: 900, color, textShadow: `0 0 30px ${color}44`, lineHeight: 1, letterSpacing: 1 }}>{value}</div>
+      {unit && <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
       <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 6 }}>{label}</div>
-      {sub && <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted, marginTop: 4 }}>{sub}</div>}
+      {sub && <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, marginTop: 4 }}>{sub}</div>}
     </div>
   );
 
-  // Compact stat tile
-  const Tile = ({ value, label, sub, color = D.orange, size = '1.6rem' }) => (
-    <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, padding: '12px 10px', flex: 1 }}>
-      <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
-      <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
-      {sub && <div style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
+  const Tile = ({ value, label, sub, color = D.orange, size = '1.7rem', href }) => {
+    const inner = (
+      <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, padding: '12px 10px', flex: 1, minWidth: 0, cursor: href ? 'pointer' : 'default' }}>
+        <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
+        <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
+        {sub && <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
+      </div>
+    );
+    return href
+      ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none', minWidth: 0 }}>{inner}</a>
+      : inner;
+  };
+
+  const Row = ({ label, value, color = D.white, mono = false, href }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8 }}>
+      <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
+      {href
+        ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'none', textAlign: 'right' }}>{value} ▶</a>
+        : <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right' }}>{value}</span>
+      }
     </div>
   );
 
-  // Ranked list
   const RankedList = ({ title, items, renderRow, emptyMsg = 'NOT ENOUGH DATA YET' }) => (
     <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
       <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>{title}</div>
       {items.length ? items.map((item, i) => (
         <div key={i} style={{ padding: '10px 14px', borderBottom: i < items.length - 1 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontFamily: D.disp, fontSize: '0.56rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+          <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
           {renderRow(item, i)}
         </div>
       )) : (
@@ -85,12 +109,18 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
     </div>
   );
 
-  const Row = ({ label, value, color = D.white, mono = false }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)' }}>
-      <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px' }}>{label}</span>
-      <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.82rem' : '0.78rem', color }}>{value}</span>
-    </div>
-  );
+  const PlayLink = ({ date, style = {} }) => date ? (
+    <a href={`${PHISH_IN}/${date}`} target="_blank" rel="noopener noreferrer"
+      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.5rem', textDecoration: 'none', flexShrink: 0, ...style }}>▶</a>
+  ) : null;
+
+  const SongLink = ({ song, children, style = {} }) => song ? (
+    <a href={`${PHISH_NET_SONG}/${encodeURIComponent(song.toLowerCase().replace(/\s+/g,'-'))}`}
+      target="_blank" rel="noopener noreferrer"
+      style={{ color: 'inherit', textDecoration: 'none', borderBottom: '1px solid rgba(0,224,208,0.2)', ...style }}>
+      {children || song}
+    </a>
+  ) : <span style={style}>{children || song}</span>;
 
   if (loading) return <FullPageLoader text="LOADING DEEP PHREEZE..." />;
 
@@ -113,18 +143,13 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
 
   const s = data.stats || {};
   const isAttended = toggle === 'attended';
-
-  // Time calculations
-  const days = s.days_since_first || 0;
-  const hrs = Math.floor((days * 24));
-  const estHrs = s.est_hours_of_phish || 0;
-  const estDays = Math.floor(estHrs / 24);
+  const liveTime = fmtLiveTime(s.est_live_minutes_total);
 
   return (
     <div style={{ paddingBottom: 24 }}>
 
-      {/* Toggle + Re-sync row */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 6, border: `1px solid ${D.border}` }}>
+      {/* Toggle + Re-sync */}
+      <div style={{ display: 'flex', marginBottom: 6, border: `1px solid ${D.border}` }}>
         {[['attended', `ATTENDED (${s.total_attended || 0})`], ['rated', `RATED (${s.total_rated || 0})`]].map(([k, l]) => (
           <button key={k} onClick={() => setToggle(k)} style={{
             flex: 1, padding: '11px 6px',
@@ -137,8 +162,8 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
         <button onClick={handleSync} disabled={syncing} style={{
           padding: '11px 14px', background: 'transparent', border: 'none',
           borderLeft: `1px solid ${D.border}`,
-          color: syncing ? D.muted : D.green, fontFamily: D.disp, fontSize: '0.52rem',
-          letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
+          color: syncing ? D.muted : D.green,
+          fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
         }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
         </button>
@@ -151,42 +176,72 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
           <Section icon="◈" label="YOUR PHISH LIFE" color={D.cyan}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Hero value={s.total_attended || '—'} label="SHOWS ATTENDED" color={D.cyan} />
-              <Hero value={s.years_active || '—'} label="YEARS OF PHISH" sub={s.first_show ? `Since ${formatDate(s.first_show)}` : ''} color={D.orange} />
+              <Hero value={s.years_active || '—'} label="YEARS OF PHISH"
+                sub={s.first_show ? `Since ${formatDate(s.first_show)}` : ''} color={D.orange} />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={`${days.toLocaleString()}`} label="DAYS SINCE FIRST SHOW" color={D.cyan} />
-              <Tile value={`${hrs.toLocaleString()}`} label="HOURS AS A PHAN" color={D.orange} />
+              <Tile value={liveTime} label="LIVE PHISH TIME" size="1.1rem"
+                sub={`~3 hrs/show × ${s.total_attended || 0} shows`} color={D.cyan} />
+              <Tile value={s.avg_shows_per_year || '—'} label="AVG SHOWS / YEAR" color={D.orange}
+                sub={s.busiest_year ? `Best: ${s.busiest_year.year} (${s.busiest_year.count} shows)` : ''} />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-              <Row label="FIRST SHOW" value={s.first_show ? formatDate(s.first_show) : '—'} color={D.cyan} mono />
-              <Row label="MOST RECENT SHOW" value={s.latest_show ? formatDate(s.latest_show) : '—'} color={D.cyan} mono />
-              <Row label="CONSECUTIVE YEARS" value={s.consecutive_years ? `${s.consecutive_years.count} YRS (from ${s.consecutive_years.start})` : '—'} color={D.orange} />
-              <Row label="AVG SHOWS / YEAR" value={s.avg_shows_per_year || '—'} color={D.white} />
+              <Row label="FIRST SHOW"
+                value={s.first_show ? formatDate(s.first_show) : '—'}
+                color={D.cyan} mono
+                href={s.first_show ? `${PHISH_IN}/${s.first_show}` : null} />
+              <Row label="MOST RECENT SHOW"
+                value={s.latest_show ? formatDate(s.latest_show) : '—'}
+                color={D.cyan} mono
+                href={s.latest_show ? `${PHISH_IN}/${s.latest_show}` : null} />
+              <Row label="DAYS SINCE FIRST SHOW" value={s.days_since_first ? s.days_since_first.toLocaleString() : '—'} color={D.white} />
+              <Row label="CONSECUTIVE YEARS"
+                value={s.consecutive_years ? `${s.consecutive_years.count} YRS (from ${s.consecutive_years.start})` : '—'}
+                color={D.orange} />
+              <Row label="SHOW DENSITY" value={s.show_density ? `${s.show_density} shows/yr` : '—'} color={D.muted} />
             </div>
           </Section>
 
-          {/* ── SONG TOTALS ── */}
+          {/* ── ERA BREAKDOWN ── */}
+          {s.eras && (
+            <Section icon="◉" label="BY ERA" color={D.orange}>
+              <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                {[['1.0', 'pre-2000', D.muted], ['2.0', '2002–04', D.cyan], ['3.0', '2009–19', D.orange], ['4.0', '2021+', D.green]].map(([era, dates, col]) => (
+                  <Tile key={era} value={s.eras[era] || 0} label={`${era} ERA`} sub={dates} color={col} />
+                ))}
+              </div>
+            </Section>
+          )}
+
+          {/* ── SONGS YOU'VE HEARD ── */}
           <Section icon="♪" label="SONGS YOU'VE HEARD" color={D.green}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Hero value={(s.total_songs_heard || 0).toLocaleString()} label="TOTAL SONGS HEARD" color={D.green} />
-              <Hero value={s.unique_songs_heard || '—'} label="UNIQUE SONGS" sub={s.total_songs_heard ? `${Math.round((s.unique_songs_heard/s.total_songs_heard)*100)}% variety` : ''} color={D.cyan} />
+              <Hero value={s.unique_songs_heard || '—'} label="UNIQUE SONGS"
+                sub={s.total_songs_heard ? `${Math.round((s.unique_songs_heard / s.total_songs_heard) * 100)}% variety` : ''}
+                color={D.cyan} />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.total_set1_songs || '—'} label="SET I SONGS" color={D.cyan} />
-              <Tile value={s.total_set2_songs || '—'} label="SET II SONGS" color={D.orange} />
-              <Tile value={s.total_encore_songs || '—'} label="ENCORES" color={D.green} />
+              <Tile value={s.total_set1_songs || '—'} label="SET I SONGS TOTAL" color={D.cyan}
+                sub={s.avg_set1_length ? `avg ${s.avg_set1_length}/show` : ''} />
+              <Tile value={s.total_set2_songs || '—'} label="SET II SONGS TOTAL" color={D.orange}
+                sub={s.avg_set2_length ? `avg ${s.avg_set2_length}/show` : ''} />
+              <Tile value={s.total_encore_songs || '—'} label="ENCORE SONGS" color={D.green} />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
+              <Row label="AVG SET I LENGTH" value={s.avg_set1_length ? `${s.avg_set1_length} songs (~${Math.round(s.avg_set1_length * 6)} min)` : '—'} color={D.cyan} />
+              <Row label="AVG SET II LENGTH" value={s.avg_set2_length ? `${s.avg_set2_length} songs (~${Math.round(s.avg_set2_length * 6)} min)` : '—'} color={D.orange} />
               <Row label="AVG SONGS / SHOW" value={s.avg_songs_per_show || '—'} color={D.white} />
-              <Row label="AVG SET I LENGTH" value={s.avg_set1_length ? `${s.avg_set1_length} songs` : '—'} color={D.cyan} />
-              <Row label="AVG SET II LENGTH" value={s.avg_set2_length ? `${s.avg_set2_length} songs` : '—'} color={D.orange} />
-              <Row label="EST. HOURS OF PHISH" value={estHrs > 0 ? `~${estHrs.toLocaleString()} hrs (${estDays} days)` : '—'} color={D.green} />
-              {s.first_song_ever && <Row label="FIRST SONG YOU EVER HEARD" value={s.first_song_ever} color={D.orange} mono />}
-              {s.last_song_ever && <Row label="LAST SONG YOU HEARD" value={s.last_song_ever} color={D.cyan} mono />}
+              {s.first_song_ever && (
+                <Row label="FIRST SONG YOU EVER HEARD" value={s.first_song_ever} color={D.orange} mono />
+              )}
+              {s.last_song_ever && (
+                <Row label="LAST SONG YOU HEARD" value={s.last_song_ever} color={D.cyan} mono />
+              )}
             </div>
           </Section>
 
-          {/* ── VENUES & GEOGRAPHY ── */}
+          {/* ── GEOGRAPHY ── */}
           <Section icon="◉" label="GEOGRAPHY" color={D.orange}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Tile value={s.unique_venues || '—'} label="UNIQUE VENUES" color={D.cyan} />
@@ -195,31 +250,73 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
           </Section>
 
           {/* ── LONGEST MOMENTS ── */}
-          <Section icon="⏱" label="LONGEST MOMENTS" color={D.cyan}>
+          <Section icon="⏱" label="LONGEST SHOWS" color={D.cyan}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.longest_show?.song_count || '—'} label="SONG SHOW" sub={s.longest_show ? `${s.longest_show.venue} · ${formatDate(s.longest_show.date)}` : ''} color={D.cyan} />
-              <Tile value={s.longest_encore?.count || '—'} label="SONG ENCORE" sub={s.longest_encore ? `${s.longest_encore.venue} · ${formatDate(s.longest_encore.date)}` : ''} color={D.orange} />
+              <Tile
+                value={s.longest_show?.song_count ? `${s.longest_show.song_count} songs` : '—'}
+                label="LONGEST SHOW"
+                sub={s.longest_show ? `${s.longest_show.venue} · ${formatDate(s.longest_show.date)}` : ''}
+                color={D.cyan} size="1.2rem"
+                href={s.longest_show?.date ? `${PHISH_IN}/${s.longest_show.date}` : null}
+              />
+              <Tile
+                value={s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—'}
+                label="LONGEST ENCORE"
+                sub={s.longest_encore ? `${s.longest_encore.venue} · ${formatDate(s.longest_encore.date)}` : ''}
+                color={D.orange} size="1.2rem"
+                href={s.longest_encore?.date ? `${PHISH_IN}/${s.longest_encore.date}` : null}
+              />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.longest_set1?.count || '—'} label="SONG SET I" sub={s.longest_set1 ? `${s.longest_set1.venue} · ${formatDate(s.longest_set1.date)}` : ''} color={D.cyan} />
-              <Tile value={s.longest_set2?.count || '—'} label="SONG SET II" sub={s.longest_set2 ? `${s.longest_set2.venue} · ${formatDate(s.longest_set2.date)}` : ''} color={D.orange} />
+              <Tile
+                value={s.longest_set1?.count ? `${s.longest_set1.count} songs` : '—'}
+                label="LONGEST SET I"
+                sub={s.longest_set1 ? `${s.longest_set1.venue} · ${formatDate(s.longest_set1.date)}` : ''}
+                color={D.cyan} size="1.2rem"
+                href={s.longest_set1?.date ? `${PHISH_IN}/${s.longest_set1.date}` : null}
+              />
+              <Tile
+                value={s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—'}
+                label="LONGEST SET II"
+                sub={s.longest_set2 ? `${s.longest_set2.venue} · ${formatDate(s.longest_set2.date)}` : ''}
+                color={D.orange} size="1.2rem"
+                href={s.longest_set2?.date ? `${PHISH_IN}/${s.longest_set2.date}` : null}
+              />
+            </div>
+            <div style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.1)', padding: '8px 14px', marginBottom: 6 }}>
+              <div style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.muted, letterSpacing: '2px' }}>
+                ◈ Song counts are used as a proxy for show length. Phish.net doesn't publish set durations.
+              </div>
             </div>
           </Section>
 
-          {/* ── STREAKS ── */}
-          <Section icon="⚡" label="STREAKS & RUNS" color={D.orange}>
+          {/* ── STREAKS & GAPS ── */}
+          <Section icon="⚡" label="STREAKS & GAPS" color={D.orange}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <Tile value={s.longest_run?.shows || '—'} label="SHOW RUN" sub={s.longest_run?.start ? `Starting ${formatDate(s.longest_run.start)}` : ''} color={D.orange} />
-              <Tile value={s.consecutive_years?.count || '—'} label="CONSECUTIVE YEARS" sub={s.consecutive_years?.start ? `From ${s.consecutive_years.start}` : ''} color={D.cyan} />
+              <Tile value={`${s.longest_run?.shows || '—'} shows`}
+                label="LONGEST CONSECUTIVE RUN"
+                sub={s.longest_run?.start ? `Starting ${formatDate(s.longest_run.start)}` : ''}
+                color={D.orange} size="1.1rem" />
+              <Tile value={s.consecutive_years?.count ? `${s.consecutive_years.count} yrs` : '—'}
+                label="CONSECUTIVE YEARS"
+                sub={s.consecutive_years?.start ? `${s.consecutive_years.start}–${s.consecutive_years.start + s.consecutive_years.count - 1}` : ''}
+                color={D.cyan} size="1.1rem" />
             </div>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-              <Row label="LONGEST GAP BETWEEN SHOWS"
-                value={s.longest_gap?.days ? `${Math.round(s.longest_gap.days / 365 * 10) / 10} years` : '—'}
+              <Row label="LONGEST GAP"
+                value={s.longest_gap?.days ? `${Math.round(s.longest_gap.days / 30.5)} months (${s.longest_gap.days} days)` : '—'}
                 color={D.muted} />
               {s.longest_gap?.from && (
-                <Row label="GAP DATES"
-                  value={`${formatDate(s.longest_gap.from)} → ${formatDate(s.longest_gap.to)}`}
-                  color={D.muted} mono />
+                <Row label="GAP FROM"
+                  value={formatDate(s.longest_gap.from)}
+                  color={D.muted} mono
+                  href={`${PHISH_IN}/${s.longest_gap.from}`} />
+              )}
+              {s.longest_gap?.to && (
+                <Row label="GAP TO"
+                  value={formatDate(s.longest_gap.to)}
+                  color={D.muted} mono
+                  href={`${PHISH_IN}/${s.longest_gap.to}`} />
               )}
             </div>
           </Section>
@@ -227,26 +324,30 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
           {/* ── MOST HEARD ── */}
           <Section icon="◉" label="MOST HEARD" color={D.green}>
             <RankedList
-              title="SONGS YOU'VE SEEN THE MOST"
+              title="SONGS YOU'VE SEEN THE MOST — TAP TO LISTEN"
               items={(s.most_heard_attended || []).slice(0, 10)}
               renderRow={(item, i) => (
                 <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
+                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <SongLink song={item.song}>{item.song}</SongLink>
+                  </div>
                   <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, letterSpacing: 1, flexShrink: 0 }}>{item.count}x</div>
                 </>
               )}
             />
           </Section>
 
-          {/* ── MOST COMMON ENCORE ── */}
+          {/* ── ENCORE PATTERNS ── */}
           {s.most_common_encore?.length > 0 && (
             <Section icon="★" label="ENCORE PATTERNS" color={D.orange}>
               <RankedList
-                title="SONGS YOU'VE SEEN IN THE ENCORE"
+                title="YOUR MOST COMMON ENCORE SONGS"
                 items={(s.most_common_encore || []).slice(0, 5)}
                 renderRow={(item, i) => (
                   <>
-                    <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
+                    <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <SongLink song={item.song}>{item.song}</SongLink>
+                    </div>
                     <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
                   </>
                 )}
@@ -261,8 +362,10 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
               items={(s.rarest_caught || []).slice(0, 8)}
               renderRow={(item) => (
                 <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1px', flexShrink: 0 }}>1x ONLY</div>
+                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <SongLink song={item.song}>{item.song}</SongLink>
+                  </div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1px', flexShrink: 0 }}>ONCE</div>
                 </>
               )}
             />
@@ -270,28 +373,51 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
         </>
       ) : (
         <>
-          {/* ── RATING OVERVIEW ── */}
+          {/* ── YOUR RATINGS ── */}
           <Section icon="★" label="YOUR RATINGS" color={D.orange}>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
               <Hero value={s.total_rated || '—'} label="SHOWS RATED" color={D.orange} />
               <Hero value={s.perfect_5s || '—'} label="PERFECT 5.0 SONGS" color={D.cyan} />
             </div>
-            <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-              <Row label="BEST SHOW" value={s.highest_show?.avg || '—'} color={D.orange} />
-              {s.highest_show && <Row label="" value={`${s.highest_show.venue} · ${formatDate(s.highest_show.date)}`} color={D.muted} mono />}
-              <Row label="LOWEST SHOW" value={s.lowest_show?.avg || '—'} color={D.cyan} />
-              {s.lowest_show && <Row label="" value={`${s.lowest_show.venue} · ${formatDate(s.lowest_show.date)}`} color={D.muted} mono />}
-            </div>
+            {(s.set1_personal_avg || s.set2_personal_avg) && (
+              <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                <Tile value={s.set1_personal_avg || '—'} label="YOUR AVG SET I" color={D.cyan}
+                  sub="across all rated shows" />
+                <Tile value={s.set2_personal_avg || '—'} label="YOUR AVG SET II" color={D.orange}
+                  sub="across all rated shows" />
+              </div>
+            )}
+            {s.preferred_set && (
+              <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
+                <Row label="YOU'RE A" value={`${s.preferred_set} PERSON`}
+                  color={s.preferred_set === 'SET II' ? D.orange : D.cyan} />
+                <Row label="BEST SHOW" value={s.highest_show?.avg || '—'} color={D.orange} />
+                {s.highest_show && (
+                  <Row label="" value={`${s.highest_show.venue} · ${formatDate(s.highest_show.date)}`}
+                    color={D.muted} mono href={`${PHISH_IN}/${s.highest_show.date}`} />
+                )}
+                <Row label="ROUGHEST SHOW" value={s.lowest_show?.avg || '—'} color={D.muted} />
+                {s.lowest_show && (
+                  <Row label="" value={`${s.lowest_show.venue} · ${formatDate(s.lowest_show.date)}`}
+                    color={D.muted} mono href={`${PHISH_IN}/${s.lowest_show.date}`} />
+                )}
+              </div>
+            )}
           </Section>
 
-          {/* ── HIGHEST RATED SONG ── */}
+          {/* ── PEAK MOMENT ── */}
           {s.highest_song && (
             <Section icon="◈" label="PEAK MOMENT" color={D.orange}>
               <div style={{ background: D.bg, border: `1px solid rgba(255,102,0,0.3)`, borderTop: `3px solid ${D.orange}`, padding: '18px 14px', marginBottom: 6 }}>
                 <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginBottom: 8 }}>HIGHEST SINGLE SONG RATING</div>
-                <div style={{ fontFamily: D.disp, fontSize: '3rem', fontWeight: 900, color: D.orange, textShadow: '0 0 30px rgba(255,102,0,0.4)', lineHeight: 1, marginBottom: 6 }}>{s.highest_song.rating}</div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.92rem', color: D.white, marginBottom: 4 }}>{s.highest_song.song}</div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{formatDate(s.highest_song.date)} · {s.highest_song.venue}</div>
+                <div style={{ fontFamily: D.disp, fontSize: '3rem', fontWeight: 900, color: D.orange, lineHeight: 1, marginBottom: 8 }}>{s.highest_song.rating}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <PlayLink date={s.highest_song.date} />
+                  <div style={{ fontFamily: D.mono, fontSize: '0.92rem', color: D.white }}>
+                    <SongLink song={s.highest_song.song}>{s.highest_song.song}</SongLink>
+                  </div>
+                </div>
+                <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted }}>{formatDate(s.highest_song.date)} · {s.highest_song.venue}</div>
               </div>
             </Section>
           )}
@@ -308,19 +434,24 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
                       const h = Math.max(20, (parseFloat(val) / 5) * 100);
                       return (
                         <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end', flex: 1 }}>
-                          <div style={{ fontFamily: D.disp, fontSize: '0.82rem', color: col }}>{val}</div>
+                          <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: col }}>{val}</div>
                           <div style={{ width: '60%', height: `${h}%`, background: col, opacity: 0.8, borderRadius: '2px 2px 0 0', boxShadow: `0 0 8px ${col}44` }} />
-                          <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1px' }}>{lbl}</div>
+                          <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.label }}>{lbl}</div>
                         </div>
                       );
                     })}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: 24, flex: 0.5 }}>
                       <div style={{ fontFamily: D.disp, fontSize: '1.4rem', color: up ? D.orange : D.cyan }}>{up ? '↑' : '↓'}</div>
-                      <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: up ? D.orange : D.cyan }}>+{g.delta}</div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.66rem', color: up ? D.orange : D.cyan }}>+{g.delta}</div>
                     </div>
                   </div>
-                  <div style={{ fontFamily: D.mono, fontSize: '0.82rem', color: D.white }}>{formatDate(g.date)}</div>
-                  <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted }}>{g.venue} · {up ? 'Set II went nuclear' : 'Set I was the peak'}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <PlayLink date={g.date} />
+                    <div>
+                      <div style={{ fontFamily: D.mono, fontSize: '0.82rem', color: D.white }}>{formatDate(g.date)}</div>
+                      <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted }}>{g.venue} · {up ? 'Set II went nuclear' : 'Set I was the peak'}</div>
+                    </div>
+                  </div>
                 </div>
               </Section>
             );
@@ -331,14 +462,19 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
             <Section icon="◈" label="COMPLETIONISM" color={D.green}>
               <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderLeft: `3px solid ${D.green}`, padding: 14, marginBottom: 8 }}>
                 <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>MOST COMPLETE SHOW RATED</div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.9rem', color: D.white, marginBottom: 3 }}>{s.most_complete.venue}</div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted, marginBottom: 12 }}>{formatDate(s.most_complete.date)} · {s.most_complete.rated}/{s.most_complete.total} songs</div>
-                <div style={{ height: 8, background: 'rgba(51,255,51,0.08)', borderRadius: 2, marginBottom: 8 }}>
-                  <div style={{ height: '100%', width: `${s.most_complete.pct}%`, background: `linear-gradient(90deg, ${D.green}, rgba(51,255,51,0.6))`, borderRadius: 2, boxShadow: '0 0 8px rgba(51,255,51,0.4)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  <PlayLink date={s.most_complete.date} />
+                  <div>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.9rem', color: D.white }}>{s.most_complete.venue}</div>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted }}>{formatDate(s.most_complete.date)} · {s.most_complete.rated}/{s.most_complete.total} songs rated</div>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontFamily: D.disp, fontSize: '1.4rem', color: D.green }}>{s.most_complete.pct}%</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1.5px' }}>{s.most_complete.pct === 100 ? 'FULLY PHROZEN' : 'PHROZEN'}</div>
+                <div style={{ height: 8, background: 'rgba(51,255,51,0.08)', borderRadius: 2, marginBottom: 8 }}>
+                  <div style={{ height: '100%', width: `${s.most_complete.pct}%`, background: `linear-gradient(90deg, ${D.green}, rgba(51,255,51,0.6))`, borderRadius: 2 }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '1.5rem', color: D.green }}>{s.most_complete.pct}%</div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1.5px', alignSelf: 'center' }}>{s.most_complete.pct === 100 ? 'FULLY PHROZEN' : 'PHROZEN'}</div>
                 </div>
               </div>
             </Section>
@@ -351,19 +487,26 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
               items={(s.most_heard_rated || []).slice(0, 10)}
               renderRow={(item, i) => (
                 <>
-                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
+                  <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <SongLink song={item.song}>{item.song}</SongLink>
+                  </div>
                   <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0, minWidth: 36, textAlign: 'right' }}>avg {item.avg}</div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0, minWidth: 38, textAlign: 'right' }}>avg {item.avg}</div>
                 </>
               )}
             />
+            {!s.most_heard_rated?.length && (
+              <div style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.muted, padding: '12px 0', lineHeight: 1.6 }}>
+                No rated songs yet. Rate shows in MY SHOWS to populate your song ratings.
+              </div>
+            )}
           </Section>
         </>
       )}
 
       {data.computed_at && (
         <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, textAlign: 'center', paddingTop: 16, borderTop: `1px solid ${D.border}` }}>
-          Computed {new Date(data.computed_at).toLocaleDateString()}
+          Last synced {new Date(data.computed_at).toLocaleDateString()} · Hit SYNC to recompute
         </div>
       )}
     </div>
