@@ -99,6 +99,11 @@
 - Phishook dropped entirely — separate brand, not ours
 - Set duration shown as real time when phish.in data available, song count only when not
 
+### Process change this session
+- INSTRUCTIONS.md updated: ROADMAP.md now pulled at session kickoff (step 3)
+- Formal session wrap protocol added — roadmap + session log must be updated and validated before session closes
+- Rule added: if Matthew asks about roadmap mid-session, pull it fresh — never answer from memory
+
 ### Next session priorities
 1. **COMMUNITY tab** — biggest visible gap, still placeholder
 2. **Rate limiting on auth endpoints** — security backlog Priority 1
