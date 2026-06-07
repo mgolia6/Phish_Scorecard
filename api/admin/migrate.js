@@ -40,6 +40,19 @@ export default async function handler(req, res) {
     { name: 'users.avatar_icon', sql: "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_icon VARCHAR(10)" },
   ];
 
+  migrations.push({
+    name: 'create_vibe_checks',
+    sql: `
+      CREATE TABLE IF NOT EXISTS vibe_checks (
+        show_date     VARCHAR(10) PRIMARY KEY,
+        structured    JSONB,
+        review_count  INT,
+        generated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        model         VARCHAR(50)
+      )
+    `
+  });
+
   for (const m of migrations) {
     try {
       await pool.query(m.sql);
