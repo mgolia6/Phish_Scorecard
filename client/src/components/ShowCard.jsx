@@ -63,7 +63,13 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
   const compactYear = dateParts[0] || '';
 
   return (
-    <div style={{ marginBottom: 6, border: '1px solid var(--border)', borderLeft: `3px solid ${cardAccent}`, background: 'var(--bg-panel)' }}>
+    <div style={{
+      marginBottom: 6,
+      border: '1px solid var(--border)',
+      borderLeft: phreezerScore != null ? '3px solid var(--cyan)' : hasReview ? '3px solid var(--orange)' : '3px solid var(--border)',
+      boxShadow: phreezerScore != null && hasReview ? 'inset 3px 0 0 0 var(--orange)' : 'none',
+      background: 'var(--bg-panel)',
+    }}>
 
       {/* ── MAIN ROW ── */}
       <div style={{ padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -132,7 +138,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
             <>
               {/* Set scores */}
               {Object.keys(cardData.setAvgs).filter(k => !['S','s'].includes(k)).length > 0 && (
-                <div style={{ display: 'flex', gap: 24, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-evenly', marginBottom: 16 }}>
                   {Object.entries(cardData.setAvgs)
                     .filter(([k]) => !['S','s'].includes(k))
                     .map(([k, v]) => {
@@ -172,7 +178,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                 </div>
               )}
               {/* My Review — deduped, bbcode stripped */}
-              {hasReview && reviewExpanded && (() => {
+              {hasReview && (() => {
                 const seen = new Set();
                 const unique = reviews.filter(r => {
                   const key = (r.review_text || '').slice(0, 80);
@@ -205,12 +211,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           style={{ flex: 1, padding: '11px 8px', background: 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: phreezerScore != null ? 'var(--cyan)' : 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer' }}>
           {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
         </button>
-        {hasReview && (
-          <button onClick={() => setExpandedReview(reviewExpanded ? null : show.show_date)}
-            style={{ flex: 1, padding: '11px 8px', background: reviewExpanded ? 'rgba(255,102,0,0.06)' : 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: reviewExpanded ? 'var(--orange)' : 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}>
-            MY REVIEW
-          </button>
-        )}
+
         <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer"
           style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
           PHISH.NET
@@ -223,6 +224,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
     </div>
   );
 }
+
 
 
 
