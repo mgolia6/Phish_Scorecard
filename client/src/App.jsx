@@ -962,7 +962,7 @@ function KPICards({ api }) {
       {/* Compact summary row */}
       <div style={{
         width: '100%', background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-        borderBottom: 'none', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 0,
+        borderBottom: 'none', padding: '18px 14px', display: 'flex', alignItems: 'center', gap: 0,
       }}>
         {[
           { val: attended,                  lbl: 'ATT',   col: 'var(--cyan)'   },
@@ -971,14 +971,14 @@ function KPICards({ api }) {
           { val: kpi.shows_with_reviews,    lbl: 'REV',   col: 'var(--cyan)'   },
         ].map(({ val, lbl, col }, i) => (
           <div key={lbl} style={{ flex: 1, textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(51,255,51,0.1)' : 'none', padding: '0 4px' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: col, lineHeight: 1, letterSpacing: 1 }}>{val}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{lbl}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', color: col, lineHeight: 1, letterSpacing: 1, textShadow: '0 0 16px currentColor' }}>{val}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 6 }}>{lbl}</div>
           </div>
         ))}
         {kpi.login_streak > 1 && (
           <div style={{ paddingLeft: 10, borderLeft: '1px solid rgba(51,255,51,0.1)', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: 'var(--orange)', lineHeight: 1 }}>⚡{kpi.login_streak}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 3 }}>STREAK</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--orange)', lineHeight: 1, textShadow: '0 0 12px rgba(255,102,0,0.6)' }}>⚡{kpi.login_streak}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 6 }}>STREAK</div>
           </div>
         )}
       </div>
