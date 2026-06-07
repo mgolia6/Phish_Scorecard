@@ -116,7 +116,7 @@ function PassiveFeedbackButton({ api }) {
           position: 'fixed', bottom: 80, right: 16, zIndex: 500,
           background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
           color: 'rgba(51,255,51,0.45)', fontFamily: 'var(--font-display)',
-          fontSize: '0.4rem', letterSpacing: '2px', padding: '8px 12px',
+          fontSize: '0.55rem', letterSpacing: '2px', padding: '10px 16px',
           cursor: 'pointer', borderRadius: 0,
         }}
         title="Send feedback"
