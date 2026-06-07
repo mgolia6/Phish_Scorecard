@@ -34,6 +34,21 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
   const [expandedSong, setExpandedSong] = useState(null);
   const [longestToggle, setLongestToggle] = useState('songs'); // 'songs' | 'time'
   const [expandedMostHeard, setExpandedMostHeard] = useState(null);
+  const longPressTimer = React.useRef(null);
+
+  const handleSyncPressStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      longPressTimer.current = null;
+      handleSync(true); // FULL rebuild on long press
+    }, 1500);
+  };
+  const handleSyncPressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+      handleSync(false); // normal sync on tap
+    }
+  };
 
   const load = () => {
     setLoading(true);
@@ -207,21 +222,17 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
             fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
           }}>{l}</button>
         ))}
-        <button onClick={() => handleSync(false)} disabled={syncing} style={{
-          padding: '11px 14px', background: 'transparent', border: 'none',
-          borderLeft: `1px solid ${D.border}`,
-          color: syncing ? D.muted : D.green,
-          fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
-        }}>
+        <button
+          onMouseDown={handleSyncPressStart} onMouseUp={handleSyncPressEnd} onMouseLeave={handleSyncPressEnd}
+          onTouchStart={handleSyncPressStart} onTouchEnd={handleSyncPressEnd}
+          disabled={syncing}
+          style={{
+            padding: '11px 14px', background: 'transparent', border: 'none',
+            borderLeft: `1px solid ${D.border}`,
+            color: syncing ? D.muted : D.green,
+            fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
+          }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
-        </button>
-        <button onClick={() => handleSync(true)} disabled={syncing} style={{
-          padding: '11px 10px', background: 'transparent', border: 'none',
-          borderLeft: `1px solid ${D.border}`,
-          color: syncing ? D.muted : 'rgba(255,140,0,0.7)',
-          fontFamily: D.disp, fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer', flexShrink: 0,
-        }} title="Wipe cache and rebuild from scratch">
-          {syncing ? '' : '↺↺ FULL'}
         </button>
       </div>
       {syncing && syncStatus && (
