@@ -7,21 +7,28 @@ Full-stack Phish show rating app. Stack: React + Vite frontend (`/client`), Verc
 At the start of every session, before anything else:
 1. Pull this file (INSTRUCTIONS.md) from the repo via GitHub API
 2. Pull SESSION_LOG.md from the same repo
-3. Read both — weight actual code over the session log if there's a conflict
-4. Surface current state, open issues, what was last worked on
-5. Then ask Matthew where he wants to start — or if he's already said, get into it
+3. Pull STYLE_GUIDE.md from the same repo
+4. Read all three — weight actual code over session log if there's a conflict
+5. Surface current state, open issues, what was last worked on
+6. Then ask Matthew where he wants to start — or if he's already said, get into it
+
+## Context Window Management
+- At ~75% context window, stop mid-task if needed and write a full SESSION_LOG.md update before continuing
+- Never compress, summarize, or drop detail to fit — wrap cleanly instead
+- Flag to Matthew when approaching the limit so he can start a fresh session if preferred
 
 ## GitHub Access
 - Repo: `mgolia6/Phish_Scorecard`
-- Token: stored in Claude project instructions (not in this file — GitHub blocks it)
+- Token: provided by Matthew at the start of each session — never stored in this file
 - Push files directly via GitHub API — no need to ask Matthew to push
 - Use python3 scripts with curl + base64 to read/write files
+- Always fetch a fresh SHA immediately before any PUT — stale SHAs cause silent failures
 
 ## Database Access
 - Provider: Neon Postgres (connected to Vercel project)
 - POSTGRES_URL: stored in Claude project instructions
 - Use psycopg2 to run schema or queries directly from session
-- Schema is in `init-db.sql` — tables: users, shows, ratings
+- Schema is in `init-db.sql` — tables: users, shows, ratings, vibe_checks
 
 ## Vercel
 - Project: phish-scorecard under Matthew's Pro account
@@ -43,12 +50,17 @@ At the start of every session, before anything else:
 │   ├── shows/[date].js      setlist
 │   ├── ratings/[showDate].js
 │   ├── user/shows.js
+│   ├── user/kpi.js
+│   ├── ai/summarize.js      Vibe Check (Haiku, cached in vibe_checks table)
+│   ├── ai/ebenezer.js       Uncle Ebenezer AI agent (Sonnet)
 │   └── analytics/songs.js + venues.js
 ├── client/src/
 │   ├── App.jsx
-│   ├── index.css            design system
+│   ├── components/          26 component files (refactored from monolith)
+│   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
 ├── init-db.sql
+├── STYLE_GUIDE.md           design tokens, font system, component patterns
 ├── package.json             backend deps (bcryptjs, jsonwebtoken, pg)
 └── vercel.json
 ```
@@ -58,6 +70,7 @@ At the start of every session, before anything else:
 - `POSTGRES_URL_NON_POOLING` — for direct connections/migrations
 - `JWT_SECRET`
 - `PHISH_NET_API_KEY`
+- `ANTHROPIC_API_KEY`
 - `NODE_ENV`
 
 ## Standing Preferences
@@ -68,6 +81,7 @@ At the start of every session, before anything else:
 - Protect the retro terminal aesthetic — it is the identity
 - Built to scale — make space for features as we grow
 - Matthew's name is Matthew
+- Always read STYLE_GUIDE.md before touching any UI component
 
 ## What to Log Each Session
 After each session, update SESSION_LOG.md with:
@@ -75,4 +89,3 @@ After each session, update SESSION_LOG.md with:
 - Decisions made and why
 - Known issues or open debt
 - Next session priorities
-
