@@ -43,7 +43,7 @@ Read every review carefully. Then produce a structured synthesis in this exact J
   "reviewCount": ${reviews.filter(r => r.review && r.review.trim().length > 20).length}
 }
 
-Only include a theme if multiple reviews mention it. Keep each theme to 1-2 tight sentences. Be specific — name actual songs if reviewers mention them.`;
+Only include a theme if multiple reviews mention it. Keep each theme to 1-2 tight sentences. Be specific — name actual songs if reviewers mention them. Return ONLY the JSON object — no markdown, no backticks, no explanation.`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
