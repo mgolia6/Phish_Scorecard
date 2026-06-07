@@ -93,6 +93,10 @@
       "destination": "/api/user/profile-options"
     },
     {
+      "source": "/api/ai/summarize",
+      "destination": "/api/ai/summarize"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
