@@ -21,6 +21,7 @@ import { CommunityTab } from './components/CommunityTab';
 import { AdminTab } from './components/AdminTab';
 import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal } from './components/ProfileModal';
+import { EbenezerDrawer } from './components/EbenezerDrawer';
 
 export default function App() {
   const [tab, setTab] = useState('scorecard'); // will be overridden on user load
@@ -433,6 +434,7 @@ export default function App() {
           </div>
         </div>
       )}
+      {user && <EbenezerDrawer api={api} />}
     </div>
   );
 }
