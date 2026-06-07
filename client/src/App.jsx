@@ -3,24 +3,24 @@ import './index.css';
 
 import { useApi } from './useApi';
 import { API } from './utils';
-import { FeedbackModal, PassiveFeedbackButton } from './FeedbackModal';
-import { WelcomeCelebration } from './Celebrations';
-import { FullPageLoader, MikeError } from './FullPageLoader';
-import { TandCModal, AuthModal } from './AuthModals';
-import { OnboardingFlow, ProfileSetupModal } from './OnboardingFlow';
-import { Sidebar } from './Sidebar';
-import { ScorecardTab } from './ScorecardTab';
-import { MyShowsTab } from './MyShowsTab';
-import { AnalyticsTab } from './AnalyticsTab';
-import { MySongsTab } from './MySongsTab';
-import { MyVenuesTab } from './MyVenuesTab';
-import { MyStatesTab } from './MyStatesTab';
-import { MyPhriends } from './MyPhriends';
-import { DeepPhreezeTab } from './DeepPhreezeTab';
-import { CommunityTab } from './CommunityTab';
-import { AdminTab } from './AdminTab';
-import { ProfileTab } from './ProfileTab';
-import { ProfileModal } from './ProfileModal';
+import { FeedbackModal, PassiveFeedbackButton } from './components/FeedbackModal';
+import { WelcomeCelebration } from './components/Celebrations';
+import { FullPageLoader, MikeError } from './components/FullPageLoader';
+import { TandCModal, AuthModal } from './components/AuthModals';
+import { OnboardingFlow, ProfileSetupModal } from './components/OnboardingFlow';
+import { Sidebar } from './components/Sidebar';
+import { ScorecardTab } from './components/ScorecardTab';
+import { MyShowsTab } from './components/MyShowsTab';
+import { AnalyticsTab } from './components/AnalyticsTab';
+import { MySongsTab } from './components/MySongsTab';
+import { MyVenuesTab } from './components/MyVenuesTab';
+import { MyStatesTab } from './components/MyStatesTab';
+import { MyPhriends } from './components/MyPhriends';
+import { DeepPhreezeTab } from './components/DeepPhreezeTab';
+import { CommunityTab } from './components/CommunityTab';
+import { AdminTab } from './components/AdminTab';
+import { ProfileTab } from './components/ProfileTab';
+import { ProfileModal } from './components/ProfileModal';
 
 export default function App() {
   const [tab, setTab] = useState('scorecard'); // will be overridden on user load
