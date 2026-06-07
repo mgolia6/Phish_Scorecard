@@ -147,30 +147,34 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
         {/* ◈ MY SHOWS label */}
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(51,255,51,0.3)', marginBottom: 10 }}>◈ MY SHOWS</div>
 
-        {/* Filter pills */}
-        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
+        {/* Filter + Sort — combined, scrollable row */}
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
           {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED'],['favorites','★ FAV']].map(([k,l]) => (
             <button key={k} onClick={() => setFilterBy(k)} style={{
-              padding: '8px 11px',
-              border: `1px solid ${filterBy === k ? 'var(--green)' : 'rgba(51,255,51,0.18)'}`,
-              background: filterBy === k ? 'rgba(51,255,51,0.06)' : 'transparent',
+              flexShrink: 0,
+              padding: '9px 14px',
+              border: `1px solid ${filterBy === k ? 'var(--green)' : 'rgba(51,255,51,0.2)'}`,
+              background: filterBy === k ? 'rgba(51,255,51,0.07)' : 'transparent',
               color: filterBy === k ? 'var(--green)' : 'var(--text-muted)',
-              fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer',
+              fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '1.5px', cursor: 'pointer',
               boxShadow: filterBy === k ? '0 0 8px rgba(51,255,51,0.2)' : 'none',
+              whiteSpace: 'nowrap',
             }}>{l}</button>
           ))}
         </div>
 
         {/* Sort row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 10, borderBottom: '1px solid var(--border)', marginBottom: 10 }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SORT:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid var(--border)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: 'var(--text-muted)', flexShrink: 0 }}>SORT:</span>
           {[['date_desc','DATE ↓'],['date_asc','DATE ↑'],['phreezer_desc','SCORE'],['no_phreezer','UNRATED']].map(([k,l]) => (
             <button key={k} onClick={() => setSortBy(k)} style={{
-              padding: '5px 10px',
-              border: `1px solid ${sortBy === k ? 'var(--green)' : 'rgba(51,255,51,0.18)'}`,
-              background: 'transparent',
+              flexShrink: 0,
+              padding: '7px 12px',
+              border: `1px solid ${sortBy === k ? 'var(--green)' : 'rgba(51,255,51,0.2)'}`,
+              background: sortBy === k ? 'rgba(51,255,51,0.07)' : 'transparent',
               color: sortBy === k ? 'var(--green)' : 'var(--text-muted)',
-              fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', cursor: 'pointer',
+              fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1.5px', cursor: 'pointer',
+              whiteSpace: 'nowrap',
             }}>{l}</button>
           ))}
         </div>
