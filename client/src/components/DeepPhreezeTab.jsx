@@ -691,29 +691,6 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
             );
           })()}
 
-          {/* ── COMPLETIONISM ── */}
-          {s.most_complete && (
-            <Section icon="◈" label="COMPLETIONISM" color={D.green}>
-              <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderLeft: `3px solid ${D.green}`, padding: 14, marginBottom: 8 }}>
-                <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>MOST COMPLETE SHOW RATED</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                  <PlayLink date={s.most_complete.date} />
-                  <div>
-                    <div style={{ fontFamily: D.mono, fontSize: '0.9rem', color: D.white }}>{s.most_complete.venue}</div>
-                    <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted }}>{formatDate(s.most_complete.date)} · {s.most_complete.rated}/{s.most_complete.total} songs rated</div>
-                  </div>
-                </div>
-                <div style={{ height: 8, background: 'rgba(51,255,51,0.08)', borderRadius: 2, marginBottom: 8 }}>
-                  <div style={{ height: '100%', width: `${s.most_complete.pct}%`, background: `linear-gradient(90deg, ${D.green}, rgba(51,255,51,0.6))`, borderRadius: 2 }} />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div style={{ fontFamily: D.disp, fontSize: '1.5rem', color: D.green }}>{s.most_complete.pct}%</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1.5px', alignSelf: 'center' }}>{s.most_complete.pct === 100 ? 'FULLY PHROZEN' : 'PHROZEN'}</div>
-                </div>
-              </div>
-            </Section>
-          )}
-
           {/* ── MOST RATED VERSIONS ── */}
           <Section icon="◉" label="MOST RATED VERSIONS" color={D.cyan}>
             {!s.most_heard_rated?.length ? (
