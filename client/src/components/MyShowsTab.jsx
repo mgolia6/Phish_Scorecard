@@ -165,7 +165,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
 
         {/* Sort row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid var(--border)' }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: 'var(--text-muted)', flexShrink: 0 }}>SORT:</span>
+
           {[['date_desc','DATE ↓'],['date_asc','DATE ↑'],['phreezer_desc','SCORE'],['no_phreezer','UNRATED']].map(([k,l]) => (
             <button key={k} onClick={() => setSortBy(k)} style={{
               flexShrink: 0,
