@@ -20,7 +20,7 @@ import { DeepPhreezeTab } from './components/DeepPhreezeTab';
 import { CommunityTab } from './components/CommunityTab';
 import { AdminTab } from './components/AdminTab';
 import { ProfileTab } from './components/ProfileTab';
-import { ProfileModal } from './components/ProfileModal';
+import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer } from './components/EbenezerDrawer';
 
 export default function App() {
@@ -319,9 +319,9 @@ export default function App() {
                     className="avatar-btn"
                     onClick={() => setShowProfileModal(true)}
                     aria-label="Profile"
-                    style={{ fontSize: user.avatar_icon ? '1.1rem' : undefined }}
+                    style={{ background: 'transparent', border: '1.5px solid rgba(0,224,208,0.4)', borderRadius: '50%', width: 44, height: 44, padding: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(0,224,208,0.2)' }}
                   >
-                    {user.avatar_icon || user.username.slice(0,2).toUpperCase()}
+                    <PhreezerAvatar seed={user.avatar_icon || 'phreeze'} size={34} color="#00ffff" />
                   </button>
                 ) : (
                   <><button onClick={() => openAuth('login')}>LOGIN</button><button className="btn-primary" onClick={() => openAuth('signup')}>REGISTER</button></>
@@ -440,3 +440,4 @@ export default function App() {
     </div>
   );
 }
+
