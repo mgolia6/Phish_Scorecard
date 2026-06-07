@@ -134,17 +134,28 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
     }).catch(() => {});
   }, []);
 
+  const saveProfile = async (patch) => {
+    const updated = { ...profile, ...patch };
+    setProfile(updated);
+    try {
+      await api.post('/user/profile', {
+        phishnet_username: updated.phishnet_username || null,
+        favorite_song: updated.favorite_song || null,
+        favorite_venue: updated.favorite_venue || null,
+        favorite_show_date: updated.favorite_show_date || null,
+        avatar_icon: updated.avatar_icon || null,
+        vantage_point: updated.vantage_point || null,
+        show_style: updated.show_style || null,
+        era_preference: updated.era_preference || null,
+      });
+    } catch (e) {}
+  };
+
   const handleSaveIcon = async (icon) => {
     setSelectedIcon(icon);
     setSavingIcon(true);
     try {
-      await api.post('/user/profile', {
-        phishnet_username: profile?.phishnet_username || null,
-        favorite_song: profile?.favorite_song || null,
-        favorite_venue: profile?.favorite_venue || null,
-        favorite_show_date: profile?.favorite_show_date || null,
-        avatar_icon: icon,
-      });
+      await saveProfile({ avatar_icon: icon });
       onAvatarChange && onAvatarChange(icon);
     } catch (e) {}
     finally { setSavingIcon(false); }
@@ -176,8 +187,9 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
         {/* Body */}
         <div className="profile-modal-body">
           {sec === 'info' && (
-            <div className="panel" style={{ marginBottom: 12 }}>
-              <div className="profile-section">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Static fields */}
+              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '12px 14px' }}>
                 {[
                   ['PHISH.NET HANDLE', profile?.phishnet_username],
                   ['FAVORITE SONG',    profile?.favorite_song],
@@ -192,6 +204,64 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
                   </div>
                 ))}
               </div>
+
+              {/* Vantage point */}
+              {[
+                {
+                  label: 'WHERE DO YOU USUALLY SIT?',
+                  field: 'vantage_point',
+                  options: [
+                    { val: 'floor', label: 'FLOOR' },
+                    { val: 'pit', label: 'PIT' },
+                    { val: 'lower-bowl', label: 'LOWER BOWL' },
+                    { val: 'upper-bowl', label: 'UPPER BOWL' },
+                    { val: 'lawn', label: 'LAWN' },
+                    { val: 'balcony', label: 'BALCONY' },
+                    { val: 'anywhere', label: 'WHEREVER' },
+                  ]
+                },
+                {
+                  label: 'HOW DO YOU EXPERIENCE PHISH?',
+                  field: 'show_style',
+                  options: [
+                    { val: 'attended', label: 'IN PERSON' },
+                    { val: 'webcast', label: 'WEBCAST' },
+                    { val: 'both', label: 'BOTH' },
+                  ]
+                },
+                {
+                  label: 'FAVORITE ERA?',
+                  field: 'era_preference',
+                  options: [
+                    { val: '1.0', label: '1.0' },
+                    { val: '2.0', label: '2.0' },
+                    { val: '3.0', label: '3.0' },
+                    { val: '4.0', label: '4.0' },
+                    { val: 'no-preference', label: 'ALL OF IT' },
+                  ]
+                },
+              ].map(({ label, field, options }) => (
+                <div key={field} style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '12px 14px' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-label)', letterSpacing: '2px', marginBottom: 10 }}>{label}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {options.map(opt => {
+                      const active = profile?.[field] === opt.val;
+                      return (
+                        <button key={opt.val} onClick={() => saveProfile({ [field]: active ? null : opt.val })} style={{
+                          padding: '7px 12px', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '1.5px',
+                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
+                          background: active ? 'rgba(0,224,208,0.1)' : 'transparent',
+                          color: active ? 'var(--cyan)' : 'var(--text-muted)',
+                          cursor: 'pointer',
+                          boxShadow: active ? '0 0 8px rgba(0,224,208,0.2)' : 'none',
+                        }}>
+                          {active && '◈ '}{opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
           {sec === 'badges' && (
