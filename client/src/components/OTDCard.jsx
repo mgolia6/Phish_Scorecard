@@ -30,10 +30,10 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
         setLoadingAI(true);
         try {
           // Try cache first
-          const cached = await fetch(`/api/ai/summarize?showDate=${otdShow.show_date}`);
-          if (cached.ok) {
-            const result = await cached.json();
-            setAiData(result);
+          const cacheRes = await fetch(`/api/ai/summarize?showDate=${otdShow.show_date}`);
+          const cacheData = cacheRes.ok ? await cacheRes.json() : null;
+          if (cacheData?.structured?.overall) {
+            setAiData(cacheData);
           } else {
             // Cache miss — generate
             const res = await fetch('/api/ai/summarize', {
