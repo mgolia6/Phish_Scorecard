@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
 import { CommExpandCard } from './CommunityTab';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function MySongsTab({ api, showMessage, showError }) {
   const [songs, setSongs] = useState([]);
