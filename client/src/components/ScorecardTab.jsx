@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useApi } from './useApi';
-import { API, PNET, RELISTEN, TODAY, formatDate, formatDuration, filterByQuery } from './utils';
+import { useApi } from '../useApi';
+import { API, PNET, RELISTEN, TODAY, formatDate, formatDuration, filterByQuery } from '../utils';
 import { SaveCelebration } from './Celebrations';
 import { SongRating, SetScore } from './ScorecardHelpers';
 
