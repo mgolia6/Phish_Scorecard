@@ -62,7 +62,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     setSyncResult(null);
     try {
       const res = await api.post('/admin/clear-cache', {});
-      setSyncResult(`✓ ${res.message}`);
+      setSyncResult(`✓ Cleared ${res.cleared_show_cache} shows, ${res.cleared_stats} stats row. Now hit SYNC.`);
       setData({ needs_sync: true });
     } catch (e) {
       setSyncResult(`✗ Clear failed: ${e.message}`);
