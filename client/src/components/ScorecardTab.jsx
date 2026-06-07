@@ -30,6 +30,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [vibeCheck, setVibeCheck] = useState(null);
   const [vibeExpanded, setVibeExpanded] = useState(false);
   const [loadingVibe, setLoadingVibe] = useState(false);
+  const [vibeError, setVibeError] = useState(false);
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
@@ -111,24 +112,33 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       // Fetch vibe check (cached or generate)
       if (showData.reviews?.count > 0) {
         setLoadingVibe(true);
+        setVibeError(false);
         fetch(`/api/ai/summarize?showDate=${date}`)
           .then(r => r.ok ? r.json() : null)
           .then(data => {
-            if (data?.structured) { setVibeCheck(data); }
+            if (data?.structured) { setVibeCheck(data); setLoadingVibe(false); }
             else if (showData.reviews?.items?.length) {
-              // Not cached — generate in background
+              // Not cached — generate
               const reviewsWithText = showData.reviews.items.filter(r => r.review && r.review.trim().length > 20);
               if (reviewsWithText.length) {
                 fetch('/api/ai/summarize', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ reviews: reviewsWithText, showDate: date, venue: showData.venue, city: showData.city }),
-                }).then(r => r.json()).then(d => { if (d?.structured) setVibeCheck(d); }).catch(() => {});
+                }).then(r => r.json()).then(d => {
+                  if (d?.structured) setVibeCheck(d);
+                  else setVibeError(true);
+                }).catch(() => setVibeError(true))
+                  .finally(() => setLoadingVibe(false));
+              } else {
+                setVibeError(true);
+                setLoadingVibe(false);
               }
+            } else {
+              setLoadingVibe(false);
             }
           })
-          .catch(() => {})
-          .finally(() => setLoadingVibe(false));
+          .catch(() => { setVibeError(true); setLoadingVibe(false); });
       }
       setPhriends(phriendData || { tagged: [], also_attended: [] });
       const savedRatings = Array.isArray(ratingsResp) ? ratingsResp : (ratingsResp.ratings || []);
@@ -601,7 +611,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               </div>
 
               {/* ── VIBE CHECK ── */}
-              {(vibeCheck?.structured || loadingVibe) && (
+              {(vibeCheck?.structured || loadingVibe || vibeError) && (
                 <div style={{ marginBottom: 16, border: '1px solid rgba(255,140,0,0.25)', background: 'rgba(0,0,0,0.3)' }}>
                   <button onClick={() => setVibeExpanded(v => !v)} style={{
                     width: '100%', padding: '10px 14px', background: 'transparent', border: 'none',
@@ -617,11 +627,16 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       )}
                     </div>
                     <span style={{ fontSize: '0.38rem', color: 'var(--text-muted)' }}>
-                      {loadingVibe ? 'GENERATING...' : `AI · ${vibeCheck?.reviewCount || vibeCheck?.structured?.reviewCount || ''} PHISH.NET REVIEWS`}
+                      {loadingVibe ? 'GENERATING...' : vibeError ? 'GENERATION FAILED' : `AI · ${vibeCheck?.reviewCount || vibeCheck?.structured?.reviewCount || ''} PHISH.NET REVIEWS`}
                       {vibeExpanded ? ' ▲' : ' ▼'}
                     </span>
                   </button>
-                  {vibeExpanded && vibeCheck?.structured && (
+                  {vibeExpanded && (vibeError ? (
+                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,102,0,0.15)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
+                      Could not synthesize reviews for this show.<br/>
+                      <span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.48rem' }}>Reviews are still available below ↓</span>
+                    </div>
+                  ) : vibeCheck?.structured && (
                     <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,140,0,0.15)' }}>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 12, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
                         {vibeCheck.structured.overall}
@@ -636,6 +651,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                         AI SYNTHESIS OF {vibeCheck.structured.reviewCount} PHISH.NET REVIEWS · {vibeCheck.cached ? 'CACHED' : 'JUST GENERATED'}
                       </div>
                     </div>
+                  )}
                   )}
                 </div>
               )}
@@ -679,4 +695,5 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
