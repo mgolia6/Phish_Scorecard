@@ -957,107 +957,92 @@ function KPICards({ api }) {
   const ratedPct = Math.min((rated / nextRated) * 100, 100);
   const attendedPct = Math.min((attended / nextAttended) * 100, 100);
 
+  const reviewedPct = Math.min((kpi.shows_with_reviews / Math.max(attended,1)) * 100, 100);
+  const streakMax = 30;
+  const streakPct = Math.min((kpi.login_streak || 0) / streakMax * 100, 100);
+
   return (
-    <div style={{ marginBottom: 10 }}>
-      {/* Compact summary row */}
-      <div style={{
-        width: '100%', background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-        borderBottom: 'none', padding: '18px 14px', display: 'flex', alignItems: 'center', gap: 0,
-      }}>
-        {[
-          { val: attended,                  lbl: 'ATT',   col: 'var(--cyan)'   },
-          { val: rated,                     lbl: 'RATED', col: 'var(--orange)' },
-          { val: kpi.avg_score ?? '—',     lbl: 'AVG',   col: 'var(--green)'  },
-          { val: kpi.shows_with_reviews,    lbl: 'REV',   col: 'var(--cyan)'   },
-        ].map(({ val, lbl, col }, i) => (
-          <div key={lbl} style={{ flex: 1, textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(51,255,51,0.1)' : 'none', padding: '0 4px' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', color: col, lineHeight: 1, letterSpacing: 1, textShadow: '0 0 16px currentColor' }}>{val}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 6 }}>{lbl}</div>
-          </div>
-        ))}
-        {kpi.login_streak > 1 && (
-          <div style={{ paddingLeft: 10, borderLeft: '1px solid rgba(51,255,51,0.1)', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--orange)', lineHeight: 1, textShadow: '0 0 12px rgba(255,102,0,0.6)' }}>⚡{kpi.login_streak}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 6 }}>STREAK</div>
-          </div>
+    <div>
+      {/* ── QUICK STATS HEADER + IMPORT placeholder (import button passed via prop or context) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-panel)', padding: '10px 14px', borderBottom: '1px solid rgba(255,102,0,0.2)' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.45)' }}>◈ QUICK STATS</span>
+        {kpi.last_sync && (
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '1.5px' }}>LAST RATED {kpi.last_sync}</span>
         )}
       </div>
 
-      {/* DIVE DEEP — full-width glowing tab below stats */}
-      <button onClick={() => setExpanded(e => !e)} style={{
-        width: '100%', cursor: 'pointer',
-        background: expanded ? 'rgba(0,224,208,0.08)' : 'rgba(0,224,208,0.04)',
-        border: '1px solid rgba(0,224,208,0.35)',
-        borderTop: expanded ? '1px solid rgba(0,224,208,0.35)' : 'none',
-        padding: '22px 14px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        boxShadow: expanded ? '0 0 10px rgba(0,224,208,0.2)' : '0 0 22px rgba(0,224,208,0.5), inset 0 0 20px rgba(0,224,208,0.06)',
-        transition: 'all 0.2s',
-      }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.72rem', color: 'var(--cyan)', letterSpacing: '3px', textShadow: '0 0 14px rgba(0,224,208,0.9)' }}>
-          {expanded ? '▲ CLOSE' : '❄ DIVE DEEP'}
-        </span>
-        {!expanded && (
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.65)', letterSpacing: '2px' }}>
-            — TAP FOR FULL STATS
-          </span>
-        )}
-      </button>
+      {/* ── KPI ROW ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--bg-elevated)', borderBottom: '1px solid rgba(255,102,0,0.15)' }}>
+        {[
+          { val: attended,                lbl: 'ATT',   col: 'var(--cyan)'   },
+          { val: rated,                   lbl: 'RATED', col: 'var(--orange)' },
+          { val: kpi.avg_score ?? '—',   lbl: 'AVG',   col: 'var(--green)'  },
+          { val: kpi.shows_with_reviews,  lbl: 'REV',   col: 'var(--cyan)'   },
+        ].map(({ val, lbl, col }, i) => (
+          <div key={lbl} style={{ padding: '18px 6px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(51,255,51,0.08)' : 'none' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: col, lineHeight: 1, textShadow: '0 0 16px currentColor' }}>{val}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 5 }}>{lbl}</div>
+          </div>
+        ))}
+      </div>
 
-      {/* Expanded detail */}
-      {expanded && (
-        <div style={{ border: '1px solid var(--border)', borderTop: 'none', padding: '12px 14px', background: 'var(--bg-panel)' }}>
-          {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
-            <div style={{ borderLeft: '3px solid var(--orange)', paddingLeft: 10, marginBottom: 12 }}>
-              {[
-                kpi.top_song   ? ['TOP SONG',    kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
-                kpi.top_venue  ? ['MOST VISITED', kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
-                kpi.first_show ? ['FIRST SHOW',   formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
-              ].filter(Boolean).map(([l, v, s, col], i, arr) => (
-                <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {v} <span style={{ color: col, fontSize: '0.7rem' }}>{s}</span>
-                  </span>
-                </div>
-              ))}
+      {/* ── PROGRESS BARS ── */}
+      <div style={{ background: 'var(--bg-panel)', padding: '14px', borderBottom: '2px solid rgba(255,102,0,0.15)' }}>
+        {[
+          { lbl: 'SHOWS RATED',    val: rated,                   total: attended, col: 'var(--orange)' },
+          { lbl: 'SHOWS REVIEWED', val: kpi.shows_with_reviews,  total: attended, col: 'var(--cyan)'   },
+          ...(kpi.login_streak > 1 ? [{ lbl: `LOGIN STREAK`, val: `⚡ ${kpi.login_streak} DAYS`, pct: streakPct, col: 'var(--green)' }] : []),
+        ].map(({ lbl, val, total, pct, col }) => {
+          const fillPct = pct !== undefined ? pct : Math.min((val / Math.max(total, 1)) * 100, 100);
+          const display = pct !== undefined ? val : `${val} / ${total}`;
+          return (
+            <div key={lbl} style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', color: 'var(--text-label)', marginBottom: 5 }}>
+                <span>{lbl}</span>
+                <span style={{ color: col }}>{display}</span>
+              </div>
+              <div style={{ height: 4, background: 'rgba(51,255,51,0.08)' }}>
+                <div style={{ width: `${fillPct}%`, height: '100%', background: col, boxShadow: `0 0 6px ${col}`, transition: 'width 0.6s' }} />
+              </div>
             </div>
-          )}
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--white)' }}>Shows rated</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{rated} / {nextRated}</span>
-            </div>
-            <div style={{ height: 3, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
-              <div style={{ width: `${ratedPct}%`, height: '100%', background: 'var(--cyan)', boxShadow: '0 0 6px rgba(0,255,255,0.5)', borderRadius: 2, transition: 'width 0.6s' }} />
-            </div>
+          );
+        })}
+
+        {/* Badges */}
+        {kpi.badges && kpi.badges.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+            {kpi.badges.map(b => (
+              <div key={b.id} title={b.desc} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', border: '1px solid rgba(51,255,51,0.22)', background: 'var(--bg-elevated)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--green)', letterSpacing: '1.5px' }}>
+                <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
+              </div>
+            ))}
           </div>
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--white)' }}>Shows attended</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--orange)', letterSpacing: '1px' }}>{attended} / {nextAttended}</span>
-            </div>
-            <div style={{ height: 3, background: 'rgba(51,255,51,0.1)', borderRadius: 2 }}>
-              <div style={{ width: `${attendedPct}%`, height: '100%', background: 'var(--orange)', boxShadow: '0 0 6px rgba(255,140,0,0.5)', borderRadius: 2, transition: 'width 0.6s' }} />
-            </div>
+        )}
+
+        {/* Top stats */}
+        {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)', borderLeft: '3px solid var(--orange)', paddingLeft: 10 }}>
+            {[
+              kpi.top_song   ? ['TOP SONG',    kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
+              kpi.top_venue  ? ['MOST VISITED', kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
+              kpi.first_show ? ['FIRST SHOW',   formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
+            ].filter(Boolean).map(([l, v, s, col], i, arr) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-label)', letterSpacing: '2px', flexShrink: 0 }}>{l}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {v} <span style={{ color: col, fontSize: '0.7rem' }}>{s}</span>
+                </span>
+              </div>
+            ))}
           </div>
-          {kpi.badges && kpi.badges.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12, paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
-              {kpi.badges.map(b => (
-                <div key={b.id} title={b.desc} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', border: '1px solid rgba(51,255,51,0.22)', background: 'var(--bg-elevated)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--green)', letterSpacing: '1.5px' }}>
-                  <span style={{ fontSize: '0.8rem' }}>{b.glyph}</span> {b.label}
-                </div>
-              ))}
-            </div>
-          )}
-          {kpi.last_sync && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>Last rated: {kpi.last_sync}</span>
-              <a href="https://phish.net" target="_blank" rel="noopener noreferrer" style={{ background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', padding: '3px 8px', textDecoration: 'none' }}>↓ SYNC</a>
-            </div>
-          )}
+        )}
+
+        {/* Deep Phreeze link */}
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '3px', color: 'rgba(0,224,208,0.45)', cursor: 'pointer' }}
+          onClick={() => {/* navigate to deep phreeze */}}>
+          ❄ DIVE INTO DEEP PHREEZE ▶
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -1739,11 +1724,9 @@ Write a 2-3 sentence summary of what made this show memorable. Be specific. No f
   };
 
   return (
-    <div style={{
-      marginBottom: 16,
+    <div className="otd-card" style={{
+      marginBottom: 0,
       background: 'linear-gradient(135deg, rgba(0,224,208,0.07) 0%, rgba(5,18,5,0.98) 100%)',
-      border: '1px solid rgba(0,224,208,0.4)',
-      borderTop: '2px solid var(--cyan)',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -1762,7 +1745,7 @@ Write a 2-3 sentence summary of what made this show memorable. Be specific. No f
         </div>
 
         {/* Date — hero moment */}
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--white)', letterSpacing: '2px', lineHeight: 1.1, marginBottom: 4 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', fontWeight: 900, color: 'var(--white)', letterSpacing: '2px', lineHeight: 1.1, marginBottom: 6 }}>
           {fullDate}
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--cyan)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -1974,57 +1957,10 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
     <div className="panel">
       <ImportSuccessModal />
 
-      {/* KPI Cards */}
+      {/* ── SECTION A: QUICK STATS + KPIs ── */}
       <KPICards api={api} />
 
-      {/* Controls: view tabs + filter + sort in one clean bar */}
-      <div style={{ marginBottom: 10 }}>
-        {/* View toggle */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          {[['attended', `ATTENDED (${attended.length})`], ['rated', `RATED (${shows.length})`]].map(([v, l]) => (
-            <button key={v} onClick={() => setActiveView(v)} style={{
-              flex: 1, padding: '9px 6px',
-              border: `1px solid ${activeView === v ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
-              background: activeView === v ? 'rgba(0,255,255,0.06)' : 'transparent',
-              color: activeView === v ? 'var(--cyan)' : 'var(--text-label)',
-              fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', cursor: 'pointer',
-            }}>{l}</button>
-          ))}
-          <button onClick={() => setShowImport(!showImport)} style={{
-            padding: '9px 12px',
-            border: '1px solid rgba(255,102,0,0.45)',
-            background: 'transparent', color: 'var(--orange)',
-            fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', cursor: 'pointer',
-            boxShadow: '0 0 6px rgba(255,102,0,0.15)',
-          }}>↓ IMPORT</button>
-        </div>
-        {/* Filter pills */}
-        {activeView === 'attended' && (
-          <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-            {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED'],['favorites','★ FAV']].map(([k,l]) => (
-              <button key={k} onClick={() => setFilterBy(k)} style={{
-                padding: '6px 10px',
-                border: `1px solid ${filterBy === k ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
-                background: filterBy === k ? 'rgba(0,255,255,0.06)' : 'transparent',
-                color: filterBy === k ? 'var(--cyan)' : 'var(--text-muted)',
-                fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer',
-              }}>{l}</button>
-            ))}
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
-              marginLeft: 'auto', background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
-              color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.46rem',
-              letterSpacing: '1px', padding: '6px 8px', cursor: 'pointer', outline: 'none',
-            }}>
-              <option value="date_desc">DATE ↓</option>
-              <option value="date_asc">DATE ↑</option>
-              <option value="phreezer_desc">SCORE ↓</option>
-              <option value="no_phreezer">UNRATED FIRST</option>
-            </select>
-          </div>
-        )}
-      </div>
-
-      {/* On This Day — standalone moment */}
+      {/* ── SECTION B: ON THIS DAY ── */}
       {(() => {
         const today = new Date();
         const todayStr = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -2037,6 +1973,44 @@ function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount
         const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
         return <OTDCard otdShow={otdShow} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />;
       })()}
+
+      {/* ── SECTION C: MY SHOWS — header ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 8px', borderBottom: '1px solid var(--border)', marginBottom: 8 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(51,255,51,0.3)' }}>◈ MY SHOWS</span>
+        <button onClick={() => setShowImport(!showImport)} style={{
+          padding: '7px 14px', border: '1px solid rgba(255,102,0,0.5)',
+          background: 'transparent', color: 'var(--orange)',
+          fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', cursor: 'pointer',
+          boxShadow: '0 0 10px rgba(255,102,0,0.2)',
+        }}>↓ IMPORT</button>
+      </div>
+
+      {/* Filter + sort */}
+      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 6 }}>
+        {[['all','ALL'],['has_review','REVIEWED'],['has_phreezer','RATED'],['no_phreezer','UNRATED'],['favorites','★ FAV']].map(([k,l]) => (
+          <button key={k} onClick={() => setFilterBy(k)} style={{
+            padding: '7px 11px',
+            border: `1px solid ${filterBy === k ? 'var(--green)' : 'rgba(51,255,51,0.18)'}`,
+            background: filterBy === k ? 'rgba(51,255,51,0.06)' : 'transparent',
+            color: filterBy === k ? 'var(--green)' : 'var(--text-muted)',
+            fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '1.5px', cursor: 'pointer',
+            boxShadow: filterBy === k ? '0 0 8px rgba(51,255,51,0.2)' : 'none',
+          }}>{l}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 10, borderBottom: '1px solid var(--border)', marginBottom: 10 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SORT:</span>
+        {[['date_desc','DATE ↓'],['date_asc','DATE ↑'],['phreezer_desc','SCORE'],['no_phreezer','UNRATED']].map(([k,l]) => (
+          <button key={k} onClick={() => setSortBy(k)} style={{
+            padding: '5px 10px',
+            border: `1px solid ${sortBy === k ? 'var(--green)' : 'rgba(51,255,51,0.18)'}`,
+            background: 'transparent',
+            color: sortBy === k ? 'var(--green)' : 'var(--text-muted)',
+            fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', cursor: 'pointer',
+          }}>{l}</button>
+        ))}
+      </div>
+
 
       {showImport && (
         <div className="import-panel">
