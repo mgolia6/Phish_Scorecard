@@ -15,7 +15,7 @@ function fmtLiveTime(totalMinutes) {
   return `${h}h ${m}m`;
 }
 
-export function DeepPhreezeTab({ api, showMessage, showError }) {
+export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -97,25 +97,27 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
     </div>
   );
 
-  const Tile = ({ value, label, sub, color = D.orange, size = '1.7rem', href }) => {
+  const Tile = ({ value, label, sub, color = D.orange, size = '1.7rem', href, onClick }) => {
     const inner = (
-      <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, padding: '12px 10px', flex: 1, minWidth: 0, cursor: href ? 'pointer' : 'default' }}>
+      <div style={{ background: D.bg, border: `1px solid ${D.border}`, borderTop: `2px solid ${color}`, padding: '12px 10px', flex: 1, minWidth: 0, cursor: (href || onClick) ? 'pointer' : 'default' }}>
         <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
         <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
         {sub && <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
       </div>
     );
-    return href
-      ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none', minWidth: 0 }}>{inner}</a>
-      : inner;
+    if (onClick) return <div onClick={onClick} style={{ flex: 1, minWidth: 0 }}>{inner}</div>;
+    if (href) return <a href={href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, textDecoration: 'none', minWidth: 0 }}>{inner}</a>;
+    return inner;
   };
 
-  const Row = ({ label, value, color = D.white, mono = false, href }) => (
+  const Row = ({ label, value, color = D.white, mono = false, href, onClick }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '8px 0', borderBottom: '1px solid rgba(51,255,51,0.05)', gap: 8 }}>
       <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
-      {href
-        ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'none', textAlign: 'right' }}>{value} ▶</a>
-        : <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right' }}>{value}</span>
+      {onClick
+        ? <button onClick={onClick} style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}>{value} ▶</button>
+        : href
+          ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textDecoration: 'none', textAlign: 'right' }}>{value} ↗</a>
+          : <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right' }}>{value}</span>
       }
     </div>
   );
@@ -233,11 +235,13 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
               <Row label="FIRST SHOW"
                 value={s.first_show ? formatDate(s.first_show) : '—'}
                 color={D.cyan} mono
-                href={s.first_show ? `${PHISH_IN}/${s.first_show}` : null} />
+                onClick={s.first_show && onOpenScorecard ? () => onOpenScorecard(s.first_show) : null}
+                href={s.first_show && !onOpenScorecard ? `${PHISH_IN}/${s.first_show}` : null} />
               <Row label="MOST RECENT SHOW"
                 value={s.latest_show ? formatDate(s.latest_show) : '—'}
                 color={D.cyan} mono
-                href={s.latest_show ? `${PHISH_IN}/${s.latest_show}` : null} />
+                onClick={s.latest_show && onOpenScorecard ? () => onOpenScorecard(s.latest_show) : null}
+                href={s.latest_show && !onOpenScorecard ? `${PHISH_IN}/${s.latest_show}` : null} />
               <Row label="DAYS SINCE FIRST SHOW" value={s.days_since_first ? s.days_since_first.toLocaleString() : '—'} color={D.white} />
               <Row label="CONSECUTIVE YEARS"
                 value={s.consecutive_years ? `${s.consecutive_years.count} YRS (from ${s.consecutive_years.start})` : '—'}
@@ -301,14 +305,16 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
                 label="LONGEST SHOW"
                 sub={s.longest_show ? `${s.longest_show.venue} · ${formatDate(s.longest_show.date)}` : ''}
                 color={D.cyan} size="1.2rem"
-                href={s.longest_show?.date ? `${PHISH_IN}/${s.longest_show.date}` : null}
+                onClick={s.longest_show?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_show.date) : null}
+                href={s.longest_show?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_show.date}` : null}
               />
               <Tile
                 value={s.longest_encore?.count ? `${s.longest_encore.count} songs` : '—'}
                 label="LONGEST ENCORE"
                 sub={s.longest_encore ? `${s.longest_encore.venue} · ${formatDate(s.longest_encore.date)}` : ''}
                 color={D.orange} size="1.2rem"
-                href={s.longest_encore?.date ? `${PHISH_IN}/${s.longest_encore.date}` : null}
+                onClick={s.longest_encore?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_encore.date) : null}
+                href={s.longest_encore?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_encore.date}` : null}
               />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
@@ -317,14 +323,16 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
                 label="LONGEST SET I"
                 sub={s.longest_set1 ? `${s.longest_set1.venue} · ${formatDate(s.longest_set1.date)}` : ''}
                 color={D.cyan} size="1.2rem"
-                href={s.longest_set1?.date ? `${PHISH_IN}/${s.longest_set1.date}` : null}
+                onClick={s.longest_set1?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_set1.date) : null}
+                href={s.longest_set1?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_set1.date}` : null}
               />
               <Tile
                 value={s.longest_set2?.count ? `${s.longest_set2.count} songs` : '—'}
                 label="LONGEST SET II"
                 sub={s.longest_set2 ? `${s.longest_set2.venue} · ${formatDate(s.longest_set2.date)}` : ''}
                 color={D.orange} size="1.2rem"
-                href={s.longest_set2?.date ? `${PHISH_IN}/${s.longest_set2.date}` : null}
+                onClick={s.longest_set2?.date && onOpenScorecard ? () => onOpenScorecard(s.longest_set2.date) : null}
+                href={s.longest_set2?.date && !onOpenScorecard ? `${PHISH_IN}/${s.longest_set2.date}` : null}
               />
             </div>
             <div style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.1)', padding: '8px 14px', marginBottom: 6 }}>
@@ -438,12 +446,16 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
                 <Row label="BEST SHOW" value={s.highest_show?.avg || '—'} color={D.orange} />
                 {s.highest_show && (
                   <Row label="" value={`${s.highest_show.venue} · ${formatDate(s.highest_show.date)}`}
-                    color={D.muted} mono href={`${PHISH_IN}/${s.highest_show.date}`} />
+                    color={D.muted} mono
+                    onClick={onOpenScorecard ? () => onOpenScorecard(s.highest_show.date) : null}
+                    href={!onOpenScorecard ? `${PHISH_IN}/${s.highest_show.date}` : null} />
                 )}
                 <Row label="ROUGHEST SHOW" value={s.lowest_show?.avg || '—'} color={D.muted} />
                 {s.lowest_show && (
                   <Row label="" value={`${s.lowest_show.venue} · ${formatDate(s.lowest_show.date)}`}
-                    color={D.muted} mono href={`${PHISH_IN}/${s.lowest_show.date}`} />
+                    color={D.muted} mono
+                    onClick={onOpenScorecard ? () => onOpenScorecard(s.lowest_show.date) : null}
+                    href={!onOpenScorecard ? `${PHISH_IN}/${s.lowest_show.date}` : null} />
                 )}
               </div>
             )}
@@ -591,5 +603,6 @@ export function DeepPhreezeTab({ api, showMessage, showError }) {
 // ============================================================
 // MY PHRIENDS TAB
 // ============================================================
+
 
 
