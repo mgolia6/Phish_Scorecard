@@ -292,12 +292,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             <div className="instructions-grid">
               <div>
                 <div className="instr-step"><span className="instr-num">01</span><span>Search by date, venue, city, or year. Or let RANDOM SHOW decide your fate.</span></div>
-                <div className="instr-step"><span className="instr-num">02</span><span>Rate each song 1–5. 1 means they tried. 5 means you were there in spirit even if you weren't.</span></div>
-                <div className="instr-step"><span className="instr-num">03</span><span>▶ PLAY streams the song from Phish.in. Rate while you listen. That's the move.</span></div>
+                <div className="instr-step"><span className="instr-num">02</span><span>Rate each song 1–5 stars. Your ratings roll up into a show score saved to your Phreezer.</span></div>
+                <div className="instr-step"><span className="instr-num">03</span><span>▶ PLAY streams the show from Phish.in. Rate while you listen. That's the move.</span></div>
               </div>
               <div>
-                <div className="instr-step"><span className="instr-num">04</span><span>Tap a song name to pull up its full Phish.net history. Every version, every year.</span></div>
-                <div className="instr-step"><span className="instr-num">05</span><span>Save ratings. They stack up in My Shows, Analytics, and the Leaderboard.</span></div>
+                <div className="instr-step"><span className="instr-num">04</span><span>VIBE CHECK pulls an AI synthesis of what Phish.net reviewers said about the show.</span></div>
+                <div className="instr-step"><span className="instr-num">05</span><span>Ratings stack up in MY PHREEZER — shows, songs, venues, and stats all update automatically.</span></div>
                 <div className="instr-step"><span className="instr-num">06</span><span>Don't suck at Phish. Or at least try not to.</span></div>
               </div>
             </div>
