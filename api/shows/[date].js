@@ -23,11 +23,18 @@ export default async function handler(req, res) {
 
     const first = setlistData.data[0];
 
-    // Deduplicate by set+position: Phish.net lists guest/benefit acts at the same
-    // position as the real Phish song. Keep only the first song at each set+position.
+    // Filter to Phish-only songs (artistid=1).
+    // Phish.net returns all artists for a given date — e.g. Dude of Life shows
+    // on the same date will bleed into the setlist if not filtered.
+    // Also deduplicate by set+position for benefit shows where guest acts
+    // share position numbers with Phish songs.
     const seenPositions = new Set();
     const songs = setlistData.data
       .filter(entry => {
+        // Only include Phish songs (artistid 1, or no artistid field = legacy data)
+        const aid = entry.artistid || entry.artist_id;
+        if (aid && String(aid) !== '1') return false;
+        // Deduplicate by set+position (benefit show openers at same slot)
         const key = `${entry.set}-${entry.position}`;
         if (seenPositions.has(key)) return false;
         seenPositions.add(key);
