@@ -3,7 +3,7 @@ import { FullPageLoader } from './FullPageLoader';
 import { KPICards } from './KPICards';
 import { OTDCard } from './OTDCard';
 import { ShowCard } from './ShowCard';
-import { formatDate } from './utils';
+import { formatDate } from '../utils';
 
 export function MyShowsTab({ api, showMessage, showError, onRateShow, openImportOnMount, onDeepPhreeze }) {
   const [shows, setShows] = useState([]);
