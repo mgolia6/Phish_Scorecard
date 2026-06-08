@@ -231,7 +231,7 @@ function successPage() {
   <div class="sub">You're in. Head back to the app and log in.</div>
   <a href="https://phreezer.mpgink.com" class="btn">OPEN PHREEZER</a>
   <hr class="divider">
-  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
+  <a href="mailto:phreezer.support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
@@ -300,7 +300,7 @@ function expiredPage(email) {
   <div class="sub">That verification link is no longer valid.<br>Head back to the app and request a new one.</div>
   <a href="https://phreezer.mpgink.com" class="btn">BACK TO PHREEZER</a>
   <hr class="divider">
-  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
+  <a href="mailto:phreezer.support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
@@ -367,8 +367,9 @@ function errorPage(msg) {
   <div class="sub">${msg}</div>
   <a href="https://phreezer.mpgink.com" class="btn">BACK TO PHREEZER</a>
   <hr class="divider">
-  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
+  <a href="mailto:phreezer.support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
+
 
