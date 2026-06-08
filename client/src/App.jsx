@@ -21,7 +21,7 @@ import { CommunityTab } from './components/CommunityTab';
 import { AdminTab } from './components/AdminTab';
 import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
-import { EbenezerDrawer } from './components/EbenezerDrawer';
+import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
 
 export default function App() {
   const [tab, setTab] = useState('scorecard'); // will be overridden on user load
@@ -46,6 +46,13 @@ export default function App() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileInitSection, setProfileInitSection] = useState('phish');
   const [headerHeight, setHeaderHeight] = useState(132);
+  // Ebenezer — shared across mobile drawer + desktop rail
+  const [ebenHistory, setEbenHistory] = useState([]);
+  const [ebenLoading, setEbenLoading] = useState(false);
+  const [ebenError, setEbenError] = useState(null);
+  const [ebenInput, setEbenInput] = useState('');
+  const [ebenOpen, setEbenOpen] = useState(false);     // mobile drawer
+  const [ebenRailOpen, setEbenRailOpen] = useState(true); // desktop rail
   const stickyHeaderRef = useRef(null);
   const api = useApi();
 
@@ -270,8 +277,9 @@ export default function App() {
           onLogout={handleLogout}
           expanded={sidebarExpanded}
           setExpanded={setSidebarExpanded}
+          onOpenProfile={() => { setProfileInitSection('phish'); setShowProfileModal(true); }}
         />
-        <div className="main-area">
+        <div className="main-area" style={{ flex: 1, minWidth: 0 }}>
           <div className="marquee-bar">
             <span className="marquee-track" onClick={() => {
                 const now = Date.now();
@@ -291,6 +299,18 @@ export default function App() {
             {renderMain()}
           </div>
         </div>
+      <EbenezerRail
+          history={ebenHistory}
+          setHistory={setEbenHistory}
+          loading={ebenLoading}
+          setLoading={setEbenLoading}
+          error={ebenError}
+          setError={setEbenError}
+          input={ebenInput}
+          setInput={setEbenInput}
+          railOpen={ebenRailOpen}
+          setRailOpen={setEbenRailOpen}
+        />
       </div>
 
       {/* MOBILE LAYOUT: original header + tabs */}
@@ -447,9 +467,21 @@ export default function App() {
           </div>
         </div>
       )}
-      {user && <EbenezerDrawer api={api} />}
+      {user && <EbenezerDrawer
+        history={ebenHistory}
+        setHistory={setEbenHistory}
+        loading={ebenLoading}
+        setLoading={setEbenLoading}
+        error={ebenError}
+        setError={setEbenError}
+        input={ebenInput}
+        setInput={setEbenInput}
+        open={ebenOpen}
+        setOpen={setEbenOpen}
+      />}
     </div>
   );
 }
+
 
 
