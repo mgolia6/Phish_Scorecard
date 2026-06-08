@@ -303,7 +303,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               <div>
                 <div className="instr-step"><span className="instr-num">01</span><span>Search for any Phish show by date, venue, city, or year. Or hit RANDOM SHOW and let fate decide.</span></div>
                 <div className="instr-step"><span className="instr-num">02</span><span>Rate each song 1–5 stars. Your ratings roll up into a show score that lives in your Phreezer.</span></div>
-                <div className="instr-step"><spa<div className="instr-step"><span className="instr-num">03</span><span>▶ PLAY streams the show from Phish.in. Listen back and rate as you go, or rate from memory — your call.</span></div>
+                 <div className="instr-step"><span className="instr-num">03</span><span>▶ PLAY streams the show from Phish.in. Listen back and rate as you go, or rate from memory — your call.</span></div>
               </div>
               <div>
                 <div className="instr-step"><span className="instr-num">04</span><span>Mark whether you attended, watched the webcast, or listened after. Tracked separately from your ratings.</span></div>
