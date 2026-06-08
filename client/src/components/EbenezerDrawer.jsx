@@ -139,13 +139,11 @@ export function EbenezerDrawer({ api }) {
           background: 'rgba(255,102,0,0.05)',
         }}>
           <div>
-            <div style={{
-              fontFamily: 'var(--font-display)', fontSize: '0.7rem', fontWeight: 700,
-              letterSpacing: '3px',
-              color: '#FF8C00',
-              textShadow: '0 0 20px rgba(255,140,0,0.9), 0 0 40px rgba(255,140,0,0.5), 0 0 60px rgba(255,100,0,0.3), 2px 2px 0px rgba(180,60,0,0.8), -1px -1px 0px rgba(255,220,80,0.4)',
-            }}>
-              UNCLE EBENEZER <span style={{ fontSize: '0.44rem', letterSpacing: '2px', color: '#FFB347', textShadow: '0 0 10px rgba(255,140,0,0.6)', opacity: 0.85 }}>· JADED VET</span>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: 'var(--orange)', letterSpacing: '3px', fontWeight: 700 }}>
+              UNCLE EBENEZER
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--green)', letterSpacing: '2px', marginTop: 2 }}>
+              JADED VET
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>
               show analyst · discovery engine
@@ -201,7 +199,8 @@ export function EbenezerDrawer({ api }) {
                 </div>
               ) : (
                 <div style={{ maxWidth: '92%' }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 4, color: '#FF8C00', textShadow: '0 0 12px rgba(255,140,0,0.9), 0 0 24px rgba(255,140,0,0.5), 1px 1px 0px rgba(180,60,0,0.8), -1px -1px 0px rgba(255,220,80,0.3)' }}>UNCLE EBENEZER <span style={{ fontSize: '0.3rem', color: '#FFB347', opacity: 0.8 }}>· JADED VET</span></div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 1 }}>UNCLE EBENEZER</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.3rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 4 }}>JADED VET</div>
                   <div style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.82rem',
@@ -220,7 +219,8 @@ export function EbenezerDrawer({ api }) {
 
           {loading && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', marginBottom: 4, color: '#FF8C00', textShadow: '0 0 12px rgba(255,140,0,0.9), 0 0 24px rgba(255,140,0,0.5), 1px 1px 0px rgba(180,60,0,0.8), -1px -1px 0px rgba(255,220,80,0.3)' }}>UNCLE EBENEZER <span style={{ fontSize: '0.3rem', color: '#FFB347', opacity: 0.8 }}>· JADED VET</span></div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 1 }}>UNCLE EBENEZER</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.3rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 4 }}>JADED VET</div>
               <div style={{ borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10 }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
               </div>
