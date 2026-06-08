@@ -165,6 +165,9 @@ export function ProfileSetupModal({ api, onComplete }) {
                 className="modal-input"
                 onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
               />
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(51,255,51,0.3)', marginTop: 6, letterSpacing: '0.5px' }}>
+                Optional — but unlocks your full history, stats, and Deep Phreeze.
+              </div>
               {phishnetUsername && (
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10, cursor: 'pointer' }} onClick={() => setConfirmedHandle(v => !v)}>
                   <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0, marginTop: 3, accentColor: 'var(--orange)', width: 16, height: 16 }} />
@@ -197,11 +200,16 @@ export function ProfileSetupModal({ api, onComplete }) {
               {importing ? '◈ IMPORTING...' : '↓ IMPORT FROM PHISH.NET'}
             </button>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 12px' }}>
+              <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+            </div>
             <button
-              style={{ width: '100%', padding: '11px', background: 'transparent', border: '1px solid rgba(51,255,51,0.15)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', cursor: 'pointer' }}
+              style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}
               onClick={() => setStep('guilt')}
             >
-              SKIP IMPORT
+              I DON'T HAVE A PHISH.NET ACCOUNT
             </button>
           </>
         )}
