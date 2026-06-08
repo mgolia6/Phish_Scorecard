@@ -236,10 +236,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const submitRatings = async () => {
     setSubmitting(true);
     try {
-      const ratingsList = songs.filter(s => ratings[s.song]?.rating).map(s => ({
+      const ratingsList = songs.filter(s => ratings[s.posKey || s.song]?.rating).map(s => ({
         song: s.song, set: s.set,
-        rating: parseInt(ratings[s.song].rating),
-        notes: ratings[s.song]?.notes || '',
+        position: s.globalIdx,
+        rating: parseInt(ratings[s.posKey || s.song].rating),
+        notes: ratings[s.posKey || s.song]?.notes || '',
       }));
       if (!ratingsList.length) { showMessage('Rate at least one song first', 'info'); setSubmitting(false); return; }
       await api.post(`/ratings/${currentShow.showdate}`, {
@@ -588,12 +589,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                               <input className="notes-input" type="text" placeholder="Add a note..."
                                 value={ratings[song.posKey || song.song]?.notes || ''}
                                 autoFocus
-                                onChange={e => updateRating(song.song, 'notes', e.target.value)}
+                                onChange={e => updateRating(song.posKey || song.song, 'notes', e.target.value)}
                                 onBlur={() => { if (!ratings[song.posKey || song.song]?.notes) updateRating(song.posKey || song.song, 'notesOpen', false); }}
                               />
                             </div>
                           ) : (
-                            <button className="song-notes-toggle" onClick={() => updateRating(song.song, 'notesOpen', true)}>
+                            <button className="song-notes-toggle" onClick={() => updateRating(song.posKey || song.song, 'notesOpen', true)}>
                               {ratings[song.posKey || song.song]?.notes
                                 ? <span className="song-notes-preview">✎ {ratings[song.posKey || song.song].notes}</span>
                                 : <span className="song-notes-add">+ NOTE</span>}
