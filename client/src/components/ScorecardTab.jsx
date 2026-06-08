@@ -688,7 +688,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                         )}
                         <span className="review-date">{rev.posted}</span>
                       </div>
-                      <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review?.substring(0, 300) + (rev.review?.length > 300 ? '...' : '') }} />
+                      <div className="review-text" dangerouslySetInnerHTML={{ __html: rev.review }} />
                     </div>
                   ))}
                   <a href={`${pnetUrl}#reviews`} target="_blank" rel="noopener noreferrer" className="show-link" style={{ marginTop: 8, display: 'inline-block' }}>
@@ -715,6 +715,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
 
 
