@@ -20,6 +20,11 @@ export default async function handler(req, res) {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
+    // Hard block — email not verified
+    if (!user.email_verified) {
+      return res.status(403).json({ error: 'EMAIL_NOT_VERIFIED', email: user.email });
+    }
+
     // Update login streak
     const today = new Date().toISOString().split('T')[0];
     const last = user.last_login_date ? user.last_login_date.toISOString().split('T')[0] : null;
@@ -29,11 +34,11 @@ export default async function handler(req, res) {
     } else {
       const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
       if (diff === 0) {
-        // same day — keep streak as-is
+        // same day — keep streak
       } else if (diff === 1) {
         streak += 1;
       } else {
-        streak = 1; // broke the chain
+        streak = 1;
       }
     }
     if (last !== today) {
