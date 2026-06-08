@@ -11,9 +11,9 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
   ];
 
-  // Community: leaderboard is top, rest are sub under it
-  const communityTop = { id: 'community', label: 'LEADERBOARD', glyph: '★' };
-  const communitySubItems = [
+  // All community items at same level
+  const communityItems = [
+    { id: 'community',       label: 'LEADERBOARD',     glyph: '★' },
     { id: 'top-shows',       label: 'TOP SHOWS',       glyph: '◈' },
     { id: 'top-songs',       label: 'TOP SONGS',       glyph: '♪' },
     { id: 'top-venues',      label: 'TOP VENUES',      glyph: '⌖' },
@@ -21,14 +21,12 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
   ];
 
-  const isCommunityActive = ['community','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab);
-
-  const renderItem = (item, isSubItem = false) => {
+  const renderItem = (item) => {
     const disabled = item.authRequired && !user;
     return (
       <button
         key={item.id}
-        className={`sidebar-nav-btn ${isSubItem ? 'sidebar-nav-sub-item' : ''} ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+        className={`sidebar-nav-btn sidebar-nav-sub-item ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={() => !disabled && setTab(item.id)}
         title={item.label}
         disabled={disabled}
@@ -40,7 +38,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
   };
 
   const sectionDot = (color) => (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 2px' }}>
       <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}` }} />
     </div>
   );
@@ -74,41 +72,46 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
         {/* NAV */}
         <nav className="sidebar-nav">
 
-          {/* MY PHREEZER — section label, items flat (no sub-indent) */}
+          {/* MY PHREEZER */}
           {expanded
             ? <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>
             : sectionDot('var(--cyan)')
           }
-          {myPhreezerItems.map(item => renderItem(item, false))}
+          {myPhreezerItems.map(renderItem)}
 
-          {/* COMMUNITY — section label, leaderboard top-level, rest sub */}
+          {/* COMMUNITY — all items same level */}
           {expanded
             ? <div className="sidebar-section-label section-community">★ COMMUNITY</div>
             : sectionDot('var(--orange)')
           }
-          {renderItem(communityTop, false)}
-          {communitySubItems.map(item => renderItem(item, true))}
+          {communityItems.map(renderItem)}
 
-          {/* SCORECARD — standalone, section label IS the nav target */}
+          {/* SCORECARD — standalone */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
           {expanded ? (
             <div
               className={`sidebar-section-label section-scorecard ${tab === 'scorecard' ? 'active' : ''}`}
               onClick={() => setTab('scorecard')}
-              style={{ padding: '14px 16px 14px' }}
+              style={{ cursor: 'pointer', padding: '14px 16px' }}
             >
               ◈ SCORECARD
             </div>
           ) : (
             <>
               {sectionDot('var(--green)')}
-              {renderItem({ id: 'scorecard', label: 'SCORECARD', glyph: '◈' }, false)}
+              <button
+                className={`sidebar-nav-btn sidebar-nav-sub-item ${tab === 'scorecard' ? 'active' : ''}`}
+                onClick={() => setTab('scorecard')}
+                title="SCORECARD"
+              >
+                <span className="sidebar-nav-glyph">◈</span>
+              </button>
             </>
           )}
 
         </nav>
 
-        {/* FOOTER */}
+        {/* FOOTER — profile + logout only, NO collapse button */}
         <div className="sidebar-footer">
           {user ? (
             <>
@@ -145,27 +148,18 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
               </button>
             </>
           )}
-
-          {/* COLLAPSE TOGGLE — always visible */}
-          <button
-            className="sidebar-nav-btn"
-            onClick={() => setExpanded(e => !e)}
-            style={{
-              borderTop: '1px solid var(--border)',
-              color: 'rgba(51,255,51,0.35)',
-              fontSize: '0.55rem',
-              letterSpacing: '2px',
-              justifyContent: expanded ? 'flex-start' : 'center',
-              marginTop: 4,
-            }}
-            title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
-          >
-            <span className="sidebar-nav-glyph">{expanded ? '◀' : '▶'}</span>
-            {expanded && <span className="sidebar-nav-label">COLLAPSE</span>}
-          </button>
-
         </div>
+
       </aside>
+
+      {/* COLLAPSE TAB — original style, outside sidebar */}
+      <button
+        className="sidebar-tab"
+        onClick={() => setExpanded(e => !e)}
+        title={expanded ? 'Collapse' : 'Expand'}
+      >
+        {expanded ? '◀' : '▶'}
+      </button>
     </div>
   );
 }
