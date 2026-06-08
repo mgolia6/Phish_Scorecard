@@ -50,12 +50,255 @@ export function TandCModal({ onAccept }) {
   );
 }
 
+// ── MIKE SAID NO — unverified email block screen ──────────────────────────────
+function MikeSaidNo({ email, onResent, onBack }) {
+  const api = useApi();
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+  const [err, setErr] = useState('');
+
+  const handleResend = async () => {
+    setResending(true); setErr('');
+    try {
+      await api.post('/auth/verify-email', { email });
+      setResent(true);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setResending(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 900 }}>
+      <div className="modal" style={{ maxWidth: 460, textAlign: 'center' }}>
+
+        {/* Big fish art */}
+        <div style={{ fontSize: '3.5rem', marginBottom: 4, lineHeight: 1 }}>🐟</div>
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.5rem',
+          letterSpacing: '3px',
+          color: 'rgba(255,102,0,0.5)',
+          marginBottom: 20,
+        }}>
+          — MIKE GORDON, PROBABLY —
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.1rem',
+          fontWeight: 900,
+          letterSpacing: '4px',
+          color: 'var(--orange)',
+          textShadow: '0 0 20px rgba(255,102,0,0.6)',
+          marginBottom: 8,
+        }}>
+          MIKE SAID NO.
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.58rem',
+          letterSpacing: '2px',
+          color: 'var(--text-label)',
+          marginBottom: 20,
+          lineHeight: 1.8,
+        }}>
+          YOUR EMAIL ISN'T VERIFIED YET.<br />
+          CHECK YOUR INBOX TO GET IN.
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.7rem',
+          color: 'rgba(0,224,208,0.6)',
+          background: 'rgba(0,224,208,0.06)',
+          border: '1px solid rgba(0,224,208,0.15)',
+          padding: '10px 16px',
+          marginBottom: 24,
+          wordBreak: 'break-all',
+        }}>
+          {email}
+        </div>
+
+        {err && (
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+            {err}
+          </div>
+        )}
+
+        {resent ? (
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
+            ✓ NEW LINK SENT — CHECK YOUR INBOX
+          </div>
+        ) : (
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            style={{
+              width: '100%',
+              padding: '13px',
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.6rem',
+              letterSpacing: '2.5px',
+              background: 'var(--orange)',
+              color: '#000',
+              border: 'none',
+              cursor: resending ? 'not-allowed' : 'pointer',
+              fontWeight: 700,
+              marginBottom: 10,
+              opacity: resending ? 0.6 : 1,
+            }}
+          >
+            {resending ? 'SENDING...' : '↺ RESEND VERIFICATION EMAIL'}
+          </button>
+        )}
+
+        <button
+          onClick={onBack}
+          style={{
+            width: '100%',
+            padding: '11px',
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.55rem',
+            letterSpacing: '2px',
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            border: '1px solid var(--border)',
+            cursor: 'pointer',
+          }}
+        >
+          ← BACK TO LOGIN
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── CHECK YOUR EMAIL — post-registration screen ───────────────────────────────
+function CheckYourEmail({ email, onBack }) {
+  const api = useApi();
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+  const [err, setErr] = useState('');
+
+  const handleResend = async () => {
+    setResending(true); setErr('');
+    try {
+      await api.post('/auth/verify-email', { email });
+      setResent(true);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setResending(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 900 }}>
+      <div className="modal" style={{ maxWidth: 460, textAlign: 'center' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>📬</div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.9rem',
+          fontWeight: 900,
+          letterSpacing: '4px',
+          color: 'var(--cyan)',
+          textShadow: '0 0 16px rgba(0,224,208,0.5)',
+          marginBottom: 8,
+        }}>
+          CHECK YOUR EMAIL
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.58rem',
+          letterSpacing: '1.5px',
+          color: 'var(--text-label)',
+          marginBottom: 20,
+          lineHeight: 1.9,
+        }}>
+          ACCOUNT CREATED.<br />
+          VERIFY YOUR EMAIL TO STEP INTO THE PHREEZER.
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.7rem',
+          color: 'rgba(0,224,208,0.6)',
+          background: 'rgba(0,224,208,0.06)',
+          border: '1px solid rgba(0,224,208,0.15)',
+          padding: '10px 16px',
+          marginBottom: 24,
+          wordBreak: 'break-all',
+        }}>
+          {email}
+        </div>
+
+        {err && (
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+            {err}
+          </div>
+        )}
+
+        {resent ? (
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
+            ✓ NEW LINK SENT
+          </div>
+        ) : (
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            style={{
+              width: '100%',
+              padding: '11px',
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.55rem',
+              letterSpacing: '2px',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              border: '1px solid var(--border)',
+              cursor: resending ? 'not-allowed' : 'pointer',
+              marginBottom: 10,
+              opacity: resending ? 0.6 : 1,
+            }}
+          >
+            {resending ? 'SENDING...' : '↺ RESEND EMAIL'}
+          </button>
+        )}
+
+        <button
+          onClick={onBack}
+          style={{
+            width: '100%',
+            padding: '11px',
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.55rem',
+            letterSpacing: '2px',
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            border: '1px solid var(--border)',
+            cursor: 'pointer',
+          }}
+        >
+          ← BACK TO LOGIN
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN AUTH MODAL ───────────────────────────────────────────────────────────
 export function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const api = useApi();
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ email: '', username: '', password: '', firstName: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [screen, setScreen] = useState('form'); // 'form' | 'check_email' | 'mike_said_no'
+  const [pendingEmail, setPendingEmail] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault(); setLoading(true); setError('');
@@ -63,17 +306,38 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
       const data = await api.post('/auth/login', loginForm);
       localStorage.setItem('phish_token', data.token);
       onSuccess(data.user);
-    } catch (err) { setError(err.message); } finally { setLoading(false); }
+    } catch (err) {
+      if (err.message === 'EMAIL_NOT_VERIFIED') {
+        setPendingEmail(loginForm.email);
+        setScreen('mike_said_no');
+      } else {
+        setError(err.message);
+      }
+    } finally { setLoading(false); }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault(); setLoading(true); setError('');
     try {
       const data = await api.post('/auth/register', signupForm);
-      localStorage.setItem('phish_token', data.token);
-      onSuccess(data.user, true);
+      if (data.needs_verification) {
+        setPendingEmail(data.email);
+        setScreen('check_email');
+      } else {
+        // Fallback: shouldn't happen but handle gracefully
+        localStorage.setItem('phish_token', data.token);
+        onSuccess(data.user, true);
+      }
     } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
+
+  if (screen === 'mike_said_no') {
+    return <MikeSaidNo email={pendingEmail} onBack={() => setScreen('form')} />;
+  }
+
+  if (screen === 'check_email') {
+    return <CheckYourEmail email={pendingEmail} onBack={() => { setScreen('form'); setMode('login'); }} />;
+  }
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
