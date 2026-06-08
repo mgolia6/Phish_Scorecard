@@ -196,11 +196,12 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
               <div className="profile-email">{user?.email}</div>
             </div>
             <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer" style={{
-              fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px',
-              border: '1px solid rgba(255,140,0,0.4)', padding: '7px 10px', flexShrink: 0, marginTop: 2,
-              background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))', textDecoration: 'none',
+              fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px',
+              border: '1px solid rgba(255,140,0,0.5)', padding: '10px 14px', flexShrink: 0, marginTop: 4,
+              color: '#FF8C00',
+              textShadow: '0 0 12px rgba(255,140,0,0.8), 0 0 24px rgba(255,140,0,0.4)',
+              textDecoration: 'none', display: 'block', background: 'rgba(255,140,0,0.06)',
+              boxShadow: '0 0 10px rgba(255,140,0,0.15)',
             }}>◈ SUPPORT</a>
           </div>
         </div>
