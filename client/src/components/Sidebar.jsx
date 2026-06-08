@@ -1,27 +1,42 @@
 import React from 'react';
 
-export function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExpanded }) {
+export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, expanded, setExpanded }) {
 
-  const navItems = [
-    // ── MY PHREEZER ──────────────────────────────────────────────────────────
-    { id: 'scorecard',       label: 'SCORECARD',    glyph: '◈', section: 'MY PHREEZER' },
-    { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', section: null, authRequired: true },
-    { id: 'my-songs',        label: 'MY SONGS',     glyph: '♪', section: null, authRequired: true },
-    { id: 'my-venues',       label: 'MY VENUES',    glyph: '⌖', section: null, authRequired: true },
-    { id: 'my-states',       label: 'MY STATES',    glyph: '⬡', section: null, authRequired: true },
-    { id: 'my-phriends',     label: 'MY PHRIENDS',  glyph: '⚇', section: null, authRequired: true },
-    { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', section: null, authRequired: true },
-    // ── COMMUNITY ────────────────────────────────────────────────────────────
-    { id: 'community',       label: 'LEADERBOARD',  glyph: '★', section: 'COMMUNITY' },
-    { id: 'top-shows',       label: 'TOP SHOWS',    glyph: '◈', section: null },
-    { id: 'top-songs',       label: 'TOP SONGS',    glyph: '♪', section: null },
-    { id: 'top-venues',      label: 'TOP VENUES',   glyph: '⌖', section: null },
-    { id: 'top-states',      label: 'TOP STATES',   glyph: '⬡', section: null },
-    { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇', section: null },
+  const myPhreezerItems = [
+    { id: 'scorecard',       label: 'SCORECARD',    glyph: '◈', top: true },
+    { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', authRequired: true },
+    { id: 'my-songs',        label: 'MY SONGS',     glyph: '♪', authRequired: true },
+    { id: 'my-venues',       label: 'MY VENUES',    glyph: '⌖', authRequired: true },
+    { id: 'my-states',       label: 'MY STATES',    glyph: '⬡', authRequired: true },
+    { id: 'my-phriends',     label: 'MY PHRIENDS',  glyph: '⚇', authRequired: true },
+    { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
   ];
 
-  const isMyPhreezer = ['scorecard','my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab);
-  const isCommunity  = ['community','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab);
+  const communityItems = [
+    { id: 'community',       label: 'LEADERBOARD',     glyph: '★', top: true },
+    { id: 'top-shows',       label: 'TOP SHOWS',       glyph: '◈' },
+    { id: 'top-songs',       label: 'TOP SONGS',       glyph: '♪' },
+    { id: 'top-venues',      label: 'TOP VENUES',      glyph: '⌖' },
+    { id: 'top-states',      label: 'TOP STATES',      glyph: '⬡' },
+    { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
+  ];
+
+  const renderItems = (items) => items.map(item => {
+    const disabled = item.authRequired && !user;
+    const isSubItem = !item.top;
+    return (
+      <button
+        key={item.id}
+        className={`sidebar-nav-btn ${isSubItem ? 'sidebar-nav-sub-item' : ''} ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+        onClick={() => !disabled && setTab(item.id)}
+        title={item.label}
+        disabled={disabled}
+      >
+        <span className="sidebar-nav-glyph">{item.glyph}</span>
+        {expanded && <span className="sidebar-nav-label">{item.label}</span>}
+      </button>
+    );
+  });
 
   return (
     <div className="sidebar-wrapper">
@@ -51,53 +66,37 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, expanded, setExp
 
         {/* NAV */}
         <nav className="sidebar-nav">
-          {navItems.map((item, i) => {
-            const disabled = item.authRequired && !user;
-            return (
-              <React.Fragment key={item.id}>
-                {item.section && expanded && (
-                  <div className="sidebar-section-label">{item.section}</div>
-                )}
-                {item.section && !expanded && i > 0 && (
-                  <div className="sidebar-divider" />
-                )}
-                <button
-                  className={`sidebar-nav-btn ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
-                  onClick={() => !disabled && setTab(item.id)}
-                  title={item.label}
-                  disabled={disabled}
-                >
-                  <span className="sidebar-nav-glyph">{item.glyph}</span>
-                  {expanded && <span className="sidebar-nav-label">{item.label}</span>}
-                </button>
-              </React.Fragment>
-            );
-          })}
+          {/* MY PHREEZER */}
+          {expanded && <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>}
+          {!expanded && <div className="sidebar-divider" />}
+          {renderItems(myPhreezerItems)}
+
+          {/* COMMUNITY */}
+          {expanded && <div className="sidebar-section-label section-community">★ COMMUNITY</div>}
+          {!expanded && <div className="sidebar-divider" />}
+          {renderItems(communityItems)}
         </nav>
 
         {/* FOOTER */}
         <div className="sidebar-footer">
           {user ? (
             <>
-              <div className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}>
-                <div className="sidebar-avatar" style={{ fontSize: user.avatar_icon ? '1rem' : undefined }}>
+              {/* Avatar — tappable, opens profile */}
+              <div
+                className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
+                onClick={onOpenProfile}
+                title="My Profile"
+              >
+                <div className="sidebar-avatar">
                   {user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}
                 </div>
-                {expanded && <span className="sidebar-username">{user.username}</span>}
+                {expanded && (
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="sidebar-username">{user.username}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 2 }}>VIEW PROFILE</div>
+                  </div>
+                )}
               </div>
-              {expanded && (
-                <a
-                  href="https://buymeacoffee.com/mpgink"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="sidebar-nav-btn"
-                  style={{ textDecoration: 'none', color: 'var(--orange)', borderColor: 'rgba(255,102,0,0.3)', marginBottom: 4 }}
-                  title="Buy Me a Coffee"
-                >
-                  <span className="sidebar-nav-glyph">☕</span>
-                  <span className="sidebar-nav-label">BUY A COFFEE</span>
-                </a>
-              )}
               <button className="sidebar-nav-btn sidebar-logout" onClick={onLogout} title="Logout">
                 <span className="sidebar-nav-glyph">⏻</span>
                 {expanded && <span className="sidebar-nav-label">LOGOUT</span>}
