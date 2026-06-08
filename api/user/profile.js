@@ -2,7 +2,7 @@ import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 
 const ALLOWED_ICONS = ['❄','◈','⚡','✦','⬡','◉','▦','✎','🔥','🐟','🌀','🎸','💯','★','✍','🏔'];
-const ALLOWED_VANTAGE = ['floor', 'pit', 'lower-bowl', 'upper-bowl', 'lawn', 'balcony', 'anywhere'];
+const ALLOWED_VANTAGE = ['floor', 'reserved', 'lawn'];
 const ALLOWED_STYLE = ['attended', 'webcast', 'both'];
 const ALLOWED_ERA = ['1.0', '2.0', '3.0', '4.0', 'no-preference'];
 const ALLOWED_STAGE_SIDE = ['mike', 'page', 'center', 'no-preference'];
