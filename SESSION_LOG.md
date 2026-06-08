@@ -199,3 +199,79 @@
 4. **Verify sandwiched song fix** on a real show with reprises (e.g. Mike's Song > something > Mike's Song)
 5. **Deep Phreeze SYNC** — run a full sync to populate new data fields (rarest date/venue, encore last_date, run detail)
 6. **Desktop UAT pass** still pending
+
+---
+
+## Session: 2026-06-08 (late night — bug fixes, Ebenezer, Profile, About)
+
+### Shipped
+
+**Scorecard — sandwich/reprise bug fixes (continued)**
+- ratingsList now uses posKey consistently
+- updateRating calls for notes and notesOpen fixed to use posKey
+- Black screen fallback added when show fails to load: ◈ SHOW NOT FOUND
+
+**sync.js — artistid filter**
+- fetchSetlist now filters artistid=1 (Phish only)
+- Fixes Trey Trio / side project shows bleeding into Deep Phreeze data (Iron City)
+
+**Profile modal — full rebuild**
+- 3 tabs: MY PHISH / BADGES / ABOUT
+- INFO + SETTINGS merged into MY PHISH
+- Avatar moved into MY PHISH tab
+- Scroll fixed — CSS profile-modal-inner height + webkit-overflow-scrolling
+- SUPPORT button in hero — solid orange, black text, screams
+- Questions: Floor/Reserved/Lawn, Era, Mike/Page, Dance/Chill — bigger buttons, better aesthetic
+- Sign out at bottom of MY PHISH
+- ABOUT tab — full origin story copy (Matthew's words), WHAT THIS IS, built by, credits
+- ALL_BADGES_DEF defined in ProfileModal (was missing — caused blank badges tab)
+- initialSection prop works correctly, defaults to 'phish'
+
+**About copy**
+- Full origin story in Matthew's voice — 6 paragraphs, last line italicized
+- "Coming soon" placeholder removed
+- No gap-fill framing — about what he wanted to build and contribute
+
+**Uncle Ebenezer**
+- Title: plain var(--orange) restored — no gradients, no textShadow, no effects
+- JADED VET merged into subtitle line: "jaded vet · show analyst · discovery engine"
+- Auth bug fixed: was using phreezer_token, should be phish_token — caused Unauthorized error
+- Send button: solid orange bg, black text, impossible to miss
+- ✕ close button moved into drawer header (next to CLEAR)
+- Floating ❄ ASK button hidden when drawer is open (no more overlap)
+- Input bar paddingRight hack removed
+
+**FEEDBACK button**
+- Moved to bottom-left to stop overlapping Ebenezer button
+
+**Orange gradient text — all reverted**
+- QUICK PHREEZE, IMPORT, RATE (OTD), SEARCH (MyPhriends + CommunityTab)
+- All back to plain var(--orange) — same as original Ebenezer
+- WebkitBackgroundClip / gradient clip removed from all instances
+
+**OTD carousel**
+- Arrow buttons replaced with swipe gesture (40px threshold) + dot indicators
+- Active dot wider (18px), tap any dot to jump
+
+**Venue heatmap**
+- Confirmed removed from CommunityTab top-venues (was still rendering)
+
+**Build fixes**
+- Unescaped apostrophe in phish.in description (ProfileModal)
+- Missing closing div in info section wrapper
+- Duplicate background key in SEARCH buttons (MyPhriends + CommunityTab)
+
+### Decisions
+- Ebenezer glow was always just plain orange — no effects needed, font does the work
+- Jaded Vet inline with subtitles, not standalone
+- SUPPORT button should be solid and aggressive, not subtle
+- About framing: community love story, not product gap analysis
+
+### Next session priorities
+1. Rotate GitHub PAT
+2. Phish Phreeze — band-level stats tab in Community
+3. Run full Deep Phreeze sync to populate new data fields
+4. Onboarding tour guide rewrite (introduce Ebenezer properly)
+5. Rate limiting on auth endpoints
+6. Top Shows needs more community data — consider lowering threshold
+7. Desktop UAT pass
