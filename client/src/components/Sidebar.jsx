@@ -86,6 +86,21 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
           }
           {communityItems.map(renderItem)}
 
+          {/* FEEDBACK */}
+          {expanded
+            ? <div className="sidebar-section-label" style={{ color: 'rgba(51,255,51,0.3)', fontSize: '0.55rem', padding: '12px 16px 4px' }} />
+            : null
+          }
+          <button
+            className="sidebar-nav-btn sidebar-nav-sub-item"
+            onClick={() => { if (typeof window !== 'undefined') { const btn = document.querySelector('[title="Send feedback"]'); if (btn) btn.click(); } }}
+            title="Send Feedback"
+            style={{ color: 'rgba(51,255,51,0.4)' }}
+          >
+            <span className="sidebar-nav-glyph">◈</span>
+            {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
+          </button>
+
           {/* SCORECARD — standalone */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
           {expanded ? (
@@ -131,10 +146,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
                   </div>
                 )}
               </div>
-              <button className="sidebar-nav-btn sidebar-logout" onClick={onLogout} title="Logout">
-                <span className="sidebar-nav-glyph">⏻</span>
-                {expanded && <span className="sidebar-nav-label">LOGOUT</span>}
-              </button>
+
             </>
           ) : (
             <>
@@ -163,3 +175,4 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     </div>
   );
 }
+
