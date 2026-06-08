@@ -115,6 +115,7 @@ export function PassiveFeedbackButton({ api }) {
             cursor: 'pointer', borderRadius: '0 4px 4px 0',
             writingMode: 'vertical-rl', transform: 'translateY(50%) rotate(180deg)',
           }}
+          className="passive-feedback-desktop"
           title="Send feedback"
         >
           ◈ FEEDBACK
@@ -125,6 +126,7 @@ export function PassiveFeedbackButton({ api }) {
     </>
   );
 }
+
 
 
 
