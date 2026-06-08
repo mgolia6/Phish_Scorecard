@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 
 export function SaveCelebration({ onDone }) {
+  const onDoneRef = React.useRef(onDone);
   useEffect(() => {
-    const t = setTimeout(onDone, 2800);
+    const t = setTimeout(() => onDoneRef.current?.(), 2800);
     return () => clearTimeout(t);
-  }, [onDone]);
+  }, []);
   const glyphs = ['★','◈','✦','◉','⬡','⬢','✧','◆'];
   const particles = Array.from({ length: 18 }, (_, i) => ({
     id: i,
@@ -33,6 +34,7 @@ export function SaveCelebration({ onDone }) {
 }
 
 export function WelcomeCelebration({ username, onDone }) {
+  const onDoneRef = React.useRef(onDone);
   const lyrics = [
     "We're glad, glad, glad that you've arrived!",
     "We're glad glad glad that you've arrived.",
@@ -48,9 +50,9 @@ export function WelcomeCelebration({ username, onDone }) {
   const lyric = lyrics[Math.floor(Math.random() * lyrics.length)];
 
   useEffect(() => {
-    const t = setTimeout(onDone, 3200);
+    const t = setTimeout(() => onDoneRef.current?.(), 3200);
     return () => clearTimeout(t);
-  }, [onDone]);
+  }, []);
 
   const glyphs = ['★','◈','✦','◉','⬡','❄','✧','◆'];
   const particles = Array.from({ length: 14 }, (_, i) => ({
@@ -63,7 +65,7 @@ export function WelcomeCelebration({ username, onDone }) {
   }));
 
   return (
-    <div className="celebrate-overlay" style={{ cursor: 'pointer' }} onClick={onDone}>
+    <div className="celebrate-overlay" style={{ cursor: 'pointer' }} onClick={() => onDoneRef.current?.()}>
       <div className="celebrate-burst">
         {particles.map(p => (
           <span key={p.id} className="celebrate-particle" style={{
@@ -86,3 +88,4 @@ export function WelcomeCelebration({ username, onDone }) {
     </div>
   );
 }
+
