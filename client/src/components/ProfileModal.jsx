@@ -138,7 +138,7 @@ export function BadgesSection({ api }) {
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
-  const [sec, setSec] = React.useState(initialSection);
+  const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
   const [savingIcon, setSavingIcon] = React.useState(false);
@@ -195,33 +195,58 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         </div>
         {/* Section tabs */}
         <div className="profile-modal-tabs">
-          {[['info','INFO'],['badges','BADGES'],['settings','SETTINGS'],['about','ABOUT']].map(([k,l]) => (
+          {[['phish','MY PHISH'],['badges','BADGES'],['about','ABOUT']].map(([k,l]) => (
             <button key={k} onClick={() => setSec(k)}
               className={`profile-modal-tab ${sec === k ? 'active' : ''}`}>{l}</button>
           ))}
         </div>
         {/* Body */}
-        <div className="profile-modal-body">
-          {sec === 'info' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
-              {/* Static fields */}
-              <div style={{ background: 'var(--bg-elevated)', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 14 }}>◈ YOUR PHISH IDENTITY</div>
+        <div className="profile-modal-body" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch', flex: 1 }}>
+
+          {/* ── MY PHISH TAB ── */}
+          {sec === 'phish' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+              {/* Identity block */}
+              <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.15)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ YOUR PHISH IDENTITY</div>
                 {[
                   ['PHISH.NET HANDLE', profile?.phishnet_username],
                   ['FAVORITE SONG',    profile?.favorite_song],
                   ['FAVORITE VENUE',   profile?.favorite_venue],
                   ['FIRST SHOW',       profile?.favorite_show_date ? formatDate(profile.favorite_show_date) : null],
                 ].map(([label, val]) => (
-                  <div key={label} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 6 }}>{label}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: val ? 'var(--white)' : 'rgba(51,255,51,0.25)', lineHeight: 1.3 }}>
-                      {val || (profile ? 'not set' : '...')}
+                  <div key={label} style={{ marginBottom: 12 }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: val ? 'var(--white)' : 'rgba(51,255,51,0.2)' }}>
+                      {val || '—'}
                     </div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: -6 }}>
-                  Edit these fields in phish.net import or contact support.
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(51,255,51,0.25)', marginTop: 8 }}>
+                  Edit via phish.net import ↗
+                </div>
+              </div>
+
+              {/* Avatar */}
+              <div style={{ background: 'rgba(0,224,208,0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>
+                  ◈ CHOOSE YOUR AVATAR{savingIcon && <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: '0.44rem' }}>SAVING...</span>}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {AVATAR_OPTIONS.map(opt => (
+                    <button key={opt.id} onClick={() => handleSaveIcon(opt.id)} style={{
+                      aspectRatio: '1',
+                      border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(51,255,51,0.12)'}`,
+                      background: selectedIcon === opt.id ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.3)',
+                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: 8,
+                      boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(0,224,208,0.3)' : 'none',
+                      transition: 'all 0.15s',
+                    }}>
+                      <PhreezerAvatar seed={opt.id} size={40} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(0,224,208,0.4)'} />
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: selectedIcon === opt.id ? 'var(--cyan)' : 'var(--text-muted)', letterSpacing: '1px' }}>{opt.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -267,24 +292,24 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   ]
                 },
               ].map(({ label, field, options }) => (
-                <div key={field} style={{ background: 'var(--bg-elevated)', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', padding: '16px 14px', marginBottom: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 14 }}>◈ {label}</div>
+                <div key={field} style={{ borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px', background: 'rgba(0,0,0,0.2)' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 12 }}>◈ {label}</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {options.map(opt => {
                       const active = profile?.[field] === opt.val;
                       return (
                         <button key={opt.val} onClick={() => saveProfile({ [field]: active ? null : opt.val })} style={{
-                          padding: '10px 16px',
+                          padding: '10px 18px',
                           fontFamily: 'var(--font-display)',
-                          fontSize: '0.6rem',
+                          fontSize: '0.62rem',
                           letterSpacing: '2px',
-                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.25)'}`,
-                          background: active ? 'rgba(0,224,208,0.12)' : 'rgba(0,0,0,0.3)',
+                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
+                          background: active ? 'rgba(0,224,208,0.12)' : 'transparent',
                           color: active ? 'var(--cyan)' : 'var(--text-label)',
                           cursor: 'pointer',
-                          boxShadow: active ? '0 0 12px rgba(0,224,208,0.25)' : 'none',
+                          boxShadow: active ? '0 0 16px rgba(0,224,208,0.3)' : 'none',
+                          textShadow: active ? '0 0 10px rgba(0,224,208,0.6)' : 'none',
                           transition: 'all 0.15s',
-                          textShadow: active ? '0 0 8px rgba(0,224,208,0.5)' : 'none',
                         }}>
                           {active ? '◈ ' : ''}{opt.label}
                         </button>
@@ -293,39 +318,93 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   </div>
                 </div>
               ))}
+
+              {/* Sign out + BMaC */}
+              <div style={{ padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+                  className="btn-glow-cyan">◈ SUPPORT THE PHREEZER</a>
+                <button className="btn-glow-red" onClick={() => { onLogout && onLogout(); onClose(); }}>SIGN OUT</button>
+              </div>
+
             </div>
           )}
 
-          {sec === 'settings' && (
-            <div>
-              {/* Avatar — geometric SVG options */}
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 12 }}>
-                  ◈ CHOOSE YOUR AVATAR
-                  {savingIcon && <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>SAVING...</span>}
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                  {AVATAR_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => handleSaveIcon(opt.id)} style={{
-                      aspectRatio: '1', border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(51,255,51,0.15)'}`,
-                      background: selectedIcon === opt.id ? 'rgba(0,224,208,0.08)' : 'var(--bg-elevated)',
-                      cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 8,
-                      boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(0,224,208,0.3)' : 'none',
-                      transition: 'all 0.2s',
-                    }}>
-                      <PhreezerAvatar seed={opt.id} size={44} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(0,224,208,0.5)'} />
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: selectedIcon === opt.id ? 'var(--cyan)' : 'var(--text-muted)', letterSpacing: '1px' }}>{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
+          {/* ── BADGES TAB ── */}
+          {sec === 'badges' && (
+            <BadgesSection api={api} />
+          )}
+
+          {/* ── ABOUT TAB ── */}
+          {sec === 'about' && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+              <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ ORIGIN STORY</div>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 12px' }}>
+                  Been part of this community for a long time. Always in awe of what the fans at Phish.net built — the reviews, the forums, the data, the obsession. I've contributed my own reviews and been part of the conversations for years.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 12px' }}>
+                  What I kept wanting was a way to rate — not just review. To score individual songs, track what I'd seen, and let the data tell me things about my own history with this band. Phish.net didn't have that. So I built it.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0 }}>
+                  Phreezer is built on top of the community's work — the setlist data, the audio archives, the decades of fan documentation — and tries to add a layer that complements what's already there.
+                </p>
               </div>
-              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+              <div style={{ borderLeft: '3px solid var(--orange)', borderBottom: '1px solid rgba(255,140,0,0.1)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ WHAT THIS IS</div>
+                {[
+                  ['RATE', 'Score every song 1–5. Build a record of how you actually hear the music.'],
+                  ['TRACK', 'Log what you attended, watched, or listened back. Your history, your way.'],
+                  ['RELIVE', 'Deep Phreeze surfaces patterns in your data. When you see Phish, where, how often, what sticks.'],
+                ].map(([verb, desc]) => (
+                  <div key={verb} style={{ display: 'flex', gap: 14, marginBottom: 14, alignItems: 'flex-start' }}>
+                    <span style={{
+                      fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', flexShrink: 0, paddingTop: 2,
+                      background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                      filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
+                    }}>{verb}.</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.6 }}>{desc}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderLeft: '3px solid var(--green)', borderBottom: '1px solid rgba(51,255,51,0.1)', padding: '20px 16px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ BUILT BY</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', color: 'var(--white)', marginBottom: 4 }}>mpgink</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 16 }}>
+                  Fan. Builder. Trying not to suck at Phish.
+                </div>
                 <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-                  className="btn-glow-cyan" style={{ marginBottom: 4 }}>◈ SUPPORT THE PHREEZER</a>
-                <button className="btn-glow-red" onClick={() => { onLogout && onLogout(); onClose(); }}>SIGN OUT</button>
+                  className="btn-glow-cyan" style={{ display: 'block', textAlign: 'center' }}>
+                  ◈ SUPPORT THE PHREEZER
+                </a>
               </div>
+
+              <div style={{ borderLeft: '3px solid rgba(51,255,51,0.3)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ STANDING ON SHOULDERS</div>
+                {[
+                  ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
+                  ['PHISH.IN', 'Live audio archives. Stream what you're rating.', 'https://phish.in'],
+                  ['ANTHROPIC', 'AI powering Vibe Check and Uncle Ebenezer.', 'https://anthropic.com'],
+                ].map(([name, desc, href]) => (
+                  <div key={name} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(51,255,51,0.06)' }}>
+                    <a href={href} target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none' }}>
+                      {name} ↗
+                    </a>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
+                  </div>
+                ))}
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(51,255,51,0.2)', marginTop: 4 }}>
+                  Independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
+                </div>
+              </div>
+
             </div>
           )}
+
         </div>
       </div>
     </div>
