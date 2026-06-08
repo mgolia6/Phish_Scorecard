@@ -13,26 +13,34 @@ function OTDCarousel({ otdShows, months, onRateShow, api }) {
   const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
   const yearsAgo = new Date().getFullYear() - parseInt(show.show_date);
   const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+  const touchStartX = React.useRef(null);
+
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) setIdx(i => Math.min(otdShows.length - 1, i + 1)); // swipe left = next
+    else setIdx(i => Math.max(0, i - 1)); // swipe right = prev
+  };
+
   return (
     <div style={{ margin: '10px' }}>
       {otdShows.length > 1 && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <button
-            onClick={() => setIdx(i => Math.max(0, i - 1))}
-            disabled={idx === 0}
-            style={{ padding: '4px 12px', background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: idx === 0 ? 'rgba(0,224,208,0.2)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', cursor: idx === 0 ? 'default' : 'pointer' }}
-          >‹</button>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>
-            ON THIS DAY — {idx + 1} / {otdShows.length}
-          </span>
-          <button
-            onClick={() => setIdx(i => Math.min(otdShows.length - 1, i + 1))}
-            disabled={idx === otdShows.length - 1}
-            style={{ padding: '4px 12px', background: 'transparent', border: '1px solid rgba(0,224,208,0.3)', color: idx === otdShows.length - 1 ? 'rgba(0,224,208,0.2)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', cursor: idx === otdShows.length - 1 ? 'default' : 'pointer' }}
-          >›</button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
+          {otdShows.map((_, i) => (
+            <div key={i} onClick={() => setIdx(i)} style={{
+              width: i === idx ? 18 : 6, height: 6,
+              background: i === idx ? 'var(--cyan)' : 'rgba(0,224,208,0.2)',
+              borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
+            }} />
+          ))}
         </div>
       )}
-      <OTDCard otdShow={show} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />
+      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <OTDCard otdShow={show} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />
+      </div>
     </div>
   );
 }
