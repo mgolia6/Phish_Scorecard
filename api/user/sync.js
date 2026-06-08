@@ -59,8 +59,16 @@ async function fetchSetlist(date, apiKey) {
   const data = await res.json();
   if (!data.data?.length) return null;
 
-  const first = data.data[0];
-  const songs = data.data.map(e => ({
+  // Filter to Phish-only (artistid=1) — same logic as shows/[date].js
+  // Without this, Trey Trio / side project shows on the same date bleed in
+  const phishOnly = data.data.filter(e => {
+    const aid = e.artistid || e.artist_id;
+    return !aid || String(aid) === '1';
+  });
+  if (!phishOnly.length) return null;
+
+  const first = phishOnly[0];
+  const songs = phishOnly.map(e => ({
     song:     e.song,
     slug:     e.slug,
     set:      e.set,
