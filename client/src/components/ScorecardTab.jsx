@@ -276,7 +276,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
   const totalRated = songs.filter(s => ratings[s.posKey || s.song]?.rating);
   const overallAvg = totalRated.length
-    ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.song].rating), 0) / totalRated.length).toFixed(2)
+    ? (totalRated.reduce((sum, s) => sum + parseInt(ratings[s.posKey || s.song]?.rating || 0), 0) / totalRated.length).toFixed(2)
     : null;
 
   const hasAudio = Object.keys(audioTracks).length > 0;
@@ -291,7 +291,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
     <div>
       {celebrating && <SaveCelebration onDone={() => {
         setCelebrating(false);
-        showMessage(`Saved ${songs.filter(s => ratings[s.song]?.rating).length} ratings`, 'success');
+        showMessage(`Saved ${songs.filter(s => ratings[s.posKey || s.song]?.rating).length} ratings`, 'success');
       }} />}
 
       {!initialShowDate && <div className="instructions-panel">
@@ -715,6 +715,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
 
 
