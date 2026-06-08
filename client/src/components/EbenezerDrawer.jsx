@@ -42,7 +42,7 @@ export function EbenezerDrawer({ api }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('phreezer_token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('phish_token')}`,
         },
         body: JSON.stringify({
           message: msg,
@@ -236,6 +236,7 @@ export function EbenezerDrawer({ api }) {
         {/* Input */}
         <div style={{
           padding: '10px 14px 16px',
+          paddingRight: 80,
           borderTop: '1px solid rgba(255,102,0,0.15)',
           display: 'flex',
           gap: 8,
