@@ -104,12 +104,15 @@ export function PassiveFeedbackButton({ api }) {
     <>
       <button
         onClick={() => setOpen(true)}
+        className="passive-feedback-btn"
         style={{
-          position: 'fixed', bottom: 80, left: 0, zIndex: 500,
+          position: 'fixed', bottom: '50%', left: 0, zIndex: 500,
           background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
+          borderLeft: 'none',
           color: 'rgba(51,255,51,0.45)', fontFamily: 'var(--font-display)',
-          fontSize: '0.55rem', letterSpacing: '2px', padding: '10px 16px',
-          cursor: 'pointer', borderRadius: 0,
+          fontSize: '0.52rem', letterSpacing: '2px', padding: '8px 10px',
+          cursor: 'pointer', borderRadius: '0 4px 4px 0',
+          writingMode: 'vertical-rl', transform: 'translateY(50%) rotate(180deg)',
         }}
         title="Send feedback"
       >
@@ -119,5 +122,6 @@ export function PassiveFeedbackButton({ api }) {
     </>
   );
 }
+
 
 
