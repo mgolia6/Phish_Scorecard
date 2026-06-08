@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, expanded, setExpanded }) {
+export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, onFeedback, expanded, setExpanded }) {
 
   const myPhreezerItems = [
     { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', authRequired: true },
@@ -86,21 +86,6 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
           }
           {communityItems.map(renderItem)}
 
-          {/* FEEDBACK */}
-          {expanded
-            ? <div className="sidebar-section-label" style={{ color: 'rgba(51,255,51,0.3)', fontSize: '0.55rem', padding: '12px 16px 4px' }} />
-            : null
-          }
-          <button
-            className="sidebar-nav-btn sidebar-nav-sub-item"
-            onClick={() => { if (typeof window !== 'undefined') { const btn = document.querySelector('[title="Send feedback"]'); if (btn) btn.click(); } }}
-            title="Send Feedback"
-            style={{ color: 'rgba(51,255,51,0.4)' }}
-          >
-            <span className="sidebar-nav-glyph">◈</span>
-            {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
-          </button>
-
           {/* SCORECARD — standalone */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
           {expanded ? (
@@ -124,9 +109,21 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
             </>
           )}
 
+          {/* FEEDBACK — below scorecard */}
+          <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
+          <button
+            className="sidebar-nav-btn sidebar-nav-sub-item"
+            onClick={onFeedback}
+            title="Send Feedback"
+            style={{ color: 'rgba(51,255,51,0.4)' }}
+          >
+            <span className="sidebar-nav-glyph">◈</span>
+            {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
+          </button>
+
         </nav>
 
-        {/* FOOTER — profile + logout only, NO collapse button */}
+        {/* FOOTER — profile only, NO collapse button */}
         <div className="sidebar-footer">
           {user ? (
             <>
@@ -175,4 +172,5 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     </div>
   );
 }
+
 
