@@ -39,7 +39,15 @@ export default async function handler(req, res) {
   const pool = getPool();
   try {
     const [attendedRes, ratedRes, topSongRes, topVenueRes, reviewsRes, streakRes, firstShowRes, lastSyncRes] = await Promise.all([
-      pool.query('SELECT COUNT(*) as count FROM attendance WHERE user_id = $1', [user.id]),
+      // SHOWS count: union of phish.net import (attendance) + any show they've rated/tracked (user_show_attendance)
+      pool.query(
+        `SELECT COUNT(DISTINCT show_date) as count FROM (
+           SELECT show_date FROM attendance WHERE user_id = $1
+           UNION
+           SELECT show_date FROM user_show_attendance WHERE user_id = $1
+         ) combined`,
+        [user.id]
+      ),
       pool.query(
         `SELECT COUNT(DISTINCT show_date) as count, ROUND(AVG(rating)::numeric, 2) as avg_score
          FROM ratings WHERE user_id = $1 AND rating IS NOT NULL`,
@@ -51,10 +59,18 @@ export default async function handler(req, res) {
          GROUP BY song_name ORDER BY avg DESC, times_rated DESC LIMIT 1`,
         [user.id]
       ),
+      // TOP VENUE: check phish.net import first, fall back to shows rated/attended via user_show_attendance
       pool.query(
-        `SELECT venue, city, state, COUNT(*) as shows
-         FROM attendance WHERE user_id = $1
-         GROUP BY venue, city, state ORDER BY shows DESC LIMIT 1`,
+        `SELECT s.venue, s.city, s.state, COUNT(*) as shows
+         FROM (
+           SELECT show_date FROM attendance WHERE user_id = $1
+           UNION
+           SELECT show_date FROM user_show_attendance WHERE user_id = $1
+         ) combined
+         JOIN shows s ON s.show_date = combined.show_date
+         WHERE s.venue IS NOT NULL
+         GROUP BY s.venue, s.city, s.state
+         ORDER BY shows DESC LIMIT 1`,
         [user.id]
       ),
       pool.query(
@@ -62,8 +78,13 @@ export default async function handler(req, res) {
         [user.id]
       ),
       pool.query('SELECT login_streak FROM users WHERE id = $1', [user.id]),
+      // FIRST SHOW: earliest date across both attendance sources
       pool.query(
-        `SELECT TO_CHAR(MIN(show_date), 'YYYY-MM-DD') as first_show FROM attendance WHERE user_id = $1`,
+        `SELECT TO_CHAR(MIN(show_date), 'YYYY-MM-DD') as first_show FROM (
+           SELECT show_date FROM attendance WHERE user_id = $1
+           UNION
+           SELECT show_date FROM user_show_attendance WHERE user_id = $1
+         ) combined`,
         [user.id]
       ),
       pool.query(
