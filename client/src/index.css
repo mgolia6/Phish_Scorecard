@@ -1279,10 +1279,10 @@ select option { background: var(--bg); color: var(--green); }
 
   /* Move feedback button so it doesn't overlap profile */
   .passive-feedback-btn {
-    bottom: 80px;
-    left: 0;
-    transform: none;
-    right: auto;
+    bottom: 200px;
+    left: 0 !important;
+    transform: none !important;
+    right: auto !important;
     border-radius: 0 4px 4px 0;
   }
 }
@@ -1306,4 +1306,5 @@ select option { background: var(--bg); color: var(--green); }
 .sidebar-collapsed .sidebar-nav-glyph { font-size: 1.15rem; width: auto; }
 .sidebar-collapsed .sidebar-section-label { display: none; }
 .sidebar-section-dot { display: flex; justify-content: center; padding: 10px 0 4px; }
+
 
