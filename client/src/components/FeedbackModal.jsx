@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 
 const PASSIVE_SECTIONS = [
   'Onboarding', 'Scorecard / Rating', 'My Phreezer', 'Deep Phreeze',
@@ -103,29 +102,12 @@ export function PassiveFeedbackButton({ api }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      {ReactDOM.createPortal(
-        <button
-          onClick={() => setOpen(true)}
-          style={{
-            position: 'fixed', bottom: '50%', left: 0, zIndex: 9000,
-            background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
-            borderLeft: 'none',
-            color: 'rgba(51,255,51,0.45)', fontFamily: 'var(--font-display)',
-            fontSize: '0.52rem', letterSpacing: '2px', padding: '8px 10px',
-            cursor: 'pointer', borderRadius: '0 4px 4px 0',
-            writingMode: 'vertical-rl', transform: 'translateY(50%) rotate(180deg)',
-          }}
-          className="passive-feedback-desktop"
-          title="Send feedback"
-        >
-          ◈ FEEDBACK
-        </button>,
-        document.body
-      )}
+
       {open && <FeedbackModal type="passive" api={api} onClose={() => setOpen(false)} />}
     </>
   );
 }
+
 
 
 
