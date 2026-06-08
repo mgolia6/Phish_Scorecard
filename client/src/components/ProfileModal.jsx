@@ -163,6 +163,8 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         vantage_point: updated.vantage_point || null,
         show_style: updated.show_style || null,
         era_preference: updated.era_preference || null,
+        stage_side: updated.stage_side || null,
+        show_vibe: updated.show_vibe || null,
       });
     } catch (e) {}
   };
@@ -436,3 +438,4 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
