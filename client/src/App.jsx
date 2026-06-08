@@ -278,6 +278,7 @@ export default function App() {
           expanded={sidebarExpanded}
           setExpanded={setSidebarExpanded}
           onOpenProfile={() => { setProfileInitSection('phish'); setShowProfileModal(true); }}
+          onFeedback={() => setFeedbackModal('passive')}
         />
         <div className="main-area">
           <div className="marquee-bar">
@@ -482,6 +483,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
