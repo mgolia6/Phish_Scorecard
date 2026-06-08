@@ -111,105 +111,263 @@ export async function sendVerificationEmail(email, token) {
 
 function emailTemplate(verifyUrl) {
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><style>
-  body { background: #0a0a0a; color: #33ff33; font-family: monospace; margin: 0; padding: 40px 20px; }
-  .container { max-width: 480px; margin: 0 auto; border: 1px solid rgba(0,224,208,0.3); padding: 40px; }
-  .logo { font-size: 1.4rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 8px; }
-  .tagline { font-size: 0.65rem; letter-spacing: 3px; color: rgba(0,224,208,0.5); margin-bottom: 32px; }
-  .heading { font-size: 0.9rem; letter-spacing: 3px; color: #33ff33; margin-bottom: 16px; }
-  .body { font-size: 0.75rem; line-height: 1.8; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .btn { display: inline-block; padding: 14px 28px; background: #ff6600; color: #000; font-family: monospace; font-size: 0.75rem; letter-spacing: 2px; text-decoration: none; font-weight: bold; }
-  .footer { margin-top: 32px; font-size: 0.6rem; color: rgba(255,255,255,0.25); line-height: 1.8; }
-</style></head>
-<body>
-  <div class="container">
-    <div class="logo">❄ PHREEZER</div>
-    <div class="tagline">RATE. TRACK. RELIVE.</div>
-    <div class="heading">VERIFY YOUR EMAIL</div>
-    <div class="body">
-      You're almost in the Phreezer. Click below to verify your email address and activate your account.<br><br>
-      This link expires in 24 hours.
-    </div>
-    <a href="${verifyUrl}" class="btn">VERIFY MY EMAIL</a>
-    <div class="footer">
-      If you didn't create a Phreezer account, ignore this email.<br>
-      phreezer.mpgink.com
-    </div>
-  </div>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verify your Phreezer account</title></head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:monospace;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0a0a;min-height:100vh;">
+    <tr><td align="center" style="padding:40px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
+
+        <!-- LOGO -->
+        <tr><td style="padding-bottom:6px;">
+          <span style="font-family:monospace;font-size:22px;letter-spacing:8px;color:#00e0d0;font-weight:bold;">❄ PHREEZER</span>
+        </td></tr>
+        <tr><td style="padding-bottom:32px;">
+          <span style="font-family:monospace;font-size:10px;letter-spacing:4px;color:rgba(0,224,208,0.5);">RATE. TRACK. RELIVE.</span>
+        </td></tr>
+
+        <!-- DIVIDER -->
+        <tr><td style="border-top:1px solid rgba(0,224,208,0.2);padding-bottom:32px;"></td></tr>
+
+        <!-- HEADING -->
+        <tr><td style="padding-bottom:16px;">
+          <span style="font-family:monospace;font-size:14px;letter-spacing:4px;color:#33ff33;font-weight:bold;">VERIFY YOUR EMAIL</span>
+        </td></tr>
+
+        <!-- BODY -->
+        <tr><td style="padding-bottom:32px;">
+          <p style="font-family:monospace;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.65);margin:0;">
+            You're almost in the Phreezer.<br>
+            Click below to verify your email address and activate your account.<br><br>
+            This link expires in 24 hours.
+          </p>
+        </td></tr>
+
+        <!-- BUTTON -->
+        <tr><td style="padding-bottom:40px;">
+          <a href="${verifyUrl}" style="display:inline-block;padding:16px 32px;background-color:#ff6600;color:#000000;font-family:monospace;font-size:12px;font-weight:bold;letter-spacing:3px;text-decoration:none;">VERIFY MY EMAIL</a>
+        </td></tr>
+
+        <!-- DIVIDER -->
+        <tr><td style="border-top:1px solid rgba(51,255,51,0.1);padding-bottom:24px;"></td></tr>
+
+        <!-- FOOTER -->
+        <tr><td>
+          <p style="font-family:monospace;font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;margin:0;">
+            If you didn't create a Phreezer account, ignore this email.<br>
+            Questions? Reply to this email or visit <a href="https://phreezer.mpgink.com" style="color:rgba(0,224,208,0.5);text-decoration:none;">phreezer.mpgink.com</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
 </body>
 </html>`;
 }
 
 function successPage() {
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Phreezer — Verified</title>
-<style>
-  body { background: #0a0a0a; color: #33ff33; font-family: monospace; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-  .box { text-align: center; border: 1px solid rgba(0,224,208,0.3); padding: 48px 40px; max-width: 420px; }
-  .logo { font-size: 1.4rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 8px; }
-  .check { font-size: 2.5rem; margin: 24px 0; }
-  h2 { font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 12px; color: #33ff33; }
-  p { font-size: 0.7rem; color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 28px; }
-  a { display: inline-block; padding: 12px 24px; background: #ff6600; color: #000; font-family: monospace; font-size: 0.7rem; letter-spacing: 2px; text-decoration: none; font-weight: bold; }
-</style></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Phreezer — Verified</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #0a0a0a; }
+    body {
+      font-family: monospace;
+      color: #33ff33;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .logo { font-size: 1.3rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 4px; }
+    .tagline { font-size: 0.55rem; letter-spacing: 3px; color: rgba(0,224,208,0.45); margin-bottom: 48px; }
+    .check { font-size: 3rem; color: #33ff33; margin-bottom: 20px; }
+    .heading { font-size: 1rem; letter-spacing: 4px; color: #33ff33; margin-bottom: 12px; }
+    .sub { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; text-align: center; }
+    .btn {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      background: #ff6600;
+      color: #000;
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-decoration: none;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .support {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: rgba(0,224,208,0.4);
+      text-decoration: none;
+      text-align: center;
+    }
+    .support:hover { color: rgba(0,224,208,0.7); }
+    .divider {
+      width: 100%;
+      max-width: 320px;
+      border: none;
+      border-top: 1px solid rgba(51,255,51,0.08);
+      margin: 32px 0;
+    }
+  </style>
+</head>
 <body>
-  <div class="box">
-    <div class="logo">❄ PHREEZER</div>
-    <div class="check">✓</div>
-    <h2>EMAIL VERIFIED</h2>
-    <p>You're in. Head back to the app and log in.</p>
-    <a href="https://phreezer.mpgink.com">OPEN PHREEZER</a>
-  </div>
+  <div class="logo">❄ PHREEZER</div>
+  <div class="tagline">RATE. TRACK. RELIVE.</div>
+  <div class="check">✓</div>
+  <div class="heading">EMAIL VERIFIED</div>
+  <div class="sub">You're in. Head back to the app and log in.</div>
+  <a href="https://phreezer.mpgink.com" class="btn">OPEN PHREEZER</a>
+  <hr class="divider">
+  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
 
 function expiredPage(email) {
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Phreezer — Link Expired</title>
-<style>
-  body { background: #0a0a0a; color: #33ff33; font-family: monospace; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-  .box { text-align: center; border: 1px solid rgba(255,102,0,0.3); padding: 48px 40px; max-width: 420px; }
-  .logo { font-size: 1.4rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 8px; }
-  .icon { font-size: 2.5rem; margin: 24px 0; color: #ff6600; }
-  h2 { font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 12px; color: #ff6600; }
-  p { font-size: 0.7rem; color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 28px; }
-  a { display: inline-block; padding: 12px 24px; background: #ff6600; color: #000; font-family: monospace; font-size: 0.7rem; letter-spacing: 2px; text-decoration: none; font-weight: bold; }
-</style></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Phreezer — Link Expired</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #0a0a0a; }
+    body {
+      font-family: monospace;
+      color: #33ff33;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .logo { font-size: 1.3rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 4px; }
+    .tagline { font-size: 0.55rem; letter-spacing: 3px; color: rgba(0,224,208,0.45); margin-bottom: 48px; }
+    .icon { font-size: 3rem; color: #ff6600; margin-bottom: 20px; }
+    .heading { font-size: 1rem; letter-spacing: 4px; color: #ff6600; margin-bottom: 12px; }
+    .sub { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; text-align: center; }
+    .btn {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      background: #ff6600;
+      color: #000;
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-decoration: none;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .support {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: rgba(0,224,208,0.4);
+      text-decoration: none;
+      text-align: center;
+    }
+    .divider {
+      width: 100%;
+      max-width: 320px;
+      border: none;
+      border-top: 1px solid rgba(51,255,51,0.08);
+      margin: 32px 0;
+    }
+  </style>
+</head>
 <body>
-  <div class="box">
-    <div class="logo">❄ PHREEZER</div>
-    <div class="icon">⚠</div>
-    <h2>LINK EXPIRED</h2>
-    <p>That verification link is no longer valid.<br>Head back to the app and request a new one.</p>
-    <a href="https://phreezer.mpgink.com">BACK TO PHREEZER</a>
-  </div>
+  <div class="logo">❄ PHREEZER</div>
+  <div class="tagline">RATE. TRACK. RELIVE.</div>
+  <div class="icon">⚠</div>
+  <div class="heading">LINK EXPIRED</div>
+  <div class="sub">That verification link is no longer valid.<br>Head back to the app and request a new one.</div>
+  <a href="https://phreezer.mpgink.com" class="btn">BACK TO PHREEZER</a>
+  <hr class="divider">
+  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
 
 function errorPage(msg) {
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Phreezer — Error</title>
-<style>
-  body { background: #0a0a0a; color: #33ff33; font-family: monospace; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-  .box { text-align: center; border: 1px solid rgba(255,0,0,0.3); padding: 48px 40px; max-width: 420px; }
-  .logo { font-size: 1.4rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 8px; }
-  h2 { font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 12px; color: #ff3333; }
-  p { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-bottom: 28px; }
-  a { display: inline-block; padding: 12px 24px; background: #ff6600; color: #000; font-family: monospace; font-size: 0.7rem; letter-spacing: 2px; text-decoration: none; font-weight: bold; }
-</style></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Phreezer — Error</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #0a0a0a; }
+    body {
+      font-family: monospace;
+      color: #33ff33;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .logo { font-size: 1.3rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 4px; }
+    .tagline { font-size: 0.55rem; letter-spacing: 3px; color: rgba(0,224,208,0.45); margin-bottom: 48px; }
+    .heading { font-size: 1rem; letter-spacing: 4px; color: #ff3333; margin-bottom: 12px; }
+    .sub { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; text-align: center; }
+    .btn {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      background: #ff6600;
+      color: #000;
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-decoration: none;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .support {
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: rgba(0,224,208,0.4);
+      text-decoration: none;
+      text-align: center;
+    }
+    .divider {
+      width: 100%;
+      max-width: 320px;
+      border: none;
+      border-top: 1px solid rgba(51,255,51,0.08);
+      margin: 32px 0;
+    }
+  </style>
+</head>
 <body>
-  <div class="box">
-    <div class="logo">❄ PHREEZER</div>
-    <h2>SOMETHING WENT WRONG</h2>
-    <p>${msg}</p>
-    <a href="https://phreezer.mpgink.com">BACK TO PHREEZER</a>
-  </div>
+  <div class="logo">❄ PHREEZER</div>
+  <div class="tagline">RATE. TRACK. RELIVE.</div>
+  <div class="heading">SOMETHING WENT WRONG</div>
+  <div class="sub">${msg}</div>
+  <a href="https://phreezer.mpgink.com" class="btn">BACK TO PHREEZER</a>
+  <hr class="divider">
+  <a href="mailto:support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
 </body>
 </html>`;
 }
