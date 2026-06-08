@@ -176,9 +176,12 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
     return (
       <div className="ebenezer-rail rail-collapsed" onClick={() => setRailOpen(true)} title="Open Uncle Ebenezer" style={{ cursor: 'pointer' }}>
         <div className="ebenezer-rail-collapsed-strip">
-          <span style={{ fontSize: '2rem', color: 'var(--orange)', textShadow: '0 0 16px rgba(255,102,0,0.6)' }}>❄</span>
-          <span className="ebenezer-rail-collapsed-label" style={{ fontSize: '0.52rem', letterSpacing: '3px' }}>UNCLE EBENEZER</span>
-          <div style={{ width: 28, height: 28, border: '1px solid rgba(255,102,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--orange)', fontSize: '0.75rem' }}>◀</div>
+          <button
+            style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.35)', color: 'var(--orange)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, fontSize: '0.75rem' }}
+            onClick={(e) => { e.stopPropagation(); setRailOpen(true); }}
+          >◀</button>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)', writing-mode: 'vertical-rl', transform: 'rotate(180deg)', fontWeight: 700 }}>EBENEZER</span>
+          <span style={{ fontSize: '1.8rem', color: 'var(--orange)', textShadow: '0 0 16px rgba(255,102,0,0.6)' }}>❄</span>
         </div>
       </div>
     );
@@ -188,20 +191,21 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
     <div className="ebenezer-rail">
       {/* Header */}
       <div className="ebenezer-rail-header">
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(255,102,0,0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: 5, letterSpacing: '1px' }}>jaded vet · show analyst · discovery engine</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(255,102,0,0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,102,0,0.55)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, marginLeft: 8 }}>
           {history.length > 0 && (
-            <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
+            <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
           )}
-          <button onClick={() => setRailOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.75rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title="Collapse">▶</button>
+          <button onClick={() => setRailOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.35)', color: 'var(--orange)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, fontSize: '0.75rem' }} title="Collapse">▶</button>
         </div>
       </div>
       <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} compact />
     </div>
   );
 }
+
 
 
