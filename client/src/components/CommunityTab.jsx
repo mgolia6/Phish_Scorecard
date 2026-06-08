@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { FullPageLoader } from './FullPageLoader';
-import { Heatmap } from './Heatmap';
 import { formatDate } from '../utils';
 
 export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', accent = 'var(--cyan)', children }) {
@@ -348,7 +347,6 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
           { label: 'TOP VENUE AVG', value: topVenues?.venues?.[0]?.avg_score || '—', color: 'var(--green)' },
           { label: 'TOP VENUE', value: topVenues?.venues?.[0]?.venue || '—', color: 'var(--cyan)', small: true },
         ]} />
-        <Heatmap data={stateMap} title="COMMUNITY RATINGS BY STATE" />
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>TOP VENUES — TAP FOR TOP SHOWS</div>
         {(topVenues?.venues || []).map((venue, i) => (
           <CommExpandCard key={venue.venue} name={venue.venue}
@@ -376,7 +374,6 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
           { label: 'TOP STATE AVG', value: s?.top_state?.avg_score || '—', color: 'var(--green)' },
           { label: 'BOTTOM STATE', value: s?.bottom_state?.state || '—', color: 'var(--cyan)' },
         ]} />
-        <Heatmap data={stateMap} title="COMMUNITY RATINGS BY STATE" />
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>STATE RANKINGS — TAP TO EXPAND</div>
         {states.map((st, i) => {
           const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
