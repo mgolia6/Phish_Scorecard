@@ -386,7 +386,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ STANDING ON SHOULDERS</div>
                 {[
                   ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
-                  ['PHISH.IN', 'Live audio archives. Stream what you're rating.', 'https://phish.in'],
+                  ['PHISH.IN', 'Live audio archives. Stream what you\'re rating.', 'https://phish.in'],
                   ['ANTHROPIC', 'AI powering Vibe Check and Uncle Ebenezer.', 'https://anthropic.com'],
                 ].map(([name, desc, href]) => (
                   <div key={name} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(51,255,51,0.06)' }}>
