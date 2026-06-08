@@ -11,8 +11,9 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
   ];
 
-  const communityItems = [
-    { id: 'community',       label: 'LEADERBOARD',     glyph: '★', top: true },
+  // Community: leaderboard is top, rest are sub under it
+  const communityTop = { id: 'community', label: 'LEADERBOARD', glyph: '★' };
+  const communitySubItems = [
     { id: 'top-shows',       label: 'TOP SHOWS',       glyph: '◈' },
     { id: 'top-songs',       label: 'TOP SONGS',       glyph: '♪' },
     { id: 'top-venues',      label: 'TOP VENUES',      glyph: '⌖' },
@@ -20,9 +21,10 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
   ];
 
-  const renderBtn = (item) => {
+  const isCommunityActive = ['community','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab);
+
+  const renderItem = (item, isSubItem = false) => {
     const disabled = item.authRequired && !user;
-    const isSubItem = !item.top && item.id !== 'scorecard';
     return (
       <button
         key={item.id}
@@ -37,8 +39,8 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     );
   };
 
-  const collapsedDot = (color) => (
-    <div className="sidebar-section-dot">
+  const sectionDot = (color) => (
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
       <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}` }} />
     </div>
   );
@@ -72,31 +74,37 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
         {/* NAV */}
         <nav className="sidebar-nav">
 
-          {/* MY PHREEZER */}
+          {/* MY PHREEZER — section label, items flat (no sub-indent) */}
           {expanded
             ? <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>
-            : collapsedDot('var(--cyan)')
+            : sectionDot('var(--cyan)')
           }
-          {myPhreezerItems.map(renderBtn)}
+          {myPhreezerItems.map(item => renderItem(item, false))}
 
-          {/* COMMUNITY */}
+          {/* COMMUNITY — section label, leaderboard top-level, rest sub */}
           {expanded
             ? <div className="sidebar-section-label section-community">★ COMMUNITY</div>
-            : collapsedDot('var(--orange)')
+            : sectionDot('var(--orange)')
           }
-          {communityItems.map(renderBtn)}
+          {renderItem(communityTop, false)}
+          {communitySubItems.map(item => renderItem(item, true))}
 
-          {/* SCORECARD — standalone, largest */}
+          {/* SCORECARD — standalone, section label IS the nav target */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
-          {expanded
-            ? (
-              <div className="sidebar-section-label section-scorecard">
-                ◈ SCORECARD
-              </div>
-            )
-            : collapsedDot('var(--green)')
-          }
-          {renderBtn({ id: 'scorecard', label: 'SCORECARD', glyph: '◈', top: true })}
+          {expanded ? (
+            <div
+              className={`sidebar-section-label section-scorecard ${tab === 'scorecard' ? 'active' : ''}`}
+              onClick={() => setTab('scorecard')}
+              style={{ padding: '14px 16px 14px' }}
+            >
+              ◈ SCORECARD
+            </div>
+          ) : (
+            <>
+              {sectionDot('var(--green)')}
+              {renderItem({ id: 'scorecard', label: 'SCORECARD', glyph: '◈' }, false)}
+            </>
+          )}
 
         </nav>
 
@@ -108,6 +116,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
                 className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
                 onClick={onOpenProfile}
                 title="My Profile"
+                style={{ cursor: 'pointer' }}
               >
                 <div className="sidebar-avatar">
                   {user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}
@@ -115,7 +124,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
                 {expanded && (
                   <div style={{ overflow: 'hidden' }}>
                     <div className="sidebar-username">{user.username}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '1px', marginTop: 2 }}>VIEW PROFILE</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>VIEW PROFILE</div>
                   </div>
                 )}
               </div>
@@ -136,16 +145,26 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
               </button>
             </>
           )}
+
+          {/* COLLAPSE TOGGLE — always visible */}
           <button
             className="sidebar-nav-btn"
             onClick={() => setExpanded(e => !e)}
-            style={{ color: 'rgba(51,255,51,0.3)', fontSize: '0.55rem', letterSpacing: '2px', borderTop: '1px solid var(--border)', justifyContent: expanded ? 'flex-start' : 'center' }}
+            style={{
+              borderTop: '1px solid var(--border)',
+              color: 'rgba(51,255,51,0.35)',
+              fontSize: '0.55rem',
+              letterSpacing: '2px',
+              justifyContent: expanded ? 'flex-start' : 'center',
+              marginTop: 4,
+            }}
+            title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             <span className="sidebar-nav-glyph">{expanded ? '◀' : '▶'}</span>
             {expanded && <span className="sidebar-nav-label">COLLAPSE</span>}
           </button>
-        </div>
 
+        </div>
       </aside>
     </div>
   );
