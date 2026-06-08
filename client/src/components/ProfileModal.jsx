@@ -353,14 +353,8 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 
               <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ ORIGIN STORY</div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 12px' }}>
-                  Been part of this community for a long time. Always in awe of what the fans at Phish.net built — the reviews, the forums, the data, the obsession. I've contributed my own reviews and been part of the conversations for years.
-                </p>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 12px' }}>
-                  What I kept wanting was a way to rate — not just review. To score individual songs, track what I'd seen, and let the data tell me things about my own history with this band. Phish.net didn't have that. So I built it.
-                </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0 }}>
-                  Phreezer is built on top of the community's work — the setlist data, the audio archives, the decades of fan documentation — and tries to add a layer that complements what's already there.
+                  Coming soon.
                 </p>
               </div>
 
