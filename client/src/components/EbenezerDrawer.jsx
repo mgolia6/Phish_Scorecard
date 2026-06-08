@@ -91,10 +91,10 @@ export function EbenezerDrawer({ api }) {
           borderRadius: open ? '50%' : 26,
           paddingLeft: open ? 0 : 16,
           paddingRight: open ? 0 : 16,
-          background: open ? 'var(--bg-panel)' : 'rgba(255,102,0,0.92)',
+           display: open ? 'none' : 'flex',
+           background: 'rgba(255,102,0,0.92)',
           border: `2px solid ${open ? 'rgba(51,255,51,0.3)' : 'var(--orange)'}`,
           color: open ? 'rgba(51,255,51,0.6)' : '#000',
-          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 6,
@@ -106,10 +106,7 @@ export function EbenezerDrawer({ api }) {
         }}
         title="Uncle Ebenezer · Jaded Vet"
       >
-        {open
-          ? <span style={{ fontSize: '1.1rem', color: 'rgba(51,255,51,0.6)' }}>✕</span>
-          : <><span style={{ fontSize: '1.2rem' }}>❄</span><span style={{ fontSize: '0.48rem', letterSpacing: '2px', fontWeight: 700 }}>ASK</span></>
-        }
+        <><span style={{ fontSize: '1.2rem' }}>❄</span><span style={{ fontSize: '0.48rem', letterSpacing: '2px', fontWeight: 700 }}>ASK</span></>
       </button>
 
 
@@ -146,14 +143,20 @@ export function EbenezerDrawer({ api }) {
               jaded vet · show analyst · discovery engine
             </div>
           </div>
-          {history.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {history.length > 0 && (
+              <button
+                onClick={() => setHistory([])}
+                style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}
+              >
+                CLEAR
+              </button>
+            )}
             <button
-              onClick={() => setHistory([])}
-              style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}
-            >
-              CLEAR
-            </button>
-          )}
+              onClick={() => setOpen(false)}
+              style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+            >✕</button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -236,7 +239,6 @@ export function EbenezerDrawer({ api }) {
         {/* Input */}
         <div style={{
           padding: '10px 14px 16px',
-          paddingRight: 80,
           borderTop: '1px solid rgba(255,102,0,0.15)',
           display: 'flex',
           gap: 8,
@@ -268,9 +270,9 @@ export function EbenezerDrawer({ api }) {
             disabled={loading || !input.trim()}
             style={{
               padding: '0 16px',
-              background: loading || !input.trim() ? 'transparent' : 'rgba(255,102,0,0.15)',
-              border: '1px solid rgba(255,102,0,0.5)',
-              color: loading || !input.trim() ? 'rgba(255,102,0,0.3)' : 'var(--orange)',
+              background: loading || !input.trim() ? 'rgba(255,102,0,0.1)' : 'var(--orange)',
+              border: '2px solid var(--orange)',
+              color: loading || !input.trim() ? 'rgba(255,102,0,0.3)' : '#000',
               fontFamily: 'var(--font-display)',
               fontSize: '0.48rem',
               letterSpacing: '2px',
