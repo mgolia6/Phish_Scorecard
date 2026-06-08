@@ -111,3 +111,91 @@
 4. **Profile tap-to-select questions** — vantage point, GA/seats, era preference
 5. **Rotate GitHub PAT** before starting
 6. Verify phish.in duration data is populating after FULL sync (check precise_show_count in result message)
+
+---
+
+## Session: 2026-06-07 (afternoon/evening — Deep Phreeze + Profile + Community pass)
+
+### Shipped
+
+**Deep Phreeze**
+- First/Last show rows: added ◈ indicator, removed href (onClick only → opens Scorecard overlay)
+- OTD carousel: switched from find() to filter() — shows ALL matching shows for today, ‹ N/total › nav
+- Longest show toggle: SONGS / TIME button pair, falls back to song count if duration_seconds unavailable
+- Most Heard: fixed "TAP TO LISTEN" label → "TAP TO EXPAND", expand shows top 5 versions with ▶ + GO TO SHOW
+- Encore Patterns: rebuilt from RankedList → custom render with last_date/last_venue + ▶ play button
+- Rarest Catches: same treatment — date/venue + ▶ play button per row
+- Streaks: added run start/end (tappable), songs heard, unique songs, states covered
+- Completionism section: removed entirely
+- Set breakdown tiles (SET I/II/ENCORE SONGS): removed — data lives in TOTAL SONGS HEARD expand
+- SYNC/FULL collapsed to single SYNC button — long press (1.5s) triggers full rebuild
+- SYNC button visually separated from ATTENDED/RATED tabs (margin, green border, glow)
+- Tap-to-expand factoids on all Hero and Tile cards (expand-below pattern, one open at a time)
+- YEARS OF PHISH renamed to YEARS WITH PHISH, factoid shows full span since first show
+
+**sync.js**
+- longest_run: added end date, songs_heard, unique_songs, states array
+- rarest_caught: added date + venue per song
+- most_common_encore: added last_date + last_venue per song
+- longest_show/set1/set2/encore: added duration_seconds
+- most_heard_attended: added versions array (top 5 dates+venues per song)
+- songAttendedVersions built from showsWithCache loop
+
+**Scorecard bug fix — sandwiched/reprised songs**
+- Songs keyed by globalIdx/posKey (pos_N) instead of song_name
+- ratings API: added song_position column (auto-migrates), upserts by position
+- ScorecardTab: annotates songs with globalIdx + posKey on load
+- ScorecardHelpers SetScore: uses posKey fallback
+
+**Community**
+- Top Shows: fixed stats query (was cross-joining, returning blank)
+- Top Venues: removed Heatmap from CommunityTab and MyVenuesTab
+- Leaderboard: added feedback_count and bugs_reported columns (JOIN on feedback table)
+- FeedbackModal: added "Bug Report" as a PASSIVE_SECTIONS option
+
+**Profile**
+- INFO tab: full aesthetic overhaul — cyan left border, ◈ headers, bigger fonts, proper spacing
+- Tap-to-select questions added: WHERE DO YOU USUALLY SIT (Floor/Reserved/Lawn), FAVORITE ERA, MIKE/PAGE SIDE, DANCE/CHILL
+- HOW DO YOU EXPERIENCE PHISH question removed
+- Profile API: added stage_side, show_vibe columns with auto-migration
+- ABOUT tab added: Origin Story, What This Is, Built By (mpgink + BMaC), Standing on Shoulders (phish.net/phish.in/Anthropic)
+- BADGES tab: fixed black screen — ALL_BADGES_DEF was defined in MyPhriends but not in ProfileModal, added it
+- initialSection prop added to ProfileModal so Easter egg and programmatic opens can target a specific tab
+
+**My Songs**
+- Removed ★ star from expanded version rating display
+
+**Holographic gradient text**
+- Applied to: UNCLE EBENEZER (all instances), JADED VET (new subtitle, own line), QUICK PHREEZE, IMPORT button, RATE button (OTD), SEARCH buttons (MyPhriends + CommunityTab)
+
+**Uncle Ebenezer**
+- Title updated to UNCLE EBENEZER / JADED VET (two lines, both holographic)
+
+**Easter egg**
+- Triple-tap DON'T SUCK AT PHISH marquee → opens ProfileModal to ABOUT tab
+- Logo triple-tap remains admin access
+
+**How-to steps**
+- All 6 steps rewritten: clearer, accurate, added attendance tracking as step 4, removed joke ending
+
+### Build failures this session (root cause documented)
+- ScorecardTab step 03: partial str.replace spliced old+new tags → `<spa<div`
+- MyPhriends/CommunityTab SEARCH buttons: duplicate `background` key from holographic patch
+- ProfileModal settings: JSX comment missing closing `}`, plus missing `</div>` for info wrapper
+- All caused by editing stale /tmp copies without re-pulling from GitHub between patches
+
+### Process fix for next session
+- Pull fresh from GitHub immediately before EVERY edit, not just at start of a block
+
+### Decisions
+- Expand-below (not flip) for Deep Phreeze card factoids — cleaner on mobile 2-col layout
+- SYNC = smart incremental, long-press = full rebuild — no second button exposed
+- Phish Phreeze (band-level stats tab) scoped but not built — next session
+
+### Next session priorities
+1. **Phish Phreeze** — band-level stats subtab in Community (shows played, songs, hours, days of week, months, countries)
+2. **Rate limiting on auth endpoints** — Priority 1 security
+3. **Top Shows blank** — needs more user ratings to populate (only 7 shows rated)
+4. **Verify sandwiched song fix** on a real show with reprises (e.g. Mike's Song > something > Mike's Song)
+5. **Deep Phreeze SYNC** — run a full sync to populate new data fields (rarest date/venue, encore last_date, run detail)
+6. **Desktop UAT pass** still pending
