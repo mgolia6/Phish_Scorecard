@@ -116,9 +116,22 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         <button
           onClick={send}
           disabled={loading || !input.trim()}
-          style={{ padding: '0 16px', background: loading || !input.trim() ? 'rgba(255,102,0,0.1)' : 'var(--orange)', border: '2px solid var(--orange)', color: loading || !input.trim() ? 'rgba(255,102,0,0.3)' : '#000', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', cursor: loading || !input.trim() ? 'default' : 'pointer', flexShrink: 0, fontWeight: 700, boxShadow: loading || !input.trim() ? 'none' : '0 0 12px rgba(255,102,0,0.2)' }}
+          style={{
+            width: 52, height: 52, borderRadius: '50%',
+            background: loading || !input.trim() ? 'rgba(255,102,0,0.15)' : 'rgba(255,102,0,0.92)',
+            border: '2px solid var(--orange)',
+            color: loading || !input.trim() ? 'rgba(255,102,0,0.3)' : '#000',
+            cursor: loading || !input.trim() ? 'default' : 'pointer',
+            flexShrink: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+            boxShadow: loading || !input.trim() ? 'none' : '0 0 16px rgba(255,102,0,0.5)',
+            transition: 'all 0.2s',
+          }}
         >
-          SEND
+          <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>❄</span>
+          <span style={{ fontSize: '0.4rem', letterSpacing: '1.5px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+            {loading ? '...' : 'SEND'}
+          </span>
         </button>
       </div>
     </>
@@ -202,6 +215,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
     </div>
   );
 }
+
 
 
 
