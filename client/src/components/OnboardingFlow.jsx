@@ -79,18 +79,28 @@ export function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecar
 }
 
 export function ProfileSetupModal({ api, onComplete }) {
+  // ── state ──────────────────────────────────────────────────────────────────
+  const [step, setStep] = useState('handle');        // 'handle' | 'importing' | 'questions'
   const [phishnetUsername, setPhishnetUsername] = useState('');
   const [confirmedHandle, setConfirmedHandle] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importCount, setImportCount] = useState(null);
+  const [importError, setImportError] = useState('');
+
+  // profile question state
   const [favoriteSong, setFavoriteSong] = useState('');
   const [favoriteVenue, setFavoriteVenue] = useState('');
   const [favoriteShowDate, setFavoriteShowDate] = useState('');
   const [favoriteShowLabel, setFavoriteShowLabel] = useState('');
   const [songs, setSongs] = useState([]);
   const [venues, setVenues] = useState([]);
-  const [importing, setImporting] = useState(false);
-  const [importCount, setImportCount] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [step, setStep] = useState('import');
+
+  const S = {
+    label: { fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2.5px', color: 'var(--text-label)', marginBottom: 8, display: 'block' },
+    hint: { fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 5 },
+    field: { marginBottom: 18 },
+  };
 
   const loadOptions = async () => {
     try {
@@ -109,11 +119,11 @@ export function ProfileSetupModal({ api, onComplete }) {
     } catch (e) {}
   };
 
-  useEffect(() => { loadOptions(); }, []);
-
+  // ── handlers ───────────────────────────────────────────────────────────────
   const handleImport = async () => {
     if (!phishnetUsername.trim() || !confirmedHandle) return;
     setImporting(true);
+    setImportError('');
     try {
       const [attRes, revRes] = await Promise.all([
         api.post('/import/phishnet', { phishnet_username: phishnetUsername.trim() }).catch(() => ({ imported: 0 })),
@@ -121,9 +131,17 @@ export function ProfileSetupModal({ api, onComplete }) {
       ]);
       setImportCount({ attendance: attRes.imported || 0, reviews: revRes.imported || 0 });
       await loadOptions();
-      setStep('success');
-    } catch (e) {}
-    finally { setImporting(false); }
+      setStep('questions');
+    } catch (e) {
+      setImportError('Import failed. Check your username and try again.');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    await loadOptions();
+    setStep('questions');
   };
 
   const handleSave = async () => {
@@ -139,195 +157,152 @@ export function ProfileSetupModal({ api, onComplete }) {
     onComplete();
   };
 
-  const S = {
-    field: { marginBottom: 18 },
-    label: { fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2.5px', color: 'var(--text-label)', marginBottom: 8, display: 'block' },
-    hint: { fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 5 },
-  };
+  // ── STEP: handle ───────────────────────────────────────────────────────────
+  if (step === 'handle') {
+    return (
+      <div className="modal-overlay" style={{ zIndex: 850 }}>
+        <div className="modal" style={{ maxWidth: 480 }}>
+          <div className="modal-title">SET UP YOUR PROFILE</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(51,255,51,0.5)', marginBottom: 24, lineHeight: 1.6 }}>
+            Import your history from phish.net to unlock your stats and Deep Phreeze.
+          </div>
 
-  return (
-    <div className="modal-overlay" style={{ zIndex: 850 }}>
-      <div className="modal" style={{ maxWidth: 480, maxHeight: '90vh', overflowY: 'auto' }}>
+          {/* phish.net input */}
+          <div style={S.field}>
+            <label style={S.label}>PHISH.NET USERNAME</label>
+            <input
+              type="text"
+              placeholder="e.g. your_username"
+              value={phishnetUsername}
+              className="modal-input"
+              onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
+            />
+            <div style={S.hint}>Optional — unlocks your full history, stats, and Deep Phreeze.</div>
+          </div>
 
-        {step === 'import' && (
-          <>
-            <div className="modal-title">SET UP YOUR PROFILE</div>
-            <div style={{ fontSize: '0.7rem', color: 'rgba(51,255,51,0.5)', letterSpacing: '1px', marginBottom: 24, lineHeight: 1.6 }}>
-              Import your history from phish.net to unlock your stats, song dropdowns, and Deep Phreeze.
+          {/* confirm checkbox — only shows when username entered */}
+          {phishnetUsername.trim() && (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 20, cursor: 'pointer' }}
+              onClick={() => setConfirmedHandle(v => !v)}>
+              <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)}
+                style={{ flexShrink: 0, marginTop: 3, accentColor: 'var(--orange)', width: 16, height: 16 }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(51,255,51,0.75)', lineHeight: 1.5 }}>
+                I confirm this is my phish.net account
+              </span>
             </div>
+          )}
 
-            <div style={S.field}>
-              <label style={S.label}>PHISH.NET USERNAME</label>
-              <input
-                type="text"
-                placeholder="e.g. your_username"
-                value={phishnetUsername}
-                className="modal-input"
-                onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
-              />
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(51,255,51,0.3)', marginTop: 6, letterSpacing: '0.5px' }}>
-                Optional — but unlocks your full history, stats, and Deep Phreeze.
-              </div>
-              {phishnetUsername && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10, cursor: 'pointer' }} onClick={() => setConfirmedHandle(v => !v)}>
-                  <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)} style={{ flexShrink: 0, marginTop: 3, accentColor: 'var(--orange)', width: 16, height: 16 }} />
-                  <span style={{ fontSize: '0.72rem', color: 'rgba(51,255,51,0.75)', letterSpacing: '0.5px', lineHeight: 1.5 }}>I confirm this is my phish.net account</span>
-                </div>
-              )}
-            </div>
-
-            <div style={{ opacity: 0.3, pointerEvents: 'none', marginBottom: 20 }}>
-              <div style={S.field}>
-                <label style={S.label}>FAVORITE SONG</label>
-                <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-elevated)' }}>
-                  — import first to unlock —
-                </div>
-              </div>
-              <div style={S.field}>
-                <label style={S.label}>FAVORITE VENUE</label>
-                <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-elevated)' }}>
-                  — import first to unlock —
-                </div>
-              </div>
-            </div>
-
+          {/* import button — only shows when username + confirmed */}
+          {phishnetUsername.trim() && confirmedHandle && (
             <button
               className="btn-primary"
-              style={{ width: '100%', padding: '14px', marginBottom: 10, fontSize: '0.65rem', opacity: (!phishnetUsername || !confirmedHandle) ? 0.4 : 1 }}
+              style={{ width: '100%', padding: '14px', marginBottom: 12 }}
               onClick={handleImport}
-              disabled={importing || !phishnetUsername || !confirmedHandle}
+              disabled={importing}
             >
               {importing ? '◈ IMPORTING...' : '↓ IMPORT FROM PHISH.NET'}
             </button>
+          )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 12px' }}>
-              <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
-              <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+          {importError && (
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+              {importError}
             </div>
-            <button
-              style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}
-              onClick={() => setStep('guilt')}
-            >
-              I DON'T HAVE A PHISH.NET ACCOUNT
-            </button>
-          </>
-        )}
+          )}
 
-        {step === 'guilt' && (
-          <>
-            <div style={{ textAlign: 'center', padding: '10px 0 20px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 12, filter: 'grayscale(1)', opacity: 0.5 }}>❄</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 900, color: 'rgba(51,255,51,0.3)', letterSpacing: '3px', marginBottom: 16, lineHeight: 1.2 }}>
-                DON'T SUCK<br/>AT PHISH.
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
-                Your stats will be empty.<br/>
-                Your Deep Phreeze will be dark.<br/>
-                Your first show will be a mystery.
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(51,255,51,0.3)', letterSpacing: '2px', marginBottom: 28 }}>
-                ARE YOU SURE?
-              </div>
-            </div>
-            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10 }} onClick={() => setStep('import')}>
-              ◀ GO BACK AND IMPORT
-            </button>
-            <button
-              style={{ width: '100%', padding: '11px', background: 'transparent', border: '1px solid rgba(255,51,51,0.2)', color: 'rgba(255,51,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', cursor: 'pointer' }}
-              onClick={() => setStep('manual')}
-            >
-              PROCEED WITHOUT IMPORTING
-            </button>
-          </>
-        )}
+          {/* OR divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0 12px' }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+          </div>
 
-        {step === 'manual' && (
-          <>
-            <div className="modal-title">SET UP YOUR PROFILE</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,51,51,0.5)', letterSpacing: '1px', marginBottom: 20, lineHeight: 1.6, borderLeft: '2px solid rgba(255,51,51,0.3)', paddingLeft: 10 }}>
-              No import — entering manually. You can always import later from your profile.
-            </div>
-            <div style={S.field}>
-              <label style={S.label}>FAVORITE SONG</label>
-              <input type="text" placeholder="e.g. Tweezer" value={favoriteSong} className="modal-input" onChange={e => setFavoriteSong(e.target.value)} />
-            </div>
-            <div style={S.field}>
-              <label style={S.label}>FAVORITE VENUE</label>
-              <input type="text" placeholder="e.g. Madison Square Garden" value={favoriteVenue} className="modal-input" onChange={e => setFavoriteVenue(e.target.value)} />
-            </div>
-            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-              <button className="btn-primary" style={{ flex: 1, padding: '13px' }} onClick={handleSave} disabled={saving}>
-                {saving ? 'SAVING...' : 'SAVE PROFILE'}
-              </button>
-              <button style={{ flex: 1, padding: '13px' }} onClick={onComplete}>SKIP FOR NOW</button>
-            </div>
-          </>
-        )}
+          {/* skip */}
+          <button
+            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}
+            onClick={handleSkip}
+          >
+            I DON'T HAVE A PHISH.NET ACCOUNT
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-        {step === 'success' && (
-          <>
-            <div style={{ textAlign: 'center', padding: '10px 0 20px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: 10, animation: 'pulse 1s infinite' }}>❄</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 900, color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 8, textShadow: '0 0 30px rgba(0,255,255,0.5)' }}>
+  // ── STEP: questions ─────────────────────────────────────────────────────────
+  if (step === 'questions') {
+    return (
+      <div className="modal-overlay" style={{ zIndex: 850 }}>
+        <div className="modal" style={{ maxWidth: 480, maxHeight: '90vh', overflowY: 'auto' }}>
+
+          {/* import success banner */}
+          {importCount && (
+            <div style={{ textAlign: 'center', marginBottom: 24, padding: '16px', border: '1px solid rgba(0,224,208,0.2)', background: 'rgba(0,224,208,0.04)' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 900, color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 6, textShadow: '0 0 20px rgba(0,224,208,0.4)' }}>
                 PHROZEN IN.
               </div>
-              {importCount && (
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 6 }}>
-                  ✓ {importCount.attendance} SHOWS · {importCount.reviews} REVIEWS
-                </div>
-              )}
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
-                Your history is locked in.<br/>Now pick your favorites.
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px' }}>
+                ✓ {importCount.attendance} SHOWS · {importCount.reviews} REVIEWS
               </div>
             </div>
+          )}
 
-            <div style={S.field}>
-              <label style={S.label}>FAVORITE SONG</label>
-              {songs.length > 0 ? (
-                <select value={favoriteSong} onChange={e => setFavoriteSong(e.target.value)} className="era-select" style={{ width: '100%' }}>
-                  <option value="">— SELECT A SONG —</option>
-                  {songs.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              ) : (
-                <input type="text" placeholder="e.g. Tweezer" value={favoriteSong} className="modal-input" onChange={e => setFavoriteSong(e.target.value)} />
-              )}
-              {songs.length > 0 && <div style={S.hint}>{songs.length} songs from your ratings</div>}
-            </div>
+          <div className="modal-title">A FEW QUICK QUESTIONS</div>
 
-            <div style={S.field}>
-              <label style={S.label}>FAVORITE VENUE</label>
-              {venues.length > 0 ? (
-                <select value={favoriteVenue} onChange={e => setFavoriteVenue(e.target.value)} className="era-select" style={{ width: '100%' }}>
-                  <option value="">— SELECT A VENUE —</option>
-                  {venues.map((v, i) => (
-                    <option key={i} value={v.venue}>{v.venue}{v.city ? ` — ${v.city}${v.state ? `, ${v.state}` : ''}` : ''}</option>
-                  ))}
-                </select>
-              ) : (
-                <input type="text" placeholder="e.g. Madison Square Garden" value={favoriteVenue} className="modal-input" onChange={e => setFavoriteVenue(e.target.value)} />
-              )}
-              {venues.length > 0 && <div style={S.hint}>{venues.length} venues from your history</div>}
-            </div>
-
-            {favoriteShowDate && (
-              <div style={S.field}>
-                <label style={S.label}>FIRST SHOW ◈ AUTO-SET</label>
-                <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', background: 'rgba(0,224,208,0.04)' }}>
-                  {favoriteShowLabel}
-                </div>
-                <div style={S.hint}>Your earliest attended show</div>
-              </div>
+          {/* favorite song */}
+          <div style={S.field}>
+            <label style={S.label}>FAVORITE SONG</label>
+            {songs.length > 0 ? (
+              <select value={favoriteSong} onChange={e => setFavoriteSong(e.target.value)} className="era-select" style={{ width: '100%' }}>
+                <option value="">— SELECT A SONG —</option>
+                {songs.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            ) : (
+              <input type="text" placeholder="e.g. Tweezer" value={favoriteSong} className="modal-input" onChange={e => setFavoriteSong(e.target.value)} />
             )}
+          </div>
 
-            <button className="btn-primary" style={{ width: '100%', padding: '14px', marginTop: 8 }} onClick={handleSave} disabled={saving}>
-              {saving ? 'SAVING...' : "LET'S GO ◈"}
-            </button>
-          </>
-        )}
+          {/* favorite venue */}
+          <div style={S.field}>
+            <label style={S.label}>FAVORITE VENUE</label>
+            {venues.length > 0 ? (
+              <select value={favoriteVenue} onChange={e => setFavoriteVenue(e.target.value)} className="era-select" style={{ width: '100%' }}>
+                <option value="">— SELECT A VENUE —</option>
+                {venues.map((v, i) => (
+                  <option key={i} value={v.venue}>{v.venue}{v.city ? ` — ${v.city}${v.state ? `, ${v.state}` : ''}` : ''}</option>
+                ))}
+              </select>
+            ) : (
+              <input type="text" placeholder="e.g. Madison Square Garden" value={favoriteVenue} className="modal-input" onChange={e => setFavoriteVenue(e.target.value)} />
+            )}
+          </div>
 
+          {/* first show — auto-set if imported */}
+          {favoriteShowDate && (
+            <div style={S.field}>
+              <label style={S.label}>FIRST SHOW ◈ AUTO-SET</label>
+              <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', background: 'rgba(0,224,208,0.04)' }}>
+                {favoriteShowLabel}
+              </div>
+              <div style={S.hint}>Your earliest attended show</div>
+            </div>
+          )}
+
+          <button className="btn-primary" style={{ width: '100%', padding: '14px', marginBottom: 10, marginTop: 8 }} onClick={handleSave} disabled={saving}>
+            {saving ? 'SAVING...' : "LET'S GO ◈"}
+          </button>
+
+          <button
+            style={{ width: '100%', padding: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', cursor: 'pointer' }}
+            onClick={onComplete}
+          >
+            SKIP FOR NOW
+          </button>
+
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
+  return null;
+}
