@@ -187,46 +187,37 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         {/* Body */}
         <div className="profile-modal-body">
           {sec === 'info' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
               {/* Static fields */}
-              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '12px 14px' }}>
+              <div style={{ background: 'var(--bg-elevated)', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 14 }}>◈ YOUR PHISH IDENTITY</div>
                 {[
                   ['PHISH.NET HANDLE', profile?.phishnet_username],
                   ['FAVORITE SONG',    profile?.favorite_song],
                   ['FAVORITE VENUE',   profile?.favorite_venue],
                   ['FIRST SHOW',       profile?.favorite_show_date ? formatDate(profile.favorite_show_date) : null],
                 ].map(([label, val]) => (
-                  <div key={label} className="profile-field-row">
-                    <div className="profile-field-label">{label}</div>
-                    <div className="profile-field-val" style={{ color: val ? 'var(--white)' : 'var(--text-muted)', fontSize: val ? '0.92rem' : '0.8rem' }}>
-                      {val || (profile ? '—' : '...')}
+                  <div key={label} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 6 }}>{label}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: val ? 'var(--white)' : 'rgba(51,255,51,0.25)', lineHeight: 1.3 }}>
+                      {val || (profile ? 'not set' : '...')}
                     </div>
                   </div>
                 ))}
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: -6 }}>
+                  Edit these fields in phish.net import or contact support.
+                </div>
               </div>
 
-              {/* Vantage point */}
+              {/* Tap-to-select questions */}
               {[
                 {
                   label: 'WHERE DO YOU USUALLY SIT?',
                   field: 'vantage_point',
                   options: [
                     { val: 'floor', label: 'FLOOR' },
-                    { val: 'pit', label: 'PIT' },
-                    { val: 'lower-bowl', label: 'LOWER BOWL' },
-                    { val: 'upper-bowl', label: 'UPPER BOWL' },
+                    { val: 'reserved', label: 'RESERVED' },
                     { val: 'lawn', label: 'LAWN' },
-                    { val: 'balcony', label: 'BALCONY' },
-                    { val: 'anywhere', label: 'WHEREVER' },
-                  ]
-                },
-                {
-                  label: 'HOW DO YOU EXPERIENCE PHISH?',
-                  field: 'show_style',
-                  options: [
-                    { val: 'attended', label: 'IN PERSON' },
-                    { val: 'webcast', label: 'WEBCAST' },
-                    { val: 'both', label: 'BOTH' },
                   ]
                 },
                 {
@@ -260,103 +251,32 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   ]
                 },
               ].map(({ label, field, options }) => (
-                <div key={field} style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-label)', letterSpacing: '2px', marginBottom: 10 }}>{label}</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <div key={field} style={{ background: 'var(--bg-elevated)', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', padding: '16px 14px', marginBottom: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 14 }}>◈ {label}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {options.map(opt => {
                       const active = profile?.[field] === opt.val;
                       return (
                         <button key={opt.val} onClick={() => saveProfile({ [field]: active ? null : opt.val })} style={{
-                          padding: '7px 12px', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '1.5px',
-                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
-                          background: active ? 'rgba(0,224,208,0.1)' : 'transparent',
-                          color: active ? 'var(--cyan)' : 'var(--text-muted)',
+                          padding: '10px 16px',
+                          fontFamily: 'var(--font-display)',
+                          fontSize: '0.6rem',
+                          letterSpacing: '2px',
+                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.25)'}`,
+                          background: active ? 'rgba(0,224,208,0.12)' : 'rgba(0,0,0,0.3)',
+                          color: active ? 'var(--cyan)' : 'var(--text-label)',
                           cursor: 'pointer',
-                          boxShadow: active ? '0 0 8px rgba(0,224,208,0.2)' : 'none',
+                          boxShadow: active ? '0 0 12px rgba(0,224,208,0.25)' : 'none',
+                          transition: 'all 0.15s',
+                          textShadow: active ? '0 0 8px rgba(0,224,208,0.5)' : 'none',
                         }}>
-                          {active && '◈ '}{opt.label}
+                          {active ? '◈ ' : ''}{opt.label}
                         </button>
                       );
                     })}
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-          {sec === 'badges' && (
-            <BadgesSection api={api} />
-          )}
-          {sec === 'about' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-              {/* Origin */}
-              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ ORIGIN STORY</div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: '0 0 10px' }}>
-                  I've been part of the Phish community for a long time. Always in awe of what the fans at Phish.net built — the reviews, the forums, the data, the obsession. I've contributed my own reviews and been part of the conversations for years.
-                </p>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: '0 0 10px' }}>
-                  What I kept wanting was a way to rate — not just review. To score individual songs, track what I'd seen, and let the data tell me things about my own history with this band. Phish.net didn't have that. So I built it.
-                </p>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: 0 }}>
-                  Phreezer isn't meant to replace anything. It's built on top of the community's work — the setlist data, the audio archives, the decades of fan documentation — and tries to add a layer that complements what's already there.
-                </p>
-              </div>
-
-              {/* What it is */}
-              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ WHAT THIS IS</div>
-                {[
-                  ['RATE', 'Score every song in a show 1–5 stars. Build a record of how you actually hear the music.'],
-                  ['TRACK', 'Log what you've attended, webcast, or listened back. Your history, your way.'],
-                  ['RELIVE', 'Deep Phreeze surfaces patterns in your data you didn't know were there. When you see Phish, where, how often, what sticks.'],
-                ].map(([label, desc]) => (
-                  <div key={label} style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--orange)', letterSpacing: '2px', flexShrink: 0, paddingTop: 2,
-                      background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
-                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                      filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
-                    }}>{label}.</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-label)', lineHeight: 1.6 }}>{desc}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Built by */}
-              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ BUILT BY</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', marginBottom: 4 }}>mpgink</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 14 }}>
-                  Fan. Builder. Trying not to suck at Phish.
-                </div>
-                <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-                  className="btn-glow-cyan" style={{ display: 'block', textAlign: 'center', marginBottom: 0 }}>
-                  ◈ SUPPORT THE PHREEZER
-                </a>
-              </div>
-
-              {/* Data sources */}
-              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ STANDING ON SHOULDERS</div>
-                {[
-                  ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
-                  ['PHISH.IN', 'Live show audio archives. Stream what you're rating.', 'https://phish.in'],
-                  ['ANTHROPIC', 'AI powering Vibe Check and Uncle Ebenezer.', 'https://anthropic.com'],
-                ].map(([name, desc, href]) => (
-                  <div key={name} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid rgba(51,255,51,0.06)' }}>
-                    <a href={href} target="_blank" rel="noopener noreferrer"
-                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none' }}>
-                      {name} ↗
-                    </a>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
-                  </div>
-                ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', lineHeight: 1.6, marginTop: 4 }}>
-                  Phreezer is an independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
-                </div>
-              </div>
-
-            </div>
           )}
 
           {sec === 'settings' && (
