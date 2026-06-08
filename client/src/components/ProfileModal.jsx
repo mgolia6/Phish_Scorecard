@@ -293,6 +293,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   </div>
                 </div>
               ))}
+            </div>
           )}
 
           {sec === 'settings' && (
