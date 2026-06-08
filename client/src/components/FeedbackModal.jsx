@@ -105,7 +105,7 @@ export function PassiveFeedbackButton({ api }) {
       <button
         onClick={() => setOpen(true)}
         style={{
-          position: 'fixed', bottom: 80, right: 16, zIndex: 500,
+          position: 'fixed', bottom: 24, left: 16, zIndex: 500,
           background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.2)',
           color: 'rgba(51,255,51,0.45)', fontFamily: 'var(--font-display)',
           fontSize: '0.55rem', letterSpacing: '2px', padding: '10px 16px',
