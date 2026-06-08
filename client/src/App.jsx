@@ -44,6 +44,7 @@ export default function App() {
   const [scorecardOverlayDate, setScorecardOverlayDate] = useState(null);
   const [scorecardOverlayOrigin, setScorecardOverlayOrigin] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileInitSection, setProfileInitSection] = useState('info');
   const [headerHeight, setHeaderHeight] = useState(132);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
@@ -272,7 +273,17 @@ export default function App() {
         />
         <div className="main-area">
           <div className="marquee-bar">
-            <span className="marquee-track">
+            <span className="marquee-track" onClick={() => {
+                const now = Date.now();
+                if (!window._marqueeTaps) window._marqueeTaps = [];
+                window._marqueeTaps = window._marqueeTaps.filter(t => now - t < 800);
+                window._marqueeTaps.push(now);
+                if (window._marqueeTaps.length >= 3) {
+                  window._marqueeTaps = [];
+                  setProfileInitSection('about');
+                  setShowProfileModal(true);
+                }
+              }} style={{ cursor: 'default' }}>
               DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp; DON'T SUCK AT PHISH &nbsp;&nbsp;◈&nbsp;&nbsp;
             </span>
           </div>
@@ -402,7 +413,7 @@ export default function App() {
         </div>
       )}
 
-      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => setShowProfileModal(false)} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
+      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => { setShowProfileModal(false); setProfileInitSection('info'); }} initialSection={profileInitSection} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
 
       {feedbackModal && (
         <FeedbackModal type={feedbackModal} api={api} onClose={() => setFeedbackModal(null)} />
