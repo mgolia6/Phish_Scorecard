@@ -97,15 +97,16 @@ body::before {
 }
 .sidebar-tab {
   position: absolute;
-  right: -20px;
-  top: 14px;
-  width: 20px;
-  height: 32px;
+  right: -24px;
+  top: 0;
+  width: 24px;
+  height: 88px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-left: none;
-  color: var(--text-label);
-  font-size: 0.55rem;
+  border-top: none;
+  color: var(--cyan);
+  font-size: 0.7rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -113,8 +114,9 @@ body::before {
   z-index: 101;
   transition: all 0.15s;
   padding: 0;
+  box-shadow: 0 0 8px rgba(0,224,208,0.15);
 }
-.sidebar-tab:hover { color: var(--green); background: var(--bg-elevated); box-shadow: none; }
+.sidebar-tab:hover { color: var(--cyan); background: var(--bg-elevated); box-shadow: 0 0 12px rgba(0,224,208,0.3); }
 
 .sidebar-logo {
   display: flex;
@@ -238,13 +240,14 @@ body::before {
   min-width: 48px;
 }
 .ebenezer-rail-header {
-  padding: 16px 16px 14px;
+  padding: 0 16px;
   border-bottom: 2px solid rgba(255,102,0,0.3);
   background: rgba(255,102,0,0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
+  min-height: 88px;
 }
 .ebenezer-rail-collapsed-strip {
   display: flex;
@@ -1276,6 +1279,7 @@ select option { background: var(--bg); color: var(--green); }
 
   /* Hide floating ASK button on desktop — rail handles it */
   .ebenezer-float-btn { display: none !important; }
+  .passive-feedback-desktop { display: none !important; }
 
   /* Move feedback button so it doesn't overlap profile */
   .passive-feedback-btn {
@@ -1295,6 +1299,7 @@ select option { background: var(--bg); color: var(--green); }
   .sub-tab-btn { font-size: 0.68rem !important; padding: 9px 18px !important; }
   .marquee-track { font-size: 0.85rem; letter-spacing: 3px; }
   .ebenezer-float-btn { display: none !important; }
+  .passive-feedback-desktop { display: none !important; }
   .passive-feedback-btn { bottom: 16px; left: 50%; transform: translateX(-50%); right: auto; }
 }
 
@@ -1314,6 +1319,28 @@ select option { background: var(--bg); color: var(--green); }
   }
 }
 
+/* ── EBENEZER RAIL TOGGLE TAB ────────────────────────── */
+.ebenezer-rail-tab {
+  width: 24px;
+  height: 88px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(255,102,0,0.3);
+  border-right: none;
+  border-top: none;
+  color: var(--orange);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  padding: 0;
+  box-shadow: 0 0 8px rgba(255,102,0,0.15);
+  align-self: flex-start;
+}
+.ebenezer-rail-tab:hover { background: var(--bg-elevated); box-shadow: 0 0 12px rgba(255,102,0,0.3); }
+
 /* ── COLLAPSED SIDEBAR ───────────────────────────────── */
 .sidebar-collapsed .sidebar-nav-btn {
   padding: 10px 0;
@@ -1322,6 +1349,7 @@ select option { background: var(--bg); color: var(--green); }
 .sidebar-collapsed .sidebar-nav-glyph { font-size: 1.15rem; width: auto; }
 .sidebar-collapsed .sidebar-section-label { display: none; }
 .sidebar-section-dot { display: flex; justify-content: center; padding: 10px 0 4px; }
+
 
 
 
