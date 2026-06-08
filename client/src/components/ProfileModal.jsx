@@ -76,6 +76,22 @@ export function PhreezerAvatar({ seed, size = 52, color = '#00ffff' }) {
   );
 }
 
+const ALL_BADGES_DEF = [
+  { id: 'century',    label: 'CENTURY CLUB',    desc: 'Attended 100 shows',         glyph: '💯', color: 'var(--orange)' },
+  { id: 'fifty',      label: 'HALF-CENTURY',    desc: 'Attended 50 shows',          glyph: '★',  color: 'var(--cyan)'   },
+  { id: 'quarter',    label: 'QUARTER-CENTURY', desc: 'Attended 25 shows',          glyph: '◉',  color: 'var(--cyan)'   },
+  { id: 'ten',        label: 'DOUBLE DIGITS',   desc: 'Attended 10 shows',          glyph: '◈',  color: 'var(--cyan)'   },
+  { id: 'rated_100',  label: 'HALL OF PHAME',   desc: 'Rated 100 shows',            glyph: '🏆', color: 'var(--orange)' },
+  { id: 'rated_50',   label: 'ARCHIVIST',       desc: 'Rated 50 shows',             glyph: '⬡',  color: 'var(--green)'  },
+  { id: 'rated_25',   label: 'PHISH SCHOLAR',   desc: 'Rated 25 shows',             glyph: '▦',  color: 'var(--cyan)'   },
+  { id: 'rated_10',   label: 'PHAN OF 10',      desc: 'Rated 10 shows',             glyph: '✦',  color: 'var(--cyan)'   },
+  { id: 'rated_1',    label: 'FIRST PHREEZE',   desc: 'Rated your first show',      glyph: '❄',  color: 'var(--cyan)'   },
+  { id: 'critic',     label: 'PHISH CRITIC',    desc: 'Imported 10+ reviews',       glyph: '✍',  color: 'var(--green)'  },
+  { id: 'reviewer',   label: 'REVIEWER',        desc: 'Imported phish.net reviews', glyph: '✎',  color: 'var(--green)'  },
+  { id: 'streak_30',  label: 'ON FIRE',         desc: '30-day login streak',        glyph: '🔥', color: 'var(--orange)' },
+  { id: 'streak_7',   label: 'ON A STREAK',     desc: '7-day login streak',         glyph: '⚡', color: 'var(--orange)' },
+];
+
 export function BadgesSection({ api }) {
   const [kpi, setKpi] = useState(null);
   useEffect(() => { api.get('/user/kpi').then(setKpi).catch(() => {}); }, []);
