@@ -74,16 +74,7 @@ function MikeSaidNo({ email, onResent, onBack }) {
       <div className="modal" style={{ maxWidth: 460, textAlign: 'center' }}>
 
         {/* Big fish art */}
-        <div style={{ fontSize: '3.5rem', marginBottom: 4, lineHeight: 1 }}>🐟</div>
-        <div style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '0.5rem',
-          letterSpacing: '3px',
-          color: 'rgba(255,102,0,0.5)',
-          marginBottom: 20,
-        }}>
-          — MIKE GORDON, PROBABLY —
-        </div>
+        <div style={{ fontSize: '3.5rem', marginBottom: 16, lineHeight: 1 }}>🐟</div>
 
         <div style={{
           fontFamily: 'var(--font-display)',
@@ -105,8 +96,8 @@ function MikeSaidNo({ email, onResent, onBack }) {
           marginBottom: 20,
           lineHeight: 1.8,
         }}>
-          YOUR EMAIL ISN'T VERIFIED YET.<br />
-          CHECK YOUR INBOX TO GET IN.
+          UNAUTHORIZED. BACKSTAGE ACCESS DENIED.<br />
+          VERIFY YOUR EMAIL TO GET IN.
         </div>
 
         <div style={{
@@ -366,4 +357,5 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
     </div>
   );
 }
+
 
