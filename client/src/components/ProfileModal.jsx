@@ -189,9 +189,20 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         </div>
         {/* Identity hero */}
         <div className="profile-modal-hero">
-          <div className="profile-username-label">USERNAME</div>
-          <div className="profile-username">{user?.username}</div>
-          <div className="profile-email">{user?.email}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div className="profile-username-label">USERNAME</div>
+              <div className="profile-username">{user?.username}</div>
+              <div className="profile-email">{user?.email}</div>
+            </div>
+            <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer" style={{
+              fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px',
+              border: '1px solid rgba(255,140,0,0.4)', padding: '7px 10px', flexShrink: 0, marginTop: 2,
+              background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))', textDecoration: 'none',
+            }}>◈ SUPPORT</a>
+          </div>
         </div>
         {/* Section tabs */}
         <div className="profile-modal-tabs">
@@ -201,7 +212,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           ))}
         </div>
         {/* Body */}
-        <div className="profile-modal-body" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch', flex: 1 }}>
+        <div className="profile-modal-body">
 
           {/* ── MY PHISH TAB ── */}
           {sec === 'phish' && (
