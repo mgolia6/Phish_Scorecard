@@ -180,7 +180,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.35)', color: 'var(--orange)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, fontSize: '0.75rem' }}
             onClick={(e) => { e.stopPropagation(); setRailOpen(true); }}
           >◀</button>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)', writing-mode: 'vertical-rl', transform: 'rotate(180deg)', fontWeight: 700 }}>EBENEZER</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '3px', color: 'var(--orange)', textShadow: '0 0 10px rgba(255,102,0,0.5)', writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontWeight: 700 }}>EBENEZER</span>
           <span style={{ fontSize: '1.8rem', color: 'var(--orange)', textShadow: '0 0 16px rgba(255,102,0,0.6)' }}>❄</span>
         </div>
       </div>
@@ -206,6 +206,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
     </div>
   );
 }
+
 
 
 
