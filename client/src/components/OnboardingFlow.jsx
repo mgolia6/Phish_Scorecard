@@ -160,7 +160,7 @@ export function ProfileSetupModal({ api, onComplete }) {
               <label style={S.label}>PHISH.NET USERNAME</label>
               <input
                 type="text"
-                placeholder="e.g. mgolia6"
+                placeholder="e.g. your_username"
                 value={phishnetUsername}
                 className="modal-input"
                 onChange={e => { setPhishnetUsername(e.target.value); setConfirmedHandle(false); }}
@@ -322,3 +322,4 @@ export function ProfileSetupModal({ api, onComplete }) {
     </div>
   );
 }
+
