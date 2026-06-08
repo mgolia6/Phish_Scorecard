@@ -101,7 +101,7 @@ export async function sendVerificationEmail(email, token) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Phreezer <noreply@phreezer.mpgink.com>',
+      from: 'Phreezer <noreply@mpgink.com>',
       to: [email],
       subject: 'Verify your Phreezer account',
       html: emailTemplate(verifyUrl),
@@ -213,3 +213,4 @@ function errorPage(msg) {
 </body>
 </html>`;
 }
+
