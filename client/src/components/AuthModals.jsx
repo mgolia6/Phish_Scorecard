@@ -307,7 +307,7 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
       localStorage.setItem('phish_token', data.token);
       onSuccess(data.user);
     } catch (err) {
-      if (err.message === 'EMAIL_NOT_VERIFIED') {
+      if (err.message.includes('EMAIL_NOT_VERIFIED')) {
         setPendingEmail(loginForm.email);
         setScreen('mike_said_no');
       } else {
@@ -366,3 +366,4 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
     </div>
   );
 }
+
