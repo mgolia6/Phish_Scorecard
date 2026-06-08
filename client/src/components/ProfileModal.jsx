@@ -121,8 +121,8 @@ export function BadgesSection({ api }) {
 // ============================================================
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
-export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
-  const [sec, setSec] = React.useState('info');
+export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
+  const [sec, setSec] = React.useState(initialSection);
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
   const [savingIcon, setSavingIcon] = React.useState(false);
@@ -179,7 +179,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
         </div>
         {/* Section tabs */}
         <div className="profile-modal-tabs">
-          {[['info','INFO'],['badges','BADGES'],['settings','SETTINGS']].map(([k,l]) => (
+          {[['info','INFO'],['badges','BADGES'],['settings','SETTINGS'],['about','ABOUT']].map(([k,l]) => (
             <button key={k} onClick={() => setSec(k)}
               className={`profile-modal-tab ${sec === k ? 'active' : ''}`}>{l}</button>
           ))}
@@ -286,9 +286,82 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout }) {
           {sec === 'badges' && (
             <BadgesSection api={api} />
           )}
+          {sec === 'about' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+              {/* Origin */}
+              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ ORIGIN STORY</div>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: '0 0 10px' }}>
+                  I've been part of the Phish community for a long time. Always in awe of what the fans at Phish.net built — the reviews, the forums, the data, the obsession. I've contributed my own reviews and been part of the conversations for years.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: '0 0 10px' }}>
+                  What I kept wanting was a way to rate — not just review. To score individual songs, track what I'd seen, and let the data tell me things about my own history with this band. Phish.net didn't have that. So I built it.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.7, margin: 0 }}>
+                  Phreezer isn't meant to replace anything. It's built on top of the community's work — the setlist data, the audio archives, the decades of fan documentation — and tries to add a layer that complements what's already there.
+                </p>
+              </div>
+
+              {/* What it is */}
+              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ WHAT THIS IS</div>
+                {[
+                  ['RATE', 'Score every song in a show 1–5 stars. Build a record of how you actually hear the music.'],
+                  ['TRACK', 'Log what you've attended, webcast, or listened back. Your history, your way.'],
+                  ['RELIVE', 'Deep Phreeze surfaces patterns in your data you didn't know were there. When you see Phish, where, how often, what sticks.'],
+                ].map(([label, desc]) => (
+                  <div key={label} style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--orange)', letterSpacing: '2px', flexShrink: 0, paddingTop: 2,
+                      background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                      filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
+                    }}>{label}.</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-label)', lineHeight: 1.6 }}>{desc}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Built by */}
+              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ BUILT BY</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', marginBottom: 4 }}>mpgink</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 14 }}>
+                  Fan. Builder. Trying not to suck at Phish.
+                </div>
+                <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
+                  className="btn-glow-cyan" style={{ display: 'block', textAlign: 'center', marginBottom: 0 }}>
+                  ◈ SUPPORT THE PHREEZER
+                </a>
+              </div>
+
+              {/* Data sources */}
+              <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 12 }}>◈ STANDING ON SHOULDERS</div>
+                {[
+                  ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
+                  ['PHISH.IN', 'Live show audio archives. Stream what you're rating.', 'https://phish.in'],
+                  ['ANTHROPIC', 'AI powering Vibe Check and Uncle Ebenezer.', 'https://anthropic.com'],
+                ].map(([name, desc, href]) => (
+                  <div key={name} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid rgba(51,255,51,0.06)' }}>
+                    <a href={href} target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none' }}>
+                      {name} ↗
+                    </a>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
+                  </div>
+                ))}
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', lineHeight: 1.6, marginTop: 4 }}>
+                  Phreezer is an independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
+                </div>
+              </div>
+
+            </div>
+          )}
+
           {sec === 'settings' && (
             <div>
-              {/* Avatar — geometric SVG options */}
+              {/* Avatar — geometric SVG options */
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 12 }}>
                   ◈ CHOOSE YOUR AVATAR
