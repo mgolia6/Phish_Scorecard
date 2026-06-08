@@ -297,7 +297,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 
           {sec === 'settings' && (
             <div>
-              {/* Avatar — geometric SVG options */
+              {/* Avatar — geometric SVG options */}
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-label)', letterSpacing: '2.5px', marginBottom: 12 }}>
                   ◈ CHOOSE YOUR AVATAR
