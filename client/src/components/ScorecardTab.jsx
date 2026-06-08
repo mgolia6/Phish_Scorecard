@@ -164,8 +164,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       }
       setAudioTracks(aMap);
     } catch (err) {
-      showError('Failed to load show');
+      showError(err.message || 'Failed to load show');
       setCurrentShow(null);
+      setSongs([]);
     } finally {
       setLoadingShow(false);
     }
@@ -396,6 +397,14 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       </div>}
 
       {loadingShow && <div className="loading">LOADING SETLIST FROM PHISH.NET...</div>}
+
+      {!loadingShow && !currentShow && (
+        <div style={{ padding: '60px 20px', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 2 }}>
+          <div style={{ fontSize: '1.4rem', marginBottom: 12 }}>◈</div>
+          SHOW NOT FOUND
+          <div style={{ fontSize: '0.52rem', marginTop: 8, color: 'rgba(51,255,51,0.3)' }}>This show may not be in the Phreezer database yet.</div>
+        </div>
+      )}
 
       {currentShow && !loadingShow && (
         <div className="panel">
