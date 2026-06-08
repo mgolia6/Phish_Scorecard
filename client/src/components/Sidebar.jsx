@@ -3,7 +3,6 @@ import React from 'react';
 export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, expanded, setExpanded }) {
 
   const myPhreezerItems = [
-    { id: 'scorecard',       label: 'SCORECARD',    glyph: '◈', top: true },
     { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', authRequired: true },
     { id: 'my-songs',        label: 'MY SONGS',     glyph: '♪', authRequired: true },
     { id: 'my-venues',       label: 'MY VENUES',    glyph: '⌖', authRequired: true },
@@ -21,9 +20,9 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
     { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
   ];
 
-  const renderItems = (items) => items.map(item => {
+  const renderBtn = (item) => {
     const disabled = item.authRequired && !user;
-    const isSubItem = !item.top;
+    const isSubItem = !item.top && item.id !== 'scorecard';
     return (
       <button
         key={item.id}
@@ -36,7 +35,13 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
         {expanded && <span className="sidebar-nav-label">{item.label}</span>}
       </button>
     );
-  });
+  };
+
+  const collapsedDot = (color) => (
+    <div className="sidebar-section-dot">
+      <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}` }} />
+    </div>
+  );
 
   return (
     <div className="sidebar-wrapper">
@@ -66,22 +71,39 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
 
         {/* NAV */}
         <nav className="sidebar-nav">
+
           {/* MY PHREEZER */}
-          {expanded && <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>}
-          {!expanded && <div className="sidebar-divider" />}
-          {renderItems(myPhreezerItems)}
+          {expanded
+            ? <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>
+            : collapsedDot('var(--cyan)')
+          }
+          {myPhreezerItems.map(renderBtn)}
 
           {/* COMMUNITY */}
-          {expanded && <div className="sidebar-section-label section-community">★ COMMUNITY</div>}
-          {!expanded && <div className="sidebar-divider" />}
-          {renderItems(communityItems)}
+          {expanded
+            ? <div className="sidebar-section-label section-community">★ COMMUNITY</div>
+            : collapsedDot('var(--orange)')
+          }
+          {communityItems.map(renderBtn)}
+
+          {/* SCORECARD — standalone, largest */}
+          <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
+          {expanded
+            ? (
+              <div className="sidebar-section-label section-scorecard">
+                ◈ SCORECARD
+              </div>
+            )
+            : collapsedDot('var(--green)')
+          }
+          {renderBtn({ id: 'scorecard', label: 'SCORECARD', glyph: '◈', top: true })}
+
         </nav>
 
         {/* FOOTER */}
         <div className="sidebar-footer">
           {user ? (
             <>
-              {/* Avatar — tappable, opens profile */}
               <div
                 className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
                 onClick={onOpenProfile}
@@ -114,17 +136,17 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, e
               </button>
             </>
           )}
+          <button
+            className="sidebar-nav-btn"
+            onClick={() => setExpanded(e => !e)}
+            style={{ color: 'rgba(51,255,51,0.3)', fontSize: '0.55rem', letterSpacing: '2px', borderTop: '1px solid var(--border)', justifyContent: expanded ? 'flex-start' : 'center' }}
+          >
+            <span className="sidebar-nav-glyph">{expanded ? '◀' : '▶'}</span>
+            {expanded && <span className="sidebar-nav-label">COLLAPSE</span>}
+          </button>
         </div>
 
       </aside>
-
-      <button
-        className="sidebar-tab"
-        onClick={() => setExpanded(e => !e)}
-        title={expanded ? 'Collapse' : 'Expand'}
-      >
-        {expanded ? '◀' : '▶'}
-      </button>
     </div>
   );
 }
