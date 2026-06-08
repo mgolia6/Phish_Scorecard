@@ -279,7 +279,7 @@ export default function App() {
           setExpanded={setSidebarExpanded}
           onOpenProfile={() => { setProfileInitSection('phish'); setShowProfileModal(true); }}
         />
-        <div className="main-area" style={{ flex: 1, minWidth: 0 }}>
+        <div className="main-area">
           <div className="marquee-bar">
             <span className="marquee-track" onClick={() => {
                 const now = Date.now();
@@ -482,6 +482,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
