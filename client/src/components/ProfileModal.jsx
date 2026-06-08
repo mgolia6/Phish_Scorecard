@@ -353,8 +353,23 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 
               <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ ORIGIN STORY</div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0 }}>
-                  Coming soon.
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  I’ve been blessed to be a part of the Phish community for over three decades. I remember immediately feeling embraced by the community even at my first few shows. There is a comfort I have found being in a crowd of thousands at a Phish show that evades me in other large crowd situations. It’s that felt sense of joy and also critical analysis of the music that keeps the experience fresh and perpetuates the scene.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  For a while I have looked for ways to participate further in the community. I have volunteered for reviews, participated in forums, done meetups during tours. But I always wanted to contribute more.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  I’ve always been fascinated by statistics, keeping records of things that others might have felt were arbitrary or unimportant. That is a huge allure to this community that keeps track of so many of the important details.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  So it made sense that my deeper involvement be a way for fans to visualize a lot of their stats in a more engaging way. Also, to add some granularity to the show rating system. I’ve brought together the best of all worlds: the ability to rate shows by song, accessing links directly to the live recordings, while simultaneously serving up stats that will hopefully meet the high standard of this fabulous community.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  Please use the feedback button to share your thoughts — what’s missing for you, what you like, what you hate, what I did right and wrong. Be honest. I’ll try to accommodate and adjust to the best of my ability.
+                </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0, fontStyle: 'italic' }}>
+                  And, hopefully you enjoy it and it helps us all suck a little less at Phish.
                 </p>
               </div>
 
