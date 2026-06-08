@@ -44,7 +44,7 @@ export default function App() {
   const [scorecardOverlayDate, setScorecardOverlayDate] = useState(null);
   const [scorecardOverlayOrigin, setScorecardOverlayOrigin] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [profileInitSection, setProfileInitSection] = useState('info');
+  const [profileInitSection, setProfileInitSection] = useState('phish');
   const [headerHeight, setHeaderHeight] = useState(132);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
@@ -413,7 +413,7 @@ export default function App() {
         </div>
       )}
 
-      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => { setShowProfileModal(false); setProfileInitSection('info'); }} initialSection={profileInitSection} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
+      {showProfileModal && user && <ProfileModal user={user} api={api} onClose={() => { setShowProfileModal(false); setProfileInitSection('phish'); }} initialSection={profileInitSection} onAvatarChange={(icon) => setUser(u => ({ ...u, avatar_icon: icon }))} onLogout={handleLogout} />}
 
       {feedbackModal && (
         <FeedbackModal type={feedbackModal} api={api} onClose={() => setFeedbackModal(null)} />
