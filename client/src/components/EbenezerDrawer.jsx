@@ -84,27 +84,34 @@ export function EbenezerDrawer({ api }) {
         onClick={() => setOpen(v => !v)}
         style={{
           position: 'fixed',
-          bottom: 24,
-          right: 18,
-          width: 52,
+          bottom: 20,
+          right: 16,
           height: 52,
-          borderRadius: '50%',
-          background: open ? 'var(--bg-panel)' : 'rgba(255,102,0,0.15)',
+          width: open ? 52 : 'auto',
+          borderRadius: open ? '50%' : 26,
+          paddingLeft: open ? 0 : 16,
+          paddingRight: open ? 0 : 16,
+          background: open ? 'var(--bg-panel)' : 'rgba(255,102,0,0.92)',
           border: `2px solid ${open ? 'rgba(51,255,51,0.3)' : 'var(--orange)'}`,
-          color: open ? 'rgba(51,255,51,0.6)' : 'var(--orange)',
-          fontSize: open ? '1.1rem' : '1.3rem',
+          color: open ? 'rgba(51,255,51,0.6)' : '#000',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: 6,
           cursor: 'pointer',
-          boxShadow: open ? 'none' : '0 0 20px rgba(255,102,0,0.4)',
+          boxShadow: open ? 'none' : '0 0 24px rgba(255,102,0,0.6), 0 2px 8px rgba(0,0,0,0.4)',
           zIndex: 1000,
           transition: 'all 0.2s',
+          fontFamily: 'var(--font-display)',
         }}
         title="Uncle Ebenezer · Jaded Vet"
       >
-        {open ? '✕' : '❄'}
+        {open
+          ? <span style={{ fontSize: '1.1rem', color: 'rgba(51,255,51,0.6)' }}>✕</span>
+          : <><span style={{ fontSize: '1.2rem' }}>❄</span><span style={{ fontSize: '0.48rem', letterSpacing: '2px', fontWeight: 700 }}>ASK</span></>
+        }
       </button>
+
 
       {/* ── Drawer ── */}
       <div style={{
