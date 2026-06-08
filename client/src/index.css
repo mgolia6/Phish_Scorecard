@@ -1257,24 +1257,12 @@ select option { background: var(--bg); color: var(--green); }
 
 /* ── DESKTOP FONT SCALE-UP ───────────────────────────── */
 @media (min-width: 769px) {
-  /* KPI values */
-  .kpi-card-inner .kpi-face div[style*="2rem"] { font-size: 2.6rem !important; }
-
-  /* Show cards */
-  .show-card-v2-main { font-size: 1.05rem; }
-
-  /* Section headers */
-  .section-header, [style*="0.6rem"][style*="letter-spacing"] { font-size: 0.75rem; }
-
-  /* Container max width — use the space */
+  /* Container — use the space */
   .container { max-width: 100%; padding: 20px 28px; }
 
   /* Tab navigation */
   .tab-btn { font-size: 0.8rem !important; padding: 12px 24px !important; letter-spacing: 3px !important; }
   .sub-tab-btn { font-size: 0.68rem !important; padding: 9px 18px !important; }
-
-  /* Body text in panels */
-  .panel, .pcard-body { font-size: 0.9rem; }
 
   /* Marquee bigger on desktop */
   .marquee-track { font-size: 0.85rem; letter-spacing: 3px; }
@@ -1290,3 +1278,4 @@ select option { background: var(--bg); color: var(--green); }
     right: auto;
   }
 }
+
