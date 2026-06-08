@@ -174,28 +174,10 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', flexShrink: 0 }}>
-      {/* Toggle tab — mirrors left sidebar-tab, sits outside the rail */}
+      {/* Toggle tab — orange, matches sidebar-tab height */}
       <button
+        className="ebenezer-rail-tab"
         onClick={() => setRailOpen(v => !v)}
-        style={{
-          position: 'relative',
-          width: 20,
-          height: 32,
-          alignSelf: 'flex-start',
-          marginTop: 14,
-          background: 'var(--bg-panel)',
-          border: '1px solid var(--border)',
-          borderRight: 'none',
-          color: 'var(--text-label)',
-          fontSize: '0.55rem',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 101,
-          padding: 0,
-          flexShrink: 0,
-        }}
         title={railOpen ? 'Collapse' : 'Expand'}
       >
         {railOpen ? '▶' : '◀'}
@@ -220,6 +202,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
     </div>
   );
 }
+
 
 
 
