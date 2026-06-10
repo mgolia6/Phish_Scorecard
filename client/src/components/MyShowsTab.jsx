@@ -5,15 +5,37 @@ import { OTDCard } from './OTDCard';
 import { ShowCard } from './ShowCard';
 import { formatDate } from '../utils';
 
-function OTDCarousel({ otdShows, months, onRateShow, api }) {
+function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   const [idx, setIdx] = React.useState(0);
-  const show = otdShows[idx];
-  if (!show) return null;
-  const [y, m, day] = show.show_date.split('-');
-  const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
-  const yearsAgo = new Date().getFullYear() - parseInt(show.show_date);
-  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+  const [otdShows, setOtdShows] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const touchStartX = React.useRef(null);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  React.useEffect(() => {
+    fetch('/api/shows/on-this-day')
+      .then(r => r.json())
+      .then(data => {
+        const attendedDates = new Set((attended || []).map(s => s.show_date));
+        const ratedMap = {};
+        (ratedShows || []).forEach(s => { ratedMap[s.show_date] = s; });
+        const merged = (data.shows || []).map(s => ({
+          ...s,
+          attended: attendedDates.has(s.show_date),
+          phreezer_avg: ratedMap[s.show_date]?.phreezer_avg || null,
+        }));
+        // Sort: attended/rated first, then chronological
+        merged.sort((a, b) => {
+          const aVal = (a.attended || a.phreezer_avg) ? 1 : 0;
+          const bVal = (b.attended || b.phreezer_avg) ? 1 : 0;
+          if (bVal !== aVal) return bVal - aVal;
+          return a.show_date.localeCompare(b.show_date);
+        });
+        setOtdShows(merged);
+      })
+      .catch(() => setOtdShows([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e) => {
@@ -21,26 +43,102 @@ function OTDCarousel({ otdShows, months, onRateShow, api }) {
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     touchStartX.current = null;
     if (Math.abs(dx) < 40) return;
-    if (dx < 0) setIdx(i => Math.min(otdShows.length - 1, i + 1)); // swipe left = next
-    else setIdx(i => Math.max(0, i - 1)); // swipe right = prev
+    if (dx < 0) setIdx(i => Math.min(otdShows.length - 1, i + 1));
+    else setIdx(i => Math.max(0, i - 1));
   };
+
+  if (loading) return (
+    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
+    </div>
+  );
+
+  if (!otdShows.length) return (
+    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--cyan)', opacity: 0.4 }} />
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
+      </div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phish didn't play today's date in any year.</div>
+    </div>
+  );
+
+  const show = otdShows[idx];
+  const [y, m, day] = show.show_date.split('-');
+  const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+  const yearsAgo = new Date().getFullYear() - parseInt(y);
+  const isAttended = show.attended;
+  const isRated = !!show.phreezer_avg;
+  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+
+  // Border/glow treatment
+  const cardBorder = isRated
+    ? '1px solid rgba(255,140,0,0.5)'
+    : isAttended
+      ? '1px solid rgba(51,255,51,0.5)'
+      : '1px solid rgba(0,224,208,0.3)';
+  const cardBorderLeft = isRated
+    ? '3px solid var(--orange)'
+    : isAttended
+      ? '3px solid var(--green)'
+      : '3px solid var(--cyan)';
+  const cardGlow = isRated
+    ? '0 0 18px rgba(255,140,0,0.12)'
+    : isAttended
+      ? '0 0 18px rgba(51,255,51,0.12)'
+      : 'none';
 
   return (
     <div style={{ margin: '10px' }}>
+      {/* Dot indicators */}
       {otdShows.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
-          {otdShows.map((_, i) => (
-            <div key={i} onClick={() => setIdx(i)} style={{
-              width: i === idx ? 18 : 6, height: 6,
-              background: i === idx ? 'var(--cyan)' : 'rgba(0,224,208,0.2)',
-              borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
-            }} />
-          ))}
+          {otdShows.map((s, i) => {
+            const dotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'rgba(0,224,208,0.3)';
+            const activeDotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'var(--cyan)';
+            return (
+              <div key={i} onClick={() => setIdx(i)} style={{
+                width: i === idx ? 18 : 6, height: 6,
+                background: i === idx ? activeDotColor : dotColor,
+                borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
+              }} />
+            );
+          })}
         </div>
       )}
+
+      {/* Badge row */}
+      {(isAttended || isRated) && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 6, paddingLeft: 2 }}>
+          {isRated && (
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>
+          )}
+          {isAttended && (
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>
+          )}
+        </div>
+      )}
+
       <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <OTDCard otdShow={show} fullDate={fullDate} yearsAgo={yearsAgo} scoreColor={scoreColor} onRateShow={onRateShow} api={api} />
+        <OTDCard
+          otdShow={show}
+          fullDate={fullDate}
+          yearsAgo={yearsAgo}
+          scoreColor={scoreColor}
+          onRateShow={onRateShow}
+          api={api}
+          cardBorder={cardBorder}
+          cardBorderLeft={cardBorderLeft}
+          cardGlow={cardGlow}
+        />
       </div>
+
+      {/* Show counter */}
+      {otdShows.length > 1 && (
+        <div style={{ textAlign: 'center', marginTop: 6, fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px' }}>
+          {idx + 1} / {otdShows.length} SHOWS
+        </div>
+      )}
     </div>
   );
 }
@@ -165,14 +263,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       )}
 
       {/* ── SECTION B: ON THIS DAY ── */}
-      {(() => {
-        const today = new Date();
-        const todayStr = `${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const otdShows = (attended || []).filter(s => s.show_date && s.show_date.slice(5) === todayStr);
-        if (!otdShows.length) return null;
-        return <OTDCarousel otdShows={otdShows} months={months} onRateShow={onRateShow} api={api} />;
-      })()}
+      <OTDCarousel attended={attended} ratedShows={shows} onRateShow={onRateShow} api={api} />
 
       {/* ── SECTION C: MY SHOWS ── */}
       <div style={{ padding: '10px' }}>
@@ -242,5 +333,6 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
 
 
