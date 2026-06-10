@@ -7,7 +7,7 @@ const SENTIMENT_COLORS = {
   SLEEPER: 'var(--text-muted)',
 };
 
-export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, api, cardBorder, cardBorderLeft, cardGlow }) {
+export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, api, cardBorder, cardBorderLeft, cardGlow, cardBackground }) {
   const [expanded, setExpanded] = useState(false);
   const [reviews, setReviews] = useState(null);
   const [aiData, setAiData] = useState(null); // { structured } or { summary }
@@ -73,7 +73,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(0,224,208,0.07) 0%, rgba(5,18,5,0.98) 100%)',
+      background: cardBackground || 'linear-gradient(135deg, rgba(0,224,208,0.07) 0%, rgba(5,18,5,0.98) 100%)',
       border: cardBorder || '1px solid rgba(0,224,208,0.3)',
       borderLeft: cardBorderLeft || '3px solid var(--cyan)',
       boxShadow: cardGlow || 'none',
@@ -233,6 +233,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
     </div>
   );
 }
+
 
 
 
