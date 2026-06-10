@@ -58,8 +58,8 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
     const isRated = !!show.phreezer_avg;
     const isAttended = show.attended;
     const tint = i % 2 === 0
-      ? 'rgba(0,224,208,0.07)'
-      : 'rgba(255,140,0,0.04)';
+      ? 'rgba(0,224,208,0.09)'
+      : 'rgba(255,140,0,0.13)';
     return {
       background: isRated
         ? 'linear-gradient(135deg, rgba(255,140,0,0.08) 0%, rgba(5,18,5,0.98) 100%)'
@@ -175,14 +175,14 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
         )}
       </div>
 
-      {/* Counter — legible */}
+      {/* Counter */}
       {otdShows.length > 1 && (
         <div style={{
-          textAlign: 'center', marginTop: 8,
-          fontFamily: 'var(--font-display)', fontSize: '0.62rem',
-          color: 'var(--cyan)', letterSpacing: '2px', opacity: 0.7,
+          textAlign: 'center', marginTop: 10,
+          fontFamily: 'var(--font-display)', fontSize: '0.85rem',
+          color: 'var(--cyan)', letterSpacing: '3px',
         }}>
-          {idx + 1} / {otdShows.length}
+          {idx + 1} <span style={{ opacity: 0.4 }}>of</span> {otdShows.length}
         </div>
       )}
     </div>
@@ -379,6 +379,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
 
 
 
