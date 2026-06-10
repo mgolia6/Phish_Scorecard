@@ -9,6 +9,8 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   const [idx, setIdx] = React.useState(0);
   const [otdShows, setOtdShows] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [dragX, setDragX] = React.useState(0);
+  const [dragging, setDragging] = React.useState(false);
   const touchStartX = React.useRef(null);
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -24,7 +26,6 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
           attended: attendedDates.has(s.show_date),
           phreezer_avg: ratedMap[s.show_date]?.phreezer_avg || null,
         }));
-        // Sort: attended/rated first, then chronological
         merged.sort((a, b) => {
           const aVal = (a.attended || a.phreezer_avg) ? 1 : 0;
           const bVal = (b.attended || b.phreezer_avg) ? 1 : 0;
@@ -37,14 +38,40 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    setDragging(true);
+    setDragX(0);
+  };
+  const handleTouchMove = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    // Resist at edges
+    if ((idx === 0 && dx > 0) || (idx === otdShows.length - 1 && dx < 0)) {
+      setDragX(dx * 0.2);
+    } else {
+      setDragX(dx);
+    }
+  };
   const handleTouchEnd = (e) => {
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     touchStartX.current = null;
+    setDragging(false);
+    setDragX(0);
     if (Math.abs(dx) < 40) return;
     if (dx < 0) setIdx(i => Math.min(otdShows.length - 1, i + 1));
     else setIdx(i => Math.max(0, i - 1));
+  };
+
+  const getCardStyle = (show) => {
+    const isRated = !!show.phreezer_avg;
+    const isAttended = show.attended;
+    return {
+      border: isRated ? '1px solid rgba(255,140,0,0.5)' : isAttended ? '1px solid rgba(51,255,51,0.5)' : '1px solid rgba(0,224,208,0.3)',
+      borderLeft: isRated ? '3px solid var(--orange)' : isAttended ? '3px solid var(--green)' : '3px solid var(--cyan)',
+      boxShadow: isRated ? '0 0 18px rgba(255,140,0,0.12)' : isAttended ? '0 0 18px rgba(51,255,51,0.12)' : 'none',
+    };
   };
 
   if (loading) return (
@@ -64,42 +91,28 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   );
 
   const show = otdShows[idx];
+  const prevShow = idx > 0 ? otdShows[idx - 1] : null;
+  const nextShow = idx < otdShows.length - 1 ? otdShows[idx + 1] : null;
   const [y, m, day] = show.show_date.split('-');
   const fullDate = `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
   const yearsAgo = new Date().getFullYear() - parseInt(y);
   const isAttended = show.attended;
   const isRated = !!show.phreezer_avg;
   const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
-
-  // Border/glow treatment
-  const cardBorder = isRated
-    ? '1px solid rgba(255,140,0,0.5)'
-    : isAttended
-      ? '1px solid rgba(51,255,51,0.5)'
-      : '1px solid rgba(0,224,208,0.3)';
-  const cardBorderLeft = isRated
-    ? '3px solid var(--orange)'
-    : isAttended
-      ? '3px solid var(--green)'
-      : '3px solid var(--cyan)';
-  const cardGlow = isRated
-    ? '0 0 18px rgba(255,140,0,0.12)'
-    : isAttended
-      ? '0 0 18px rgba(51,255,51,0.12)'
-      : 'none';
+  const cardStyle = getCardStyle(show);
 
   return (
     <div style={{ margin: '10px' }}>
-      {/* Dot indicators */}
+      {/* Dots */}
       {otdShows.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
           {otdShows.map((s, i) => {
-            const dotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'rgba(0,224,208,0.3)';
             const activeDotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'var(--cyan)';
+            const inactiveDotColor = s.phreezer_avg ? 'rgba(255,140,0,0.3)' : s.attended ? 'rgba(51,255,51,0.3)' : 'rgba(0,224,208,0.2)';
             return (
               <div key={i} onClick={() => setIdx(i)} style={{
                 width: i === idx ? 18 : 6, height: 6,
-                background: i === idx ? activeDotColor : dotColor,
+                background: i === idx ? activeDotColor : inactiveDotColor,
                 borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
               }} />
             );
@@ -110,30 +123,58 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       {/* Badge row */}
       {(isAttended || isRated) && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 6, paddingLeft: 2 }}>
-          {isRated && (
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>
-          )}
-          {isAttended && (
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>
-          )}
+          {isRated && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>}
+          {isAttended && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>}
         </div>
       )}
 
-      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <OTDCard
-          otdShow={show}
-          fullDate={fullDate}
-          yearsAgo={yearsAgo}
-          scoreColor={scoreColor}
-          onRateShow={onRateShow}
-          api={api}
-          cardBorder={cardBorder}
-          cardBorderLeft={cardBorderLeft}
-          cardGlow={cardGlow}
-        />
+      {/* Sliding viewport */}
+      <div style={{ overflow: 'hidden', position: 'relative' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Track — 3 slots: prev | current | next */}
+        <div style={{
+          display: 'flex',
+          transform: `translateX(calc(-100% + ${dragX}px))`,
+          transition: dragging ? 'none' : 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          willChange: 'transform',
+        }}>
+          {/* Prev slot */}
+          <div style={{ minWidth: '100%' }}>
+            {prevShow ? (() => {
+              const [py, pm, pd] = prevShow.show_date.split('-');
+              const pStyle = getCardStyle(prevShow);
+              return <OTDCard otdShow={prevShow} fullDate={`${months[parseInt(pm)-1]} ${parseInt(pd)}, ${py}`} yearsAgo={new Date().getFullYear() - parseInt(py)} scoreColor={prevShow.phreezer_avg >= 4.7 ? 'var(--orange)' : prevShow.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)'} onRateShow={onRateShow} api={api} cardBorder={pStyle.border} cardBorderLeft={pStyle.borderLeft} cardGlow={pStyle.boxShadow} />;
+            })() : <div style={{ minHeight: 100 }} />}
+          </div>
+          {/* Current slot */}
+          <div style={{ minWidth: '100%' }}>
+            <OTDCard
+              otdShow={show}
+              fullDate={fullDate}
+              yearsAgo={yearsAgo}
+              scoreColor={scoreColor}
+              onRateShow={onRateShow}
+              api={api}
+              cardBorder={cardStyle.border}
+              cardBorderLeft={cardStyle.borderLeft}
+              cardGlow={cardStyle.boxShadow}
+            />
+          </div>
+          {/* Next slot */}
+          <div style={{ minWidth: '100%' }}>
+            {nextShow ? (() => {
+              const [ny, nm, nd] = nextShow.show_date.split('-');
+              const nStyle = getCardStyle(nextShow);
+              return <OTDCard otdShow={nextShow} fullDate={`${months[parseInt(nm)-1]} ${parseInt(nd)}, ${ny}`} yearsAgo={new Date().getFullYear() - parseInt(ny)} scoreColor={nextShow.phreezer_avg >= 4.7 ? 'var(--orange)' : nextShow.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)'} onRateShow={onRateShow} api={api} cardBorder={nStyle.border} cardBorderLeft={nStyle.borderLeft} cardGlow={nStyle.boxShadow} />;
+            })() : <div style={{ minHeight: 100 }} />}
+          </div>
+        </div>
       </div>
 
-      {/* Show counter */}
+      {/* Counter */}
       {otdShows.length > 1 && (
         <div style={{ textAlign: 'center', marginTop: 6, fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px' }}>
           {idx + 1} / {otdShows.length} SHOWS
@@ -333,6 +374,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
 
 
 
