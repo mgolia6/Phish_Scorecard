@@ -16,7 +16,7 @@ const D = {
 };
 
 const SectionLabel = ({ color = D.cyan, children }) => (
-  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '3px', color, marginBottom: 10 }}>
+  <div style={{ fontFamily: D.disp, fontSize: '0.7rem', letterSpacing: '3px', color, marginBottom: 10 }}>
     {children}
   </div>
 );
@@ -24,14 +24,14 @@ const SectionLabel = ({ color = D.cyan, children }) => (
 const StatBox = ({ val, label, color = D.cyan }) => (
   <div style={{ textAlign: 'center', padding: '12px 6px', background: 'rgba(0,0,0,0.2)', border: `1px solid ${color}22` }}>
     <div style={{ fontFamily: D.disp, fontSize: '1.6rem', color, lineHeight: 1 }}>{val}</div>
-    <div style={{ fontFamily: D.disp, fontSize: '0.36rem', color: D.muted, letterSpacing: '1.5px', marginTop: 4 }}>{label}</div>
+    <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1.5px', marginTop: 4 }}>{label}</div>
   </div>
 );
 
 const TabBtn = ({ active, color, onClick, children }) => (
   <button onClick={onClick} style={{
-    fontFamily: D.disp, fontSize: '0.46rem', letterSpacing: '2px',
-    padding: '8px 12px', border: `1px solid ${active ? color : 'rgba(51,255,51,0.15)'}`,
+    fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px',
+    padding: '10px 14px', border: `1px solid ${active ? color : 'rgba(51,255,51,0.15)'}`,
     background: active ? `${color}18` : 'transparent',
     color: active ? color : D.muted, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
   }}>{children}</button>
@@ -106,7 +106,7 @@ function ApiHealthTab() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
           <button onClick={runProbes} disabled={running} style={{
-            fontFamily: D.disp, fontSize: '0.44rem', letterSpacing: '2px', padding: '6px 12px',
+            fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', padding: '8px 14px',
             border: `1px solid ${D.green}`, background: 'transparent', color: D.green, cursor: 'pointer',
           }}>{running ? 'PROBING...' : '↺ REFRESH'}</button>
         </div>
@@ -133,13 +133,13 @@ function ApiHealthTab() {
                 {statusIcon(r.status)}
               </span>
               <div>
-                <div style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.label, letterSpacing: '1.5px' }}>{r.name}</div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, marginTop: 1 }}>{r.path}</div>
+                <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label, letterSpacing: '1.5px' }}>{r.name}</div>
+                <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, marginTop: 1 }}>{r.path}</div>
               </div>
             </div>
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              {r.statusCode && <div style={{ fontFamily: D.mono, fontSize: '0.65rem', color: statusColor(r.status) }}>{r.statusCode}</div>}
-              {r.ms !== null && <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted }}>{r.ms}ms</div>}
+              {r.statusCode && <div style={{ fontFamily: D.mono, fontSize: '0.78rem', color: statusColor(r.status) }}>{r.statusCode}</div>}
+              {r.ms !== null && <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{r.ms}ms</div>}
             </div>
           </div>
         ))}
@@ -214,10 +214,10 @@ function ErrorLogTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <SectionLabel color={D.red}>◈ ERROR LOG</SectionLabel>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={refresh} style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '5px 10px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
-          <button onClick={copyAll} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '5px 10px', border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>COPY JSON</button>
-          <button onClick={exportText} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '5px 10px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer' }}>EXPORT .TXT</button>
-          <button onClick={clearLog} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '5px 10px', border: `1px solid ${D.red}`, background: 'transparent', color: D.red, cursor: 'pointer' }}>CLEAR</button>
+          <button onClick={refresh} style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
+          <button onClick={copyAll} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>COPY JSON</button>
+          <button onClick={exportText} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer' }}>EXPORT .TXT</button>
+          <button onClick={clearLog} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.red}`, background: 'transparent', color: D.red, cursor: 'pointer' }}>CLEAR</button>
         </div>
       </div>
 
@@ -240,14 +240,14 @@ function ErrorLogTab() {
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '1.5px', color: typeColor(e.type), border: `1px solid ${typeColor(e.type)}55`, padding: '1px 6px', flexShrink: 0 }}>
+                    <span style={{ fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '1.5px', color: typeColor(e.type), border: `1px solid ${typeColor(e.type)}55`, padding: '1px 6px', flexShrink: 0 }}>
                       {e.type.toUpperCase()}
                     </span>
-                    <span style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, flexShrink: 0 }}>
+                    <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, flexShrink: 0 }}>
                       {new Date(e.ts).toLocaleTimeString()}
                     </span>
                   </div>
-                  <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.label, lineHeight: 1.4, wordBreak: 'break-word' }}>
+                  <div style={{ fontFamily: D.mono, fontSize: '0.82rem', color: D.label, lineHeight: 1.4, wordBreak: 'break-word' }}>
                     {e.message.length > 120 ? e.message.slice(0, 120) + '…' : e.message}
                   </div>
                 </div>
@@ -259,7 +259,7 @@ function ErrorLogTab() {
                     {e.message}
                   </div>
                   {e.source && (
-                    <div style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.muted, marginTop: 6 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.74rem', color: D.muted, marginTop: 6 }}>
                       📍 {e.source}
                     </div>
                   )}
@@ -270,7 +270,7 @@ function ErrorLogTab() {
                   )}
                   <button
                     onClick={() => navigator.clipboard.writeText(JSON.stringify(e, null, 2))}
-                    style={{ marginTop: 8, fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '1.5px', padding: '4px 10px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}
+                    style={{ marginTop: 8, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '1.5px', padding: '6px 12px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}
                   >
                     COPY THIS ERROR
                   </button>
@@ -372,9 +372,9 @@ function SystemTab({ api, showMessage }) {
             <StatBox val={stats.vibe_checks}  label="VIBE CHECKS"   color={D.orange} />
             <StatBox val={stats.feedback}     label="FEEDBACK"       color={D.green} />
           </div>
-          <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, marginBottom: 20 }}>
+          <div style={{ fontFamily: D.mono, fontSize: '0.74rem', color: D.muted, marginBottom: 20 }}>
             Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
-            <button onClick={loadStats} style={{ marginLeft: 10, fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '1.5px', padding: '2px 8px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
+            <button onClick={loadStats} style={{ marginLeft: 10, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '1.5px', padding: '4px 10px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
           </div>
         </>
       )}
@@ -382,7 +382,7 @@ function SystemTab({ api, showMessage }) {
       <SectionLabel color={D.orange}>◈ ACTIONS</SectionLabel>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <button onClick={runMigrations} disabled={!!working} style={{
-          fontFamily: D.disp, fontSize: '0.5rem', letterSpacing: '2px', padding: '13px',
+          fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '15px',
           border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer',
         }}>{working === 'migrate' ? 'RUNNING...' : '⚙ RUN MIGRATIONS'}</button>
         <button onClick={clearCache} disabled={!!working} style={{
@@ -424,10 +424,10 @@ function FeedbackTab({ api }) {
 
       {data.section_summary?.length > 0 && (
         <div style={{ marginBottom: 18 }}>
-          <div style={{ fontFamily: D.disp, fontSize: '0.44rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SECTIONS (PASSIVE)</div>
+          <div style={{ fontFamily: D.disp, fontSize: '0.6rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SECTIONS (PASSIVE)</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {data.section_summary.map(s => (
-              <span key={s.section} style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan, border: `1px solid ${D.cyan}33`, padding: '3px 8px' }}>
+              <span key={s.section} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.cyan, border: `1px solid ${D.cyan}33`, padding: '3px 8px' }}>
                 {s.section} <span style={{ color: D.orange }}>({s.count})</span>
               </span>
             ))}
@@ -443,7 +443,7 @@ function FeedbackTab({ api }) {
         ))}
       </div>
 
-      <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>
+      <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>
         {filtered.length} RESPONSES
       </div>
 
@@ -452,9 +452,9 @@ function FeedbackTab({ api }) {
           <div key={r.id} style={{ padding: '12px 14px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,140,0,0.15)', borderLeft: '3px solid var(--orange)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.label }}>{r.phishnet_username || r.email}</span>
-                <span style={{ fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(255,140,0,0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
-                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(0,224,208,0.35)', padding: '1px 6px' }}>{r.section}</span>}
+                <span style={{ fontFamily: D.mono, fontSize: '0.84rem', color: D.label }}>{r.phishnet_username || r.email}</span>
+                <span style={{ fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(255,140,0,0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
+                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(0,224,208,0.35)', padding: '1px 6px' }}>{r.section}</span>}
               </div>
               <span style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, flexShrink: 0 }}>
                 {new Date(r.created_at).toLocaleDateString()}
@@ -483,6 +483,7 @@ function FeedbackTab({ api }) {
 
 // ── Users Tab (existing, extracted) ───────────────────────
 function UsersTab({ api, showError }) {
+  const [expanded, setExpanded] = React.useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(null);
@@ -550,7 +551,7 @@ function UsersTab({ api, showError }) {
         </div>
       )}
 
-      <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color: D.muted, letterSpacing: '2px', marginBottom: 12 }}>
+      <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '2px', marginBottom: 12 }}>
         {users.length} REGISTERED USER{users.length !== 1 ? 'S' : ''}
       </div>
 
@@ -561,52 +562,78 @@ function UsersTab({ api, showError }) {
             borderLeft: `3px solid ${u.is_admin ? D.cyan : 'rgba(51,255,51,0.3)'}`,
             background: D.panel,
           }}>
-            <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(51,255,51,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Collapsed header — always visible, tap to expand */}
+            <div
+              onClick={() => setExpanded(expanded === u.id ? null : u.id)}
+              style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+            >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontFamily: D.mono, fontSize: '0.95rem', color: 'var(--white)' }}>{u.username}</span>
-                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.38rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(0,224,208,0.4)', padding: '2px 5px' }}>ADMIN</span>}
+                  <span style={{ fontFamily: D.mono, fontSize: '1.05rem', color: 'var(--white)' }}>{u.username}</span>
+                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(0,224,208,0.4)', padding: '2px 6px' }}>ADMIN</span>}
                 </div>
-                <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, marginTop: 2 }}>{u.email}</div>
-              </div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.4rem', color: D.muted, letterSpacing: '1.5px', textAlign: 'right' }}>
-                JOINED<br/><span style={{ color: D.label }}>{u.joined}</span>
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
-              {[
-                { val: u.shows_attended, lbl: 'ATTENDED', col: D.cyan },
-                { val: u.shows_rated,    lbl: 'RATED',    col: D.orange },
-                { val: u.reviews,        lbl: 'REVIEWS',  col: D.green },
-                { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? D.green : 'rgba(51,255,51,0.2)' },
-                { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? D.green : 'rgba(51,255,51,0.2)' },
-              ].map(({ val, lbl, col }) => (
-                <div key={lbl} style={{ padding: '10px 4px', textAlign: 'center', borderRight: '1px solid rgba(51,255,51,0.06)' }}>
-                  <div style={{ fontFamily: D.disp, fontSize: '1.1rem', color: col, lineHeight: 1 }}>{val}</div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.34rem', color: D.muted, letterSpacing: '1.5px', marginTop: 4 }}>{lbl}</div>
+                <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.muted, marginTop: 3 }}>{u.email}</div>
+                {/* Mini stat pills — always visible */}
+                <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+                  {[
+                    { val: u.shows_attended, lbl: 'ATT', col: D.cyan },
+                    { val: u.shows_rated,    lbl: 'RATED', col: D.orange },
+                    { val: u.reviews,        lbl: 'REV', col: D.green },
+                  ].map(({ val, lbl, col }) => (
+                    <span key={lbl} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: col }}>
+                      <span style={{ fontFamily: D.disp, fontSize: '0.9rem' }}>{val}</span>
+                      <span style={{ color: D.muted, fontSize: '0.64rem', marginLeft: 3 }}>{lbl}</span>
+                    </span>
+                  ))}
                 </div>
-              ))}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{u.joined}</span>
+                <span style={{ color: D.muted, fontSize: '1rem' }}>{expanded === u.id ? '▲' : '▼'}</span>
+              </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '10px 14px' }}>
-              {[
-                { label: 'RESET ONBOARDING', action: 'reset-onboarding', col: D.cyan },
-                { label: 'RESET PASSWORD',   action: 'reset-password',   col: D.label },
-                { label: 'CLEAR DATA',       action: 'clear-data',       col: D.orange },
-              ].map(({ label, action, col }) => (
-                <button key={action}
-                  onClick={() => action === 'reset-password' ? doAction(u.id, action) : setConfirming({ userId: u.id, username: u.username, action })}
-                  disabled={!!working}
-                  style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: 'pointer' }}>
-                  {working === `${u.id}-${action}` ? 'WORKING...' : label}
-                </button>
-              ))}
-              {!u.is_admin && (
-                <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })} disabled={!!working}
-                  style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', padding: '6px 10px', border: `1px solid ${D.red}55`, background: 'transparent', color: D.red, cursor: 'pointer' }}>
-                  DELETE USER
-                </button>
-              )}
-            </div>
+
+            {/* Expanded — stats + actions */}
+            {expanded === u.id && (
+              <div style={{ borderTop: '1px solid rgba(51,255,51,0.1)' }}>
+                {/* Full stat grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                  {[
+                    { val: u.shows_attended, lbl: 'ATTENDED', col: D.cyan },
+                    { val: u.shows_rated,    lbl: 'RATED',    col: D.orange },
+                    { val: u.reviews,        lbl: 'REVIEWS',  col: D.green },
+                    { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? D.green : 'rgba(51,255,51,0.2)' },
+                    { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? D.green : 'rgba(51,255,51,0.2)' },
+                  ].map(({ val, lbl, col }) => (
+                    <div key={lbl} style={{ padding: '12px 4px', textAlign: 'center', borderRight: '1px solid rgba(51,255,51,0.06)' }}>
+                      <div style={{ fontFamily: D.disp, fontSize: '1.3rem', color: col, lineHeight: 1 }}>{val}</div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
+                    </div>
+                  ))}
+                </div>
+                {/* Actions */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '12px 16px' }}>
+                  {[
+                    { label: 'RESET ONBOARDING', action: 'reset-onboarding', col: D.cyan },
+                    { label: 'RESET PASSWORD',   action: 'reset-password',   col: D.label },
+                    { label: 'CLEAR DATA',       action: 'clear-data',       col: D.orange },
+                  ].map(({ label, action, col }) => (
+                    <button key={action}
+                      onClick={() => action === 'reset-password' ? doAction(u.id, action) : setConfirming({ userId: u.id, username: u.username, action })}
+                      disabled={!!working}
+                      style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: 'pointer' }}>
+                      {working === `${u.id}-${action}` ? 'WORKING...' : label}
+                    </button>
+                  ))}
+                  {!u.is_admin && (
+                    <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })} disabled={!!working}
+                      style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${D.red}55`, background: 'transparent', color: D.red, cursor: 'pointer' }}>
+                      DELETE USER
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -650,3 +677,4 @@ export function AdminTab({ api, showMessage, showError }) {
     </div>
   );
 }
+
