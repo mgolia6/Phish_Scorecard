@@ -9,9 +9,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   const [idx, setIdx] = React.useState(0);
   const [otdShows, setOtdShows] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const [dragX, setDragX] = React.useState(0);
-  const [dragging, setDragging] = React.useState(false);
-  const touchStartX = React.useRef(null);
+  const [animDir, setAnimDir] = React.useState(0); // -1 left, 1 right, 0 idle
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   React.useEffect(() => {
@@ -38,50 +36,40 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const getCardStyle = (show) => {
+  const go = (dir) => {
+    const next = idx + dir;
+    if (next < 0 || next >= otdShows.length) return;
+    setAnimDir(dir);
+    setTimeout(() => {
+      setIdx(next);
+      setAnimDir(0);
+    }, 220);
+  };
+
+  const handleTap = (e) => {
+    if (otdShows.length <= 1) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const half = rect.left + rect.width / 2;
+    go(x < half ? -1 : 1);
+  };
+
+  const getCardStyle = (show, i) => {
     const isRated = !!show.phreezer_avg;
     const isAttended = show.attended;
+    const tint = i % 2 === 0
+      ? 'rgba(0,224,208,0.07)'
+      : 'rgba(255,140,0,0.04)';
     return {
+      background: isRated
+        ? 'linear-gradient(135deg, rgba(255,140,0,0.08) 0%, rgba(5,18,5,0.98) 100%)'
+        : isAttended
+          ? 'linear-gradient(135deg, rgba(51,255,51,0.07) 0%, rgba(5,18,5,0.98) 100%)'
+          : `linear-gradient(135deg, ${tint} 0%, rgba(5,18,5,0.98) 100%)`,
       border: isRated ? '1px solid rgba(255,140,0,0.5)' : isAttended ? '1px solid rgba(51,255,51,0.5)' : '1px solid rgba(0,224,208,0.3)',
       borderLeft: isRated ? '3px solid var(--orange)' : isAttended ? '3px solid var(--green)' : '3px solid var(--cyan)',
       boxShadow: isRated ? '0 0 18px rgba(255,140,0,0.12)' : isAttended ? '0 0 18px rgba(51,255,51,0.12)' : 'none',
-      // Alternating tint so adjacent cards feel distinct
-      background: isRated
-        ? 'linear-gradient(135deg, rgba(255,140,0,0.06) 0%, rgba(5,18,5,0.98) 100%)'
-        : isAttended
-          ? 'linear-gradient(135deg, rgba(51,255,51,0.06) 0%, rgba(5,18,5,0.98) 100%)'
-          : undefined, // OTDCard will apply its own based on cardTint
     };
-  };
-
-  const getCardTint = (i) =>
-    i % 2 === 0
-      ? 'linear-gradient(135deg, rgba(0,224,208,0.07) 0%, rgba(5,18,5,0.98) 100%)'
-      : 'linear-gradient(135deg, rgba(255,140,0,0.04) 0%, rgba(5,18,5,0.98) 100%)';
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    setDragging(true);
-    setDragX(0);
-  };
-  const handleTouchMove = (e) => {
-    if (touchStartX.current === null) return;
-    const dx = e.touches[0].clientX - touchStartX.current;
-    if ((idx === 0 && dx > 0) || (idx === otdShows.length - 1 && dx < 0)) {
-      setDragX(dx * 0.15); // rubber-band at edges
-    } else {
-      setDragX(dx);
-    }
-  };
-  const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    setDragging(false);
-    setDragX(0);
-    if (Math.abs(dx) < 35) return;
-    if (dx < 0) setIdx(i => Math.min(otdShows.length - 1, i + 1));
-    else setIdx(i => Math.max(0, i - 1));
   };
 
   if (loading) return (
@@ -103,17 +91,26 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   const show = otdShows[idx];
   const isAttended = show.attended;
   const isRated = !!show.phreezer_avg;
+  const [sy, sm, sd] = show.show_date.split('-');
+  const fullDate = `${months[parseInt(sm)-1]} ${parseInt(sd)}, ${sy}`;
+  const yearsAgo = new Date().getFullYear() - parseInt(sy);
+  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+  const cStyle = getCardStyle(show, idx);
+
+  // Slide-out direction while animating, then snap new card in from opposite side
+  const slideOut = animDir !== 0;
+  const translateX = animDir === -1 ? '60px' : animDir === 1 ? '-60px' : '0px';
 
   return (
     <div style={{ margin: '10px' }}>
       {/* Dots */}
       {otdShows.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
           {otdShows.map((s, i) => {
             const activeDotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'var(--cyan)';
             const inactiveDotColor = s.phreezer_avg ? 'rgba(255,140,0,0.3)' : s.attended ? 'rgba(51,255,51,0.3)' : 'rgba(0,224,208,0.2)';
             return (
-              <div key={i} onClick={() => { setDragX(0); setIdx(i); }} style={{
+              <div key={i} onClick={() => go(i - idx)} style={{
                 width: i === idx ? 18 : 6, height: 6,
                 background: i === idx ? activeDotColor : inactiveDotColor,
                 borderRadius: 3, cursor: 'pointer', transition: 'all 0.2s',
@@ -131,52 +128,61 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
         </div>
       )}
 
-      {/* Viewport — clips the full track */}
+      {/* Card with tap zones */}
       <div
-        style={{ overflow: 'hidden', position: 'relative' }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        style={{ position: 'relative', overflow: 'hidden', cursor: otdShows.length > 1 ? 'pointer' : 'default' }}
+        onClick={handleTap}
+        onTouchEnd={handleTap}
       >
-        {/* Full track — all cards side by side, translate by idx */}
+        {/* Card — animates out, then new one snaps in */}
         <div style={{
-          display: 'flex',
-          width: `${otdShows.length * 100}%`,
-          transform: `translateX(calc(${-idx * (100 / otdShows.length)}% + ${dragX / otdShows.length}px))`,
-          transition: dragging ? 'none' : 'transform 0.32s cubic-bezier(0.2, 0, 0, 1)',
-          willChange: 'transform',
+          transform: slideOut ? `translateX(${translateX})` : 'translateX(0)',
+          opacity: slideOut ? 0 : 1,
+          transition: slideOut
+            ? 'transform 0.18s ease-in, opacity 0.18s ease-in'
+            : 'transform 0.22s cubic-bezier(0.2, 0, 0, 1), opacity 0.22s ease-out',
         }}>
-          {otdShows.map((s, i) => {
-            const [sy, sm, sd] = s.show_date.split('-');
-            const sFullDate = `${months[parseInt(sm)-1]} ${parseInt(sd)}, ${sy}`;
-            const sYearsAgo = new Date().getFullYear() - parseInt(sy);
-            const sScoreColor = s.phreezer_avg >= 4.7 ? 'var(--orange)' : s.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
-            const sStyle = getCardStyle(s);
-            const sTint = s.phreezer_avg || s.attended ? sStyle.background : getCardTint(i);
-            return (
-              <div key={s.show_date} style={{ width: `${100 / otdShows.length}%`, flexShrink: 0 }}>
-                <OTDCard
-                  otdShow={s}
-                  fullDate={sFullDate}
-                  yearsAgo={sYearsAgo}
-                  scoreColor={sScoreColor}
-                  onRateShow={onRateShow}
-                  api={api}
-                  cardBorder={sStyle.border}
-                  cardBorderLeft={sStyle.borderLeft}
-                  cardGlow={sStyle.boxShadow}
-                  cardBackground={sTint}
-                />
-              </div>
-            );
-          })}
+          <OTDCard
+            otdShow={show}
+            fullDate={fullDate}
+            yearsAgo={yearsAgo}
+            scoreColor={scoreColor}
+            onRateShow={onRateShow}
+            api={api}
+            cardBorder={cStyle.border}
+            cardBorderLeft={cStyle.borderLeft}
+            cardGlow={cStyle.boxShadow}
+            cardBackground={cStyle.background}
+          />
         </div>
+
+        {/* Tap zone hints — only visible on multi-show */}
+        {otdShows.length > 1 && (
+          <>
+            <div style={{
+              position: 'absolute', top: 0, left: 0, width: '20%', height: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8,
+              opacity: idx === 0 ? 0.1 : 0.35, pointerEvents: 'none',
+              color: 'var(--cyan)', fontSize: '1rem',
+            }}>‹</div>
+            <div style={{
+              position: 'absolute', top: 0, right: 0, width: '20%', height: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8,
+              opacity: idx === otdShows.length - 1 ? 0.1 : 0.35, pointerEvents: 'none',
+              color: 'var(--cyan)', fontSize: '1rem',
+            }}>›</div>
+          </>
+        )}
       </div>
 
-      {/* Counter */}
+      {/* Counter — legible */}
       {otdShows.length > 1 && (
-        <div style={{ textAlign: 'center', marginTop: 6, fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px' }}>
-          {idx + 1} / {otdShows.length} SHOWS
+        <div style={{
+          textAlign: 'center', marginTop: 8,
+          fontFamily: 'var(--font-display)', fontSize: '0.62rem',
+          color: 'var(--cyan)', letterSpacing: '2px', opacity: 0.7,
+        }}>
+          {idx + 1} / {otdShows.length}
         </div>
       )}
     </div>
@@ -373,6 +379,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
 
 
 
