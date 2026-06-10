@@ -137,6 +137,10 @@
       "destination": "/api/shows/companions"
     },
     {
+      "source": "/api/admin/stats",
+      "destination": "/api/admin/stats"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
