@@ -1,7 +1,7 @@
 # Phreezer — Roadmap
 
-## Target: Community tab live + rate limiting before July 4. Phish summer tour starts July 7.
-## Last updated: 2026-06-08 (daytime session)
+## Target: Rate limiting + Community tab live before July 4. Phish summer tour starts July 7.
+## Last updated: 2026-06-10
 
 ---
 
@@ -31,7 +31,25 @@
 
 ### MY PHREEZER
 - My Shows, My Songs, My Venues, My States, My Phriends, Deep Phreeze — all shipped
-- OTD carousel — swipe nav, all matching shows
+
+### OTD Carousel (rebuilt 2026-06-10)
+- Pulls ALL historical Phish shows on today's MM-DD from Phish.net (not just attended)
+- 1hr server-side cache via /api/shows/on-this-day
+- Tap left/right half to advance — slide animation with snap
+- Alternating card tint (cyan even / warm odd) for visual distinction
+- Attended: green border + glow + ✓ I WAS THERE badge
+- Rated: orange border + glow + ◈ PHROZEN badge
+- Color-coded dot indicators; legible N of N counter
+- Empty state if Phish never played this date
+
+### Admin Panel (rebuilt 2026-06-10)
+- 5-tab layout: USERS / SYSTEM / API / ERRORS / FEEDBACK
+- USERS: collapsible cards (tap to expand), mini stat pills always visible, all actions behind expand
+- SYSTEM: live DB stat boxes (users, ratings, attendance, cached shows, vibe checks, feedback), Run Migrations + Clear Cache buttons, /api/admin/stats endpoint
+- API HEALTH: probes all 15 endpoints on load, response time + status code, color-coded ✓/⚡/✗, summary bar, manual refresh
+- ERROR LOG: captures console.error + uncaught exceptions + unhandled promise rejections at module level; expandable stack traces; Copy JSON / Export .txt / Clear
+- FEEDBACK: full inbox with type filter tabs, section breakdown, free text quoted, answers inline
+- Font sizes bumped throughout for mobile legibility
 
 ### Onboarding
 - Clean two-path flow: import or skip → questions → proceed
@@ -57,32 +75,31 @@
 ### Community
 - Leaderboard, Top Shows (needs more data), Top Songs, Top Venues
 
-### Admin
-- User management, password reset, cascade delete, clear-cache
+### Debt Closed
+- /api/debug/reviews.js — confirmed deleted, directory gone
+- Admin migrate auth — confirmed has verifyToken + is_admin check
+- Top Shows HAVING threshold — already COUNT > 0; blank because no other users have rated yet, not a code bug
 
 ---
 
 ## NEXT SESSION — START HERE
 
-### 1. Middle section desktop expansion
-- Use the space better — wider content, better typography at desktop scale
-- Desktop logo: Matthew to provide Canva version
-
-### 2. Rate Limiting on Auth Endpoints (Priority 1 — security)
+### 1. Rate Limiting on Auth Endpoints (Priority 1 — security, STILL OPEN)
 - /api/auth/register and /api/auth/login have no rate limiting
 - 10 attempts/15min per IP, 429 with Retry-After header
+
+### 2. Middle section desktop expansion
+- Use the space better — wider content, better typography at desktop scale
+- Desktop logo: Matthew to provide Canva version
 
 ### 3. Phish Phreeze — band-level Community subtab
 - Total shows, songs, hours; breakdowns by day/month/country/state
 - Cache in phish_stats_cache table
 
-### 4. Top Shows threshold
-- Currently blank — lower HAVING count or show 1+ rater
-
-### 5. Verify sandwiched song fix
+### 4. Verify sandwiched song fix
 - Test on real reprise show (e.g. Mike's Song > something > Mike's Song)
 
-### 6. Desktop UAT continued
+### 5. Desktop UAT continued
 - Logo swap when Matthew delivers Canva version
 - Further font/spacing pass on middle content
 
@@ -90,11 +107,10 @@
 
 ## OPEN BUGS / DEBT
 
-- /api/debug/reviews.js — exposed endpoint, should be deleted
-- Admin endpoint /api/admin/migrate has no auth check
-- Onboarding tour guide — deferred
-- Top Shows blank until more community ratings exist
+- Rate limiting on /api/auth/login and /api/auth/register — Priority 1
+- Top Shows blank until more community ratings exist (data problem, not code)
 - Deep Phreeze new data fields won't populate until users run full sync
+- Onboarding tour guide — deferred post-launch
 
 ---
 
@@ -122,3 +138,5 @@
 - **JSX**: CSS property names are camelCase (writingMode not writing-mode).
 - **Postgres**: posKey || song consistently — never mix keys in ratings map.
 - **SaveCelebration**: onDone must be a ref, not inline — inline functions reset useEffect timer every render.
+- **vercel.json**: Every new API route must be explicitly added to rewrites array before catch-all.
+- **OTD cache**: Module-level in on-this-day.js, 1hr TTL, shared across all users.
