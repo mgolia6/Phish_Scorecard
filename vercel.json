@@ -159,6 +159,10 @@
       "destination": "/api/admin/ai-usage"
     },
     {
+      "source": "/api/audio/stream",
+      "destination": "/api/audio/stream"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
