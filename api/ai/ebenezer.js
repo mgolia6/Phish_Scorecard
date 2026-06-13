@@ -1,5 +1,6 @@
 import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
+import { logAiUsage } from '../_ai_usage.js';
 
 const SYSTEM_PROMPT = `You are Uncle Ebenezer, a Phish analyst and discovery engine embedded in Phreezer — a show rating app for phans. You have been to hundreds of shows spanning every era. You are opinionated, knowledgeable, and direct.
 
@@ -128,8 +129,21 @@ ${rated.length > 0 ? `- Avg rating: ${(rated.reduce((s, r) => s + parseFloat(r.o
     const reply = data?.content?.[0]?.text;
     if (!reply) return res.status(500).json({ error: 'No response' });
 
+    // Log usage — fire and forget
+    const usage = data?.usage;
+    if (usage) {
+      logAiUsage({
+        userId: user.id,
+        feature: 'ebenezer',
+        model: 'claude-sonnet-4-6',
+        inputTokens: usage.input_tokens || 0,
+        outputTokens: usage.output_tokens || 0,
+      });
+    }
+
     return res.status(200).json({ reply });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 }
+
