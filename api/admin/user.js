@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     try {
       await pool.query('DELETE FROM ratings WHERE user_id = $1', [id]);
       await pool.query('DELETE FROM attendance WHERE user_id = $1', [id]);
+      await pool.query('DELETE FROM user_show_attendance WHERE user_id = $1', [id]);
       await pool.query('DELETE FROM user_reviews WHERE user_id = $1', [id]);
       await pool.query('DELETE FROM user_stats WHERE user_id = $1', [id]);
       await pool.query('DELETE FROM show_companions WHERE user_id = $1 OR companion_user_id = $1', [id]);
@@ -31,6 +32,17 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     // Reset onboarding + T&C flags AND clear profile fields so setup modal starts fresh
+    // Reset tour — clears server-side tour flag so it fires again on next login
+    if (action === 'reset-tour') {
+      try {
+        await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS tour_completed BOOLEAN DEFAULT FALSE').catch(() => {});
+        await pool.query('UPDATE users SET tour_completed = FALSE WHERE id = $1', [id]);
+        return res.json({ success: true, action: 'reset-tour' });
+      } catch (err) {
+        return res.status(500).json({ error: err.message });
+      }
+    }
+
     if (action === 'reset-onboarding') {
       try {
         await pool.query(`
@@ -55,6 +67,7 @@ export default async function handler(req, res) {
       try {
         await pool.query('DELETE FROM ratings WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM attendance WHERE user_id = $1', [id]);
+        await pool.query('DELETE FROM user_show_attendance WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM user_reviews WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM user_stats WHERE user_id = $1', [id]);
         await pool.query('DELETE FROM show_companions WHERE user_id = $1 OR companion_user_id = $1', [id]);
@@ -119,3 +132,4 @@ export default async function handler(req, res) {
 
   res.status(405).json({ error: 'Method not allowed' });
 }
+
