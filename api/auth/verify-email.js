@@ -49,6 +49,11 @@ export default async function handler(req, res) {
       await pool.query('UPDATE users SET email_verified = TRUE WHERE id = $1', [row.user_id]);
       await pool.query('UPDATE email_verification_tokens SET used = TRUE WHERE id = $1', [row.id]);
 
+      // Fire onboarding email — fire and forget
+      triggerOnboardingEmail(row.user_id).catch(err =>
+        console.error('Onboarding email trigger failed:', err)
+      );
+
       return res.status(200).send(successPage());
     } catch (err) {
       return res.status(500).send(errorPage(err.message));
@@ -83,6 +88,17 @@ export default async function handler(req, res) {
   }
 
   res.status(405).json({ error: 'Method not allowed' });
+}
+
+async function triggerOnboardingEmail(userId) {
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'https://phreezer.mpgink.com';
+  await fetch(`${baseUrl}/api/emails/onboarding`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId }),
+  });
 }
 
 function generateToken() {
@@ -155,7 +171,7 @@ function emailTemplate(verifyUrl) {
         <tr><td>
           <p style="font-family:monospace;font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;margin:0;">
             If you didn't create a Phreezer account, ignore this email.<br>
-            Questions? Reply to this email or visit <a href="https://phreezer.mpgink.com" style="color:rgba(0,224,208,0.5);text-decoration:none;">phreezer.mpgink.com</a>
+            Questions? <a href="mailto:phreezer.support@mpgink.com" style="color:rgba(0,224,208,0.5);text-decoration:none;">phreezer.support@mpgink.com</a>
           </p>
         </td></tr>
 
@@ -213,7 +229,6 @@ function successPage() {
       text-decoration: none;
       text-align: center;
     }
-    .support:hover { color: rgba(0,224,208,0.7); }
     .divider {
       width: 100%;
       max-width: 320px;
@@ -228,7 +243,7 @@ function successPage() {
   <div class="tagline">RATE. TRACK. RELIVE.</div>
   <div class="check">✓</div>
   <div class="heading">EMAIL VERIFIED</div>
-  <div class="sub">You're in. Head back to the app and log in.</div>
+  <div class="sub">You're in. Head back to the app and log in.<br>Check your inbox — a welcome email is on its way.</div>
   <a href="https://phreezer.mpgink.com" class="btn">OPEN PHREEZER</a>
   <hr class="divider">
   <a href="mailto:phreezer.support@mpgink.com" class="support">◈ QUESTIONS? CONTACT SUPPORT</a>
@@ -262,34 +277,13 @@ function expiredPage(email) {
     .heading { font-size: 1rem; letter-spacing: 4px; color: #ff6600; margin-bottom: 12px; }
     .sub { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; text-align: center; }
     .btn {
-      display: block;
-      width: 100%;
-      max-width: 320px;
-      padding: 16px;
-      background: #ff6600;
-      color: #000;
-      font-family: monospace;
-      font-size: 0.75rem;
-      font-weight: bold;
-      letter-spacing: 3px;
-      text-decoration: none;
-      text-align: center;
-      margin-bottom: 16px;
+      display: block; width: 100%; max-width: 320px; padding: 16px;
+      background: #ff6600; color: #000; font-family: monospace;
+      font-size: 0.75rem; font-weight: bold; letter-spacing: 3px;
+      text-decoration: none; text-align: center; margin-bottom: 16px;
     }
-    .support {
-      font-size: 0.55rem;
-      letter-spacing: 2px;
-      color: rgba(0,224,208,0.4);
-      text-decoration: none;
-      text-align: center;
-    }
-    .divider {
-      width: 100%;
-      max-width: 320px;
-      border: none;
-      border-top: 1px solid rgba(51,255,51,0.08);
-      margin: 32px 0;
-    }
+    .support { font-size: 0.55rem; letter-spacing: 2px; color: rgba(0,224,208,0.4); text-decoration: none; text-align: center; }
+    .divider { width: 100%; max-width: 320px; border: none; border-top: 1px solid rgba(51,255,51,0.08); margin: 32px 0; }
   </style>
 </head>
 <body>
@@ -316,48 +310,22 @@ function errorPage(msg) {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; background: #0a0a0a; }
     body {
-      font-family: monospace;
-      color: #33ff33;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
+      font-family: monospace; color: #33ff33;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
     }
     .logo { font-size: 1.3rem; letter-spacing: 6px; color: #00e0d0; margin-bottom: 4px; }
     .tagline { font-size: 0.55rem; letter-spacing: 3px; color: rgba(0,224,208,0.45); margin-bottom: 48px; }
     .heading { font-size: 1rem; letter-spacing: 4px; color: #ff3333; margin-bottom: 12px; }
     .sub { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 40px; text-align: center; }
     .btn {
-      display: block;
-      width: 100%;
-      max-width: 320px;
-      padding: 16px;
-      background: #ff6600;
-      color: #000;
-      font-family: monospace;
-      font-size: 0.75rem;
-      font-weight: bold;
-      letter-spacing: 3px;
-      text-decoration: none;
-      text-align: center;
-      margin-bottom: 16px;
+      display: block; width: 100%; max-width: 320px; padding: 16px;
+      background: #ff6600; color: #000; font-family: monospace;
+      font-size: 0.75rem; font-weight: bold; letter-spacing: 3px;
+      text-decoration: none; text-align: center; margin-bottom: 16px;
     }
-    .support {
-      font-size: 0.55rem;
-      letter-spacing: 2px;
-      color: rgba(0,224,208,0.4);
-      text-decoration: none;
-      text-align: center;
-    }
-    .divider {
-      width: 100%;
-      max-width: 320px;
-      border: none;
-      border-top: 1px solid rgba(51,255,51,0.08);
-      margin: 32px 0;
-    }
+    .support { font-size: 0.55rem; letter-spacing: 2px; color: rgba(0,224,208,0.4); text-decoration: none; text-align: center; }
+    .divider { width: 100%; max-width: 320px; border: none; border-top: 1px solid rgba(51,255,51,0.08); margin: 32px 0; }
   </style>
 </head>
 <body>
@@ -371,5 +339,3 @@ function errorPage(msg) {
 </body>
 </html>`;
 }
-
-
