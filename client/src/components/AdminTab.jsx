@@ -534,7 +534,7 @@ function UsersTab({ api, showError }) {
     }
   };
 
-  if (loading) return <FullPageLoader text="LOADING USERS..." />;
+  if (loading) return <FullPageLoader text="LOADING..." />;
 
   return (
     <div style={{ padding: '0 10px 20px' }}>
@@ -623,11 +623,12 @@ function UsersTab({ api, showError }) {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '12px 16px' }}>
                   {[
                     { label: 'RESET ONBOARDING', action: 'reset-onboarding', col: D.cyan },
+                    { label: 'RESET TOUR',       action: 'reset-tour',       col: D.cyan },
                     { label: 'RESET PASSWORD',   action: 'reset-password',   col: D.label },
                     { label: 'CLEAR DATA',       action: 'clear-data',       col: D.orange },
                   ].map(({ label, action, col }) => (
                     <button key={action}
-                      onClick={() => action === 'reset-password' ? doAction(u.id, action) : setConfirming({ userId: u.id, username: u.username, action })}
+                      onClick={() => (action === 'reset-password' || action === 'reset-tour') ? doAction(u.id, action) : setConfirming({ userId: u.id, username: u.username, action })}
                       disabled={!!working}
                       style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: 'pointer' }}>
                       {working === `${u.id}-${action}` ? 'WORKING...' : label}
@@ -878,5 +879,6 @@ export function AdminTab({ api, showMessage, showError }) {
     </div>
   );
 }
+
 
 
