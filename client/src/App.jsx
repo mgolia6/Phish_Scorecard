@@ -22,6 +22,7 @@ import { AdminTab } from './components/AdminTab';
 import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
+import { TourGuide } from './components/TourGuide';
 
 export default function App() {
   const [tab, setTab] = useState('scorecard'); // will be overridden on user load
@@ -53,6 +54,7 @@ export default function App() {
   const [ebenInput, setEbenInput] = useState('');
   const [ebenOpen, setEbenOpen] = useState(false);     // mobile drawer
   const [ebenRailOpen, setEbenRailOpen] = useState(true); // desktop rail
+  const [showTour, setShowTour] = useState(false);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
 
@@ -176,6 +178,9 @@ export default function App() {
     } catch (e) {}
     setPendingImportOnMyShows(true);
     setTimeout(() => setTab('my-shows'), 100);
+    if (!localStorage.getItem('phreezer_tour_done')) {
+      setTimeout(() => setShowTour(true), 800);
+    }
   };
 
   const handleOnboardingScorecard = async () => {
@@ -184,7 +189,10 @@ export default function App() {
       await api.post('/auth/accept?field=onboarding', {});
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
-    setTab('my-shows'); // Go home — My Shows is the landing for returning users
+    setTab('my-shows');
+    if (!localStorage.getItem('phreezer_tour_done')) {
+      setTimeout(() => setShowTour(true), 600);
+    }
   };
 
   const handleOnboardingComplete = async () => {
@@ -194,6 +202,9 @@ export default function App() {
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
     setShowFirstShowPrompt(true);
+    if (!localStorage.getItem('phreezer_tour_done')) {
+      setTimeout(() => setShowTour(true), 800);
+    }
   };
 
   const renderMain = (isMobile = false) => (
@@ -300,6 +311,7 @@ export default function App() {
             {renderMain()}
           </div>
         </div>
+      <div data-tour="ebenezer" style={{ display: 'contents' }}>
       <EbenezerRail
           history={ebenHistory}
           setHistory={setEbenHistory}
@@ -312,6 +324,7 @@ export default function App() {
           railOpen={ebenRailOpen}
           setRailOpen={setEbenRailOpen}
         />
+      </div>
       </div>
 
       {/* MOBILE LAYOUT: original header + tabs */}
@@ -441,6 +454,10 @@ export default function App() {
       )}
       <PassiveFeedbackButton api={api} />
 
+      {showTour && (
+        <TourGuide onComplete={() => setShowTour(false)} />
+      )}
+
       {showFirstShowPrompt && (
         <div className="modal-overlay" style={{ zIndex: 750 }}>
           <div className="modal" style={{ maxWidth: 400, textAlign: 'center' }}>
@@ -483,6 +500,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
