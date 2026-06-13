@@ -900,6 +900,12 @@ select option { background: var(--bg); color: var(--green); }
 /* Song play inline */
 .song-play-row { display: none; }
 .song-play-inline { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: var(--cyan); border: 1px solid rgba(0,255,255,0.32); background: rgba(0,255,255,0.05); text-decoration: none; font-size: 0.7rem; flex-shrink: 0; transition: all 0.15s; }
+
+.song-play-inline.active {
+  color: var(--cyan);
+  background: rgba(0,224,208,0.12);
+  border-color: rgba(0,224,208,0.4);
+}
 .song-play-inline:hover { background: rgba(0,255,255,0.15); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,255,255,0.35); }
 .song-play-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid rgba(0,255,255,0.38); color: var(--cyan); font-size: 0.7rem; text-decoration: none; transition: all 0.15s; flex-shrink: 0; -webkit-tap-highlight-color: transparent; box-shadow: 0 0 4px rgba(0,255,255,0.12); }
 .song-play-btn:hover { background: rgba(0,255,255,0.14); border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,255,255,0.4); color: #fff; }
@@ -1358,3 +1364,4 @@ select option { background: var(--bg); color: var(--green); }
 .avatar-pulse {
   animation: avatar-pulse 2s ease-in-out infinite;
 }
+
