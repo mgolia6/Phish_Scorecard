@@ -435,6 +435,9 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           {sec === 'shop' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 0 40px' }}>
 
+              {/* Mockingbird donation tracker */}
+              <DonationCard />
+
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, padding: '0 4px' }}>
                 Represent at lot. Every purchase supports an independent fan project.
               </div>
@@ -505,6 +508,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
 
 
