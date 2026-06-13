@@ -81,6 +81,7 @@ export default function App() {
       if (!res.ok) return; // non-401 error — keep token, stay logged in
       const u = await res.json();
       setUser(u);
+      setProfileTapped(false); // reset pulse on every session load
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
@@ -118,6 +119,7 @@ export default function App() {
   const handleAuthSuccess = (u, isNewUser = false) => {
     setUser(u);
     setShowAuth(false);
+    setProfileTapped(false); // reset pulse on every login
     if (!u.tandc_accepted) {
       setShowTandC(true);
       if (isNewUser) {
@@ -503,6 +505,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
