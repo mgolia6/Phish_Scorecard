@@ -7,6 +7,10 @@
     {
       "path": "/api/emails/cron",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/etsy/sync",
+      "schedule": "0 15 * * *"
     }
   ],
   "rewrites": [
@@ -165,6 +169,18 @@
     {
       "source": "/api/admin/donations",
       "destination": "/api/admin/donations"
+    },
+    {
+      "source": "/api/etsy/auth",
+      "destination": "/api/etsy/auth"
+    },
+    {
+      "source": "/api/etsy/callback",
+      "destination": "/api/etsy/callback"
+    },
+    {
+      "source": "/api/etsy/sync",
+      "destination": "/api/etsy/sync"
     },
     {
       "source": "/(.*)",
