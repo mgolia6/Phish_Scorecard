@@ -210,7 +210,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         </div>
         {/* Section tabs */}
         <div className="profile-modal-tabs">
-          {[['phish','MY PHISH'],['badges','BADGES'],['about','ABOUT']].map(([k,l]) => (
+          {[['phish','MY PHISH'],['badges','BADGES'],['about','ABOUT'],['shop','SHOP']].map(([k,l]) => (
             <button key={k} onClick={() => setSec(k)}
               className={`profile-modal-tab ${sec === k ? 'active' : ''}`}>{l}</button>
           ))}
@@ -429,6 +429,62 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
             </div>
           )}
 
+          {/* ── SHOP TAB ── */}
+          {sec === 'shop' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 0 40px' }}>
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, padding: '0 4px' }}>
+                Represent at lot. Every purchase supports an independent fan project.
+              </div>
+
+              {[
+                {
+                  name: 'PHREEZER LOGO T-SHIRT',
+                  sub: 'Ice Blue Tech Typography',
+                  price: 'From $23.99',
+                  desc: 'Softstyle tee. Phreezer snowflake logo across the chest. Multiple colors and sizes.',
+                  url: 'https://mattymattemodgepodge.etsy.com/listing/4521116067',
+                  img: 'https://i.etsystatic.com/65030338/r/il/d9b7e1/8178642947/il_794xN.8178642947_6oe7.jpg',
+                  color: 'var(--cyan)',
+                },
+                {
+                  name: 'PHREEZER BUMPER STICKER',
+                  sub: 'Snowflake Tech Decal',
+                  price: '$11.99',
+                  desc: 'Matte finish, UV-resistant, waterproof. For bumpers, laptops, water bottles.',
+                  url: 'https://mattymattemodgepodge.etsy.com/listing/4521118995',
+                  img: 'https://i.etsystatic.com/65030338/r/il/109253/8130742818/il_794xN.8130742818_7dzl.jpg',
+                  color: 'var(--orange)',
+                },
+              ].map(p => (
+                <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                  <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderTop: `2px solid ${p.color}`, overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: 200, overflow: 'hidden', background: '#111' }}>
+                      <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    </div>
+                    <div style={{ padding: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                        <div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', letterSpacing: '2px', color: p.color, fontWeight: 700, marginBottom: 2 }}>{p.name}</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)' }}>{p.sub}</div>
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: p.color, whiteSpace: 'nowrap', marginLeft: 10 }}>{p.price}</div>
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 12 }}>{p.desc}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: p.color }}>SHOP ON ETSY →</div>
+                    </div>
+                  </div>
+                </a>
+              ))}
+
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.15)', lineHeight: 1.8, textAlign: 'center', paddingTop: 8 }}>
+                Sold via Etsy · Fulfilled by Printify<br />
+                Questions? phreezer.support@mpgink.com
+              </div>
+
+            </div>
+          )}
+
         </div>
       </div>
     </div>
@@ -438,4 +494,5 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
