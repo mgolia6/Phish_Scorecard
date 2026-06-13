@@ -8,10 +8,13 @@ At the start of every session, before anything else:
 1. Pull this file (INSTRUCTIONS.md) from the repo via GitHub API
 2. Pull SESSION_LOG.md from the same repo
 3. Pull ROADMAP.md from the same repo
-4. Pull STYLE_GUIDE.md from the same repo
-5. Read all four — weight actual code over session log if there's a conflict
-6. Surface current state, open issues, what was last worked on
-7. Then ask Matthew where he wants to start — or if he's already said, get into it
+4. Pull LAYOUT.md from the same repo
+5. Pull STYLE_GUIDE.md from the same repo (if it exists)
+6. Read all of them — weight actual code over session log if there's a conflict
+7. Surface current state, open issues, what was last worked on
+8. Then ask Matthew where he wants to start — or if he's already said, get into it
+
+**LAYOUT.md is mandatory before any UI work.** Before recommending or making any layout change, tab restructure, navigation change, or component placement decision — read LAYOUT.md first. It records what has been decided, what has been tried and abandoned, and what is explicitly off-limits. Do not recommend things that are already in place or that were explicitly reversed.
 
 ## Context Window Management
 - At ~75% context window, stop mid-task if needed and write a full SESSION_LOG.md update before continuing
@@ -95,8 +98,9 @@ After each session, update SESSION_LOG.md with:
 Before ending any session, in this order:
 1. **Update SESSION_LOG.md** — what shipped, decisions, open debt, next priorities
 2. **Update ROADMAP.md** — mark completed items, add any new items raised during the session, remove anything that's no longer relevant
-3. **Validate ROADMAP against session** — explicitly check: did anything get discussed or requested this session that isn't captured? Did we complete anything that's still marked open? Surface any gaps to Matthew before closing.
-4. **Confirm with Matthew** — say explicitly "roadmap and session log are updated — anything missing?" Do not assume the session is done until Matthew confirms.
+3. **Update LAYOUT.md** — if any UI, navigation, tab structure, or component placement changed this session, update LAYOUT.md to reflect it. This is how the next session knows where things live.
+4. **Validate ROADMAP against session** — explicitly check: did anything get discussed or requested this session that isn't captured? Did we complete anything that's still marked open? Surface any gaps to Matthew before closing.
+5. **Confirm with Matthew** — say explicitly "roadmap, session log, and layout doc are updated — anything missing?" Do not assume the session is done until Matthew confirms.
 
 The failure mode this prevents: Matthew asks for the roadmap, Claude gives stale information because the update hasn't happened yet. The roadmap must reflect the current session before the session ends.
 
@@ -105,4 +109,5 @@ The failure mode this prevents: Matthew asks for the roadmap, Claude gives stale
 - Any feature, fix, or idea raised during a session that isn't already on the roadmap gets added before wrap
 - Completed items get marked ✅ with the session date
 - Do not let the roadmap drift more than one session behind
+
 
