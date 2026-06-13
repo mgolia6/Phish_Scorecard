@@ -56,6 +56,14 @@ const API_PROBES = [
   { name: 'FEEDBACK / SUBMIT',   path: '/api/feedback/submit',          method: 'GET', expectError: true },
 ];
 
+// External API health probes — these hit third-party services directly
+const EXTERNAL_PROBES = [
+  { name: 'PHISH.NET API',  url: 'https://api.phish.net/v5/shows/recent.json?apikey=&limit=1', label: 'Phish.net' },
+  { name: 'PHISH.IN API',   url: 'https://phish.in/api/v2/shows?per_page=1', label: 'Phish.in' },
+  { name: 'ANTHROPIC API',  url: 'https://api.anthropic.com/v1/models', label: 'Anthropic', expectApiKey: true },
+  { name: 'RESEND API',     url: 'https://api.resend.com/emails', label: 'Resend', expectError: true },
+];
+
 function ApiHealthTab() {
   const [results, setResults] = useState([]);
   const [running, setRunning] = useState(false);
@@ -641,13 +649,204 @@ function UsersTab({ api, showError }) {
   );
 }
 
+// ── External API Health ────────────────────────────────────
+function ExternalApiHealthTab() {
+  const [results, setResults] = useState([]);
+  const [running, setRunning] = useState(false);
+  const [lastRun, setLastRun] = useState(null);
+
+  const runProbes = useCallback(async () => {
+    setRunning(true);
+    const fresh = EXTERNAL_PROBES.map(p => ({ ...p, status: 'pending', ms: null, statusCode: null }));
+    setResults(fresh);
+    const updated = [...fresh];
+
+    await Promise.all(EXTERNAL_PROBES.map(async (probe, i) => {
+      const t0 = Date.now();
+      try {
+        const res = await fetch(probe.url, {
+          method: 'GET',
+          signal: AbortSignal.timeout(8000),
+        });
+        const ms = Date.now() - t0;
+        // 401/403 means the service is up but rejected us — that's fine, means it's alive
+        const ok = res.status < 500;
+        updated[i] = { ...probe, status: ok ? (ms > 3000 ? 'slow' : 'ok') : 'error', ms, statusCode: res.status };
+      } catch (e) {
+        updated[i] = { ...probe, status: 'error', ms: Date.now() - t0, statusCode: null, err: e.message };
+      }
+      setResults([...updated]);
+    }));
+
+    setLastRun(new Date());
+    setRunning(false);
+  }, []);
+
+  useEffect(() => { runProbes(); }, []);
+
+  const statusColor = s => s === 'ok' ? D.green : s === 'slow' ? D.orange : s === 'pending' ? D.muted : D.red;
+  const statusIcon  = s => s === 'ok' ? '✓' : s === 'slow' ? '⚡' : s === 'pending' ? '◌' : '✗';
+
+  return (
+    <div style={{ padding: '0 10px 20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <SectionLabel color={D.orange}>◈ EXTERNAL API STATUS</SectionLabel>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
+          <button onClick={runProbes} disabled={running} style={{
+            fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', padding: '8px 14px',
+            border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer',
+          }}>{running ? 'CHECKING...' : '↺ RECHECK'}</button>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {results.map((r, i) => (
+          <div key={i} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 14px', background: 'rgba(0,0,0,0.3)',
+            borderLeft: `3px solid ${statusColor(r.status)}`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.9rem', color: statusColor(r.status) }}>
+                {statusIcon(r.status)}
+              </span>
+              <span style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', color: D.label }}>
+                {r.name}
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              {r.statusCode && (
+                <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{r.statusCode}</span>
+              )}
+              {r.ms !== null && (
+                <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: statusColor(r.status) }}>{r.ms}ms</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── AI Usage Tab ───────────────────────────────────────────
+function AiUsageTab({ api }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('phish_token');
+    fetch('/api/admin/ai-usage', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(e => { setError(e.message); setLoading(false); });
+  }, []);
+
+  if (loading) return <div style={{ padding: 20, fontFamily: D.mono, color: D.muted, fontSize: '0.75rem' }}>LOADING...</div>;
+  if (error)   return <div style={{ padding: 20, fontFamily: D.mono, color: D.red, fontSize: '0.75rem' }}>{error}</div>;
+  if (!data)   return null;
+
+  const { totals, byFeature, byDay, byModel, recent } = data;
+
+  const fmt = n => Number(n).toLocaleString();
+  const fmtCost = n => `$${Number(n).toFixed(4)}`;
+
+  return (
+    <div style={{ padding: '0 10px 40px' }}>
+
+      {/* Totals */}
+      <SectionLabel color={D.orange}>◈ AI USAGE — ALL TIME</SectionLabel>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 24 }}>
+        {[
+          { label: 'TOTAL CALLS',    val: fmt(totals.total_calls),          color: D.cyan },
+          { label: 'INPUT TOKENS',   val: fmt(totals.total_input_tokens),   color: D.green },
+          { label: 'OUTPUT TOKENS',  val: fmt(totals.total_output_tokens),  color: D.orange },
+          { label: 'EST. COST',      val: fmtCost(totals.total_cost_usd),   color: D.red },
+        ].map(s => (
+          <div key={s.label} style={{ padding: '12px 10px', background: 'rgba(0,0,0,0.4)', borderTop: `2px solid ${s.color}`, textAlign: 'center' }}>
+            <div style={{ fontFamily: D.mono, fontSize: '1rem', color: s.color, fontWeight: 700 }}>{s.val}</div>
+            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* By Feature */}
+      <SectionLabel color={D.cyan}>◈ BY FEATURE</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+        {byFeature.map(f => (
+          <div key={f.feature} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderLeft: `3px solid ${D.cyan}` }}>
+            <span style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', color: D.label }}>{f.feature.toUpperCase()}</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{fmt(f.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{fmt(parseInt(f.input_tokens) + parseInt(f.output_tokens))} tokens</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(f.cost_usd)}</span>
+            </div>
+          </div>
+        ))}
+        {byFeature.length === 0 && <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted, padding: '10px 0' }}>No data yet.</div>}
+      </div>
+
+      {/* By Model */}
+      <SectionLabel color={D.green}>◈ BY MODEL</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+        {byModel.map(m => (
+          <div key={m.model} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderLeft: `3px solid ${D.green}` }}>
+            <span style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.label }}>{m.model}</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.green }}>{fmt(m.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(m.cost_usd)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Last 30 days */}
+      <SectionLabel color={D.label}>◈ LAST 30 DAYS</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 24 }}>
+        {byDay.slice(0, 14).map(d => (
+          <div key={d.day} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', background: 'rgba(0,0,0,0.2)' }}>
+            <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{d.day}</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{d.calls} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(d.cost_usd)}</span>
+            </div>
+          </div>
+        ))}
+        {byDay.length === 0 && <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted, padding: '10px 0' }}>No data yet.</div>}
+      </div>
+
+      {/* Recent calls */}
+      <SectionLabel color={D.label}>◈ RECENT CALLS</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {recent.map(r => (
+          <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', background: 'rgba(0,0,0,0.2)' }}>
+            <div>
+              <span style={{ fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', color: D.orange, marginRight: 10 }}>{r.feature}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted }}>{r.username || 'system'}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted }}>{r.input_tokens}+{r.output_tokens}tok</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.orange }}>{fmtCost(r.cost_usd)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main AdminTab ──────────────────────────────────────────
 const TABS = [
-  { id: 'users',    label: 'USERS',    color: 'var(--cyan)' },
-  { id: 'system',   label: 'SYSTEM',   color: 'var(--cyan)' },
-  { id: 'api',      label: 'API',      color: 'var(--green)' },
-  { id: 'errors',   label: 'ERRORS',   color: 'var(--red, #ff3333)' },
-  { id: 'feedback', label: 'FEEDBACK', color: 'var(--orange)' },
+  { id: 'users',     label: 'USERS',     color: 'var(--cyan)' },
+  { id: 'system',    label: 'SYSTEM',    color: 'var(--cyan)' },
+  { id: 'api',       label: 'API',       color: 'var(--green)' },
+  { id: 'external',  label: 'EXTERNAL',  color: 'var(--orange)' },
+  { id: 'ai-usage',  label: 'AI USAGE',  color: 'var(--orange)' },
+  { id: 'errors',    label: 'ERRORS',    color: 'var(--red, #ff3333)' },
+  { id: 'feedback',  label: 'FEEDBACK',  color: 'var(--orange)' },
 ];
 
 export function AdminTab({ api, showMessage, showError }) {
@@ -669,12 +868,15 @@ export function AdminTab({ api, showMessage, showError }) {
         ))}
       </div>
 
-      {activeTab === 'users'    && <UsersTab    api={api} showError={showError} />}
-      {activeTab === 'system'   && <SystemTab   api={api} showMessage={showMessage} />}
+      {activeTab === 'users'    && <UsersTab           api={api} showError={showError} />}
+      {activeTab === 'system'   && <SystemTab          api={api} showMessage={showMessage} />}
       {activeTab === 'api'      && <ApiHealthTab />}
+      {activeTab === 'external' && <ExternalApiHealthTab />}
+      {activeTab === 'ai-usage' && <AiUsageTab          api={api} />}
       {activeTab === 'errors'   && <ErrorLogTab />}
-      {activeTab === 'feedback' && <FeedbackTab api={api} />}
+      {activeTab === 'feedback' && <FeedbackTab         api={api} />}
     </div>
   );
 }
+
 
