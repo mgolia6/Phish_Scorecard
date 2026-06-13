@@ -3,6 +3,7 @@ import { useApi } from '../useApi';
 import { API, PNET, RELISTEN, TODAY, formatDate, formatDuration, filterByQuery } from '../utils';
 import { SaveCelebration } from './Celebrations';
 import { SongRating, SetScore } from './ScorecardHelpers';
+import { InlineAudioPlayer } from './AudioPlayer';
 
 export function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShowDate, onShowLoaded, onFeedbackTrigger }) {
   const [query, setQuery] = useState('');
@@ -31,6 +32,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [vibeExpanded, setVibeExpanded] = useState(false);
   const [loadingVibe, setLoadingVibe] = useState(false);
   const [vibeError, setVibeError] = useState(false);
+  const [activeAudio, setActiveAudio] = useState(null); // posKey of currently open player
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
@@ -576,9 +578,16 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                           </span>
                           <div className="song-row-controls">
                             {audio?.mp3_url ? (
-                              <a href={audio.mp3_url} target="_blank" rel="noopener noreferrer"
-                                className="song-play-inline" title={`Stream on Phish.in`}
-                                onClick={e => e.stopPropagation()}>▶</a>
+                              <button
+                                className={`song-play-inline${activeAudio === (song.posKey || song.song) ? ' active' : ''}`}
+                                title="Play on Phish.in"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setActiveAudio(prev =>
+                                    prev === (song.posKey || song.song) ? null : (song.posKey || song.song)
+                                  );
+                                }}
+                              >▶</button>
                             ) : (
                               <span style={{ width: 32, display: 'inline-block', flexShrink: 0 }} />
                             )}
@@ -599,6 +608,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                                 ? <span className="song-notes-preview">✎ {ratings[song.posKey || song.song].notes}</span>
                                 : <span className="song-notes-add">+ NOTE</span>}
                             </button>
+                          )}
+                          {activeAudio === (song.posKey || song.song) && audio?.mp3_url && (
+                            <InlineAudioPlayer
+                              track={audio}
+                              onClose={() => setActiveAudio(null)}
+                            />
                           )}
                         </div>
                       );
@@ -715,6 +730,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 // ON THIS DAY CARD — standalone, expandable, AI review synthesis
 // ============================================================
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
 
 
 
