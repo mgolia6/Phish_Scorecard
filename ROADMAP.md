@@ -1,7 +1,7 @@
 # Phreezer — Roadmap
 
 ## Target: Beta launch to Phish.net community. Phish summer tour starts July 7.
-## Last updated: 2026-06-13
+## Last updated: 2026-06-13 (evening)
 
 ---
 
@@ -109,7 +109,7 @@
 - Username required at registration — field exists in form, confirm it's enforced
 - Top Shows blank until more community ratings exist (data problem, not code)
 - Deep Phreeze new data fields won't populate until users run full sync
-- phreezer.mpgink.com subdomain not yet configured in GoDaddy for Resend
+- ~~phreezer.mpgink.com subdomain~~ — confirmed live, mpgink.com domain already configured in Resend ✅
 
 ---
 
@@ -120,12 +120,7 @@
 
 ### 🔴 IMMEDIATE — Before Forum Post Goes Live
 
-**1. Error Monitoring — Sentry**
-- Free tier, ~30 min to wire in
-- Client-side: `@sentry/react` in main.jsx
-- Server-side: `@sentry/node` in Vercel functions
-- Without this: zero visibility into production errors once real users hit it
-- DSN goes in Vercel env vars as `SENTRY_DSN`
+**1. Error Monitoring — Sentry** ✅ (2026-06-13 — code shipped, Matthew adds VITE_SENTRY_DSN to Vercel to activate)
 
 **2. Discord Server**
 - Matthew creates server, I help structure channels
@@ -142,11 +137,7 @@
 
 ### 🟠 WEEK 1 POST-LAUNCH
 
-**4. Analytics — Posthog**
-- Free tier, privacy-friendly, built for product analytics
-- Track: feature usage, drop-off points, rating completion rate, tab engagement
-- Self-hostable if privacy becomes a concern later
-- ~2 hours to wire in
+**4. Analytics — Posthog** ✅ (2026-06-13 — code shipped, Matthew adds VITE_POSTHOG_KEY to Vercel to activate)
 
 **5. Bug Tracking — GitHub Issues**
 - Enable Issues on the Phish_Scorecard repo
@@ -220,4 +211,5 @@
 - **CRON_SECRET**: Set in Vercel env vars — required for cron endpoint auth
 - **Tour state**: Server-side (tour_completed on users table) — admin can reset
 - **donation_tracker**: Single row (id=1), cumulative items_sold, $1.00/item
+
 
