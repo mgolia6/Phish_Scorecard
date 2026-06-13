@@ -116,7 +116,30 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
             </>
           )}
 
-          {/* FEEDBACK — below scorecard */}
+          {/* SHOP */}
+          <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
+          {expanded ? (
+            <div
+              className={`sidebar-section-label ${tab === 'shop' ? 'active' : ''}`}
+              onClick={() => setTab('shop')}
+              style={{ cursor: 'pointer', padding: '14px 16px', color: 'var(--orange)' }}
+            >
+              ◈ SHOP
+            </div>
+          ) : (
+            <>
+              {sectionDot('var(--orange)')}
+              <button
+                className={`sidebar-nav-btn sidebar-nav-sub-item ${tab === 'shop' ? 'active' : ''}`}
+                onClick={() => setTab('shop')}
+                title="SHOP"
+              >
+                <span className="sidebar-nav-glyph" style={{ color: 'var(--orange)' }}>◈</span>
+              </button>
+            </>
+          )}
+
+          {/* FEEDBACK — below shop */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
           <button
             className="sidebar-nav-btn sidebar-nav-sub-item"
@@ -180,6 +203,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
     </div>
   );
 }
+
 
 
 
