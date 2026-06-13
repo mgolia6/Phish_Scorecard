@@ -9,11 +9,23 @@ export default async function handler(req, res) {
   const user = verifyToken(req);
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-  const { field } = req.query; // 'tandc' or 'onboarding'
+  const { field } = req.query;
   const pool = getPool();
 
-  const col = field === 'onboarding' ? 'onboarding_complete' : 'tandc_accepted';
+  const colMap = {
+    tandc:      'tandc_accepted',
+    onboarding: 'onboarding_complete',
+    tour:       'tour_completed',
+  };
+
+  const col = colMap[field];
+  if (!col) return res.status(400).json({ error: 'Unknown field' });
+
   try {
+    // Lazy-add tour_completed column if it doesn't exist
+    if (field === 'tour') {
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS tour_completed BOOLEAN DEFAULT FALSE').catch(() => {});
+    }
     await pool.query(`UPDATE users SET ${col} = TRUE WHERE id = $1`, [user.id]);
     res.json({ ok: true });
   } catch (err) {
