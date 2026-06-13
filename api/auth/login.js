@@ -2,11 +2,19 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
+import { checkRateLimit } from '../_ratelimit.js';
 
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Rate limit: 10 attempts per IP per 15 minutes
+  const rl = checkRateLimit(req, 'login', 10, 15 * 60 * 1000);
+  if (!rl.allowed) {
+    res.setHeader('Retry-After', rl.retryAfter);
+    return res.status(429).json({ error: 'Too many login attempts. Try again later.', retryAfter: rl.retryAfter });
+  }
 
   const pool = getPool();
   const { email, password } = req.body;
