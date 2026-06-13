@@ -448,13 +448,22 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   color: 'var(--cyan)',
                 },
                 {
-                  name: 'PHREEZER BUMPER STICKER',
+                  name: 'PHREEZER LOGO BUMPER STICKER',
                   sub: 'Snowflake Tech Decal',
-                  price: '$11.99',
+                  price: 'From $11.99',
                   desc: 'Matte finish, UV-resistant, waterproof. For bumpers, laptops, water bottles.',
                   url: 'https://mattymattemodgepodge.etsy.com/listing/4521118995',
                   img: 'https://i.etsystatic.com/65030338/r/il/109253/8130742818/il_794xN.8130742818_7dzl.jpg',
                   color: 'var(--orange)',
+                },
+                {
+                  name: "DON'T SUCK AT PHISH BUMPER STICKER",
+                  sub: 'The Tagline. On a Sticker.',
+                  price: 'From $8.99',
+                  desc: 'Three sizes. Matte finish, UV laminate, durable vinyl rated 5+ years outdoors. Say it loud.',
+                  url: 'https://mattymattemodgepodge.etsy.com/listing/4521316287',
+                  img: 'https://i.etsystatic.com/65030338/r/il/cce4b4/8132229006/il_794xN.8132229006_2xw7.jpg',
+                  color: 'var(--green)',
                 },
               ].map(p => (
                 <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
@@ -494,5 +503,6 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
 
