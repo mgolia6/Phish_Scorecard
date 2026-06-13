@@ -23,6 +23,7 @@ import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
 import { TourGuide } from './components/TourGuide';
+import { Analytics, identifyUser, resetIdentity } from './analytics';
 
 export default function App() {
   const [tab, setTab] = useState('scorecard'); // will be overridden on user load
@@ -53,11 +54,17 @@ export default function App() {
   const [ebenError, setEbenError] = useState(null);
   const [ebenInput, setEbenInput] = useState('');
   const [ebenOpen, setEbenOpen] = useState(false);     // mobile drawer
+  const openEbenezerDrawer = () => { setEbenOpen(true); Analytics.ebenezerOpened('drawer'); };
   const [ebenRailOpen, setEbenRailOpen] = useState(true); // desktop rail
   const [showTour, setShowTour] = useState(false);
   const [profileTapped, setProfileTapped] = useState(false);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
+
+  // Track tab views
+  useEffect(() => {
+    Analytics.tabViewed(tab);
+  }, [tab]);
 
   const showMessage = useCallback((text, type = 'info') => {
     const id = Date.now() + Math.random();
@@ -81,6 +88,7 @@ export default function App() {
       if (!res.ok) return; // non-401 error — keep token, stay logged in
       const u = await res.json();
       setUser(u);
+      identifyUser(u);
       setProfileTapped(false); // reset pulse on every session load
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
       if (!u.tandc_accepted) {
@@ -120,6 +128,8 @@ export default function App() {
     setUser(u);
     setShowAuth(false);
     setProfileTapped(false); // reset pulse on every login
+    if (isNewUser) { Analytics.registered(); } else { Analytics.loginSuccess(); }
+    identifyUser(u);
     if (!u.tandc_accepted) {
       setShowTandC(true);
       if (isNewUser) {
@@ -135,7 +145,7 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); };
+  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); Analytics.loggedOut(); resetIdentity(); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   // Measure sticky header height dynamically
@@ -155,6 +165,7 @@ export default function App() {
     setScorecardOverlayDate(showDate);
     setScorecardOverlayOrigin(tab);
     setScorecardOverlay(true);
+    Analytics.scorecardOpened(showDate, tab);
   };
 
   const [kpiRefreshKey, setKpiRefreshKey] = useState(0);
@@ -183,6 +194,7 @@ export default function App() {
     setTimeout(() => setTab('my-shows'), 100);
     // Tour fires server-side — check user flag not localStorage
     setShowTour(true);
+    Analytics.tourStarted();
   };
 
   const handleOnboardingScorecard = async () => {
@@ -500,11 +512,12 @@ export default function App() {
         input={ebenInput}
         setInput={setEbenInput}
         open={ebenOpen}
-        setOpen={setEbenOpen}
+        setOpen={(v) => { if (v) Analytics.ebenezerOpened('drawer'); setEbenOpen(v); }}
       />}
     </div>
   );
 }
+
 
 
 
