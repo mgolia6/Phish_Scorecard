@@ -365,9 +365,11 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   I’ve always been fascinated by statistics, keeping records of things that others might have felt were arbitrary or unimportant. That is a huge allure to this community that keeps track of so many of the important details.
                 </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
-                  So it made sense that my deeper involvement be a way for fans to visualize a lot of their stats in a more engaging way. Also, to add some granularity to the show rating system. I’ve brought together the best of all worlds: the ability to rate shows by song, accessing links directly to the live recordings, while simultaneously serving up stats that will hopefully meet the high standard of this fabulous community.
+                  The honest inspiration for this whole thing is <a href="http://www.ihoz.com/PhishStats.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cyan)', textDecoration: 'none' }}>ihoz.com</a> — ZZYZX’s Phishtistics page. I’ve loved that site for years. It’s where the idea was sparked. The data compiled in this community over the decades is extraordinary — it deserves a place to shine. Phreezer is my attempt to build on that foundation and elevate it for a new era.
                 </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
+                  It started as an Excel spreadsheet pulling from the Phish.net API, turned into a stab at a website, and eventually became this. The ability to rate shows by song, stream the live recording directly from Phish.in, and surface stats specific to you — all in one place.
+                </p>
                   Please use the feedback button to share your thoughts — what’s missing for you, what you like, what you hate, what I did right and wrong. Be honest. I’ll try to accommodate and adjust to the best of my ability.
                 </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0, fontStyle: 'italic' }}>
@@ -503,6 +505,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
 
 
