@@ -370,6 +370,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
                   It started as an Excel spreadsheet pulling from the Phish.net API, turned into a stab at a website, and eventually became this. The ability to rate shows by song, stream the live recording directly from Phish.in, and surface stats specific to you — all in one place.
                 </p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
                   Please use the feedback button to share your thoughts — what’s missing for you, what you like, what you hate, what I did right and wrong. Be honest. I’ll try to accommodate and adjust to the best of my ability.
                 </p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: 0, fontStyle: 'italic' }}>
@@ -508,6 +509,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
 
 
