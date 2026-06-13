@@ -49,7 +49,7 @@ const STEPS = [
     target: 'profile-avatar',
     position: 'above',
     title: 'YOUR PROFILE',
-    body: 'Connect your Phish.net account here. Your full attendance history imports in seconds. Also where you set your preferences and pick your avatar.',
+    body: 'Connect your Phish.net account, set preferences, and pick your avatar. Also where you'll find ABOUT — the story behind the app — and SHOP, if you want to represent at lot.',
   },
 ];
 
@@ -298,3 +298,4 @@ export function TourGuide({ onComplete, setTab }) {
     </>
   );
 }
+
