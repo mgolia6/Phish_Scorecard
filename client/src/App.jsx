@@ -22,7 +22,6 @@ import { AdminTab } from './components/AdminTab';
 import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
-import { ShopTab } from './components/ShopTab';
 import { TourGuide } from './components/TourGuide';
 
 export default function App() {
@@ -246,7 +245,6 @@ export default function App() {
       {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" />}
       {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
-      {tab === 'shop' && <ShopTab />}
     </>
   );
 
@@ -382,7 +380,6 @@ export default function App() {
               <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
             </>}
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
-            <button className={`tab-btn ${tab === 'shop' ? 'active' : ''}`} onClick={() => setTab('shop')}>SHOP</button>
           </nav>
           {user && ['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
@@ -503,6 +500,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
