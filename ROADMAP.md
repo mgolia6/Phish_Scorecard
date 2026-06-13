@@ -1,7 +1,7 @@
 # Phreezer — Roadmap
 
-## Target: Rate limiting + Community tab live before July 4. Phish summer tour starts July 7.
-## Last updated: 2026-06-10
+## Target: Beta launch to Phish.net community. Phish summer tour starts July 7.
+## Last updated: 2026-06-13
 
 ---
 
@@ -16,127 +16,132 @@
 
 ### Security / Auth
 - Email verification — register sends email, login hard-blocks unverified (MIKE SAID NO screen)
+- Rate limiting — login (10/15min), register (5/60min) per IP — MIKE SAYS NO screen on 429
 - Verification email via Resend from noreply@mpgink.com
 - RESEND_API_KEY in Vercel shared env
-- Neon token exposure resolved, repo clean
 
-### KPI Fix
-- SHOWS / TOP VENUE / FIRST SHOW now count from both attendance + user_show_attendance
-- Non-import users see populated KPIs after rating
+### Email System (2026-06-13)
+- Onboarding email — fires after email verification, Uncle Ebenezer voice
+- Day 3 nudge — fires if zero ratings after 3 days
+- Day 7 engage — fires if 1+ ratings after 7 days, shows count
+- Day 30 re-engage — fires if inactive 30+ days, resets every 60 days
+- Milestone emails — 5, 25, 50 shows phrozen
+- Daily cron at 2pm UTC via Vercel cron
+- email_log table prevents duplicates
+- All from: Phreezer Support <phreezer.support@mpgink.com>
 
-### Scorecard
-- Black screen on first star click fixed (posKey in overallAvg, SaveCelebration timer)
-- Sandwiched/reprised song bug fixed (posKey keying)
-- Full reviews shown (no 300-char truncation)
+### Onboarding Tour (2026-06-13)
+- 9-step centered modal — Ebenezer intro + 7 feature stops + outro
+- No DOM targeting — works on mobile and desktop
+- Server-side tour_completed flag — admin can RESET TOUR per user
+- Fires after any onboarding path completes
 
-### MY PHREEZER
-- My Shows, My Songs, My Venues, My States, My Phriends, Deep Phreeze — all shipped
+### Shop + Donations (2026-06-13)
+- Shop tab in ProfileModal — 3 Etsy listings (t-shirt, logo sticker, DSAP sticker)
+- $1/item donated to Mockingbird Foundation
+- Donation tracker — admin DONATIONS tab to log sales, public display in Shop + Community tabs
+- Etsy OAuth integration built and ready — pending Etsy app review
 
-### OTD Carousel (rebuilt 2026-06-10)
-- Pulls ALL historical Phish shows on today's MM-DD from Phish.net (not just attended)
-- 1hr server-side cache via /api/shows/on-this-day
-- Tap left/right half to advance — slide animation with snap
-- Alternating card tint (cyan even / warm odd) for visual distinction
-- Attended: green border + glow + ✓ I WAS THERE badge
-- Rated: orange border + glow + ◈ PHROZEN badge
-- Color-coded dot indicators; legible N of N counter
-- Empty state if Phish never played this date
+### AI Usage Logging (2026-06-13)
+- ai_usage_log table — logs every Ebenezer + Vibe Check call
+- Tracks model, input/output tokens, estimated cost per call
+- Admin AI USAGE tab — totals, by feature, by model, last 30 days, recent calls
 
-### Admin Panel (rebuilt 2026-06-10)
-- 5-tab layout: USERS / SYSTEM / API / ERRORS / FEEDBACK
-- USERS: collapsible cards (tap to expand), mini stat pills always visible, all actions behind expand
-- SYSTEM: live DB stat boxes (users, ratings, attendance, cached shows, vibe checks, feedback), Run Migrations + Clear Cache buttons, /api/admin/stats endpoint
-- API HEALTH: probes all 15 endpoints on load, response time + status code, color-coded ✓/⚡/✗, summary bar, manual refresh
-- ERROR LOG: captures console.error + uncaught exceptions + unhandled promise rejections at module level; expandable stack traces; Copy JSON / Export .txt / Clear
-- FEEDBACK: full inbox with type filter tabs, section breakdown, free text quoted, answers inline
-- Font sizes bumped throughout for mobile legibility
+### Admin Panel
+- USERS: collapsible cards, all actions — Reset Onboarding, Reset Tour, Reset Password, Clear Data, Delete
+- Clear Data now wipes user_show_attendance (Albany show bug fixed)
+- SYSTEM: live DB stats, Run Migrations, Clear Cache
+- API HEALTH: probes all internal endpoints
+- EXTERNAL: probes Phish.net, Phish.in, Anthropic, Resend
+- AI USAGE: full token/cost dashboard
+- ERRORS: console capture, export
+- FEEDBACK: full inbox
+- DONATIONS: items sold input, total donated display
 
-### Onboarding
-- Clean two-path flow: import or skip → questions → proceed
-- No guilt trip, clear bypass for non-phish.net users
+### Audio (2026-06-13)
+- Audio proxy endpoint — pipes Phish.in MP3s server-side (CORS bypass)
+- Inline audio player in scorecard — expandable drop-down per song row
+- Play/pause, scrubber, seek, duration — no external navigation
 
-### Profile
-- ProfileModal: MY PHISH / BADGES / ABOUT tabs
-- All questions save correctly (stage_side, show_vibe fixed)
-- Avatar tappable in sidebar footer
+### Profile / About (2026-06-13)
+- ProfileModal: MY PHISH / BADGES / ABOUT / SHOP tabs
+- About section: ihoz.com origin story, Phish.net foundation, Excel → app journey
+- Shop tab: 3 Etsy listings + DonationCard
 
-### Desktop Layout
-- Three-column: sidebar | main | Ebenezer rail
-- Sidebar hierarchy: MY PHREEZER → items, COMMUNITY → items, SCORECARD, FEEDBACK
-- Ebenezer rail: persistent, collapsible, shared state with mobile drawer
-- Both headers 88px, 2px colored borders, matching collapse tabs
-- Song row: desktop grid override prevents name crushing
-- Feedback: sidebar nav item only
+### Ebenezer (2026-06-13)
+- System prompt rewritten — loving jaded vet character
+- Sees 400+ shows, dry/weary but genuine love underneath
+- Token usage logged after every call
 
-### AI
-- Uncle Ebenezer — desktop rail with matching send button
-- Vibe Check — fixed model, tokens, JSON parser
+### UX
+- Avatar pulses cyan → orange on every login until tapped
+- OTD Carousel — all historical shows on today's date
+- Deep Phreeze — full stats engine
+- Uncle Ebenezer — desktop rail + mobile drawer
+
+### KPI / Scorecard Fixes
+- SHOWS / TOP VENUE / FIRST SHOW count from both attendance tables
+- posKey keying throughout — sandwiched/reprised songs correct
+- SaveCelebration black screen fixed
 
 ### Community
-- Leaderboard, Top Shows (needs more data), Top Songs, Top Venues
-
-### Debt Closed
-- /api/debug/reviews.js — confirmed deleted, directory gone
-- Admin migrate auth — confirmed has verifyToken + is_admin check
-- Top Shows HAVING threshold — already COUNT > 0; blank because no other users have rated yet, not a code bug
+- Leaderboard, Top Shows, Top Songs, Top Venues
+- Mockingbird donation banner at top
 
 ---
 
-## NEXT SESSION — START HERE
+## PENDING / IN PROGRESS
 
-### 1. Rate Limiting on Auth Endpoints (Priority 1 — security, STILL OPEN)
-- /api/auth/register and /api/auth/login have no rate limiting
-- 10 attempts/15min per IP, 429 with Retry-After header
+### Etsy OAuth Integration
+- Built and ready: api/etsy/auth.js, api/etsy/callback.js, api/etsy/sync.js
+- Pending: Etsy developer app review (1-3 business days)
+- Once approved: visit /api/etsy/auth once to authorize, cron handles rest
 
-### 2. Middle section desktop expansion
-- Use the space better — wider content, better typography at desktop scale
-- Desktop logo: Matthew to provide Canva version
-
-### 3. Phish Phreeze — band-level Community subtab
-- Total shows, songs, hours; breakdowns by day/month/country/state
-- Cache in phish_stats_cache table
-
-### 4. Verify sandwiched song fix
-- Test on real reprise show (e.g. Mike's Song > something > Mike's Song)
-
-### 5. Desktop UAT continued
-- Logo swap when Matthew delivers Canva version
-- Further font/spacing pass on middle content
+### Phish.net Profile Import Test
+- Waiting on buddy to test .net profile + data upload
+- Username pre-fill from .net handle on import (built, needs UAT)
 
 ---
 
 ## OPEN BUGS / DEBT
 
-- Rate limiting on /api/auth/login and /api/auth/register — Priority 1
+- Tour guide UAT needed after reset — confirm 9-step flow works end to end
+- Username required at registration — field exists in form, confirm it's enforced
 - Top Shows blank until more community ratings exist (data problem, not code)
 - Deep Phreeze new data fields won't populate until users run full sync
-- Onboarding tour guide — deferred post-launch
+- phreezer.mpgink.com subdomain not yet configured in GoDaddy for Resend
 
 ---
 
-## POST-LAUNCH (after July 4)
+## POST-LAUNCH (after beta stabilizes)
 
+- In-app Phish.in streaming polish — mini persistent player bar across full scorecard
+- Desktop logo — Matthew to deliver Canva version
+- Middle section desktop expansion
+- Phish Phreeze — band-level community subtab (total shows, songs, hours, era breakdowns)
 - Scheduled phish.net sync via Vercel cron
 - Disposable email blocklist
-- Welcome + weekly nudge emails via Resend
 - Tour grouping in My Shows
 - Export ratings to CSV
 - Jam chart filter in setlist view
 - Live show mode
-- Phantasy Phishball — separate product
+- More Etsy listings as created — add to Shop tab
 
 ---
 
 ## Architecture Notes
 
-- **phish.in**: fail gracefully, no key needed
-- **phish.net API v5**: artistid=1 filter mandatory. review_text field. Pre-1998 needs limit 2500+.
-- **Neon**: Never direct connect from Claude env.
-- **GitHub token**: Rotates each session.
-- **Vercel**: list_deployments requires projectId AND teamId.
-- **CSS**: Always pull full file, rewrite clean, push. Never use attribute selectors for overrides.
-- **JSX**: CSS property names are camelCase (writingMode not writing-mode).
-- **Postgres**: posKey || song consistently — never mix keys in ratings map.
-- **SaveCelebration**: onDone must be a ref, not inline — inline functions reset useEffect timer every render.
-- **vercel.json**: Every new API route must be explicitly added to rewrites array before catch-all.
-- **OTD cache**: Module-level in on-this-day.js, 1hr TTL, shared across all users.
+- **phish.in**: fail gracefully, no key needed. Audio proxy via /api/audio/stream (CORS bypass)
+- **phish.net API v5**: artistid=1 filter mandatory. review_text field. Pre-1998 needs limit 2500+
+- **Neon**: Never direct connect from Claude env
+- **GitHub token**: Rotates each session
+- **Vercel**: list_deployments requires projectId AND teamId
+- **CSS**: Always pull full file, rewrite clean, push. Never append
+- **JSX**: CSS property names are camelCase (writingMode not writing-mode)
+- **Postgres**: posKey || song consistently — never mix keys in ratings map
+- **SaveCelebration**: onDone must be a ref, not inline
+- **vercel.json**: Every new API route must be explicitly added to rewrites before catch-all
+- **Etsy listings**: 4521118995 (logo sticker), 4521116067 (t-shirt), 4521316287 (DSAP sticker)
+- **CRON_SECRET**: Set in Vercel env vars — required for cron endpoint auth
+- **Tour state**: Server-side (tour_completed on users table) — admin can reset
+- **donation_tracker**: Single row (id=1), cumulative items_sold, $1.00/item
