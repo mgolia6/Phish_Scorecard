@@ -36,6 +36,40 @@ export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', 
 export function CommShowRows({ shows, label = 'TOP SHOWS' }) {
   return (
     <div>
+      {donations && (
+        <div style={{
+          background: 'rgba(0,0,0,0.4)',
+          borderLeft: '3px solid var(--green)',
+          padding: '12px 14px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'var(--green)', marginBottom: 4 }}>
+              ◈ GIVING BACK
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              $1 from every Phreezer merch purchase goes to the{' '}
+              <a href="https://mbird.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'none' }}>
+                Mockingbird Foundation
+              </a>
+              .
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '2px' }}>
+              ${donations.total_donated}
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px', marginTop: 2 }}>
+              {donations.items_sold} ITEMS SOLD
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {shows.map((s, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
@@ -52,6 +86,40 @@ export function CommShowRows({ shows, label = 'TOP SHOWS' }) {
 export function CommVersionRows({ versions, label = 'TOP VERSIONS' }) {
   return (
     <div>
+      {donations && (
+        <div style={{
+          background: 'rgba(0,0,0,0.4)',
+          borderLeft: '3px solid var(--green)',
+          padding: '12px 14px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'var(--green)', marginBottom: 4 }}>
+              ◈ GIVING BACK
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              $1 from every Phreezer merch purchase goes to the{' '}
+              <a href="https://mbird.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'none' }}>
+                Mockingbird Foundation
+              </a>
+              .
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '2px' }}>
+              ${donations.total_donated}
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px', marginTop: 2 }}>
+              {donations.items_sold} ITEMS SOLD
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {versions.map((v, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < versions.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
@@ -71,6 +139,40 @@ export function CommVersionRows({ versions, label = 'TOP VERSIONS' }) {
 export function CommSongRows({ songs, label = 'TOP SONGS IN THIS SHOW' }) {
   return (
     <div>
+      {donations && (
+        <div style={{
+          background: 'rgba(0,0,0,0.4)',
+          borderLeft: '3px solid var(--green)',
+          padding: '12px 14px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'var(--green)', marginBottom: 4 }}>
+              ◈ GIVING BACK
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              $1 from every Phreezer merch purchase goes to the{' '}
+              <a href="https://mbird.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'none' }}>
+                Mockingbird Foundation
+              </a>
+              .
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '2px' }}>
+              ${donations.total_donated}
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px', marginTop: 2 }}>
+              {donations.items_sold} ITEMS SOLD
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {songs.map((s, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < songs.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
@@ -85,6 +187,40 @@ export function CommSongRows({ songs, label = 'TOP SONGS IN THIS SHOW' }) {
 export function CommStateRows({ states, label = 'STATE RANKINGS' }) {
   return (
     <div>
+      {donations && (
+        <div style={{
+          background: 'rgba(0,0,0,0.4)',
+          borderLeft: '3px solid var(--green)',
+          padding: '12px 14px',
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'var(--green)', marginBottom: 4 }}>
+              ◈ GIVING BACK
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              $1 from every Phreezer merch purchase goes to the{' '}
+              <a href="https://mbird.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'none' }}>
+                Mockingbird Foundation
+              </a>
+              .
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '2px' }}>
+              ${donations.total_donated}
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px', marginTop: 2 }}>
+              {donations.items_sold} ITEMS SOLD
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {states.map((s, i) => (
         <div key={s.state} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < states.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
@@ -229,12 +365,20 @@ export function PhriendOverlapCommunity({ api }) {
 // COMMUNITY TAB — all sub-tabs
 // ============================================================
 export function CommunityTab({ api, subTab = "leaderboard" }) {
+  const [donations, setDonations] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [topShows, setTopShows] = useState(null);
   const [topSongs, setTopSongs] = useState(null);
   const [topVenues, setTopVenues] = useState(null);
   const [topStates, setTopStates] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/admin/donations')
+      .then(r => r.json())
+      .then(d => setDonations(d))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -417,3 +561,4 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
 // ============================================================
 // ADMIN TAB
 // ============================================================
+
