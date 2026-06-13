@@ -55,6 +55,7 @@ export default function App() {
   const [ebenOpen, setEbenOpen] = useState(false);     // mobile drawer
   const [ebenRailOpen, setEbenRailOpen] = useState(true); // desktop rail
   const [showTour, setShowTour] = useState(false);
+  const [profileTapped, setProfileTapped] = useState(false);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
 
@@ -356,8 +357,8 @@ export default function App() {
               <div className="header-auth">
                 {user ? (
                   <button
-                    className="avatar-btn"
-                    onClick={() => setShowProfileModal(true)}
+                    className={`avatar-btn${profileTapped ? '' : ' avatar-pulse'}`}
+                    onClick={() => { setShowProfileModal(true); setProfileTapped(true); }}
                     aria-label="Profile"
                     style={{ background: 'transparent', border: '1.5px solid rgba(0,224,208,0.4)', borderRadius: '50%', width: 44, height: 44, padding: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(0,224,208,0.2)' }}
                   >
@@ -502,6 +503,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
