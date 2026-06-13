@@ -178,9 +178,8 @@ export default function App() {
     } catch (e) {}
     setPendingImportOnMyShows(true);
     setTimeout(() => setTab('my-shows'), 100);
-    if (!localStorage.getItem('phreezer_tour_done')) {
-      setTimeout(() => setShowTour(true), 800);
-    }
+    // Tour fires server-side — check user flag not localStorage
+    setShowTour(true);
   };
 
   const handleOnboardingScorecard = async () => {
@@ -190,9 +189,7 @@ export default function App() {
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
     setTab('my-shows');
-    if (!localStorage.getItem('phreezer_tour_done')) {
-      setTimeout(() => setShowTour(true), 600);
-    }
+    setTimeout(() => setShowTour(true), 600);
   };
 
   const handleOnboardingComplete = async () => {
@@ -202,9 +199,7 @@ export default function App() {
       setUser(u => ({ ...u, onboarding_complete: true }));
     } catch (e) {}
     setShowFirstShowPrompt(true);
-    if (!localStorage.getItem('phreezer_tour_done')) {
-      setTimeout(() => setShowTour(true), 800);
-    }
+    setTimeout(() => setShowTour(true), 800);
   };
 
   const renderMain = (isMobile = false) => (
@@ -455,7 +450,14 @@ export default function App() {
       <PassiveFeedbackButton api={api} />
 
       {showTour && (
-        <TourGuide onComplete={() => setShowTour(false)} setTab={setTab} />
+        <TourGuide
+          onComplete={async () => {
+            setShowTour(false);
+            // Mark tour complete server-side so admin can reset it
+            try { await api.post('/auth/accept?field=tour', {}); } catch (e) {}
+          }}
+          setTab={setTab}
+        />
       )}
 
       {showFirstShowPrompt && (
@@ -500,6 +502,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
