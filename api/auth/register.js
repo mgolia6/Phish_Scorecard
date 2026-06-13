@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
 import { sendVerificationEmail } from './verify-email.js';
+import { checkRateLimit } from '../_ratelimit.js';
 
 async function ensureMigration(pool) {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`);
@@ -31,6 +32,13 @@ export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Rate limit: 5 registrations per IP per 60 minutes
+  const rl = checkRateLimit(req, 'register', 5, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    res.setHeader('Retry-After', rl.retryAfter);
+    return res.status(429).json({ error: 'Too many registration attempts. Try again later.', retryAfter: rl.retryAfter });
+  }
 
   const pool = getPool();
   await ensureMigration(pool);
