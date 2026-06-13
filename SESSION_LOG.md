@@ -110,3 +110,46 @@
 4. Phish Phreeze community subtab
 5. Any beta user feedback after forum post
 
+
+
+---
+
+## Session: 2026-06-13 (evening)
+
+### What shipped
+
+**Sentry + Posthog integration (client-side, keys-pending)**
+- `client/package.json` — added `@sentry/react` ^8.0.0 and `posthog-js` ^1.143.0
+- `client/src/analytics.js` — new module: Posthog init, identifyUser, resetIdentity, track(), and `Analytics` named-event object covering tabs, auth, scorecard, audio, Ebenezer, tour, profile, shop, feedback, community
+- `client/src/main.jsx` — Sentry init (DSN from VITE_SENTRY_DSN env var), Posthog init, Sentry ErrorBoundary wrapping entire app, retro "EBENEZER IS FROZEN" fallback UI, Sentry.withProfiler on App
+- `client/src/App.jsx` — wired Analytics calls: tabViewed on tab change, loginSuccess/registered on auth, loggedOut + resetIdentity on logout, scorecardOpened on rate show, identifyUser on auto-login, tourStarted on onboarding complete, ebenezerOpened('drawer') on drawer open
+
+**Resend/GoDaddy confirmed**
+- phreezer.mpgink.com subdomain already configured — mpgink.com Resend domain is live (Matthew uses it for another app)
+- Removed from open debt
+
+### Decisions made
+- Both Sentry + Posthog are no-op when env vars are absent — no errors in dev, keys just aren't set yet
+- Posthog: explicit tracking only (autocapture off) — cleaner signal, less noise
+- Posthog person profiles: identified_only — no anonymous bloat
+- Sentry replay: 10% of sessions, 100% of error sessions — cost-efficient
+- Sentry tracing: 20% sample rate — enough for perf data without burning quota
+- Sentry strips Authorization headers from error payloads before send
+
+### What Matthew needs to do (desktop, ~10 min)
+1. Create Sentry account → new project (React) → copy DSN → add as `VITE_SENTRY_DSN` in Vercel env vars
+2. Create Posthog account → new project → copy API key → add as `VITE_POSTHOG_KEY` in Vercel env vars
+3. Redeploy (or push any change) — both activate automatically
+
+### Known issues / open debt
+- Etsy OAuth pending app review
+- Tour guide UAT needed end-to-end
+- Posthog: EbenezerRail open not yet tracked (rail open/close is in Sidebar component — low priority)
+- Posthog: ratingSubmitted not yet wired (fires from ScorecardTab — next session if needed)
+
+### Next session priorities
+1. Posthog/Sentry activation once Matthew adds keys
+2. Etsy OAuth activation (once Etsy approves)
+3. Phish.net import UAT
+4. Phish Phreeze community subtab
+5. Any beta feedback after forum post
