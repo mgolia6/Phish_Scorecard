@@ -839,6 +839,103 @@ function AiUsageTab({ api }) {
   );
 }
 
+// ── Donations Tab ─────────────────────────────────────────
+function DonationsTab({ api, showMessage, showError }) {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [saving, setSaving] = React.useState(false);
+  const [input, setInput] = React.useState('');
+
+  const load = () => {
+    setLoading(true);
+    fetch('/api/admin/donations', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('phish_token')}` }
+    })
+      .then(r => r.json())
+      .then(d => { setData(d); setInput(String(d.items_sold)); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
+
+  React.useEffect(() => { load(); }, []);
+
+  const save = async () => {
+    const val = parseInt(input, 10);
+    if (isNaN(val) || val < 0) { showError('Enter a valid number'); return; }
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('phish_token');
+      const res = await fetch('/api/admin/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ items_sold: val }),
+      });
+      const d = await res.json();
+      setData(d);
+      setInput(String(d.items_sold));
+      showMessage(`Updated — $${d.total_donated} donated`);
+    } catch (e) {
+      showError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div style={{ padding: 20, fontFamily: D.mono, color: D.muted, fontSize: '0.75rem' }}>LOADING...</div>;
+  if (!data)   return null;
+
+  return (
+    <div style={{ padding: '0 10px 40px' }}>
+      <SectionLabel color={D.green}>◈ MOCKINGBIRD FOUNDATION TRACKER</SectionLabel>
+      <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, lineHeight: 1.8, marginBottom: 20 }}>
+        $1.00 donated per item sold. Update the total items sold below after each Etsy payout.
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 24 }}>
+        {[
+          { label: 'ITEMS SOLD',    val: data.items_sold,    color: D.cyan },
+          { label: 'PER ITEM',      val: `$${data.donation_per_item.toFixed(2)}`, color: D.label },
+          { label: 'TOTAL DONATED', val: `$${data.total_donated}`, color: D.green },
+        ].map(s => (
+          <div key={s.label} style={{ padding: '12px 10px', background: 'rgba(0,0,0,0.4)', borderTop: `2px solid ${s.color}`, textAlign: 'center' }}>
+            <div style={{ fontFamily: D.mono, fontSize: '1.2rem', color: s.color, fontWeight: 700 }}>{s.val}</div>
+            <div style={{ fontFamily: D.disp, fontSize: '0.4rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Update form */}
+      <SectionLabel color={D.label}>◈ UPDATE ITEMS SOLD</SectionLabel>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
+        <input
+          type="number" min="0" value={input}
+          onChange={e => setInput(e.target.value)}
+          style={{
+            flex: 1, padding: '12px 14px', background: 'rgba(0,0,0,0.4)',
+            border: `1px solid ${D.border}`, color: D.white,
+            fontFamily: D.mono, fontSize: '0.85rem',
+          }}
+          placeholder="Total items sold to date"
+        />
+        <button
+          onClick={save} disabled={saving}
+          style={{
+            padding: '12px 20px', fontFamily: D.disp, fontSize: '0.55rem',
+            letterSpacing: '2px', background: D.green, color: '#000',
+            border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700,
+            opacity: saving ? 0.6 : 1, whiteSpace: 'nowrap',
+          }}
+        >
+          {saving ? 'SAVING...' : 'SAVE'}
+        </button>
+      </div>
+      <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted }}>
+        This is a cumulative total — enter the all-time number of items sold.
+      </div>
+    </div>
+  );
+}
+
 // ── Main AdminTab ──────────────────────────────────────────
 const TABS = [
   { id: 'users',     label: 'USERS',     color: 'var(--cyan)' },
@@ -847,7 +944,8 @@ const TABS = [
   { id: 'external',  label: 'EXTERNAL',  color: 'var(--orange)' },
   { id: 'ai-usage',  label: 'AI USAGE',  color: 'var(--orange)' },
   { id: 'errors',    label: 'ERRORS',    color: 'var(--red, #ff3333)' },
-  { id: 'feedback',  label: 'FEEDBACK',  color: 'var(--orange)' },
+  { id: 'feedback',   label: 'FEEDBACK',   color: 'var(--orange)' },
+  { id: 'donations',  label: 'DONATIONS',  color: 'var(--green)'  },
 ];
 
 export function AdminTab({ api, showMessage, showError }) {
@@ -875,10 +973,12 @@ export function AdminTab({ api, showMessage, showError }) {
       {activeTab === 'external' && <ExternalApiHealthTab />}
       {activeTab === 'ai-usage' && <AiUsageTab          api={api} />}
       {activeTab === 'errors'   && <ErrorLogTab />}
-      {activeTab === 'feedback' && <FeedbackTab         api={api} />}
+      {activeTab === 'feedback'  && <FeedbackTab          api={api} />}
+      {activeTab === 'donations' && <DonationsTab         api={api} showMessage={showMessage} showError={showError} />}
     </div>
   );
 }
+
 
 
 
