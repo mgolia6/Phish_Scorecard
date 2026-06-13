@@ -309,7 +309,9 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       )}
 
       {/* ── SECTION B: ON THIS DAY ── */}
-      <OTDCarousel attended={attended} ratedShows={shows} onRateShow={onRateShow} api={api} />
+      <div data-tour="otd">
+        <OTDCarousel attended={attended} ratedShows={shows} onRateShow={onRateShow} api={api} />
+      </div>
 
       {/* ── SECTION C: MY SHOWS ── */}
       <div style={{ padding: '10px' }}>
@@ -379,6 +381,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
     </div>
   );
 }
+
 
 
 
