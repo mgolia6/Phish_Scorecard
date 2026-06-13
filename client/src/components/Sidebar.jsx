@@ -80,7 +80,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
           {myPhreezerItems.map(item => {
             const el = renderItem(item);
             if (item.id === 'my-deep-phreeze') {
-              return <div key={item.id} data-tour="deep-phreeze" style={{ display: 'contents' }}>{el}</div>;
+              return <div key={item.id} data-tour="deep-phreeze">{el}</div>;
             }
             return el;
           })}
@@ -180,6 +180,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
     </div>
   );
 }
+
 
 
 
