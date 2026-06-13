@@ -163,6 +163,10 @@
       "destination": "/api/audio/stream"
     },
     {
+      "source": "/api/admin/donations",
+      "destination": "/api/admin/donations"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
