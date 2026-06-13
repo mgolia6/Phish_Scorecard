@@ -113,6 +113,81 @@
 
 ---
 
+
+---
+
+## PROJECT MANAGEMENT PRIORITIES
+
+### 🔴 IMMEDIATE — Before Forum Post Goes Live
+
+**1. Error Monitoring — Sentry**
+- Free tier, ~30 min to wire in
+- Client-side: `@sentry/react` in main.jsx
+- Server-side: `@sentry/node` in Vercel functions
+- Without this: zero visibility into production errors once real users hit it
+- DSN goes in Vercel env vars as `SENTRY_DSN`
+
+**2. Discord Server**
+- Matthew creates server, I help structure channels
+- Suggested channels: #announcements, #feedback, #bugs, #show-ratings, #general
+- Gives beta users a place to talk to each other and to you
+- Post invite link in the app (About tab + onboarding outro)
+
+**3. Beta Success Criteria — Define It**
+- Proposed: 50 users · 500 shows rated · no P0 bugs for 14 consecutive days
+- Without a definition you can't tell when beta is done
+- Document in ROADMAP once agreed
+
+---
+
+### 🟠 WEEK 1 POST-LAUNCH
+
+**4. Analytics — Posthog**
+- Free tier, privacy-friendly, built for product analytics
+- Track: feature usage, drop-off points, rating completion rate, tab engagement
+- Self-hostable if privacy becomes a concern later
+- ~2 hours to wire in
+
+**5. Bug Tracking — GitHub Issues**
+- Enable Issues on the Phish_Scorecard repo
+- Label taxonomy: P0-critical / P1-high / P2-medium / P3-low + feature/bug/ux
+- Triage weekly — move from Discord #bugs → GitHub Issue
+- Replaces the current "lives in feedback and session logs" approach
+
+**6. Privacy Policy Page**
+- In-app route: `/privacy`
+- Covers: what data is collected, how it's used, phish.net handle storage, email, ratings
+- Links to it from footer, onboarding T&C screen, and About tab
+- Does NOT need a lawyer — plain language is fine for beta
+
+---
+
+### 🟡 MONTH 1
+
+**7. In-App Changelog**
+- Version bump triggers a "What's New" modal on next login
+- Simple: `app_version` in env var, `seen_version` on user record
+- Shows last 3–5 changes in Ebenezer voice
+- Builds trust, makes updates feel intentional
+
+**8. Feature Flags**
+- `feature_flags` table: `user_id`, `flag_name`, `enabled`
+- Admin panel toggle per user or globally
+- Lets you test features on subset of users before rolling out
+- Especially useful for anything controversial or experimental
+
+**9. Backup / Disaster Recovery**
+- Document: Neon recovery tier, how to restore, RTO/RPO
+- Verify point-in-time recovery is enabled on current plan
+- 30 min to document, could save the app if something goes wrong
+
+**10. Data Retention Policy**
+- Define: inactive user data after 2 years → anonymized or deleted
+- Define: account deletion → what gets wiped, what gets aggregated
+- Document before you have 1000 users — much harder to retrofit
+
+---
+
 ## POST-LAUNCH (after beta stabilizes)
 
 - In-app Phish.in streaming polish — mini persistent player bar across full scorecard
@@ -145,3 +220,4 @@
 - **CRON_SECRET**: Set in Vercel env vars — required for cron endpoint auth
 - **Tour state**: Server-side (tour_completed on users table) — admin can reset
 - **donation_tracker**: Single row (id=1), cumulative items_sold, $1.00/item
+
