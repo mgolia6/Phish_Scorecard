@@ -74,14 +74,20 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
 
           {/* MY PHREEZER */}
           {expanded
-            ? <div className="sidebar-section-label section-my-phreezer">◈ MY PHREEZER</div>
+            ? <div className="sidebar-section-label section-my-phreezer" data-tour="my-phreezer">◈ MY PHREEZER</div>
             : sectionDot('var(--cyan)')
           }
-          {myPhreezerItems.map(renderItem)}
+          {myPhreezerItems.map(item => {
+            const el = renderItem(item);
+            if (item.id === 'my-deep-phreeze') {
+              return <div key={item.id} data-tour="deep-phreeze" style={{ display: 'contents' }}>{el}</div>;
+            }
+            return el;
+          })}
 
           {/* COMMUNITY — all items same level */}
           {expanded
-            ? <div className="sidebar-section-label section-community">★ COMMUNITY</div>
+            ? <div className="sidebar-section-label section-community" data-tour="community">★ COMMUNITY</div>
             : sectionDot('var(--orange)')
           }
           {communityItems.map(renderItem)}
@@ -93,6 +99,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
               className={`sidebar-section-label section-scorecard ${tab === 'scorecard' ? 'active' : ''}`}
               onClick={() => setTab('scorecard')}
               style={{ cursor: 'pointer', padding: '14px 16px' }}
+              data-tour="scorecard"
             >
               ◈ SCORECARD
             </div>
@@ -130,6 +137,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
               <div
                 className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
                 onClick={onOpenProfile}
+          data-tour="profile-avatar"
                 title="My Profile"
                 style={{ cursor: 'pointer' }}
               >
@@ -172,5 +180,6 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
     </div>
   );
 }
+
 
 
