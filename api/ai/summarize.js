@@ -1,5 +1,6 @@
 import { cors } from '../_auth.js';
 import { getPool } from '../_db.js';
+import { logAiUsage } from '../_ai_usage.js';
 
 // Strips markdown fences and parses JSON — handles both string and object inputs
 function parseStructured(raw) {
@@ -149,6 +150,18 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
       return res.status(500).json({ error: 'AI returned unparseable response', raw: text });
     }
 
+    // Log usage — fire and forget
+    const usage = data?.usage;
+    if (usage) {
+      logAiUsage({
+        userId: null,
+        feature: 'vibe_check',
+        model: 'claude-haiku-4-5-20251001',
+        inputTokens: usage.input_tokens || 0,
+        outputTokens: usage.output_tokens || 0,
+      });
+    }
+
     // Store in cache
     try {
       const pool = getPool();
@@ -171,4 +184,5 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
     return res.status(500).json({ error: e.message });
   }
 }
+
 
