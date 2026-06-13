@@ -73,7 +73,6 @@ function MikeSaidNo({ email, onResent, onBack }) {
     <div className="modal-overlay" style={{ zIndex: 900 }}>
       <div className="modal" style={{ maxWidth: 460, textAlign: 'center' }}>
 
-        {/* Big fish art */}
         <div style={{ fontSize: '3.5rem', marginBottom: 16, lineHeight: 1 }}>🐟</div>
 
         <div style={{
@@ -161,6 +160,59 @@ function MikeSaidNo({ email, onResent, onBack }) {
           }}
         >
           ← BACK TO LOGIN
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── MIKE SAYS NO — rate limit screen ─────────────────────────────────────────
+function MikeSaysNo({ onBack }) {
+  return (
+    <div className="modal-overlay" style={{ zIndex: 900 }}>
+      <div className="modal" style={{ maxWidth: 460, textAlign: 'center' }}>
+
+        <div style={{ fontSize: '3.5rem', marginBottom: 16, lineHeight: 1 }}>🐟</div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.1rem',
+          fontWeight: 900,
+          letterSpacing: '4px',
+          color: 'var(--orange)',
+          textShadow: '0 0 20px rgba(255,102,0,0.6)',
+          marginBottom: 8,
+        }}>
+          MIKE SAYS NO.
+        </div>
+
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '0.58rem',
+          letterSpacing: '2px',
+          color: 'var(--text-label)',
+          marginBottom: 24,
+          lineHeight: 1.8,
+        }}>
+          TOO MANY ATTEMPTS. COOL YOUR JETS.<br />
+          TRY AGAIN IN A FEW MINUTES.
+        </div>
+
+        <button
+          onClick={onBack}
+          style={{
+            width: '100%',
+            padding: '11px',
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.55rem',
+            letterSpacing: '2px',
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            border: '1px solid var(--border)',
+            cursor: 'pointer',
+          }}
+        >
+          ← BACK
         </button>
       </div>
     </div>
@@ -288,7 +340,7 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
   const [signupForm, setSignupForm] = useState({ email: '', username: '', password: '', firstName: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [screen, setScreen] = useState('form'); // 'form' | 'check_email' | 'mike_said_no'
+  const [screen, setScreen] = useState('form'); // 'form' | 'check_email' | 'mike_said_no' | 'mike_says_no'
   const [pendingEmail, setPendingEmail] = useState('');
 
   const handleLogin = async (e) => {
@@ -301,6 +353,8 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
       if (err.message.includes('EMAIL_NOT_VERIFIED')) {
         setPendingEmail(loginForm.email);
         setScreen('mike_said_no');
+      } else if (err.message.startsWith('429')) {
+        setScreen('mike_says_no');
       } else {
         setError(err.message);
       }
@@ -315,15 +369,24 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
         setPendingEmail(data.email);
         setScreen('check_email');
       } else {
-        // Fallback: shouldn't happen but handle gracefully
         localStorage.setItem('phish_token', data.token);
         onSuccess(data.user, true);
       }
-    } catch (err) { setError(err.message); } finally { setLoading(false); }
+    } catch (err) {
+      if (err.message.startsWith('429')) {
+        setScreen('mike_says_no');
+      } else {
+        setError(err.message);
+      }
+    } finally { setLoading(false); }
   };
 
   if (screen === 'mike_said_no') {
     return <MikeSaidNo email={pendingEmail} onBack={() => setScreen('form')} />;
+  }
+
+  if (screen === 'mike_says_no') {
+    return <MikeSaysNo onBack={() => setScreen('form')} />;
   }
 
   if (screen === 'check_email') {
@@ -357,5 +420,3 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
     </div>
   );
 }
-
-
