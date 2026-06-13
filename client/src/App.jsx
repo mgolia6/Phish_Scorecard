@@ -309,7 +309,7 @@ export default function App() {
             {renderMain()}
           </div>
         </div>
-      <div data-tour="ebenezer" style={{ display: 'contents' }}>
+      <div data-tour="ebenezer" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
       <EbenezerRail
           history={ebenHistory}
           setHistory={setEbenHistory}
@@ -505,6 +505,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
