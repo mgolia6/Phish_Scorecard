@@ -191,3 +191,36 @@
 3. Phish.net import UAT with buddy
 4. Tour guide UAT after admin reset
 5. Forum post — ready to publish
+
+---
+
+## Session: 2026-06-13 (evening, pass 3 — security)
+
+### What shipped
+
+**Security hardening — all API endpoints**
+- `api/_auth.js` — CORS locked to `phreezer.mpgink.com` + `localhost:5173` (was `*`); explicit `algorithms: ['HS256']` in `verifyToken`; passes `Vary: Origin` header
+- `api/_disposable.js` — new module: disposable/throwaway email domain blocklist (~40 providers)
+- `api/auth/register.js` — blocks disposable emails at registration with clear error message
+- `api/auth/login.js` — explicit `algorithm: 'HS256'` in `jwt.sign`
+- `api/feedback/submit.js` — removed open unauthenticated GET migration endpoint (dead code, table already exists)
+- **45 API handler files** — all updated to pass `req` to `cors()` so origin-aware CORS headers work
+
+### Security audit findings
+- All admin endpoints were already properly auth-gated (session log was wrong about migrate.js)
+- Cron endpoint was already protected by CRON_SECRET header
+- Client bundle was clean — no secrets exposed
+- JWT 30d expiry + is_admin baked in: documented risk, acceptable for single-admin beta
+
+### Decisions made
+- CORS defaults to prod origin when request has no Origin header (API clients, curl, etc.)
+- Disposable email check is server-side only — no client feedback until submit
+- JWT revocation not implemented — low priority while Matthew is only admin
+- feedback migration endpoint removed entirely (not just locked) — it's been shipped for weeks, table exists
+
+### Next session priorities
+1. Posthog/Sentry activation — add VITE_SENTRY_DSN + VITE_POSTHOG_KEY to Vercel
+2. Etsy OAuth activation (pending Etsy app review)
+3. Phish.net import UAT
+4. Tour UAT
+5. **Forum post — ready to publish**
