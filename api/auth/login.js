@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
 import { checkRateLimit } from '../_ratelimit.js';
+import { captureException } from '../_sentry.js';
 
 export default async function handler(req, res) {
   cors(res, req);
