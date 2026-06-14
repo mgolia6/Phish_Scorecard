@@ -192,7 +192,7 @@
 - Middle section desktop expansion
 - Phish Phreeze — band-level community subtab (total shows, songs, hours, era breakdowns)
 - Scheduled phish.net sync via Vercel cron
-- Disposable email blocklist
+- ~~Disposable email blocklist~~ ✅ (2026-06-13)
 - Tour grouping in My Shows
 - Export ratings to CSV
 - Jam chart filter in setlist view
