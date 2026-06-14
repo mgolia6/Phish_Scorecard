@@ -1,5 +1,5 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-13
+**Last updated:** 2026-06-13 (evening, final)
 
 ---
 
@@ -99,6 +99,7 @@ Three columns:
 - Phish.net foundation, Phish.in recordings
 - Feedback CTA
 - "Hopefully you enjoy it and it helps us all suck a little less at Phish."
+- Privacy Policy link at bottom (subtle, low-contrast) — opens PrivacyModal
 
 ### SHOP
 - DonationCard at top — Mockingbird Foundation total, $1/item
@@ -141,6 +142,7 @@ Three columns:
 - **MIKE SAID NO.** (past tense) — email not verified, hard block, resend option
 - **MIKE SAYS NO.** (present tense) — rate limited, cool your jets, back button only
 - Both use orange glow, 🐟, full-screen overlay
+- T&C modal has Privacy Policy link below accept button (subtle)
 
 ---
 
@@ -177,4 +179,3 @@ Three columns:
 - Phish Phreeze community subtab
 - In-app Phish.in streaming (proxy built, audio player built — needs UAT)
 - Etsy OAuth activation (pending Etsy app review)
-- Username field at registration confirmed working (exists in form, needs UAT)
