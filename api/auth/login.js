@@ -5,7 +5,7 @@ import { cors } from '../_auth.js';
 import { checkRateLimit } from '../_ratelimit.js';
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     const token = jwt.sign(
       { id: user.id, email: user.email, is_admin: !!user.is_admin },
       process.env.JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: '30d', algorithm: 'HS256' }
     );
 
     res.json({
@@ -80,3 +80,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
+
