@@ -1,6 +1,7 @@
 import { cors } from '../_auth.js';
 import { getPool } from '../_db.js';
 import { logAiUsage } from '../_ai_usage.js';
+import { captureException } from '../_sentry.js';
 
 // Strips markdown fences and parses JSON — handles both string and object inputs
 function parseStructured(raw) {
@@ -137,11 +138,13 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
     const data = await response.json();
     if (!response.ok) {
       console.error('Anthropic API error:', response.status, JSON.stringify(data));
+      captureException(err, { path: 'api/ai/summarize.js' });
       return res.status(500).json({ error: 'Anthropic API error', status: response.status, detail: data?.error?.message || JSON.stringify(data) });
     }
     const text = data?.content?.[0]?.text || null;
     if (!text) {
       console.error('No text in Anthropic response:', JSON.stringify(data));
+      captureException(err, { path: 'api/ai/summarize.js' });
       return res.status(500).json({ error: 'No response from AI', detail: JSON.stringify(data) });
     }
 
@@ -177,6 +180,7 @@ Only include a theme if multiple reviews mention it. Name actual songs. Be speci
       );
     } catch (e) {
       console.error('Cache write failed:', e.message);
+      captureException(err, { path: 'api/ai/summarize.js' });
     }
 
     return res.status(200).json({ structured, cached: false });
