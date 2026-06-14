@@ -1,4 +1,4 @@
-import { cors, verifyToken } from '../_auth.js';
+import { cors, verifyToken, isAdminKey } from '../_auth.js';
 import { getPool } from '../_db.js';
 
 export default async function handler(req, res) {
@@ -6,12 +6,14 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).end();
 
+  // Accept either a valid admin JWT or the server-to-server admin key
   const user = verifyToken(req);
-  if (!user?.is_admin) return res.status(403).json({ error: 'Admin only' });
+  if (!user?.is_admin && !isAdminKey(req)) {
+    return res.status(403).json({ error: 'Admin only' });
+  }
 
   const db = await getPool().connect();
   try {
-    // --- Activation status ---
     const activation = {
       sentry_client:  !!process.env.VITE_SENTRY_DSN,
       posthog:        !!process.env.VITE_POSTHOG_KEY,
@@ -22,7 +24,6 @@ export default async function handler(req, res) {
       phishnet:       !!process.env.PHISH_NET_API_KEY,
     };
 
-    // --- Email log: last run + counts ---
     const emailLog = await db.query(`
       SELECT email_type, COUNT(*) as count, MAX(sent_at) as last_sent
       FROM email_log
@@ -37,7 +38,6 @@ export default async function handler(req, res) {
       LIMIT 5
     `).catch(() => ({ rows: [] }));
 
-    // --- AI usage: today + 7d + 30d ---
     const aiToday = await db.query(`
       SELECT feature, COUNT(*) as calls, SUM(cost_usd) as cost
       FROM ai_usage_log
@@ -57,7 +57,6 @@ export default async function handler(req, res) {
       WHERE created_at >= NOW() - INTERVAL '30 days'
     `).catch(() => ({ rows: [{ calls: 0, cost: 0 }] }));
 
-    // --- User growth ---
     const userStats = await db.query(`
       SELECT
         COUNT(*) as total,
@@ -67,7 +66,6 @@ export default async function handler(req, res) {
       FROM users
     `).catch(() => ({ rows: [{ total: 0, verified: 0, last_7d: 0, last_24h: 0 }] }));
 
-    // --- Rating activity ---
     const ratingStats = await db.query(`
       SELECT
         COUNT(*) as total,
@@ -76,12 +74,10 @@ export default async function handler(req, res) {
       FROM ratings
     `).catch(() => ({ rows: [{ total: 0, last_24h: 0, last_7d: 0 }] }));
 
-    // --- Donation tracker ---
     const donations = await db.query(`
       SELECT items_sold, donation_total FROM donation_tracker WHERE id = 1
     `).catch(() => ({ rows: [] }));
 
-    // --- Feedback inbox ---
     const feedbackStats = await db.query(`
       SELECT
         COUNT(*) as total,
@@ -92,15 +88,8 @@ export default async function handler(req, res) {
 
     res.json({
       activation,
-      email: {
-        by_type: emailLog.rows,
-        recent: lastEmail.rows,
-      },
-      ai: {
-        today: aiToday.rows,
-        seven_day: ai7d.rows[0],
-        thirty_day: ai30d.rows[0],
-      },
+      email: { by_type: emailLog.rows, recent: lastEmail.rows },
+      ai: { today: aiToday.rows, seven_day: ai7d.rows[0], thirty_day: ai30d.rows[0] },
       users: userStats.rows[0],
       ratings: ratingStats.rows[0],
       donations: donations.rows[0] || { items_sold: 0, donation_total: 0 },
