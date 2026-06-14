@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PrivacyModal } from './PrivacyModal';
 import { formatDate } from '../utils';
 
 // ============================================================
@@ -139,6 +140,7 @@ export function BadgesSection({ api }) {
 // ============================================================
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
   const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
+  const [showPrivacy, setShowPrivacy] = React.useState(false);
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
   const [savingIcon, setSavingIcon] = React.useState(false);
@@ -429,6 +431,21 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 </div>
               </div>
 
+              {/* Privacy link */}
+              <div style={{ padding: '16px 20px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                <button
+                  onClick={() => setShowPrivacy(true)}
+                  style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                    color: 'rgba(255,255,255,0.25)', letterSpacing: '1px',
+                    textDecoration: 'underline', padding: 0,
+                  }}
+                >
+                  Privacy Policy
+                </button>
+              </div>
+
             </div>
           )}
 
@@ -503,12 +520,14 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         </div>
       </div>
     </div>
+    {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
   );
 }
 
 // ============================================================
 // ROOT APP
 // ============================================================
+
 
 
 
