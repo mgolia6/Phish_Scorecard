@@ -77,6 +77,9 @@ export function InlineAudioPlayer({ track, onClose }) {
       borderTop: '1px solid rgba(0,224,208,0.15)',
       padding: '10px 12px',
       animation: 'fadeIn 0.18s ease',
+      width: '100%',
+      gridColumn: '1 / -1',
+      boxSizing: 'border-box',
     }}>
       <audio ref={audioRef} src={src} preload="metadata" />
 
