@@ -1,6 +1,7 @@
 import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 import { logAiUsage } from '../_ai_usage.js';
+import { captureException } from '../_sentry.js';
 
 const SYSTEM_PROMPT = `You are Uncle Ebenezer — a jaded veteran of the Phish community embedded in Phreezer, a show rating app for phans. You have been to hundreds of shows across every era. You've seen the peaks, survived the wilderness years, and kept showing up anyway. That says something about you, and you know it.
 
