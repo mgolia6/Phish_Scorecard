@@ -46,7 +46,11 @@ At the start of every session, before anything else:
 /
 ├── api/
 │   ├── _db.js               shared Postgres pool (uses POSTGRES_URL)
-│   ├── _auth.js             JWT verify + CORS helpers
+│   ├── _auth.js             JWT verify + CORS helpers (CORS locked to phreezer.mpgink.com)
+│   ├── _disposable.js       disposable email domain blocklist
+│   ├── _ratelimit.js        in-memory rate limiter (login/register)
+│   ├── _email.js            Resend email sender + all 5 HTML templates
+│   ├── _ai_usage.js         AI token usage logger
 │   ├── auth/register.js
 │   ├── auth/login.js
 │   ├── auth/me.js
@@ -60,7 +64,8 @@ At the start of every session, before anything else:
 │   └── analytics/songs.js + venues.js
 ├── client/src/
 │   ├── App.jsx
-│   ├── components/          26 component files (refactored from monolith)
+│   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
+│   ├── components/          27 component files (incl. PrivacyModal)
 │   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
 ├── init-db.sql
@@ -76,6 +81,19 @@ At the start of every session, before anything else:
 - `PHISH_NET_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `NODE_ENV`
+- `RESEND_API_KEY` — email delivery
+- `CRON_SECRET` — protects email and etsy cron endpoints
+- `VITE_SENTRY_DSN` — Sentry error monitoring (client-side, Matthew to add)
+- `VITE_POSTHOG_KEY` — Posthog analytics (client-side, Matthew to add)
+
+## Security Notes
+- CORS: locked to phreezer.mpgink.com — `cors(res, req)` signature, must pass req
+- JWT: explicit HS256, 30d expiry, is_admin baked into token
+- Rate limiting: login 10/15min, register 5/60min per IP via _ratelimit.js
+- Disposable emails: blocked at register via _disposable.js
+- Cron endpoints: protected by CRON_SECRET header
+- Admin endpoints: all require verifyToken + is_admin
+- Client bundle: VITE_ prefix exposes to browser — only Sentry DSN + Posthog key, both intentional
 
 ## Standing Preferences
 - No fluff, get to the point
