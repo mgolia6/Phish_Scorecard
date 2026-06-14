@@ -597,12 +597,23 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                           </div>
                           {ratings[song.posKey || song.song]?.notesOpen ? (
                             <div className="song-notes-expanded">
-                              <input className="notes-input" type="text" placeholder="Add a note..."
+                              <textarea
+                                className="notes-input"
+                                placeholder="Add a note..."
                                 value={ratings[song.posKey || song.song]?.notes || ''}
                                 autoFocus
-                                onChange={e => updateRating(song.posKey || song.song, 'notes', e.target.value)}
+                                rows={3}
+                                onChange={e => {
+                                  updateRating(song.posKey || song.song, 'notes', e.target.value);
+                                  e.target.style.height = 'auto';
+                                  e.target.style.height = e.target.scrollHeight + 'px';
+                                }}
                                 onBlur={() => { if (!ratings[song.posKey || song.song]?.notes) updateRating(song.posKey || song.song, 'notesOpen', false); }}
                               />
+                              <button
+                                className="notes-collapse-btn"
+                                onClick={() => updateRating(song.posKey || song.song, 'notesOpen', false)}
+                              >▲ COLLAPSE</button>
                             </div>
                           ) : (
                             <button className="song-notes-toggle" onClick={() => updateRating(song.posKey || song.song, 'notesOpen', true)}>
