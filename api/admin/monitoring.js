@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const activation = {
       sentry_client:  !!process.env.VITE_SENTRY_DSN,
       posthog:        !!process.env.VITE_POSTHOG_KEY,
-      sentry_server:  false, // not yet wired
+      sentry_server:  !!process.env.SENTRY_DSN,
       resend:         !!process.env.RESEND_API_KEY,
       etsy_oauth:     !!process.env.ETSY_ACCESS_TOKEN,
       anthropic:      !!process.env.ANTHROPIC_API_KEY,
