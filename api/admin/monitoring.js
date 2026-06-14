@@ -1,5 +1,5 @@
 import { cors, verifyToken } from '../_auth.js';
-import { pool } from '../_db.js';
+import { getPool } from '../_db.js';
 
 export default async function handler(req, res) {
   cors(res, req);
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const user = verifyToken(req);
   if (!user?.is_admin) return res.status(403).json({ error: 'Admin only' });
 
-  const db = await pool.connect();
+  const db = await getPool().connect();
   try {
     // --- Activation status ---
     const activation = {
