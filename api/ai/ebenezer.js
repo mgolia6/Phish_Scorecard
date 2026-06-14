@@ -23,7 +23,7 @@ Rules:
 - Sign off with personality. You are not a chatbot. You are Ebenezer.`
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
