@@ -182,6 +182,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
   };
 
   return (
+    <>
     <div className="profile-modal" onClick={onClose}>
       <div className="profile-modal-inner" onClick={e => e.stopPropagation()}>
         {/* Header */}
@@ -521,6 +522,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
       </div>
     </div>
     {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
+    </>
   );
 }
 
