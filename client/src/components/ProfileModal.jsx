@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PrivacyModal } from './PrivacyModal';
+import { DonationCard } from './DonationCard';
 import { formatDate } from '../utils';
 
 // ============================================================
