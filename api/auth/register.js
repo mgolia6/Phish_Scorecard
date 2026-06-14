@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { isDisposableEmail } from '../_disposable.js';
 import jwt from 'jsonwebtoken';
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
@@ -29,7 +30,7 @@ function generateToken() {
 }
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -45,6 +46,7 @@ export default async function handler(req, res) {
 
   const { email, username, password, firstName, lastName } = req.body;
   if (!email || !username || !password) return res.status(400).json({ error: 'Email, username, and password required' });
+  if (isDisposableEmail(email)) return res.status(400).json({ error: 'Disposable email addresses are not allowed. Please use a real email.' });
 
   try {
     const existing = await pool.query('SELECT id FROM users WHERE email = $1 OR username = $2', [email, username]);
@@ -77,3 +79,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
+
