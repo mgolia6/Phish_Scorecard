@@ -3,6 +3,7 @@
 // Supports Range requests for seeking.
 
 import { cors } from '../_auth.js';
+import { captureException } from '../_sentry.js';
 
 export default async function handler(req, res) {
   cors(res, req);
@@ -38,6 +39,7 @@ export default async function handler(req, res) {
 
   if (!allowed) {
     console.error(`Audio proxy: rejected URL hostname=${hostname}`);
+    captureException(err, { path: 'api/audio/stream.js' });
     return res.status(403).json({ error: 'Only phish.in audio URLs allowed' });
   }
 
@@ -53,6 +55,7 @@ export default async function handler(req, res) {
 
     if (!upstream.ok && upstream.status !== 206) {
       console.error(`Audio proxy: upstream returned ${upstream.status} for ${decoded}`);
+      captureException(err, { path: 'api/audio/stream.js' });
       return res.status(upstream.status).end();
     }
 
@@ -87,6 +90,7 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Audio proxy error:', err);
+    captureException(err, { path: 'api/audio/stream.js' });
     if (!res.headersSent) {
       res.status(502).json({ error: 'Upstream error' });
     } else {
