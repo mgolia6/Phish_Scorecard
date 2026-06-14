@@ -588,9 +588,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                                   );
                                 }}
                               >▶</button>
-                            ) : (
-                              <span style={{ width: 32, display: 'inline-block', flexShrink: 0 }} />
-                            )}
+                            ) : null}
+                            {duration && <span className="song-duration-inline">{duration}</span>}
+                            {song.isjam && <span className="badge jam-badge song-badges-inline">JAM</span>}
+                            {song.isreprise && <span className="badge reprise-badge song-badges-inline">REPRISE</span>}
+                            <span className="spacer" />
                             <SongRating value={parseInt(ratings[song.posKey || song.song]?.rating) || 0} onChange={val => updateRating(song.posKey || song.song, 'rating', val)} />
                           </div>
                           {ratings[song.posKey || song.song]?.notesOpen ? (
