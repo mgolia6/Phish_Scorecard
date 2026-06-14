@@ -5,6 +5,23 @@
 
 ---
 
+## BETA SUCCESS CRITERIA
+
+**Beta is done when all three are true:**
+- **50 registered users** with verified email addresses
+- **500 shows rated** (aggregate across all users)
+- **14 consecutive days** with no P0 bugs (app down, data loss, auth broken, security issue)
+
+**P0 definition:** App is unreachable · User data is lost or corrupted · Auth is bypassed or broken · Security vulnerability actively exploited
+
+**What happens after beta:**
+- Forum post closes / transitions to permanent listing
+- v1.0 tag on repo
+- Feature development resumes (Phish Phreeze subtab, mini player, tour grouping, etc.)
+
+---
+---
+
 ## SHIPPED ✅
 
 ### Core App
@@ -122,16 +139,9 @@
 
 **1. Error Monitoring — Sentry** ✅ (2026-06-13 — code shipped, Matthew adds VITE_SENTRY_DSN to Vercel to activate)
 
-**2. Discord Server**
-- Matthew creates server, I help structure channels
-- Suggested channels: #announcements, #feedback, #bugs, #show-ratings, #general
-- Gives beta users a place to talk to each other and to you
-- Post invite link in the app (About tab + onboarding outro)
+**2. Discord Server** — deferred until post-launch or if beta volume warrants it
 
-**3. Beta Success Criteria — Define It**
-- Proposed: 50 users · 500 shows rated · no P0 bugs for 14 consecutive days
-- Without a definition you can't tell when beta is done
-- Document in ROADMAP once agreed
+**3. Beta Success Criteria** ✅ (2026-06-13 — 50 users · 500 shows rated · 14 days no P0 — documented above)
 
 ---
 
@@ -145,11 +155,7 @@
 - Triage weekly — move from Discord #bugs → GitHub Issue
 - Replaces the current "lives in feedback and session logs" approach
 
-**6. Privacy Policy Page**
-- In-app route: `/privacy`
-- Covers: what data is collected, how it's used, phish.net handle storage, email, ratings
-- Links to it from footer, onboarding T&C screen, and About tab
-- Does NOT need a lawyer — plain language is fine for beta
+**6. Privacy Policy Page** ✅ (2026-06-13 — PrivacyModal component, linked from T&C modal + About tab)
 
 ---
 
