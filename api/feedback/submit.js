@@ -2,35 +2,11 @@ import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const pool = getPool();
-
-  // Auto-migrate feedback table
-  if (req.method === 'GET' && req.query.action === 'migrate') {
-    try {
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS feedback (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-          trigger_type VARCHAR(20) NOT NULL,
-          section VARCHAR(50),
-          answers JSONB NOT NULL DEFAULT '{}',
-          free_text TEXT,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id);
-        CREATE INDEX IF NOT EXISTS idx_feedback_trigger ON feedback(trigger_type);
-        CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC);
-      `);
-      return res.json({ ok: true, message: 'feedback table ready' });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // Allow anonymous passive feedback — token optional
   const user = verifyToken(req);
@@ -46,7 +22,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Prevent duplicate survey submissions (post_rating and week1 are one-time)
     if (trigger_type !== 'passive' && userId) {
       const existing = await pool.query(
         'SELECT id FROM feedback WHERE user_id = $1 AND trigger_type = $2',
