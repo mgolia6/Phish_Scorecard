@@ -1,5 +1,5 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-13 (evening, final)
+**Last updated:** 2026-06-14
 
 ---
 
@@ -112,19 +112,45 @@ Three columns:
 ---
 
 ## Scorecard Tab
+
+### Song Row Layout (mobile) — CURRENT STATE
+Two-row card structure:
+- **Row 1:** `#. Song Name` — full width, green glow (`text-shadow: 0 0 8px rgba(51,255,51,0.4)`), song number in brighter orange
+- **Row 2 (controls):** `▶ · duration · JAM/REPRISE badges · [spacer] · ★★★★★` — play button left, stars pushed right
+- **Row 3:** `+ NOTE` toggle / note preview (full width)
+
+Layout is `flex-direction: column` on mobile. Do NOT revert to side-by-side title+controls — this was explicitly fixed.
+
+### Song Row — Notes
+- `+ NOTE` expands to a full-width auto-growing textarea (min 3 rows)
+- Textarea grows with content — no scrollbar, no clipping
+- Green border + glow on focus, matches aesthetic
+- `▲ COLLAPSE` button bottom-right — collapses with note preserved
+- Collapsing with no text auto-dismisses back to `+ NOTE`
+- Note preview shows as `✎ note text` when collapsed with content
+
+### Song Row — Audio Player
+- ▶ button renders only when `audio.mp3_url` is present
+- Tapping ▶ expands `InlineAudioPlayer` below the song row
+- Player is `width: 100%; gridColumn: 1 / -1` — spans full width on both mobile flex and desktop grid
+- One player open at a time — tapping another ▶ closes current
+- ▶ button turns cyan when active
+- `InlineAudioPlayer` lives in `AudioPlayer.jsx` (named export), NOT a separate file
+
+### Audio Proxy
+- `api/audio/stream.js` — ES module, no `require()` — streams via Web Streams reader loop
+- URL validation uses `new URL()` hostname check — allows `phish.in` and subdomains/CDNs containing "phish"
+- Errors log to Vercel runtime logs (not client admin error log — those are browser-only)
+
+### Other Scorecard Elements
 - Search bar at top
-- Show loads: setlist by set, each song row has:
-  - Song number, song name (links to phish.net)
-  - Duration, JAM/REPRISE badges
-  - Segue indicator (> or →)
-  - ▶ play button (if audio available) — tapping expands InlineAudioPlayer below the row
-  - Star rating (1–5)
-  - + NOTE toggle
-- InlineAudioPlayer: drop-down below song row, play/pause, scrubber, time, "via phish.in"
-- One audio player open at a time
+- Show masthead: date, venue, location, tour, audio badge
+- Attendance toggle: ATTENDED / WEBCAST / LISTENED
+- Phriends section (when attended or tagged)
+- Soundcheck bar, show notes collapsible
 - Vibe Check expandable below setlist
-- ◉ AUDIO AVAILABLE badge when Phish.in data present
-- PHISH.IN link opens externally (for full show context)
+- PHISH.NET SETLIST link, STREAM ON RELISTEN link
+- Community reviews section
 
 ---
 
@@ -163,19 +189,32 @@ Three columns:
 
 ---
 
+## Error Monitoring
+- **Client-side:** Sentry wired in `main.jsx` — activates when `VITE_SENTRY_DSN` env var is set
+- **Server-side:** NOT yet wired — `@sentry/node` not added to API functions
+- **Admin error log:** captures browser-side JS exceptions only — does NOT see Vercel serverless errors or build failures
+- **Vercel runtime logs:** where server-side errors (502s, proxy failures) appear — check via Vercel MCP tools
+
+---
+
 ## Key Layout Decisions (Do Not Revisit Without Good Reason)
-- **Shop in ProfileModal, not nav** — decided this session, low-frequency feature
+- **Song row mobile:** column layout, title full width row 1, controls row 2 — do not revert to side-by-side
+- **Song notes:** textarea not input, auto-expands, has collapse button — do not revert to single-line input
+- **Audio player:** full-width span via `width:100%` + `gridColumn: 1/-1` — do not constrain to song row column
+- **Shop in ProfileModal, not nav** — low-frequency feature
 - **About in ProfileModal, not nav** — same reasoning
 - **Tour as centered modal** — spotlight approach failed on mobile, explicitly abandoned
 - **Feedback in sidebar only** — removed from floating/portal position
 - **Avatar pulse** — resets on every login, stops on first tap per session
 - **holographic/gradient text on orange** — fully reverted, plain `var(--orange)` only
 - **Scorecard keying** — always posKey, never song name — sandwiched songs break name-based lookups
+- **ProfileModal JSX** — return must be wrapped in a fragment (`<>`) so PrivacyModal renders as valid sibling
 
 ---
 
 ## What's Explicitly NOT There Yet
 - Desktop logo (Matthew to deliver from Canva)
 - Phish Phreeze community subtab
-- In-app Phish.in streaming (proxy built, audio player built — needs UAT)
+- Server-side Sentry (`@sentry/node` in API functions)
 - Etsy OAuth activation (pending Etsy app review)
+- Sentry + Posthog activation (Matthew adds env vars to Vercel)
