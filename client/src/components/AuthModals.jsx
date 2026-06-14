@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useApi } from '../useApi';
+import { PrivacyModal } from './PrivacyModal';
 
 export function TandCModal({ onAccept }) {
   const [scrolled, setScrolled] = React.useState(false);
+  const [showPrivacy, setShowPrivacy] = React.useState(false);
   const bodyRef = React.useRef(null);
 
   const handleScroll = () => {
@@ -45,7 +47,20 @@ export function TandCModal({ onAccept }) {
         >
           STEP INTO THE PHREEZER
         </button>
+        <div style={{ textAlign: 'center', marginTop: 12 }}>
+          <button
+            onClick={() => setShowPrivacy(true)}
+            style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+              color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', textDecoration: 'underline', padding: 0,
+            }}
+          >
+            Privacy Policy
+          </button>
+        </div>
       </div>
+      {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
     </div>
   );
 }
@@ -420,3 +435,4 @@ export function AuthModal({ mode, setMode, onSuccess, onClose }) {
     </div>
   );
 }
+
