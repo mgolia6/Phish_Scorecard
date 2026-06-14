@@ -910,6 +910,7 @@ select option { background: var(--bg); color: var(--green); }
 .song-play-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid rgba(0,255,255,0.38); color: var(--cyan); font-size: 0.7rem; text-decoration: none; transition: all 0.15s; flex-shrink: 0; -webkit-tap-highlight-color: transparent; box-shadow: 0 0 4px rgba(0,255,255,0.12); }
 .song-play-btn:hover { background: rgba(0,255,255,0.14); border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,255,255,0.4); color: #fff; }
 .song-notes-toggle { margin-top: 3px; font-size: 0.58rem; }
+.song-notes-expanded { width: 100%; margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
 
 /* Rating buttons */
 .song-rating-row  { display: flex; gap: 4px; align-items: center; }
@@ -917,7 +918,11 @@ select option { background: var(--bg); color: var(--green); }
 .rating-btn:hover  { border-color: var(--orange); color: var(--orange); background: rgba(255,102,0,0.08); box-shadow: none; }
 .rating-btn.active { background: rgba(255,102,0,0.12); border-color: var(--orange); color: var(--orange); }
 .rating-btn.selected { background: rgba(255,102,0,0.2); border-color: var(--orange); color: var(--orange); box-shadow: 0 0 6px rgba(255,102,0,0.5); }
-.notes-input { width: 180px; padding: 6px 8px; font-size: 0.8rem; }
+.notes-input { width: 100%; padding: 10px 12px; font-size: 0.84rem; min-height: 72px; resize: none; overflow: hidden; line-height: 1.6; background: rgba(0,0,0,0.4); border: 1px solid rgba(51,255,51,0.3); color: var(--green); font-family: var(--font-mono); box-sizing: border-box; transition: border-color 0.15s; }
+.notes-input:focus { outline: none; border-color: rgba(51,255,51,0.6); box-shadow: 0 0 8px rgba(51,255,51,0.15); }
+.notes-input::placeholder { color: rgba(51,255,51,0.25); }
+.notes-collapse-btn { align-self: flex-end; background: transparent; border: 1px solid rgba(51,255,51,0.2); color: rgba(51,255,51,0.45); font-family: var(--font-display); font-size: 0.42rem; letter-spacing: 2px; padding: 4px 10px; cursor: pointer; transition: all 0.15s; }
+.notes-collapse-btn:hover { border-color: rgba(51,255,51,0.5); color: var(--green); }
 
 /* Score summary */
 .score-summary  { margin-top: 24px; padding: 20px; background: var(--bg-elevated); border: 1px solid var(--border); }
@@ -1178,7 +1183,7 @@ select option { background: var(--bg); color: var(--green); }
   .song-row-controls .spacer               { flex: 1; }
   .song-rating-row  { display: flex; gap: 3px; flex-shrink: 0; }
   .rating-btn       { width: 34px; height: 34px; font-size: 0.78rem; }
-  .notes-input      { display: block !important; flex: 1; min-width: 0; padding: 6px 8px; font-size: 0.8rem; width: auto; }
+  .notes-input      { width: 100% !important; font-size: 0.84rem; }
   .song-play-btn    { width: 30px; height: 30px; flex-shrink: 0; }
   .song-notes-toggle{ width: 100%; }
   .overall-val      { font-size: 1.6rem; }
