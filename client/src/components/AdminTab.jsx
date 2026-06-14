@@ -957,13 +957,13 @@ function MonitoringTab({ api }) {
   const { activation, email, ai, users, ratings, donations, feedback } = data;
 
   const SERVICE_DEFS = [
-    { key: 'sentry_client',  label: 'SENTRY (CLIENT)',  desc: 'Add VITE_SENTRY_DSN to Vercel env vars',  built: true  },
-    { key: 'posthog',        label: 'POSTHOG',          desc: 'Add VITE_POSTHOG_KEY to Vercel env vars', built: true  },
-    { key: 'resend',         label: 'RESEND EMAIL',     desc: 'Email delivery',                          built: true  },
+    { key: 'sentry_client',  label: 'SENTRY (CLIENT)',  desc: 'Add VITE_SENTRY_DSN to Vercel env vars',  built: true, url: 'https://mpgink.sentry.io/issues/' },
+    { key: 'posthog',        label: 'POSTHOG',          desc: 'Add VITE_POSTHOG_KEY to Vercel env vars', built: true, url: 'https://us.posthog.com/' },
+    { key: 'resend',         label: 'RESEND EMAIL',     desc: 'Email delivery',                          built: true, url: 'https://resend.com/emails' },
     { key: 'anthropic',      label: 'ANTHROPIC AI',     desc: 'Ebenezer + Vibe Check',                   built: true  },
     { key: 'phishnet',       label: 'PHISH.NET API',    desc: 'Setlist + review data',                   built: true  },
-    { key: 'etsy_oauth',     label: 'ETSY OAUTH',       desc: 'Pending Etsy app review',                 built: true  },
-    { key: 'sentry_server',  label: 'SENTRY (SERVER)',  desc: 'Add SENTRY_DSN to Vercel env vars',       built: true  },
+    { key: 'etsy_oauth',     label: 'ETSY OAUTH',       desc: 'Pending Etsy app review',                 built: true, url: 'https://www.etsy.com/your/shops/me/dashboard' },
+    { key: 'sentry_server',  label: 'SENTRY (SERVER)',  desc: 'Add SENTRY_DSN to Vercel env vars',       built: true, url: 'https://mpgink.sentry.io/issues/' },
   ];
 
   const StatusDot = ({ on, built }) => {
@@ -1008,7 +1008,12 @@ function MonitoringTab({ api }) {
               <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{s.label}</div>
               {!activation[s.key] && <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, marginTop: 2 }}>{s.desc}</div>}
             </div>
-            <StatusDot on={activation[s.key]} built={s.built} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {activation[s.key] && s.url && (
+                <a href={s.url} target='_blank' rel='noopener noreferrer' style={{ fontFamily: D.disp, fontSize: '0.4rem', letterSpacing: '1.5px', color: D.cyan, textDecoration: 'none', opacity: 0.7 }}>OPEN →</a>
+              )}
+              <StatusDot on={activation[s.key]} built={s.built} />
+            </div>
           </div>
         ))}
       </Panel>
