@@ -22,7 +22,7 @@ async function ensureMigration(pool) {
 }
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const pool = getPool();
