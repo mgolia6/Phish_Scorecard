@@ -1,7 +1,7 @@
 # Phreezer — Roadmap
 
 ## Target: Beta launch to Phish.net community. Phish summer tour starts July 7.
-## Last updated: 2026-06-13 (evening)
+## Last updated: 2026-06-13 (evening, final)
 
 ---
 
@@ -46,6 +46,15 @@
 - Daily cron at 2pm UTC via Vercel cron
 - email_log table prevents duplicates
 - All from: Phreezer Support <phreezer.support@mpgink.com>
+
+### Analytics + Error Monitoring (2026-06-13)
+- Sentry wired in — ErrorBoundary, browser tracing, session replay (activates on VITE_SENTRY_DSN)
+- Posthog wired in — 20+ named events, identified users, explicit tracking (activates on VITE_POSTHOG_KEY)
+- analytics.js module — tab views, auth, scorecard opens, Ebenezer, tour, shop, feedback
+
+### Privacy Policy (2026-06-13)
+- PrivacyModal.jsx — plain-language, retro styled
+- Linked from T&C modal (registration) and About tab (ProfileModal)
 
 ### Onboarding Tour (2026-06-13)
 - 9-step centered modal — Ebenezer intro + 7 feature stops + outro
@@ -105,6 +114,16 @@
 - Leaderboard, Top Shows, Top Songs, Top Venues
 - Mockingbird donation banner at top
 
+### Security Hardening (2026-06-13)
+- CORS locked to phreezer.mpgink.com (was wildcard *)
+- Explicit HS256 algorithm in JWT sign + verify
+- Disposable email blocklist — ~40 providers blocked at registration
+- All 45 API handlers updated to pass req for origin-aware CORS
+- Open unauthenticated migration endpoint on feedback/submit removed
+- All admin endpoints confirmed auth-gated (migrate.js was already correct)
+- Client bundle audited — no secrets exposed
+
+
 ---
 
 ## PENDING / IN PROGRESS
@@ -123,7 +142,7 @@
 ## OPEN BUGS / DEBT
 
 - Tour guide UAT needed after reset — confirm 9-step flow works end to end
-- Username required at registration — field exists in form, confirm it's enforced
+- ~~Username required at registration~~ ✅ confirmed — backend enforces, frontend has required attribute
 - Top Shows blank until more community ratings exist (data problem, not code)
 - Deep Phreeze new data fields won't populate until users run full sync
 - ~~phreezer.mpgink.com subdomain~~ — confirmed live, mpgink.com domain already configured in Resend ✅
@@ -150,10 +169,10 @@
 **4. Analytics — Posthog** ✅ (2026-06-13 — code shipped, Matthew adds VITE_POSTHOG_KEY to Vercel to activate)
 
 **5. Bug Tracking — GitHub Issues**
-- Enable Issues on the Phish_Scorecard repo
+- Enable Issues on the Phish_Scorecard repo (Matthew flips switch in repo settings)
 - Label taxonomy: P0-critical / P1-high / P2-medium / P3-low + feature/bug/ux
-- Triage weekly — move from Discord #bugs → GitHub Issue
-- Replaces the current "lives in feedback and session logs" approach
+- Triage weekly — move from in-app feedback → GitHub Issue
+- Replaces the current "lives in session logs" approach
 
 **6. Privacy Policy Page** ✅ (2026-06-13 — PrivacyModal component, linked from T&C modal + About tab)
 
@@ -192,11 +211,11 @@
 - Middle section desktop expansion
 - Phish Phreeze — band-level community subtab (total shows, songs, hours, era breakdowns)
 - Scheduled phish.net sync via Vercel cron
-- ~~Disposable email blocklist~~ ✅ (2026-06-13)
 - Tour grouping in My Shows
 - Export ratings to CSV
 - Jam chart filter in setlist view
 - Live show mode
+- Community feed — chronological post stream in Community tab (short takes, one-level replies, no threading)
 - More Etsy listings as created — add to Shop tab
 
 ---
