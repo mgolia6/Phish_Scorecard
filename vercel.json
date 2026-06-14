@@ -163,6 +163,10 @@
       "destination": "/api/admin/ai-usage"
     },
     {
+      "source": "/api/admin/monitoring",
+      "destination": "/api/admin/monitoring"
+    },
+    {
       "source": "/api/audio/stream",
       "destination": "/api/audio/stream"
     },
