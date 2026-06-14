@@ -963,7 +963,7 @@ function MonitoringTab({ api }) {
     { key: 'anthropic',      label: 'ANTHROPIC AI',     desc: 'Ebenezer + Vibe Check',                   built: true  },
     { key: 'phishnet',       label: 'PHISH.NET API',    desc: 'Setlist + review data',                   built: true  },
     { key: 'etsy_oauth',     label: 'ETSY OAUTH',       desc: 'Pending Etsy app review',                 built: true  },
-    { key: 'sentry_server',  label: 'SENTRY (SERVER)',  desc: '@sentry/node — not yet wired',            built: false },
+    { key: 'sentry_server',  label: 'SENTRY (SERVER)',  desc: 'Add SENTRY_DSN to Vercel env vars',       built: true  },
   ];
 
   const StatusDot = ({ on, built }) => {
