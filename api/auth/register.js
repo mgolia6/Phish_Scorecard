@@ -5,6 +5,7 @@ import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
 import { sendVerificationEmail } from './verify-email.js';
 import { checkRateLimit } from '../_ratelimit.js';
+import { captureException } from '../_sentry.js';
 
 async function ensureMigration(pool) {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`);
