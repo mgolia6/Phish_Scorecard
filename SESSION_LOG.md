@@ -153,3 +153,41 @@
 3. Phish.net import UAT
 4. Phish Phreeze community subtab
 5. Any beta feedback after forum post
+
+---
+
+## Session: 2026-06-13 (evening, pass 2)
+
+### What shipped
+
+**Privacy Policy**
+- `PrivacyModal.jsx` — full plain-language privacy policy in retro terminal style
+- Covers: what we collect, what we don't, how we use it, third-party services (Phish.net, Phish.in, Anthropic, Resend, Sentry, Posthog, Etsy), data retention, user rights
+- Plain language section: "We don't sell your data. Your show ratings are yours."
+- Linked from: About tab in ProfileModal (quiet footer link), T&C modal (below accept button)
+- Accessible at any point — before account creation and after
+
+**Beta success criteria documented**
+- 50 registered users · 500 shows rated · 14 consecutive days no P0 bugs
+- P0 definition included (app down, data loss, auth broken, security vuln)
+- Added to ROADMAP.md as its own section
+
+**Username validation confirmed**
+- Backend enforces `!email || !username || !password` — 400 if missing
+- Frontend form has `required` on username field
+- No fix needed — this was already correct
+
+**Resend/GoDaddy confirmed closed**
+- mpgink.com domain already configured in Resend (Matthew confirmed)
+
+### Decisions made
+- Discord deferred — not needed for small beta, revisit if volume warrants
+- Privacy policy as modal (not route) — app has no react-router, modal is correct pattern
+- Privacy link intentionally subtle (low contrast) — present for compliance, not prominence
+
+### Next session priorities (unchanged)
+1. Posthog/Sentry activation — Matthew adds VITE_SENTRY_DSN + VITE_POSTHOG_KEY to Vercel
+2. Etsy OAuth activation (pending Etsy app review)
+3. Phish.net import UAT with buddy
+4. Tour guide UAT after admin reset
+5. Forum post — ready to publish
