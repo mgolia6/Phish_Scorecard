@@ -8,7 +8,7 @@ const ETSY_AUTH_URL = 'https://www.etsy.com/oauth/connect';
 const SCOPES = 'transactions_r listings_r';
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { ETSY_API_KEY } = process.env;
