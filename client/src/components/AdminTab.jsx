@@ -937,6 +937,157 @@ function DonationsTab({ api, showMessage, showError }) {
 }
 
 // ── Main AdminTab ──────────────────────────────────────────
+
+// ── Monitoring Tab ─────────────────────────────────────────
+function MonitoringTab({ api }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    api.get('/admin/monitoring')
+      .then(d => { setData(d); setLoading(false); })
+      .catch(e => { setError(e.message); setLoading(false); });
+  }, []);
+
+  if (loading) return <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px', padding: 24 }}>LOADING...</div>;
+  if (error)   return <div style={{ fontFamily: D.mono, fontSize: '0.75rem', color: D.red, padding: 24 }}>Error: {error}</div>;
+  if (!data)   return null;
+
+  const { activation, email, ai, users, ratings, donations, feedback } = data;
+
+  const SERVICE_DEFS = [
+    { key: 'sentry_client',  label: 'SENTRY (CLIENT)',  desc: 'Add VITE_SENTRY_DSN to Vercel env vars',  built: true  },
+    { key: 'posthog',        label: 'POSTHOG',          desc: 'Add VITE_POSTHOG_KEY to Vercel env vars', built: true  },
+    { key: 'resend',         label: 'RESEND EMAIL',     desc: 'Email delivery',                          built: true  },
+    { key: 'anthropic',      label: 'ANTHROPIC AI',     desc: 'Ebenezer + Vibe Check',                   built: true  },
+    { key: 'phishnet',       label: 'PHISH.NET API',    desc: 'Setlist + review data',                   built: true  },
+    { key: 'etsy_oauth',     label: 'ETSY OAUTH',       desc: 'Pending Etsy app review',                 built: true  },
+    { key: 'sentry_server',  label: 'SENTRY (SERVER)',  desc: '@sentry/node — not yet wired',            built: false },
+  ];
+
+  const StatusDot = ({ on, built }) => {
+    const color = !built ? D.muted : on ? D.green : D.orange;
+    const label = !built ? 'NOT BUILT' : on ? 'ACTIVE' : 'INACTIVE';
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, boxShadow: on && built ? `0 0 6px ${color}` : 'none', flexShrink: 0 }} />
+        <span style={{ fontFamily: D.disp, fontSize: '0.42rem', letterSpacing: '2px', color }}>{label}</span>
+      </div>
+    );
+  };
+
+  const fmtCost = v => v != null ? `$${parseFloat(v).toFixed(4)}` : '—';
+  const fmtNum  = v => v != null ? Number(v).toLocaleString() : '—';
+
+  const Row = ({ label, val, sub, color = D.label }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <span style={{ fontFamily: D.disp, fontSize: '0.44rem', color: D.muted, letterSpacing: '2px' }}>{label}</span>
+      <div style={{ textAlign: 'right' }}>
+        <span style={{ fontFamily: D.mono, fontSize: '0.82rem', color }}>{val}</span>
+        {sub && <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted }}>{sub}</div>}
+      </div>
+    </div>
+  );
+
+  const Panel = ({ title, color = D.cyan, children }) => (
+    <div style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${color}22`, borderTop: `2px solid ${color}55`, padding: '14px 16px', marginBottom: 14 }}>
+      <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color, letterSpacing: '3px', marginBottom: 12 }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div style={{ padding: '0 10px 24px' }}>
+
+      {/* Activation Status */}
+      <Panel title="◈ ACTIVATION STATUS" color={D.cyan}>
+        {SERVICE_DEFS.map(s => (
+          <div key={s.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{s.label}</div>
+              {!activation[s.key] && <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: D.muted, marginTop: 2 }}>{s.desc}</div>}
+            </div>
+            <StatusDot on={activation[s.key]} built={s.built} />
+          </div>
+        ))}
+      </Panel>
+
+      {/* User Growth */}
+      <Panel title="◈ USER GROWTH" color={D.cyan}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+          {[
+            { val: fmtNum(users?.total),    label: 'TOTAL' },
+            { val: fmtNum(users?.verified), label: 'VERIFIED' },
+            { val: fmtNum(users?.last_7d),  label: 'LAST 7D' },
+            { val: fmtNum(users?.last_24h), label: 'TODAY' },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(0,224,208,0.1)' }}>
+              <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.cyan, lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.38rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      {/* Rating Activity */}
+      <Panel title="◈ RATING ACTIVITY" color={D.green}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {[
+            { val: fmtNum(ratings?.total),    label: 'TOTAL RATED' },
+            { val: fmtNum(ratings?.last_7d),  label: 'LAST 7D' },
+            { val: fmtNum(ratings?.last_24h), label: 'TODAY' },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(51,255,51,0.1)' }}>
+              <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.38rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      {/* AI Usage */}
+      <Panel title="◈ AI USAGE" color={D.orange}>
+        <Row label="CALLS · 7 DAYS"  val={fmtNum(ai?.seven_day?.calls)} sub={fmtCost(ai?.seven_day?.cost)} color={D.orange} />
+        <Row label="CALLS · 30 DAYS" val={fmtNum(ai?.thirty_day?.calls)} sub={fmtCost(ai?.thirty_day?.cost)} color={D.orange} />
+        {(ai?.today || []).length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>TODAY BY FEATURE</div>
+            {ai.today.map(r => (
+              <Row key={r.feature} label={r.feature.toUpperCase()} val={`${fmtNum(r.calls)} calls`} sub={fmtCost(r.cost)} />
+            ))}
+          </div>
+        )}
+      </Panel>
+
+      {/* Email Activity */}
+      <Panel title="◈ EMAIL ACTIVITY" color={D.cyan}>
+        {email?.by_type?.length > 0 ? (
+          email.by_type.map(r => (
+            <Row key={r.email_type}
+              label={r.email_type.toUpperCase().replace(/_/g,' ')}
+              val={`${fmtNum(r.count)} sent`}
+              sub={r.last_sent ? new Date(r.last_sent).toLocaleDateString() : null}
+            />
+          ))
+        ) : (
+          <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted }}>No emails sent yet</div>
+        )}
+      </Panel>
+
+      {/* Feedback + Donations */}
+      <Panel title="◈ FEEDBACK + DONATIONS" color={D.green}>
+        <Row label="FEEDBACK TOTAL"   val={fmtNum(feedback?.total)} />
+        <Row label="FEEDBACK UNREAD"  val={fmtNum(feedback?.unread)}  color={feedback?.unread > 0 ? D.orange : D.label} />
+        <Row label="FEEDBACK · 7D"    val={fmtNum(feedback?.last_7d)} />
+        <Row label="ITEMS SOLD"       val={fmtNum(donations?.items_sold)} />
+        <Row label="DONATED"          val={donations?.donation_total != null ? `$${parseFloat(donations.donation_total).toFixed(2)}` : '—'} color={D.green} />
+      </Panel>
+
+    </div>
+  );
+}
+
 const TABS = [
   { id: 'users',     label: 'USERS',     color: 'var(--cyan)' },
   { id: 'system',    label: 'SYSTEM',    color: 'var(--cyan)' },
@@ -946,6 +1097,7 @@ const TABS = [
   { id: 'errors',    label: 'ERRORS',    color: 'var(--red, #ff3333)' },
   { id: 'feedback',   label: 'FEEDBACK',   color: 'var(--orange)' },
   { id: 'donations',  label: 'DONATIONS',  color: 'var(--green)'  },
+  { id: 'monitoring', label: 'MONITORING', color: 'var(--cyan)'  },
 ];
 
 export function AdminTab({ api, showMessage, showError }) {
@@ -974,7 +1126,8 @@ export function AdminTab({ api, showMessage, showError }) {
       {activeTab === 'ai-usage' && <AiUsageTab          api={api} />}
       {activeTab === 'errors'   && <ErrorLogTab />}
       {activeTab === 'feedback'  && <FeedbackTab          api={api} />}
-      {activeTab === 'donations' && <DonationsTab         api={api} showMessage={showMessage} showError={showError} />}
+      {activeTab === 'donations'  && <DonationsTab  api={api} showMessage={showMessage} showError={showError} />}
+      {activeTab === 'monitoring' && <MonitoringTab api={api} />}
     </div>
   );
 }
