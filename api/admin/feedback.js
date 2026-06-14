@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const user = verifyToken(req);
-  if (!user || !user.is_admin) return res.status(403).json({ error: 'Forbidden' });
+  if (!user?.is_admin && !isAdminKey(req)) return res.status(403).json({ error: 'Forbidden' });
 
   const pool = getPool();
   const { trigger_type, section, limit = 100, offset = 0 } = req.query;
