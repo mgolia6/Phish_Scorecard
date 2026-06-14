@@ -56,7 +56,7 @@ async function fire(pool, user, emailType, emailFn, ...args) {
 }
 
 export default async function handler(req, res) {
-  cors(res);
+  cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   // Auth — must provide CRON_SECRET
