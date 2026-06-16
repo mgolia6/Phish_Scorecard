@@ -119,6 +119,14 @@
       "destination": "/api/community/leaderboard"
     },
     {
+      "source": "/api/community/user-search",
+      "destination": "/api/community/user-search"
+    },
+    {
+      "source": "/api/community/overlap-suggestions",
+      "destination": "/api/community/overlap-suggestions"
+    },
+    {
       "source": "/api/user/profile-options",
       "destination": "/api/user/profile-options"
     },
