@@ -62,11 +62,13 @@ At the start of every session, before anything else:
 │   ├── ai/summarize.js      Vibe Check (Haiku, cached in vibe_checks table)
 │   ├── ai/ebenezer.js       Uncle Ebenezer AI agent (Sonnet)
 │   ├── analytics/songs.js + venues.js
-│   └── admin/health.js       server-side external API health probe
+│   ├── admin/health.js       server-side external API health probe
+│   └── admin/seed-ebenezer.js  seeds pinned Uncle Ebenezer post (admin only)
 ├── client/src/
 │   ├── App.jsx
 │   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
-│   ├── components/          29 component files (incl. PhreezeFeed, PhriendOverlap)
+│   ├── components/          31 component files (incl. PhreezeFeed, PhriendOverlap,
+│   │                            DesktopLanding, ShowSlotMachine)
 │   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
 ├── init-db.sql
