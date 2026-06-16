@@ -45,24 +45,30 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', height: '100vh', background: '#0a0a0a',
-          color: '#ff6600', fontFamily: 'Share Tech Mono, monospace', padding: '2rem',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❄</div>
-          <div style={{ fontSize: '1rem', letterSpacing: '3px', marginBottom: '0.5rem',
-            fontFamily: 'Orbitron, sans-serif', color: '#33ff33' }}>
-            EBENEZER IS FROZEN
+          fontFamily: 'Share Tech Mono, monospace', padding: '2rem', textAlign: 'center',
+          cursor: 'pointer',
+        }} onClick={resetError}>
+          <div style={{ fontSize: '0.55rem', letterSpacing: '4px', color: 'rgba(255,80,80,0.5)', marginBottom: 16, fontFamily: 'Orbitron, sans-serif' }}>
+            ⚠ SYSTEM ALERT
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '2rem', maxWidth: '400px' }}>
-            Something unexpected happened. The error has been logged.
+          <div style={{ fontSize: '2.2rem', letterSpacing: '6px', marginBottom: '0.75rem',
+            fontFamily: 'Orbitron, sans-serif', color: '#ff3333',
+            textShadow: '0 0 30px rgba(255,51,51,0.6)' }}>
+            MIKE SAYS NO
           </div>
-          <button onClick={resetError} style={{
-            background: 'transparent', border: '1px solid #ff6600', color: '#ff6600',
-            padding: '0.75rem 2rem', cursor: 'pointer', letterSpacing: '2px',
-            fontFamily: 'Orbitron, sans-serif', fontSize: '0.7rem'
+          <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: 8, letterSpacing: '2px' }}>
+            {error?.message || 'Something broke. Mike is not sorry about it.'}
+          </div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.18)', marginBottom: '2.5rem', letterSpacing: '2px' }}>
+            The error has been logged. Mike does not care.
+          </div>
+          <div style={{
+            fontSize: '0.5rem', letterSpacing: '3px', color: 'rgba(255,51,51,0.5)',
+            fontFamily: 'Orbitron, sans-serif', border: '1px solid rgba(255,51,51,0.2)',
+            padding: '8px 20px',
           }}>
-            TRY AGAIN
-          </button>
+            [ TAP ANYWHERE TO TRY AGAIN ]
+          </div>
         </div>
       )}
     >
