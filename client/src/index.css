@@ -1465,3 +1465,8 @@ select option { background: var(--bg); color: var(--green); }
   /* On mobile, masthead goes single column */
   .show-masthead { grid-template-columns: 1fr !important; }
 }
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
