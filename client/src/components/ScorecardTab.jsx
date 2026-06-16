@@ -463,7 +463,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
         </div>
         {/* ── DATE FILTERS — DESKTOP ONLY ── */}
-        <div className="desktop-filter-block">
+        {!currentShow && <div className="desktop-filter-block">
         {(() => {
           const ERAS_MAP = {'1.0': ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'], '2.0': ['2002', '2003', '2004'], '3.0': ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'], '4.0': ['2021', '2022', '2023', '2024', '2025']};
           const ALL_YEARS = ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
@@ -489,244 +489,127 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           const availDows = new Set(allShows.filter(s=>pass(s,false,false,false,false,true)).map(s=>String(new Date((s.showdate||'')+'T12:00:00').getDay())));
           const eraYearsFiltered = eraYrs ? ALL_YEARS.filter(y=>eraYrs.includes(y)) : ALL_YEARS;
           const hasFilters = selectedEra||selectedYear||selectedMonth||selectedDay||selectedDow!=='';
-          const clearAll = () => { setSelectedEra('');setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setQuery('');setCurrentShow(null); };
+
+          const clearAll = () => {
+            setSelectedEra('');setSelectedYear('');setSelectedMonth('');
+            setSelectedDay('');setSelectedDow('');setQuery('');
+            setCurrentShow(null);setSongs([]);setResults(allShows.slice(0,20));
+          };
 
           const C = { era:'#ff6600', yr:'#00e0d0', mo:'#33ff33', dy:'#ff6600', dow:'#00e0d0' };
           const btn = (type, active, avail) => ({
             background: active ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.14)` : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.28)` : 'rgba(255,255,255,0.09)'}`,
-            color: active ? C[type] : avail||!loaded ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.2)',
+            border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.25)` : 'rgba(255,255,255,0.08)'}`,
+            color: active ? C[type] : avail||!loaded ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)',
             fontFamily: 'var(--font-display)', cursor: 'pointer', textAlign: 'center',
-            fontSize: '0.62rem', letterSpacing: '0.5px', padding: '6px 3px',
-            boxShadow: active ? `0 0 6px ${C[type]}55` : 'none', transition: 'all 0.1s',
+            fontSize: '0.6rem', letterSpacing: '0.5px', padding: '5px 2px',
+            boxShadow: active ? `0 0 5px ${C[type]}44` : 'none', transition: 'all 0.1s',
           });
 
+          const colLabel = (color, text) => (
+            <div style={{ fontFamily:'var(--font-display)', fontSize:'0.38rem', color, letterSpacing:'3px', marginBottom:3 }}>{text}</div>
+          );
+
+          const sep = <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0, margin:'0 4px' }} />;
+
           return (
-            <div style={{ marginTop: 10 }}>
-              {hasFilters && (
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 8 }}>
-                  <span style={{ fontFamily:'var(--font-display)', fontSize:'0.6rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
-                  <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.48rem', letterSpacing:'2px', padding:'4px 10px', cursor:'pointer' }}>✕ CLEAR ALL</button>
-                </div>
-              )}
+            <div style={{ marginTop: 8 }}>
+              <div style={{ display:'flex', gap:8, alignItems:'start' }}>
 
-              {/* Single row: ERA | sep | YEAR | sep | MONTH | sep | DAY | sep | DOW */}
-              <div style={{ display:'flex', gap:10, alignItems:'start' }}>
-
-                {/* ERA — 4 stacked buttons */}
+                {/* ERA — 2×2 grid */}
                 <div style={{ flexShrink:0 }}>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:4 }}>ERA</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
+                  {colLabel('rgba(255,102,0,0.55)','ERA')}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:3 }}>
                     {[{l:'1.0',s:'1983–2000',v:'1.0'},{l:'2.0',s:'2002–2004',v:'2.0'},{l:'3.0',s:'2009–2020',v:'3.0'},{l:'4.0',s:'2021–NOW',v:'4.0'}].map(era => {
                       const active = selectedEra===era.v;
                       return (
-                        <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null); }} style={{
+                        <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null);setSongs([]); }} style={{
                           background: active?'rgba(255,102,0,0.14)':'rgba(255,255,255,0.03)',
                           border:`1px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
                           color: active?'#ff6600':'rgba(255,255,255,0.65)',
                           fontFamily:'var(--font-display)', cursor:'pointer',
-                          padding:'7px 10px', display:'flex', gap:7, alignItems:'center',
-                          whiteSpace:'nowrap', boxShadow:active?'0 0 10px rgba(255,102,0,0.2)':'none',
+                          padding:'6px 8px', textAlign:'center',
+                          boxShadow:active?'0 0 8px rgba(255,102,0,0.2)':'none',
+                          display:'flex', flexDirection:'column', alignItems:'center', gap:1,
                         }}>
-                          <span style={{ fontSize:'1rem', fontWeight:900, letterSpacing:'2px' }}>{era.l}</span>
-                          <span style={{ fontSize:'0.44rem', opacity:0.6, letterSpacing:'0.5px' }}>{era.s}</span>
+                          <span style={{ fontSize:'0.9rem', fontWeight:900, letterSpacing:'1.5px', lineHeight:1 }}>{era.l}</span>
+                          <span style={{ fontSize:'0.36rem', opacity:0.55, letterSpacing:'0.5px', whiteSpace:'nowrap' }}>{era.s}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+                {sep}
 
-                {/* YEAR — 10 col × 4 rows */}
+                {/* YEAR — 10×4 */}
                 <div style={{ flexShrink:0 }}>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:4 }}>YEAR</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(10, 40px)', gap:3 }}>
+                  {colLabel('rgba(0,224,208,0.55)','YEAR')}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(10,38px)', gap:3 }}>
                     {eraYearsFiltered.map(yr => {
                       const active=selectedYear===yr, avail=availYrs.has(yr);
-                      return (
-                        <button key={yr} onClick={() => { const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(n||(selectedEra?'__filter__':'')); }} style={{...btn('yr',active,avail)}}>
-                          '{yr.slice(2)}
-                        </button>
-                      );
+                      return <button key={yr} onClick={() => { const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setSongs([]);setQuery(n||(selectedEra?'__filter__':'')); }} style={{...btn('yr',active,avail)}}>'{yr.slice(2)}</button>;
                     })}
                   </div>
                 </div>
 
-                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+                {sep}
 
-                {/* MONTH — 6 col × 2 rows */}
+                {/* MONTH — 6×2 */}
                 <div style={{ flexShrink:0 }}>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(51,255,51,0.55)', letterSpacing:'3px', marginBottom:4 }}>MONTH</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 38px)', gap:3 }}>
+                  {colLabel('rgba(51,255,51,0.55)','MONTH')}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(6,38px)', gap:3 }}>
                     {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
                       const p=String(i+1).padStart(2,'0'), active=selectedMonth===p, avail=availMos.has(p);
-                      return <button key={mn} onClick={() => { setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null); }} style={{...btn('mo',active,avail)}}>{mn}</button>;
+                      return <button key={mn} onClick={() => { setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null);setSongs([]); }} style={{...btn('mo',active,avail)}}>{mn}</button>;
                     })}
                   </div>
                 </div>
 
-                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+                {sep}
 
-                {/* DAY — 8 col × 4 rows */}
+                {/* DAY — 8×4 */}
                 <div style={{ flexShrink:0 }}>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:4 }}>DAY</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(8, 28px)', gap:3 }}>
+                  {colLabel('rgba(255,102,0,0.55)','DAY')}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(8,28px)', gap:3 }}>
                     {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
                       const p=d.padStart(2,'0'), active=selectedDay===d, avail=availDays.has(p);
-                      return <button key={d} onClick={() => { setSelectedDay(active?'':d);setCurrentShow(null); }} style={{...btn('dy',active,avail)}}>{d}</button>;
-                    })}
-                    <div style={{ gridColumn:'span 1' }} />
-                  </div>
-                </div>
-
-                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
-
-                {/* DOW — 4 col × 2 rows */}
-                <div style={{ flexShrink:0 }}>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:4 }}>DAY OF WEEK</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 38px)', gap:3 }}>
-                    {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => {
-                      const active=selectedDow===String(i), avail=availDows.has(String(i));
-                      return <button key={dow} onClick={() => { setSelectedDow(active?'':String(i));setCurrentShow(null); }} style={{...btn('dow',active,avail)}}>{dow}</button>;
+                      return <button key={d} onClick={() => { setSelectedDay(active?'':d);setCurrentShow(null);setSongs([]); }} style={{...btn('dy',active,avail)}}>{d}</button>;
                     })}
                     <div />
                   </div>
                 </div>
+
+                {sep}
+
+                {/* DOW — 4×2 */}
+                <div style={{ flexShrink:0 }}>
+                  {colLabel('rgba(0,224,208,0.55)','DAY OF WEEK')}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4,38px)', gap:3 }}>
+                    {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => {
+                      const active=selectedDow===String(i), avail=availDows.has(String(i));
+                      return <button key={dow} onClick={() => { setSelectedDow(active?'':String(i));setCurrentShow(null);setSongs([]); }} style={{...btn('dow',active,avail)}}>{dow}</button>;
+                    })}
+                    <div />
+                  </div>
+                </div>
+
+                {/* CLEAR — far right, vertically centered */}
+                {hasFilters && (
+                  <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', alignSelf:'stretch', paddingTop:18 }}>
+                    <span style={{ fontFamily:'var(--font-display)', fontSize:'0.52rem', color:'var(--cyan)', letterSpacing:'1.5px', writingMode:'vertical-rl', transform:'rotate(180deg)', opacity:0.8 }}>{pool.length} MATCH</span>
+                    <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.44rem', letterSpacing:'1.5px', padding:'5px 8px', cursor:'pointer', whiteSpace:'nowrap' }}>✕ CLEAR</button>
+                  </div>
+                )}
 
               </div>
             </div>
           );
         })()}
         </div>
-
-        {/* MOBILE FILTER — 4 independent dropdowns: YEAR, MONTH, DAY, DOW */}
-        <div className="mobile-filter-block">
-          {(() => {
-            const ERAS_MAP = {'1.0':['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'],'2.0':['2002','2003','2004'],'3.0':['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'],'4.0':['2021', '2022', '2023', '2024', '2025']};
-            const ALL_YEARS_M = ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
-            const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
-            const loaded = allShows.length > 0;
-
-            const pass = (s, skipYr, skipMo, skipDy, skipDow) => {
-              const yr=s.showdate?.slice(0,4), mo=s.showdate?.slice(5,7),
-                    dy=s.showdate?.slice(8,10),
-                    dow=s.showdate ? new Date(s.showdate+'T12:00:00').getDay() : -1;
-              if(eraYrs && !eraYrs.includes(yr)) return false;
-              if(!skipYr  && selectedYear  && yr!==selectedYear)  return false;
-              if(!skipMo  && selectedMonth && mo!==selectedMonth) return false;
-              if(!skipDy  && selectedDay   && dy!==selectedDay.padStart(2,'0')) return false;
-              if(!skipDow && selectedDow!=='' && dow!==parseInt(selectedDow)) return false;
-              return true;
-            };
-
-            const availYrs  = new Set(allShows.filter(s=>pass(s,true)).map(s=>s.showdate?.slice(0,4)));
-            const availMos  = new Set(allShows.filter(s=>pass(s,false,true)).map(s=>s.showdate?.slice(5,7)));
-            const availDays = new Set(allShows.filter(s=>pass(s,false,false,true)).map(s=>s.showdate?.slice(8,10)));
-            const availDows = new Set(allShows.filter(s=>pass(s,false,false,false,true)).map(s=>String(new Date((s.showdate||'')+'T12:00:00').getDay())));
-            const pool = allShows.filter(s=>pass(s));
-            const hasFilters = selectedYear||selectedMonth||selectedDay||selectedDow!=='';
-
-            const selStyle = (color) => ({
-              width: '100%',
-              background: 'var(--bg-elevated)',
-              border: `1px solid ${color}44`,
-              color: color,
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.68rem',
-              letterSpacing: '1.5px',
-              padding: '10px 12px',
-              cursor: 'pointer',
-              outline: 'none',
-              appearance: 'none',
-              WebkitAppearance: 'none',
-              textTransform: 'uppercase',
-            });
-
-            const labelStyle = (color) => ({
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.42rem',
-              color: color,
-              letterSpacing: '3px',
-              marginBottom: 4,
-              display: 'block',
-            });
-
-            return (
-              <div style={{ marginTop: 10 }}>
-                {hasFilters && loaded && (
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
-                    <span style={{ fontFamily:'var(--font-display)', fontSize:'0.6rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
-                    <button onClick={() => { setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setQuery('');setCurrentShow(null); }} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.48rem', letterSpacing:'2px', padding:'4px 10px', cursor:'pointer' }}>✕ CLEAR</button>
-                  </div>
-                )}
-
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:8 }}>
-                  {/* YEAR */}
-                  <div>
-                    <span style={labelStyle('rgba(0,224,208,0.6)')}>YEAR</span>
-                    <div style={{ position:'relative' }}>
-                      <select value={selectedYear} onChange={e => { setSelectedYear(e.target.value);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(e.target.value||''); }} style={selStyle('var(--cyan)')}>
-                        <option value="">ALL</option>
-                        {ALL_YEARS_M.map(yr => (
-                          <option key={yr} value={yr} style={{ color: availYrs.has(yr)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{yr}</option>
-                        ))}
-                      </select>
-                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--cyan)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
-                    </div>
-                  </div>
-
-                  {/* MONTH */}
-                  <div>
-                    <span style={labelStyle('rgba(51,255,51,0.6)')}>MONTH</span>
-                    <div style={{ position:'relative' }}>
-                      <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value);setSelectedDay('');setCurrentShow(null); }} style={selStyle('var(--green)')}>
-                        <option value="">ALL</option>
-                        {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
-                          const p=String(i+1).padStart(2,'0');
-                          return <option key={mn} value={p} style={{ color: availMos.has(p)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{mn}</option>;
-                        })}
-                      </select>
-                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--green)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
-                    </div>
-                  </div>
-
-                  {/* DAY */}
-                  <div>
-                    <span style={labelStyle('rgba(255,102,0,0.6)')}>DAY</span>
-                    <div style={{ position:'relative' }}>
-                      <select value={selectedDay} onChange={e => { setSelectedDay(e.target.value);setCurrentShow(null); }} style={selStyle('var(--orange)')}>
-                        <option value="">ALL</option>
-                        {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
-                          const p=d.padStart(2,'0');
-                          return <option key={d} value={d} style={{ color: availDays.has(p)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{d}</option>;
-                        })}
-                      </select>
-                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--orange)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
-                    </div>
-                  </div>
-
-                  {/* DAY OF WEEK */}
-                  <div>
-                    <span style={labelStyle('rgba(0,224,208,0.6)')}>DAY OF WEEK</span>
-                    <div style={{ position:'relative' }}>
-                      <select value={selectedDow} onChange={e => { setSelectedDow(e.target.value);setCurrentShow(null); }} style={selStyle('var(--cyan)')}>
-                        <option value="">ALL</option>
-                        {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => (
-                          <option key={dow} value={String(i)} style={{ color: availDows.has(String(i))||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{dow}</option>
-                        ))}
-                      </select>
-                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--cyan)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-        <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 14, marginBottom: 4 }}>
+        {!currentShow && <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 10, marginBottom: 4 }}>
           {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
-        </button>
+        </button>}
                 {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
