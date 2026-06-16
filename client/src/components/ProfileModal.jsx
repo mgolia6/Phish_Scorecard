@@ -253,6 +253,9 @@ function AITab() {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ AI IN THE PHREEZER'}</div>
+        <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
+          We believe AI should inform, not decide. Every feature here is built around that principle — you stay in the loop, you make the calls, and the AI earns its place by making your judgment better, not by replacing it.
+        </p>
         <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>Two features. Both earned their place.</p>
         <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: 0 }}>
           Phreezer is a rating app. Your scores are yours — built from memory, opinion, and however many times you have heard Tweezer go somewhere unexpected. AI does not generate them, suggest them, or nudge them in any direction. What it does is help you think.
