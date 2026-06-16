@@ -223,7 +223,37 @@ export function CommKPIGrid({ items }) {
 // ============================================================
 // PHRIEND OVERLAP — community surface (unintentional overlap)
 // ============================================================
-export function PhriendOverlapCommunity({ api, onRateShow }) {
+export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
+  // Logged-out gate
+  if (!user) {
+    return (
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:400, gap:24, textAlign:'center', padding:'40px 24px' }}>
+        {/* ⚇ icon */}
+        <div style={{ fontSize:'4rem', color:'var(--cyan)', textShadow:'0 0 30px rgba(0,224,208,0.5)' }}>⚇</div>
+        <div style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', color:'var(--cyan)', letterSpacing:'4px', textShadow:'0 0 20px rgba(0,224,208,0.4)' }}>PHRIEND OVERLAP</div>
+        <div style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', color:'rgba(255,255,255,0.5)', letterSpacing:'2px', lineHeight:2, maxWidth:420 }}>
+          Find out who you shared a setlist with — intentionally or not.<br/>
+          40 years of shows. Countless accidental reunions waiting to be discovered.
+        </div>
+        <div style={{ display:'flex', gap:16 }}>
+          <button onClick={() => onLogin('signup')} style={{
+            fontFamily:'var(--font-display)', fontSize:'0.72rem', letterSpacing:'2.5px',
+            padding:'14px 36px', background:'transparent', border:'1px solid var(--orange)',
+            color:'var(--orange)', cursor:'pointer', boxShadow:'0 0 16px rgba(255,102,0,0.25)',
+          }}>+ CREATE ACCOUNT</button>
+          <button onClick={() => onLogin('login')} style={{
+            fontFamily:'var(--font-display)', fontSize:'0.65rem', letterSpacing:'2px',
+            padding:'12px 24px', background:'transparent',
+            border:'1px solid rgba(51,255,51,0.25)', color:'rgba(51,255,51,0.6)', cursor:'pointer',
+          }}>→ LOGIN</button>
+        </div>
+        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:'rgba(255,255,255,0.2)', letterSpacing:'1.5px', marginTop:8 }}>
+          FREE · NO CREDIT CARD · JUST A USERNAME
+        </div>
+      </div>
+    );
+  }
+
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [autocomplete, setAutocomplete] = useState([]);
@@ -578,7 +608,7 @@ export function PhriendOverlapCommunity({ api, onRateShow }) {
 // ============================================================
 // COMMUNITY TAB — all sub-tabs
 // ============================================================
-export function CommunityTab({ api, subTab = "leaderboard", onRateShow }) {
+export function CommunityTab({ api, subTab = "leaderboard", onRateShow, user, onLogin }) {
   const [donations, setDonations] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [topShows, setTopShows] = useState(null);
@@ -766,7 +796,7 @@ export function CommunityTab({ api, subTab = "leaderboard", onRateShow }) {
   }
 
   if (subTab === 'phriend-overlap') {
-    return <PhriendOverlapCommunity api={api} onRateShow={onRateShow} />;
+    return <PhriendOverlapCommunity api={api} onRateShow={onRateShow} user={user} onLogin={onLogin} />;
   }
 
   if (subTab === 'feed') {
