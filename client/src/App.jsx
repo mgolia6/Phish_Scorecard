@@ -27,7 +27,7 @@ import { DesktopLanding } from './components/DesktopLanding';
 import { Analytics, identifyUser, resetIdentity } from './analytics';
 
 export default function App() {
-  const [tab, setTab] = useState('scorecard'); // will be overridden on user load
+  const [tab, setTab] = useState(window.innerWidth >= 769 ? 'home' : 'scorecard'); // home for desktop logged-out
   const [user, setUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -91,7 +91,7 @@ export default function App() {
       setUser(u);
       identifyUser(u);
       setProfileTapped(false); // reset pulse on every session load
-      setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows');
+      setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows'); if (tab === 'home') setTab('my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
       } else if (!u.onboarding_complete) {
@@ -146,7 +146,7 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab('scorecard'); Analytics.loggedOut(); resetIdentity(); };
+  const handleLogout = () => { localStorage.removeItem('phish_token'); setUser(null); setTab(window.innerWidth >= 769 ? 'home' : 'scorecard'); Analytics.loggedOut(); resetIdentity(); };
   const openAuth = (mode = 'login') => { setAuthMode(mode); setShowAuth(true); };
 
   // Measure sticky header height dynamically
@@ -257,6 +257,12 @@ export default function App() {
       {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" onRateShow={handleRateShow} />}
       {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
+      {tab === 'home' && !user && (
+        <DesktopLanding
+          onLogin={openAuth}
+          onGoToScorecard={() => setTab('scorecard')}
+        />
+      )}
     </>
   );
 
@@ -320,10 +326,7 @@ export default function App() {
             </span>
           </div>
           <div className="container">
-            {!user && tab === 'scorecard'
-              ? <DesktopLanding onLogin={openAuth} />
-              : renderMain()
-            }
+            {renderMain()}
           </div>
         </div>
       {user && (
