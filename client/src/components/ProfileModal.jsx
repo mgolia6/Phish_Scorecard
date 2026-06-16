@@ -311,10 +311,23 @@ function AITab() {
       </div>
 
       <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)' }}>
-        <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>MODEL</div>
-        <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.75 }}>
-          Powered by Claude (Anthropic). No internet access — knowledge comes from training, not live search. Scoped to Phish history and your personal show data. No access to other users. No live data outside what you and the show record provide.
-        </div>
+        <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>MODEL</div>
+        <p style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: '0 0 12px' }}>
+          Powered by Claude (Anthropic). Ebenezer works from three layers of data:
+        </p>
+        {[
+          ['YOUR DATA', 'Your attended shows, your Phreezer ratings, your notes. Your context only — never shared with other users.'],
+          ['PHREEZER COMMUNITY', 'Aggregated ratings and rankings from all Phreezer users. Never attributed to individuals — only the collective signal: top shows, top songs, community averages.'],
+          ['PHISH.NET PUBLIC DATA', 'Setlists, community reviews, jamchart entries, and song histories pulled in real time when you ask about a specific show or song. This is what the broader Phish community has documented and chosen to make public.'],
+        ].map(([label, desc]) => (
+          <div key={label} style={{ marginBottom: 10 }}>
+            <div style={{ fontFamily: D.display, fontSize: '0.34rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
+            <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', lineHeight: 1.7 }}>{desc}</div>
+          </div>
+        ))}
+        <p style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', lineHeight: 1.75, margin: '10px 0 0' }}>
+          He is not answering from memory. He is speaking back what the community has already documented — with personality. No session data is used to train any model.
+        </p>
       </div>
     </div>
   );
