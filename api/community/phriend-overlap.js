@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       ON b.show_date = a.show_date
       AND b.attendance_type = 'attended'
       AND b.user_id = $2
-    LEFT JOIN shows s ON s.showdate = a.show_date
+    LEFT JOIN shows s ON s.show_date = a.show_date
     LEFT JOIN (
       SELECT show_date, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $1
