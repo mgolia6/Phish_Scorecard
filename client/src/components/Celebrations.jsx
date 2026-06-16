@@ -78,45 +78,46 @@ export function WelcomeCelebration({ username, onDone }) {
   return (
     <div
       className="celebrate-overlay"
-      style={{
-        cursor: 'pointer',
-        background: 'rgba(0,0,0,0.97)',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        padding: '0 10vw',
-      }}
       onClick={() => onDoneRef.current?.()}
+      style={{ cursor: 'pointer', background: 'rgba(0,0,0,0.97)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '3px', color: 'rgba(0,224,208,0.4)', marginBottom: 24 }}>
-        PHREEZER SYSTEMS
-      </div>
-      {lines.map((l, i) => (
-        <div key={i} style={{
-          fontFamily: l.big ? 'var(--font-display)' : 'var(--font-mono)',
-          fontSize: l.big ? '1.2rem' : '0.72rem',
-          color: l.big ? 'var(--orange)' : l.accent ? 'var(--cyan)' : 'rgba(51,255,51,0.55)',
-          letterSpacing: l.big ? '4px' : '1px',
-          marginBottom: l.big ? 0 : 8,
-          marginTop: l.big ? 20 : 0,
-          textShadow: l.big ? '0 0 20px rgba(255,102,0,0.6)' : 'none',
-          opacity: visible.includes(i) ? 1 : 0,
-          transition: 'opacity 0.3s ease',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}>
-          {!l.big && (
-            <span style={{ color: 'rgba(51,255,51,0.25)', flexShrink: 0 }}>›</span>
-          )}
-          {l.text}
-          {i === visible[visible.length - 1] && !l.big && (
-            <span style={{ animation: 'blink 1s step-end infinite' }}>▌</span>
-          )}
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: 0, padding: '60px 40px', maxWidth: 680, width: '100%',
+      }}>
+        {/* Snowflake */}
+        <img
+          src="/assets/phreezer-snowflake.png"
+          alt="Phreezer"
+          style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 40,
+            filter: 'drop-shadow(0 0 20px rgba(0,224,208,0.7))',
+            animation: 'spin 4s linear infinite',
+          }}
+        />
+        {/* Boot lines */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {lines.map((line, i) => (
+            visible.includes(i) && (
+              <div key={i} style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: line.big ? '1.6rem' : line.accent ? '1.1rem' : '0.95rem',
+                color: line.big ? 'var(--orange)' : line.accent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
+                letterSpacing: line.big ? '6px' : line.accent ? '4px' : '2px',
+                textShadow: line.big
+                  ? '0 0 30px rgba(255,102,0,0.7)'
+                  : line.accent
+                  ? '0 0 20px rgba(0,224,208,0.6)'
+                  : '0 0 8px rgba(51,255,51,0.3)',
+                animation: 'fadeIn 0.4s ease',
+                textAlign: 'center',
+                lineHeight: 1.4,
+              }}>{line.text}</div>
+            )
+          ))}
         </div>
-      ))}
-      <div style={{ marginTop: 36, fontFamily: 'var(--font-display)', fontSize: '0.3rem', color: 'rgba(255,255,255,0.12)', letterSpacing: '2px' }}>
-        TAP TO SKIP
+        <div style={{ marginTop: 48, fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px' }}>
+          TAP TO SKIP
+        </div>
       </div>
     </div>
   );
