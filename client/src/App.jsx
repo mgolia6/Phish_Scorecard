@@ -247,13 +247,13 @@ export default function App() {
       {tab === 'my-states'     && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-phriends'      && user && <MyPhriends      api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-deep-phreeze'  && user && <DeepPhreezeTab  api={api} showMessage={showMessage} showError={showError} onOpenScorecard={handleRateShow} />}
-      {tab === 'feed'              && <CommunityTab  api={api} subTab="feed"        />}
-      {tab === 'community'         && <CommunityTab  api={api} subTab="leaderboard" />}
-      {tab === 'top-shows'         && <CommunityTab  api={api} subTab="top-shows"   />}
-      {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"   />}
-      {tab === 'top-venues'        && <CommunityTab  api={api} subTab="top-venues"  />}
-      {tab === 'top-states'        && <CommunityTab  api={api} subTab="top-states"  />}
-      {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" />}
+      {tab === 'feed'              && <CommunityTab  api={api} subTab="feed"         onRateShow={handleRateShow} />}
+      {tab === 'community'         && <CommunityTab  api={api} subTab="leaderboard"  onRateShow={handleRateShow} />}
+      {tab === 'top-shows'         && <CommunityTab  api={api} subTab="top-shows"    onRateShow={handleRateShow} />}
+      {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"    onRateShow={handleRateShow} />}
+      {tab === 'top-venues'        && <CommunityTab  api={api} subTab="top-venues"   onRateShow={handleRateShow} />}
+      {tab === 'top-states'        && <CommunityTab  api={api} subTab="top-states"   onRateShow={handleRateShow} />}
+      {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" onRateShow={handleRateShow} />}
       {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
     </>
