@@ -33,23 +33,45 @@ export function SaveCelebration({ onDone }) {
   );
 }
 
+// Pool of rotating Phish inside-joke boot lines
+// 2 are picked randomly each login — keeps it fresh for returning users
+const JOKE_LINES = [
+  'INITIATING SIREN LOOPS...........OK',
+  'CHILLING THE PHREEZER............OK',
+  'EXTRACTING THE JAMS..............OK',
+  'READING THE BOOK.................OK',
+  'LOCATING THE LIZARDS.............OK',
+  'NOTIFYING WILSON.................OK',
+  'CONSULTING ICCULUS...............OK',
+  'CALCULATING TUBE TIME............OK',
+];
+
+function pickJokeLines(count = 2) {
+  const shuffled = [...JOKE_LINES].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
 export function WelcomeCelebration({ username, onDone }) {
   const onDoneRef = React.useRef(onDone);
   const [visible, setVisible] = useState([]);
 
+  // Pick joke lines once on mount — stable for this render
+  const jokeLines = React.useRef(pickJokeLines(2)).current;
+
   const lines = [
     { text: 'PHREEZER v2.0 — INITIALIZING...', delay: 0 },
-    { text: 'LOADING SHOW DATABASE............OK', delay: 350 },
-    { text: 'AUTHENTICATING SESSION...........OK', delay: 700 },
-    { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, delay: 1100, accent: true },
-    { text: "DON'T SUCK AT PHISH.", delay: 1700, big: true },
+    { text: 'LOADING SHOW DATABASE............OK', delay: 600 },
+    { text: jokeLines[0], delay: 1200 },
+    { text: jokeLines[1], delay: 1800 },
+    { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, delay: 2600, accent: true },
+    { text: "DON'T SUCK AT PHISH.", delay: 3500, big: true },
   ];
 
   useEffect(() => {
     lines.forEach((l, i) => {
       setTimeout(() => setVisible(v => [...v, i]), l.delay);
     });
-    const t = setTimeout(() => onDoneRef.current?.(), 3200);
+    const t = setTimeout(() => onDoneRef.current?.(), 5800);
     return () => clearTimeout(t);
   }, []);
 
