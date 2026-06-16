@@ -327,7 +327,7 @@ export default function App() {
           </div>
         </div>
       {user && (
-        <div data-tour="ebenezer" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <div data-tour="ebenezer" style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           <EbenezerRail
             history={ebenHistory}
             setHistory={setEbenHistory}
