@@ -606,10 +606,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
           );
         })()}
-        </div>
-        {!currentShow && <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 10, marginBottom: 4 }}>
-          {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
-        </button>}
+        </div>}
+        {!currentShow && (
+          <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 10, marginBottom: 4 }}>
+            {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
+          </button>
+        )}
                 {!currentShow && !loadingShow && results.length > 0 && (query.trim() || query === '__filter__' || query === '__era__') && (
           <>
             <div className="results-header">
