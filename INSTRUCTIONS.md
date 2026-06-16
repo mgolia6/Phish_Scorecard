@@ -61,7 +61,8 @@ At the start of every session, before anything else:
 │   ├── user/kpi.js
 │   ├── ai/summarize.js      Vibe Check (Haiku, cached in vibe_checks table)
 │   ├── ai/ebenezer.js       Uncle Ebenezer AI agent (Sonnet)
-│   └── analytics/songs.js + venues.js
+│   ├── analytics/songs.js + venues.js
+│   └── admin/health.js       server-side external API health probe
 ├── client/src/
 │   ├── App.jsx
 │   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
@@ -81,7 +82,7 @@ At the start of every session, before anything else:
 - `PHISH_NET_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `NODE_ENV`
-- `RESEND_API_KEY` — email delivery
+- `PHREEZER_RESEND_API_KEY` — email delivery (Resend)
 - `CRON_SECRET` — protects email and etsy cron endpoints
 - `VITE_SENTRY_DSN` — Sentry error monitoring (client-side, Matthew to add)
 - `VITE_POSTHOG_KEY` — Posthog analytics (client-side, Matthew to add)
@@ -105,22 +106,62 @@ At the start of every session, before anything else:
 - Matthew's name is Matthew
 - Always read STYLE_GUIDE.md before touching any UI component
 
-## What to Log Each Session
-After each session, update SESSION_LOG.md with:
-- What was actually done
+## Session Wrap Protocol (REQUIRED — do not skip)
+
+This is a checklist. Execute every step in order. Do not skip steps. Do not summarize or gesture — actually do each one.
+
+### Step 1 — SESSION_LOG.md
+Write a new dated entry with:
+- Everything that shipped this session (specific files, features, fixes)
 - Decisions made and why
-- Known issues or open debt
+- Known issues or open debt introduced this session
 - Next session priorities
 
-## Session Wrap Protocol (REQUIRED — do not skip)
-Before ending any session, in this order:
-1. **Update SESSION_LOG.md** — what shipped, decisions, open debt, next priorities
-2. **Update ROADMAP.md** — mark completed items, add any new items raised during the session, remove anything that's no longer relevant
-3. **Update LAYOUT.md** — if any UI, navigation, tab structure, or component placement changed this session, update LAYOUT.md to reflect it. This is how the next session knows where things live.
-4. **Validate ROADMAP against session** — explicitly check: did anything get discussed or requested this session that isn't captured? Did we complete anything that's still marked open? Surface any gaps to Matthew before closing.
-5. **Confirm with Matthew** — say explicitly "roadmap, session log, and layout doc are updated — anything missing?" Do not assume the session is done until Matthew confirms.
+### Step 2 — ROADMAP.md
+- Mark everything completed this session as ✅ with today's date
+- Add any new items raised during the session that aren't already there
+- Remove anything no longer relevant
+- Pull fresh before editing — never edit from memory
 
-The failure mode this prevents: Matthew asks for the roadmap, Claude gives stale information because the update hasn't happened yet. The roadmap must reflect the current session before the session ends.
+### Step 3 — LAYOUT.md
+Go section by section and explicitly check each one:
+- **Mobile Layout** — did any tab, nav, header, or bottom bar change?
+- **Desktop Layout** — did sidebar, right rail, or column structure change?
+- **ProfileModal** — did tabs or content sections change?
+- **Scorecard Tab** — did song row layout, audio player, or notes change?
+- **Community Tab** — did subtabs, features, or content change?
+- **Auth Screens** — did any auth flow or error screen change?
+- **Key Layout Decisions** — did anything get explicitly decided or reversed? Add it.
+- **What's Explicitly NOT There Yet** — update if something shipped or was descoped
+If nothing changed in a section, leave it. If anything changed, update it.
+
+### Step 4 — INSTRUCTIONS.md (this file)
+Update if any of the following changed this session:
+- New API endpoints added → update Architecture section
+- New env vars added or renamed → update Env Vars section
+- New DB tables or schema changes → update Database Access section
+- New conventions established → add to Standing Preferences or Security Notes
+- New files added to /api or /client/src/components → update Architecture
+This session: `RESEND_API_KEY` → `PHREEZER_RESEND_API_KEY`, new `api/admin/health.js` endpoint added.
+
+### Step 5 — STYLE_GUIDE.md
+Update if any of the following changed:
+- New component patterns established
+- New color usage decisions
+- New font/spacing rules applied
+- New CSS class patterns added
+If no style changes, skip this step explicitly.
+
+### Step 6 — Validate everything against the session
+Explicitly ask: is there anything that happened this session that isn't captured in one of the above files? Surface gaps to Matthew before closing.
+
+### Step 7 — Verify latest deploy is healthy
+Check Vercel — confirm the most recent deployment is READY and not erroring. If there's a build failure, fix it before wrapping.
+
+### Step 8 — Confirm with Matthew
+Say explicitly what was updated and what was skipped (and why). Do not assume the session is done until Matthew confirms.
+
+---
 
 ## Roadmap Hygiene Rules
 - If Matthew asks about the roadmap mid-session, pull ROADMAP.md fresh from the repo before answering — never answer from memory
