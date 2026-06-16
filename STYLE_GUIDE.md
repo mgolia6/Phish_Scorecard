@@ -177,3 +177,47 @@ Font: `var(--font-mono)`, `0.5rem`, colored at 60% opacity.
 - No appending to CSS files — always rewrite clean
 - No emoji in UI chrome (only in badges where defined above)
 - Never render raw AI response text — always parse and validate before rendering
+
+### Filter Button Color Convention (Scorecard)
+- **ERA buttons:** orange (`#ff6600`) — 2×2 grid, 1.6rem label, sub-label at 0.42rem
+- **YEAR buttons:** cyan — 10×4 grid, `'94` style (2-digit with tick)
+- **MONTH buttons:** green — 6×2 grid, 3-letter abbrev
+- **DAY buttons:** orange — 8×4 grid, numeric
+- **DOW buttons:** cyan — 4×2 grid, 3-letter abbrev
+- Active state: 14% opacity background + full color border + glow shadow
+- Available (inactive): 70% white text + 25% opacity colored border
+- Unavailable: 18% white text + 8% white border
+
+### Match Count Box
+- Background: `rgba(255,102,0,0.08)`, border: `rgba(255,102,0,0.4)`, glow
+- Number: `1.6rem` Orbitron 900, orange with textShadow
+- Label: `0.34rem` Orbitron, `rgba(255,102,0,0.55)`, 2px letter-spacing
+- Do NOT use cyan for this box — orange only, avoids clash with YEAR buttons
+
+### Desktop-Only CSS Pattern
+```css
+.desktop-filter-block { display: block; }
+.mobile-filter-block  { display: none; }
+.desktop-card-stats   { display: none !important; }
+
+@media (min-width: 769px) {
+  .desktop-filter-block { display: block; }  /* already default */
+  .mobile-filter-block  { display: none; }   /* already default */
+  .desktop-card-stats   { display: flex !important; }
+}
+@media (max-width: 768px) {
+  .desktop-filter-block { display: none; }
+  .mobile-filter-block  { display: block; }
+}
+```
+Use these classes to gate desktop vs mobile UI — never rely on JS window width for rendering.
+
+### Error Boundary Style (Mike Says No — full page)
+- Background: `#0a0a0a`
+- Alert label: `0.55rem` Orbitron, `rgba(255,80,80,0.5)`, 4px letter-spacing
+- Headline: `2.2rem` Orbitron, `#ff3333`, glow `0 0 30px rgba(255,51,51,0.6)`
+- Message: `0.8rem` mono, `rgba(255,255,255,0.35)`, 2px letter-spacing
+- Sub: `0.6rem` mono, `rgba(255,255,255,0.18)`
+- Retry: `0.5rem` Orbitron, border `rgba(255,51,51,0.2)`, padding `8px 20px`
+- Entire overlay is clickable (onClick=resetError)
+
