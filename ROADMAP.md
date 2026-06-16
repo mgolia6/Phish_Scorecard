@@ -1,7 +1,7 @@
 # Phreezer — Roadmap
 
 ## Target: Beta launch to Phish.net community. Phish summer tour starts July 7.
-## Last updated: 2026-06-14
+## Last updated: 2026-06-16
 
 ---
 
@@ -99,12 +99,37 @@
 - Buddy UAT: deemed not a blocker
 
 ### Forum Post
-- Drafted, approved, ready to publish
-- Posting Monday 2026-06-15 morning
+- Posted 2026-06-15 ✅
+- First real users signed up same day ✅
 
 ### STTF Outreach
 - Email sent to Christy at Surrender to the Flow — pitching Phreezer mention
 - Awaiting reply
+
+### Email Verification (fixed 2026-06-16) ✅
+- Root cause was broken `RESEND_API_KEY` — replaced with `PHREEZER_RESEND_API_KEY`
+- `sendVerificationEmail` now throws properly on Resend failure
+- End-to-end verified working
+
+### Admin Panel improvements (2026-06-16) ✅
+- USERS tab: KPI bar (TOTAL / VERIFIED / RATED / .NET LINKED)
+- USERS tab: RESEND VERIFY button on unverified users
+- USERS tab: VERIFIED stat in expanded user card
+- EXTERNAL tab: Phish.net / Anthropic / Resend now proxied server-side via `api/admin/health.js`
+
+### Phriend Overlap (fixed 2026-06-16) ✅
+- Fixed `s.showdate` → `s.show_date` column name bug
+- Fixed attendance query to union `attendance` + `user_show_attendance` for both users
+
+### Error handling (2026-06-16) ✅
+- try/catch added to `companions.js`, `deep-phreeze.js`, `phriend-overlap.js`
+- All high-traffic endpoints now protected
+
+### Floating button label (2026-06-16) ✅
+- Updated from "ASK" to "ASK EBENEZER"
+
+### Wrap protocol overhaul (2026-06-16) ✅
+- INSTRUCTIONS.md rewritten with explicit 8-step checklist
 
 ---
 
@@ -122,14 +147,17 @@
 - Top Shows blank until more community ratings exist (data problem, not code)
 - Deep Phreeze new data fields won't populate until users run full sync
 - In-memory rate limiter: less effective across multiple Vercel function instances (not a crash risk)
+- Dual attendance table pattern (`attendance` + `user_show_attendance`) — other queries may have same blind spot as Phriend Overlap had; audit needed
+- Frontend error messages: some still show raw API error strings — needs standardization pass
 
 ---
 
 ## PROJECT MANAGEMENT PRIORITIES
 
 ### 🔴 IMMEDIATE
-1. **Post forum post** — Monday 2026-06-15 morning
-2. **Monitor** — signups, errors (Sentry), usage (Posthog), feedback tab
+1. **Monitor** — signups, errors (Sentry), usage (Posthog), feedback tab ← live users now
+2. **Attendance query audit** — check other endpoints that join on attendance for dual-table blind spot
+3. **Frontend error message standardization** — replace raw API errors with friendly messages
 
 ### 🟠 WEEK 1 POST-LAUNCH
 3. **Enable GitHub Issues** — Matthew flips switch in repo settings, set up label taxonomy
