@@ -1,5 +1,5 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-14
+**Last updated:** 2026-06-16
 
 ---
 
@@ -181,7 +181,7 @@ Layout is `flex-direction: column` on mobile. Do NOT revert to side-by-side titl
 
 ## Uncle Ebenezer
 - Desktop: persistent right rail, collapsible
-- Mobile: floating ❄ button opens drawer
+- Mobile: floating ❄ button opens drawer — label is "❄ ASK EBENEZER" (updated 2026-06-16)
 - Character: jaded veteran, genuine love for the band underneath the weariness
 - 10-turn fading memory, user show history as context
 - Tagline: "Helping you suck a little less at Phish."
@@ -191,7 +191,7 @@ Layout is `flex-direction: column` on mobile. Do NOT revert to side-by-side titl
 
 ## Error Monitoring
 - **Client-side:** Sentry wired in `main.jsx` — activates when `VITE_SENTRY_DSN` env var is set
-- **Server-side:** NOT yet wired — `@sentry/node` not added to API functions
+- **Server-side:** Wired — `@sentry/node` in `api/_sentry.js`, active on 5 high-risk endpoints
 - **Admin error log:** captures browser-side JS exceptions only — does NOT see Vercel serverless errors or build failures
 - **Vercel runtime logs:** where server-side errors (502s, proxy failures) appear — check via Vercel MCP tools
 
