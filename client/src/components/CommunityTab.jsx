@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PhreezeFeed } from './PhreezeFeed';
 import { FullPageLoader } from './FullPageLoader';
 import { formatDate } from '../utils';
 
@@ -570,6 +571,7 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
   }, []);
 
   useEffect(() => {
+    if (subTab === 'feed') { setLoading(false); return; }
     setLoading(true);
     let req;
     if (subTab === 'leaderboard') req = api.get('/community/leaderboard').then(setLeaderboard);
@@ -741,6 +743,10 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
 
   if (subTab === 'phriend-overlap') {
     return <PhriendOverlapCommunity api={api} />;
+  }
+
+  if (subTab === 'feed') {
+    return <PhreezeFeed api={api} />;
   }
 
   return null;
