@@ -1,13 +1,6 @@
 // GET /api/emails/cron
 // Daily cron job — checks all cadence conditions and fires emails.
 // Secured with CRON_SECRET header or ?secret= query param.
-//
-// Cadence:
-//   onboarding    — any verified user who hasn't gotten it yet
-//   day3_nudge    — 3+ days since signup, 0 ratings, not yet sent
-//   day7_engage   — 7+ days since signup, 1+ ratings, not yet sent
-//   day30_reengage — inactive 30+ days, not yet sent in last 60 days
-//   milestone_5/25/50 — crossed show count threshold
 
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
@@ -19,6 +12,8 @@ import {
   day30ReengageEmail,
   milestoneEmail,
 } from '../_email.js';
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function ensureEmailLog(pool) {
   await pool.query(`
@@ -47,9 +42,11 @@ async function logSent(pool, userId, emailType) {
   );
 }
 
+// Fire one email with rate limit protection — 300ms between sends
 async function fire(pool, user, emailType, emailFn, ...args) {
   if (await alreadySent(pool, user.id, emailType)) return { skipped: true };
   const { subject, html } = emailFn(user.username, ...args);
+  await sleep(300);
   await sendEmail({ to: user.email, subject, html });
   await logSent(pool, user.id, emailType);
   return { sent: true, to: user.email, type: emailType };
@@ -113,6 +110,7 @@ export default async function handler(req, res) {
           [user.id]
         );
         if (!recentLog.rows.length) {
+          await sleep(300);
           const { subject, html } = day30ReengageEmail(user.username);
           await sendEmail({ to: user.email, subject, html });
           await pool.query(
