@@ -37,40 +37,6 @@ export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', 
 export function CommShowRows({ shows, label = 'TOP SHOWS' }) {
   return (
     <div>
-      {donations && (
-        <div style={{
-          background: 'rgba(0,0,0,0.4)',
-          borderLeft: '3px solid var(--green)',
-          padding: '12px 14px',
-          marginBottom: 16,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 8,
-        }}>
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'var(--green)', marginBottom: 4 }}>
-              ◈ GIVING BACK
-            </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
-              $1 from every Phreezer merch purchase goes to the{' '}
-              <a href="https://mbird.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'none' }}>
-                Mockingbird Foundation
-              </a>
-              .
-            </div>
-          </div>
-          <div style={{ textAlign: 'right', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '2px' }}>
-              ${donations.total_donated}
-            </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'rgba(51,255,51,0.4)', letterSpacing: '2px', marginTop: 2 }}>
-              {donations.items_sold} ITEMS SOLD
-            </div>
-          </div>
-        </div>
-      )}
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {shows.map((s, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
