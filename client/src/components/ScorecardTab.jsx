@@ -462,7 +462,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           </div>
 
         </div>
-        {/* ── DATE FILTERS ── */}
+        {/* ── DATE FILTERS — DESKTOP ONLY ── */}
+        <div className="desktop-filter-block">
         {(() => {
           const ERAS_MAP = {'1.0': ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'], '2.0': ['2002', '2003', '2004'], '3.0': ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'], '4.0': ['2021', '2022', '2023', '2024', '2025']};
           const ALL_YEARS = ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
@@ -490,99 +491,106 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           const hasFilters = selectedEra||selectedYear||selectedMonth||selectedDay||selectedDow!=='';
           const clearAll = () => { setSelectedEra('');setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setQuery('');setCurrentShow(null); };
 
-          // Style helpers
-          const activeColor = { era:'var(--orange)', yr:'var(--cyan)', mo:'var(--green)', dy:'var(--orange)', dow:'var(--cyan)' };
+          const C = { era:'#ff6600', yr:'#00e0d0', mo:'#33ff33', dy:'#ff6600', dow:'#00e0d0' };
           const btn = (type, active, avail) => ({
-            background: active ? `rgba(${type==='yr'?'0,224,208':type==='mo'?'51,255,51':type==='dow'?'0,224,208':'255,102,0'},0.15)` : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? activeColor[type] : avail||!loaded ? `rgba(${type==='yr'?'0,224,208':type==='mo'?'51,255,51':type==='dow'?'0,224,208':'255,102,0'},0.3)` : 'rgba(255,255,255,0.1)'}`,
-            color: active ? activeColor[type] : avail||!loaded ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.22)',
+            background: active ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.14)` : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.28)` : 'rgba(255,255,255,0.09)'}`,
+            color: active ? C[type] : avail||!loaded ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.2)',
             fontFamily: 'var(--font-display)', cursor: 'pointer', textAlign: 'center',
-            boxShadow: active ? `0 0 8px ${activeColor[type]}55` : 'none', transition: 'all 0.1s',
+            fontSize: '0.62rem', letterSpacing: '0.5px', padding: '6px 3px',
+            boxShadow: active ? `0 0 6px ${C[type]}55` : 'none', transition: 'all 0.1s',
           });
 
           return (
             <div style={{ marginTop: 10 }}>
-
-              {/* Count + clear */}
               {hasFilters && (
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
-                  <span style={{ fontFamily:'var(--font-display)', fontSize:'0.62rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
-                  <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.5)', color:'rgba(255,100,100,0.85)', fontFamily:'var(--font-display)', fontSize:'0.5rem', letterSpacing:'2px', padding:'4px 12px', cursor:'pointer' }}>✕ CLEAR ALL</button>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 8 }}>
+                  <span style={{ fontFamily:'var(--font-display)', fontSize:'0.6rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
+                  <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.48rem', letterSpacing:'2px', padding:'4px 10px', cursor:'pointer' }}>✕ CLEAR ALL</button>
                 </div>
               )}
 
-              {/* Full-width grid: ERA left | YEAR 3-col | MONTH 2-col | DAY 3-col | DOW 2-col */}
-              <div style={{ display:'grid', gridTemplateColumns:'auto 1fr auto auto', gap:16, alignItems:'start' }}>
+              {/* Single row: ERA | sep | YEAR | sep | MONTH | sep | DAY | sep | DOW */}
+              <div style={{ display:'flex', gap:10, alignItems:'start' }}>
 
-                {/* ERA — left column, stacked */}
-                <div>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:6 }}>ERA</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                {/* ERA — 4 stacked buttons */}
+                <div style={{ flexShrink:0 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:4 }}>ERA</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:3 }}>
                     {[{l:'1.0',s:'1983–2000',v:'1.0'},{l:'2.0',s:'2002–2004',v:'2.0'},{l:'3.0',s:'2009–2020',v:'3.0'},{l:'4.0',s:'2021–NOW',v:'4.0'}].map(era => {
                       const active = selectedEra===era.v;
                       return (
                         <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null); }} style={{
-                          background: active?'rgba(255,102,0,0.15)':'rgba(255,255,255,0.03)',
-                          border:`1px solid ${active?'var(--orange)':'rgba(255,255,255,0.12)'}`,
-                          color: active?'var(--orange)':'rgba(255,255,255,0.65)',
+                          background: active?'rgba(255,102,0,0.14)':'rgba(255,255,255,0.03)',
+                          border:`1px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
+                          color: active?'#ff6600':'rgba(255,255,255,0.65)',
                           fontFamily:'var(--font-display)', cursor:'pointer',
-                          padding:'10px 14px', display:'flex', gap:10, alignItems:'center',
-                          boxShadow: active?'0 0 12px rgba(255,102,0,0.25)':'none',
-                          whiteSpace:'nowrap',
+                          padding:'7px 10px', display:'flex', gap:7, alignItems:'center',
+                          whiteSpace:'nowrap', boxShadow:active?'0 0 10px rgba(255,102,0,0.2)':'none',
                         }}>
-                          <span style={{ fontSize:'1.1rem', fontWeight:900, letterSpacing:'2px' }}>{era.l}</span>
-                          <span style={{ fontSize:'0.5rem', opacity:0.65, letterSpacing:'1px' }}>{era.s}</span>
+                          <span style={{ fontSize:'1rem', fontWeight:900, letterSpacing:'2px' }}>{era.l}</span>
+                          <span style={{ fontSize:'0.44rem', opacity:0.6, letterSpacing:'0.5px' }}>{era.s}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* YEAR — 3 columns */}
-                <div>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:6 }}>YEAR</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:4 }}>
+                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+
+                {/* YEAR — 10 col × 4 rows */}
+                <div style={{ flexShrink:0 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:4 }}>YEAR</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(10, 40px)', gap:3 }}>
                     {eraYearsFiltered.map(yr => {
                       const active=selectedYear===yr, avail=availYrs.has(yr);
-                      return <button key={yr} onClick={()=>{ const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(n||(selectedEra?'__filter__':'')); }} style={{...btn('yr',active,avail), fontSize:'0.68rem', letterSpacing:'1px', padding:'9px 6px'}}>{yr}</button>;
+                      return (
+                        <button key={yr} onClick={() => { const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(n||(selectedEra?'__filter__':'')); }} style={{...btn('yr',active,avail)}}>
+                          '{yr.slice(2)}
+                        </button>
+                      );
                     })}
                   </div>
                 </div>
 
-                {/* MONTH — 2 columns */}
-                <div>
-                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(51,255,51,0.55)', letterSpacing:'3px', marginBottom:6 }}>MONTH</div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:4 }}>
-                    {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i)=>{
+                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+
+                {/* MONTH — 6 col × 2 rows */}
+                <div style={{ flexShrink:0 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(51,255,51,0.55)', letterSpacing:'3px', marginBottom:4 }}>MONTH</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(6, 38px)', gap:3 }}>
+                    {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
                       const p=String(i+1).padStart(2,'0'), active=selectedMonth===p, avail=availMos.has(p);
-                      return <button key={mn} onClick={()=>{ setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null); }} style={{...btn('mo',active,avail), fontSize:'0.65rem', letterSpacing:'1.5px', padding:'9px 8px'}}>{mn}</button>;
+                      return <button key={mn} onClick={() => { setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null); }} style={{...btn('mo',active,avail)}}>{mn}</button>;
                     })}
                   </div>
                 </div>
 
-                {/* DAY — 3 columns + DOW 2 columns stacked */}
-                <div>
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                    {/* DAY 3x10+1 */}
-                    <div>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:6 }}>DAY</div>
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:4 }}>
-                        {Array.from({length:31},(_,i)=>String(i+1)).map(d=>{
-                          const p=d.padStart(2,'0'), active=selectedDay===d, avail=availDays.has(p);
-                          return <button key={d} onClick={()=>{ setSelectedDay(active?'':d);setCurrentShow(null); }} style={{...btn('dy',active,avail), fontSize:'0.65rem', padding:'8px 4px', minWidth:32}}>{d}</button>;
-                        })}
-                      </div>
-                    </div>
-                    {/* DOW 2x4 */}
-                    <div>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:6 }}>DAY OF WEEK</div>
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:4 }}>
-                        {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i)=>{
-                          const active=selectedDow===String(i), avail=availDows.has(String(i));
-                          return <button key={dow} onClick={()=>{ setSelectedDow(active?'':String(i));setCurrentShow(null); }} style={{...btn('dow',active,avail), fontSize:'0.65rem', letterSpacing:'1.5px', padding:'9px 6px'}}>{dow}</button>;
-                        })}
-                      </div>
-                    </div>
+                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+
+                {/* DAY — 8 col × 4 rows */}
+                <div style={{ flexShrink:0 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:4 }}>DAY</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(8, 28px)', gap:3 }}>
+                    {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
+                      const p=d.padStart(2,'0'), active=selectedDay===d, avail=availDays.has(p);
+                      return <button key={d} onClick={() => { setSelectedDay(active?'':d);setCurrentShow(null); }} style={{...btn('dy',active,avail)}}>{d}</button>;
+                    })}
+                    <div style={{ gridColumn:'span 1' }} />
+                  </div>
+                </div>
+
+                <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0 }} />
+
+                {/* DOW — 4 col × 2 rows */}
+                <div style={{ flexShrink:0 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.4rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:4 }}>DAY OF WEEK</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 38px)', gap:3 }}>
+                    {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => {
+                      const active=selectedDow===String(i), avail=availDows.has(String(i));
+                      return <button key={dow} onClick={() => { setSelectedDow(active?'':String(i));setCurrentShow(null); }} style={{...btn('dow',active,avail)}}>{dow}</button>;
+                    })}
+                    <div />
                   </div>
                 </div>
 
@@ -590,6 +598,21 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
           );
         })()}
+        </div>
+
+        {/* MOBILE FILTER — simple year/month selects, no complex grid */}
+        <div className="mobile-filter-block">
+          <div className="era-filter-dropdowns">
+            <select className="era-select" value={selectedYear} onChange={e => { setSelectedYear(e.target.value); setSelectedMonth(''); setCurrentShow(null); if(e.target.value) setQuery(e.target.value); else setQuery(''); }}>
+              <option value="">ALL YEARS</option>
+              {['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'].map(yr => <option key={yr} value={yr}>{yr}</option>)}
+            </select>
+            <select className="era-select" value={selectedMonth} disabled={!selectedYear} onChange={e => { setSelectedMonth(e.target.value); setCurrentShow(null); if(e.target.value && selectedYear) setQuery(selectedYear+'-'+e.target.value); else setQuery(selectedYear); }}>
+              <option value="">ALL MONTHS</option>
+              {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => <option key={mn} value={String(i+1).padStart(2,'0')}>{mn}</option>)}
+            </select>
+          </div>
+        </div>
         <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 14, marginBottom: 4 }}>
           {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
         </button>
