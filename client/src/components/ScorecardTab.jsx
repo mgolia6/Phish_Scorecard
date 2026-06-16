@@ -599,11 +599,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 {hasFilters && (
                   <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8, alignSelf:'stretch', paddingTop:18 }}>
                     <div style={{
-                      background:'rgba(0,224,208,0.08)', border:'1px solid rgba(0,224,208,0.35)',
-                      padding:'8px 10px', textAlign:'center', minWidth:60,
+                      background:'rgba(255,102,0,0.08)', border:'1px solid rgba(255,102,0,0.4)',
+                      padding:'14px 10px', textAlign:'center', minWidth:68,
+                      boxShadow:'0 0 16px rgba(255,102,0,0.15)',
                     }}>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1rem', color:'var(--cyan)', lineHeight:1, textShadow:'0 0 10px rgba(0,224,208,0.5)' }}>{pool.length}</div>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.34rem', color:'rgba(0,224,208,0.6)', letterSpacing:'1.5px', marginTop:3 }}>SHOWS</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1.6rem', color:'var(--orange)', lineHeight:1, textShadow:'0 0 16px rgba(255,102,0,0.6)', fontWeight:900 }}>{pool.length}</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.34rem', color:'rgba(255,102,0,0.55)', letterSpacing:'2px', marginTop:5 }}>SHOWS</div>
                     </div>
                     <button onClick={clearAll} style={{
                       background:'transparent', border:'1px solid rgba(255,80,80,0.45)',
