@@ -27,16 +27,16 @@ export default async function handler(req, res) {
   // Shows both attended — union user_show_attendance + phish.net attendance table for both sides
   const overlapRes = await pool.query(`
     WITH my_shows AS (
-      SELECT show_date FROM user_show_attendance
+      SELECT show_date::text FROM user_show_attendance
         WHERE user_id = $1 AND attendance_type = 'attended'
       UNION
-      SELECT show_date FROM attendance WHERE user_id = $1
+      SELECT show_date::text FROM attendance WHERE user_id = $1
     ),
     their_shows AS (
-      SELECT show_date FROM user_show_attendance
+      SELECT show_date::text FROM user_show_attendance
         WHERE user_id = $2 AND attendance_type = 'attended'
       UNION
-      SELECT show_date FROM attendance WHERE user_id = $2
+      SELECT show_date::text FROM attendance WHERE user_id = $2
     )
     SELECT
       m.show_date,
@@ -47,14 +47,14 @@ export default async function handler(req, res) {
       tr.overall_rating AS their_score
     FROM my_shows m
     JOIN their_shows t ON t.show_date = m.show_date
-    LEFT JOIN shows s ON s.show_date = m.show_date
+    LEFT JOIN shows s ON s.show_date::text = m.show_date
     LEFT JOIN (
-      SELECT show_date, AVG(rating)::numeric(4,2) AS overall_rating
+      SELECT show_date::text, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $1
       GROUP BY show_date
     ) ur ON ur.show_date = m.show_date
     LEFT JOIN (
-      SELECT show_date, AVG(rating)::numeric(4,2) AS overall_rating
+      SELECT show_date::text, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $2
       GROUP BY show_date
     ) tr ON tr.show_date = m.show_date
