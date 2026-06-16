@@ -257,7 +257,7 @@ export function CommKPIGrid({ items }) {
 // ============================================================
 // PHRIEND OVERLAP — community surface (unintentional overlap)
 // ============================================================
-export function PhriendOverlapCommunity({ api }) {
+export function PhriendOverlapCommunity({ api, onRateShow }) {
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [autocomplete, setAutocomplete] = useState([]);
@@ -573,7 +573,11 @@ export function PhriendOverlapCommunity({ api }) {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 30, textAlign: 'center' }}>{s.my_score || '—'}</span>
+                    <button
+                      onClick={() => onRateShow && onRateShow(s.show_date)}
+                      title={s.my_score ? 'View / edit your rating' : 'Rate this show'}
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: s.my_score ? 'var(--cyan)' : 'rgba(0,224,208,0.35)', minWidth: 30, textAlign: 'center', background: 'transparent', cursor: onRateShow ? 'pointer' : 'default' }}
+                    >{s.my_score || '+'}</button>
                     <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 30, textAlign: 'center' }}>{s.their_score || '—'}</span>
                   </div>
                   <button
@@ -609,7 +613,7 @@ export function PhriendOverlapCommunity({ api }) {
 // ============================================================
 // COMMUNITY TAB — all sub-tabs
 // ============================================================
-export function CommunityTab({ api, subTab = "leaderboard" }) {
+export function CommunityTab({ api, subTab = "leaderboard", onRateShow }) {
   const [donations, setDonations] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [topShows, setTopShows] = useState(null);
@@ -797,7 +801,7 @@ export function CommunityTab({ api, subTab = "leaderboard" }) {
   }
 
   if (subTab === 'phriend-overlap') {
-    return <PhriendOverlapCommunity api={api} />;
+    return <PhriendOverlapCommunity api={api} onRateShow={onRateShow} />;
   }
 
   if (subTab === 'feed') {
