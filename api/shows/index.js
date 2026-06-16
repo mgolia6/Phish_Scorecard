@@ -35,7 +35,8 @@ export default async function handler(req, res) {
       tour_name: s.tour_name || '',
     }));
 
-    if (!q) return res.json(mapped(shows.slice(0, 20)));
+    const limit = parseInt(req.query.limit) || 20;
+    if (!q) return res.json(mapped(shows.slice(0, limit)));
 
     const query = q.toLowerCase();
     const filtered = shows.filter(show =>
