@@ -8,13 +8,23 @@ export default async function handler(req, res) {
 
   const pool = getPool();
   try {
+    // Total shows per state from shows table (all-time, not just rated) for coverage %
+    const totalShowsRes = await pool.query(`
+      SELECT state, COUNT(*) as total_shows
+      FROM shows WHERE state IS NOT NULL AND state != ''
+      GROUP BY state
+    `);
+    const totalByState = {};
+    totalShowsRes.rows.forEach(r => { totalByState[r.state] = parseInt(r.total_shows); });
+
     const result = await pool.query(`
       SELECT
         s.state,
         ROUND(AVG(r.rating)::numeric, 2) as avg_score,
         COUNT(DISTINCT r.show_date) as show_count,
         COUNT(DISTINCT s.venue) as venue_count,
-        COUNT(DISTINCT r.user_id) as unique_raters
+        COUNT(DISTINCT r.user_id) as unique_raters,
+        COUNT(r.id) as total_ratings
       FROM ratings r
       JOIN shows s ON r.show_date = s.show_date
       WHERE r.rating IS NOT NULL AND s.state IS NOT NULL AND s.state != ''
@@ -23,14 +33,13 @@ export default async function handler(req, res) {
     `);
 
     const rows = await Promise.all(result.rows.map(async (st) => {
-      // Top venue in this state
       const topVenue = await pool.query(`
         SELECT s.venue, ROUND(AVG(r.rating)::numeric, 2) as avg_score
         FROM ratings r JOIN shows s ON r.show_date = s.show_date
         WHERE r.rating IS NOT NULL AND s.state = $1
         GROUP BY s.venue ORDER BY avg_score DESC LIMIT 1
       `, [st.state]);
-      // Top show in this state
+
       const topShow = await pool.query(`
         SELECT TO_CHAR(r.show_date, 'YYYY-MM-DD') as show_date, s.venue,
           ROUND(AVG(r.rating)::numeric, 2) as avg_score
@@ -38,11 +47,20 @@ export default async function handler(req, res) {
         WHERE r.rating IS NOT NULL AND s.state = $1
         GROUP BY r.show_date, s.venue ORDER BY avg_score DESC LIMIT 1
       `, [st.state]);
+
+      // Coverage: rated shows / total shows in this state
+      const totalShows = totalByState[st.state] || 0;
+      const ratedShows = parseInt(st.show_count);
+      const coverage_pct = totalShows > 0 ? Math.round((ratedShows / totalShows) * 100) : 0;
+
       return {
         ...st,
-        show_count: parseInt(st.show_count),
+        show_count: ratedShows,
         venue_count: parseInt(st.venue_count),
         unique_raters: parseInt(st.unique_raters),
+        total_ratings: parseInt(st.total_ratings),
+        total_shows_in_state: totalShows,
+        coverage_pct,
         top_venue: topVenue.rows[0]?.venue || null,
         top_show: topShow.rows[0] || null,
       };
