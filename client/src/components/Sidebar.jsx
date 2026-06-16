@@ -13,6 +13,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
 
   // All community items at same level
   const communityItems = [
+    { id: 'feed',            label: 'FEED',            glyph: '◈' },
     { id: 'community',       label: 'LEADERBOARD',     glyph: '★' },
     { id: 'top-shows',       label: 'TOP SHOWS',       glyph: '◈' },
     { id: 'top-songs',       label: 'TOP SONGS',       glyph: '♪' },
