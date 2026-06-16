@@ -257,54 +257,250 @@ export function CommKPIGrid({ items }) {
 // PHRIEND OVERLAP — community surface (unintentional overlap)
 // ============================================================
 export function PhriendOverlapCommunity({ api }) {
-  const [searchInput, setSearchInput] = useState('');
+  const [input, setInput] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [autocomplete, setAutocomplete] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const debounceRef = React.useRef(null);
 
-  const handleSearch = async () => {
-    if (!searchInput.trim()) return;
+  React.useEffect(() => {
+    api.get('/community/overlap-suggestions')
+      .then(d => setSuggestions(d.suggestions || []))
+      .catch(() => setSuggestions([]))
+      .finally(() => setSuggestionsLoading(false));
+  }, []);
+
+  const handleInputChange = (val) => {
+    setInput(val);
+    setSelectedUser(null);
+    setResult(null);
+    setError('');
+    clearTimeout(debounceRef.current);
+    if (!val.trim()) {
+      setAutocomplete([]);
+      setDropdownOpen(true);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const d = await api.get(`/community/user-search?q=${encodeURIComponent(val.trim())}`);
+        setAutocomplete(d.users || []);
+        setDropdownOpen(true);
+      } catch { setAutocomplete([]); }
+    }, 250);
+  };
+
+  const selectUser = (username) => {
+    setInput(username);
+    setSelectedUser(username);
+    setDropdownOpen(false);
+    setAutocomplete([]);
+    runSearch(username);
+  };
+
+  const runSearch = async (username) => {
+    if (!username?.trim()) return;
     setLoading(true); setResult(null); setError('');
     try {
-      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(searchInput.trim())}`);
+      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(username.trim())}`);
       setResult(data);
     } catch (e) { setError(e.message || 'User not found'); }
     finally { setLoading(false); }
   };
+
+  const dropdownItems = input.trim()
+    ? autocomplete.map(u => ({ username: u, sub: null }))
+    : suggestions.map(s => ({ username: s.username, sub: `${s.shared_count} shared show${s.shared_count !== 1 ? 's' : ''}` }));
+
+  const showDropdown = dropdownOpen && !selectedUser && dropdownItems.length > 0;
 
   return (
     <div style={{ paddingBottom: 20 }}>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 12 }}>
         FIND SHOWS YOU BOTH ATTENDED — INTENTIONAL OR NOT
       </div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-        <input
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          placeholder="enter phreezer username..."
-          style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
-        />
-        <button onClick={handleSearch} disabled={loading}
-          style={{ border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
-          {loading ? '...' : 'SEARCH'}
-        </button>
+
+      <div style={{ position: 'relative', marginBottom: 0 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            value={input}
+            onChange={e => handleInputChange(e.target.value)}
+            onFocus={() => setDropdownOpen(true)}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && input.trim()) { setDropdownOpen(false); runSearch(input.trim()); }
+              if (e.key === 'Escape') setDropdownOpen(false);
+            }}
+            placeholder="type a username or tap a phriend below..."
+            style={{
+              flex: 1,
+              background: 'rgba(0,0,0,0.5)',
+              border: dropdownOpen ? '1px solid rgba(255,140,0,0.6)' : '1px solid rgba(255,140,0,0.35)',
+              color: 'var(--white)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.78rem',
+              padding: '10px 12px',
+              outline: 'none',
+            }}
+          />
+          <button
+            onClick={() => { setDropdownOpen(false); runSearch(input.trim()); }}
+            disabled={loading || !input.trim()}
+            style={{
+              border: '1px solid rgba(255,140,0,0.35)',
+              color: 'var(--orange)',
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.4rem',
+              letterSpacing: '2px',
+              padding: '10px 14px',
+              cursor: 'pointer',
+              opacity: (loading || !input.trim()) ? 0.4 : 1,
+              background: 'transparent',
+            }}>
+            {loading ? '...' : 'SCAN'}
+          </button>
+        </div>
+
+        {showDropdown && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: '#0d0d0d',
+            border: '1px solid rgba(255,140,0,0.35)',
+            borderTop: 'none',
+            zIndex: 100,
+            maxHeight: 260,
+            overflowY: 'auto',
+          }}>
+            {!input.trim() && (
+              <div style={{
+                padding: '7px 12px 5px',
+                fontFamily: 'var(--font-display)',
+                fontSize: '0.38rem',
+                letterSpacing: '2.5px',
+                color: 'rgba(255,140,0,0.45)',
+                borderBottom: '1px solid rgba(255,140,0,0.1)',
+              }}>
+                {suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}
+              </div>
+            )}
+            {dropdownItems.map((item, i) => (
+              <div
+                key={item.username}
+                onMouseDown={() => selectUser(item.username)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '10px 12px',
+                  borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,140,0,0.07)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <div style={{
+                  width: 30, height: 30, borderRadius: '50%',
+                  border: '1px solid rgba(255,140,0,0.4)',
+                  background: 'rgba(255,140,0,0.07)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-display)', fontSize: '0.52rem',
+                  color: 'var(--orange)', flexShrink: 0, letterSpacing: '1px',
+                }}>
+                  {item.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.username}
+                  </div>
+                  {item.sub && (
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(255,140,0,0.5)', letterSpacing: '1.5px', marginTop: 2 }}>
+                      {item.sub.toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px', flexShrink: 0 }}>▶</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--red)', marginBottom: 10 }}>{error}</div>}
+      {!result && !loading && !error && !dropdownOpen && !input.trim() && (
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(255,140,0,0.35)', letterSpacing: '2px', marginBottom: 10 }}>
+            PHRIENDS WHO WERE THERE
+          </div>
+          {suggestionsLoading ? (
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', padding: '16px 0' }}>scanning your shows...</div>
+          ) : suggestions.length === 0 ? (
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>
+              NO OTHER USERS SHARE YOUR ATTENDED SHOWS YET<br/>
+              <span style={{ color: 'rgba(255,140,0,0.35)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span>
+            </div>
+          ) : (
+            suggestions.map(s => (
+              <div
+                key={s.username}
+                onClick={() => selectUser(s.username)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '11px 12px',
+                  border: '1px solid rgba(255,140,0,0.15)',
+                  borderLeft: '3px solid rgba(255,140,0,0.4)',
+                  background: 'rgba(255,140,0,0.03)',
+                  marginBottom: 6, cursor: 'pointer',
+                }}
+              >
+                <div style={{
+                  width: 34, height: 34, borderRadius: '50%',
+                  border: '1px solid rgba(255,140,0,0.4)',
+                  background: 'rgba(255,140,0,0.07)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-display)', fontSize: '0.55rem',
+                  color: 'var(--orange)', flexShrink: 0,
+                }}>
+                  {s.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--white)' }}>{s.username}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(255,140,0,0.5)', letterSpacing: '1.5px', marginTop: 2 }}>
+                    {s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>SCAN ▶</div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--red)', marginTop: 12 }}>{error}</div>}
 
       {result && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
             <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--orange)', flexShrink: 0 }}>
               {result.target.username.slice(0,2).toUpperCase()}
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: 2 }}>
                 {result.total_shared} shared shows · {result.unique_venues} venues · {result.unique_years} years
               </div>
             </div>
+            <button
+              onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }}
+              style={{ background: 'transparent', border: '1px solid rgba(255,140,0,0.25)', color: 'rgba(255,140,0,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>
+              X CLEAR
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 12 }}>
@@ -332,7 +528,7 @@ export function PhriendOverlapCommunity({ api }) {
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.3)', marginBottom: 5 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
-                  {(() => { const [y,m,d]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+d}, ${y}`; })()}
+                  {(() => { const [y,m,dd]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+dd}, ${y}`; })()}
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {s.venue}{s.city ? ` — ${s.city}` : ''}
@@ -349,13 +545,6 @@ export function PhriendOverlapCommunity({ api }) {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0' }}>NO SHARED SHOWS FOUND</div>
           )}
         </>
-      )}
-
-      {!result && !loading && !error && (
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
-          SEARCH A USERNAME TO SEE SHOWS<br/>
-          <span style={{ color: 'rgba(255,140,0,0.4)', marginTop: 6, display: 'block' }}>YOU BOTH ATTENDED</span>
-        </div>
       )}
     </div>
   );
