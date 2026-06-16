@@ -1,87 +1,136 @@
 import React from 'react';
 
-export function DesktopLanding({ onLogin }) {
+export function DesktopLanding({ onLogin, onGoToScorecard }) {
   return (
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '80vh',
-      padding: '40px 24px',
+      minHeight: '90vh',
+      padding: '48px 32px',
       textAlign: 'center',
     }}>
 
-      {/* Snowflake */}
-      <div style={{ fontSize: '4rem', marginBottom: 24, filter: 'drop-shadow(0 0 20px rgba(0,224,208,0.6))' }}>❄</div>
+      {/* Real snowflake logo */}
+      <img
+        src="/assets/phreezer-snowflake.png"
+        alt="Phreezer"
+        style={{
+          width: 96,
+          height: 96,
+          objectFit: 'contain',
+          marginBottom: 28,
+          filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.7)) drop-shadow(0 0 48px rgba(0,224,208,0.3))',
+        }}
+      />
 
       {/* Wordmark */}
       <div style={{
         fontFamily: 'var(--font-display)',
-        fontSize: '3.2rem',
+        fontSize: '4.5rem',
         fontWeight: 900,
         color: 'var(--cyan)',
-        letterSpacing: '8px',
-        textShadow: '0 0 30px rgba(0,224,208,0.5), 0 0 60px rgba(0,224,208,0.2)',
-        marginBottom: 8,
+        letterSpacing: '10px',
+        textShadow: '0 0 40px rgba(0,224,208,0.5), 0 0 80px rgba(0,224,208,0.2)',
+        marginBottom: 10,
+        lineHeight: 1,
       }}>PHREEZER</div>
 
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.78rem',
+        fontSize: '1rem',
         color: 'rgba(51,255,51,0.5)',
-        letterSpacing: '4px',
-        marginBottom: 48,
+        letterSpacing: '6px',
+        marginBottom: 56,
       }}>RATE · TRACK · RELIVE</div>
 
-      {/* Value props */}
+      {/* Value prop cards — clickable */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr',
-        gap: 16,
-        maxWidth: 640,
+        gap: 20,
+        maxWidth: 780,
         width: '100%',
-        marginBottom: 48,
+        marginBottom: 56,
       }}>
         {[
-          { glyph: '★', label: 'RATE SHOWS', sub: "Song-by-song ratings for every show you've seen" },
-          { glyph: '◉', label: 'TRACK YOUR RUN', sub: 'Import your attendance history from Phish.net' },
-          { glyph: '⚇', label: 'FIND PHRIENDS', sub: "See who you've shared setlists with without knowing" },
-        ].map(({ glyph, label, sub }) => (
-          <div key={label} style={{
-            padding: '20px 16px',
-            border: '1px solid rgba(51,255,51,0.12)',
-            background: 'rgba(51,255,51,0.02)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 10,
-          }}>
-            <div style={{ fontSize: '1.8rem', color: 'var(--cyan)', textShadow: '0 0 12px rgba(0,224,208,0.4)' }}>{glyph}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--cyan)', letterSpacing: '2px' }}>{label}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(51,255,51,0.5)', lineHeight: 1.5 }}>{sub}</div>
+          {
+            glyph: '★',
+            label: 'RATE SHOWS',
+            sub: "Song-by-song ratings for every show you've seen",
+            color: 'var(--orange)',
+            action: onGoToScorecard,
+            cta: 'OPEN SCORECARD →',
+          },
+          {
+            glyph: '◉',
+            label: 'TRACK YOUR RUN',
+            sub: 'Import your full attendance history from Phish.net in seconds',
+            color: 'var(--cyan)',
+            action: () => onLogin('signup'),
+            cta: 'CREATE ACCOUNT →',
+          },
+          {
+            glyph: '⚇',
+            label: 'FIND PHRIENDS',
+            sub: "Discover who you've shared setlists with without ever knowing",
+            color: 'var(--green)',
+            action: () => onLogin('signup'),
+            cta: 'JOIN FREE →',
+          },
+        ].map(({ glyph, label, sub, color, action, cta }) => (
+          <div
+            key={label}
+            onClick={action}
+            style={{
+              padding: '28px 20px 22px',
+              border: `1px solid ${color === 'var(--orange)' ? 'rgba(255,102,0,0.2)' : color === 'var(--cyan)' ? 'rgba(0,224,208,0.2)' : 'rgba(51,255,51,0.2)'}`,
+              background: 'rgba(255,255,255,0.02)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = `rgba(${color === 'var(--orange)' ? '255,102,0' : color === 'var(--cyan)' ? '0,224,208' : '51,255,51'},0.06)`;
+              e.currentTarget.style.borderColor = color;
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+              e.currentTarget.style.borderColor = color === 'var(--orange)' ? 'rgba(255,102,0,0.2)' : color === 'var(--cyan)' ? 'rgba(0,224,208,0.2)' : 'rgba(51,255,51,0.2)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <div style={{ fontSize: '2.2rem', color, textShadow: `0 0 16px ${color}` }}>{glyph}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.72rem', color, letterSpacing: '2.5px' }}>{label}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{sub}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color, letterSpacing: '2px', marginTop: 4, opacity: 0.7 }}>{cta}</div>
           </div>
         ))}
       </div>
 
-      {/* CTAs */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      {/* Primary CTAs */}
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 32 }}>
         <button
           onClick={() => onLogin('signup')}
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '0.72rem',
+            fontSize: '0.85rem',
             letterSpacing: '3px',
-            padding: '16px 40px',
+            padding: '18px 52px',
             background: 'transparent',
             border: '1px solid var(--orange)',
             color: 'var(--orange)',
             cursor: 'pointer',
-            boxShadow: '0 0 20px rgba(255,102,0,0.3)',
+            boxShadow: '0 0 24px rgba(255,102,0,0.3)',
             transition: 'all 0.2s',
           }}
-          onMouseEnter={e => { e.target.style.background = 'rgba(255,102,0,0.1)'; e.target.style.boxShadow = '0 0 30px rgba(255,102,0,0.5)'; }}
-          onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.boxShadow = '0 0 20px rgba(255,102,0,0.3)'; }}
+          onMouseEnter={e => { e.target.style.background = 'rgba(255,102,0,0.1)'; e.target.style.boxShadow = '0 0 40px rgba(255,102,0,0.5)'; }}
+          onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.boxShadow = '0 0 24px rgba(255,102,0,0.3)'; }}
         >
           + CREATE ACCOUNT
         </button>
@@ -89,9 +138,9 @@ export function DesktopLanding({ onLogin }) {
           onClick={() => onLogin('login')}
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '0.65rem',
+            fontSize: '0.78rem',
             letterSpacing: '2px',
-            padding: '14px 28px',
+            padding: '16px 36px',
             background: 'transparent',
             border: '1px solid rgba(51,255,51,0.25)',
             color: 'rgba(51,255,51,0.6)',
@@ -105,15 +154,16 @@ export function DesktopLanding({ onLogin }) {
         </button>
       </div>
 
-      {/* Tip */}
       <div style={{
-        marginTop: 48,
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.68rem',
+        fontSize: '0.75rem',
         color: 'rgba(51,255,51,0.28)',
-        letterSpacing: '1.5px',
-      }}>
-        OR BROWSE COMMUNITY STATS + TOP SHOWS WITHOUT AN ACCOUNT →
+        letterSpacing: '2px',
+        cursor: 'pointer',
+      }}
+        onClick={onGoToScorecard}
+      >
+        OR BROWSE SETLISTS + COMMUNITY WITHOUT AN ACCOUNT →
       </div>
 
     </div>
