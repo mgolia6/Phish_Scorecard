@@ -1,11 +1,11 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-16
+**Last updated:** 2026-06-17
 
 ---
 
 ## App Status
 - **Live at:** phreezer.mpgink.com
-- **Stage:** Beta — Phish.net community post ready to publish
+- **Stage:** Beta — Phish.net community post published 2026-06-15
 - **Primary surface:** Mobile (iOS Safari) — all layout decisions mobile-first
 - **Desktop:** Supported, three-column layout
 
@@ -22,18 +22,10 @@ Retro terminal / synthwave. Dark background, glow effects, scanlines. This is th
 - `--orange`: `#ff6600` — CTAs, Ebenezer, warnings
 - `--bg`: `#0a0a0a` — page background
 - `--bg-panel`: `#0f0f0f` — card/panel background
-- Background for elevated surfaces: `rgba(0,0,0,0.4)`
 
 ### Fonts
 - **Display:** Orbitron — headings, labels, nav items, section titles
 - **Mono:** Share Tech Mono — body copy, data, song names, stats
-
-### Key UI Patterns
-- Section labels: `fontFamily: var(--font-display)`, `fontSize: 0.5–0.58rem`, `letterSpacing: 3–4px`
-- Body text: `fontFamily: var(--font-mono)`, `fontSize: 0.7–0.8rem`, `lineHeight: 1.8`
-- Borders: `1px solid rgba(255,255,255,0.06)` default, colored left-border for emphasis
-- Glow: `textShadow: 0 0 Xpx COLOR` on active/important elements
-- Buttons: `var(--font-display)`, all caps, `letterSpacing: 2–3px`
 
 ---
 
@@ -41,16 +33,14 @@ Retro terminal / synthwave. Dark background, glow effects, scanlines. This is th
 
 ### Header (top bar)
 - Left: ❄ PHREEZER wordmark (cyan)
-- Right: Avatar button — pulses cyan→orange on every login until tapped, stops on first tap
-- Avatar is the gateway to ProfileModal (profile, settings, shop, about)
+- Right: Avatar button — pulses cyan→orange on every login until tapped
 
 ### Bottom Tab Nav
-4 tabs: **MY PHREEZER · COMMUNITY · SCORECARD · (no shop — lives in ProfileModal)**
-- Shop was explicitly moved OUT of the tab nav — too low frequency
-- About was explicitly moved OUT of the tab nav — same reason
+4 tabs: **MY PHREEZER · COMMUNITY · SCORECARD**
+- Shop and About live in ProfileModal — NOT in tab nav
 
 ### Main Content Area
-Full-width below header, above bottom nav. Each tab owns its scroll.
+Full-width below header, above bottom nav.
 
 ---
 
@@ -62,159 +52,114 @@ Three columns:
 
 ### Sidebar Hierarchy
 ```
-◈ MY PHREEZER (section label)
-  — My Shows
-  — My Songs
-  — My Venues
-  — My States
-  — My Phriends
-  — Deep Phreeze
-★ COMMUNITY (section label)
-  — Leaderboard
-  — Top Shows
-  — Top Songs
-  — Top Venues
+◈ MY PHREEZER
+  — My Shows / Songs / Venues / States / Phriends / Deep Phreeze
+★ COMMUNITY
+  — Feed (NEW — first item)
+  — Leaderboard / Top Shows / Top Songs / Top Venues / Top States
+  — Phriend Overlap
 ◈ SCORECARD
-◈ FEEDBACK (bottom, below divider)
+◈ FEEDBACK
 ```
-- SHOP is NOT in the sidebar — lives in ProfileModal
-- ABOUT is NOT in the sidebar — lives in ProfileModal
-- FEEDBACK is sidebar-only (no floating button, no portal)
+
+---
+
+## Community Tab
+
+### Subtab order (mobile + desktop)
+**FEED · LEADERBOARD · PHRIEND OVERLAP · TOP SHOWS · TOP SONGS · TOP VENUES · TOP STATES**
+
+- FEED is the default landing when tapping COMMUNITY — do not revert
+- FEED is first in sidebar community items — do not revert
+
+### Feed
+- Chronological post stream, newest first
+- Categories: GENERAL / SHOW / SONG / VENUE / FEEDBACK — color coded
+- Compose box collapses to placeholder, expands with category picker
+- Replies inline, upvotes on posts and replies
+- 500 char limit, paginated (20/page)
+
+### Phriend Overlap
+- Default list: users who share shows, ranked by overlap count (loads on mount)
+- Autocomplete dropdown on focus/type (250ms debounce)
+- Tap any name to run scan
+- Sources: user_show_attendance + attendance + ratings
 
 ---
 
 ## ProfileModal
 4 tabs: **MY PHISH · BADGES · ABOUT · SHOP**
 
-### MY PHISH
-- INFO section: phish.net handle, first show, home venue, years active
-- SETTINGS: tap-to-select preference questions (stage side, show vibe, etc.)
-
-### BADGES
-- Badge shelf — earned badges displayed
-
-### ABOUT
-- Origin story: ihoz.com / Phishtistics as inspiration, links to http://www.ihoz.com/PhishStats.html
-- Excel → website → app journey
-- Phish.net foundation, Phish.in recordings
-- Feedback CTA
-- "Hopefully you enjoy it and it helps us all suck a little less at Phish."
-- Privacy Policy link at bottom (subtle, low-contrast) — opens PrivacyModal
-
-### SHOP
-- DonationCard at top — Mockingbird Foundation total, $1/item
-- 3 Etsy listings:
-  - Phreezer Logo T-Shirt — cyan border (`4521116067`)
-  - Phreezer Logo Bumper Sticker — orange border (`4521118995`)
-  - Don't Suck at Phish Bumper Sticker — green border (`4521316287`)
-- Footer: "Sold via Etsy · Fulfilled by Printify"
-
 ---
 
 ## Scorecard Tab
 
-### Song Row Layout (mobile) — CURRENT STATE
-Two-row card structure:
-- **Row 1:** `#. Song Name` — full width, green glow (`text-shadow: 0 0 8px rgba(51,255,51,0.4)`), song number in brighter orange
-- **Row 2 (controls):** `▶ · duration · JAM/REPRISE badges · [spacer] · ★★★★★` — play button left, stars pushed right
-- **Row 3:** `+ NOTE` toggle / note preview (full width)
+### Attendance Type — MANDATORY
+- First star tap without attendance set → intercepts, shows full-screen modal
+- Three options: 🎸 I WAS THERE / 📺 WATCHED WEBCAST / 🎧 HEARD THE RECORDING
+- Attendance sets, pending rating applies, modal closes — seamless
+- Do not remove this gate
 
-Layout is `flex-direction: column` on mobile. Do NOT revert to side-by-side title+controls — this was explicitly fixed.
+### Song Row Layout (mobile)
+- Row 1: song title full width, green glow
+- Row 2: ▶ · duration · badges · [spacer] · ★★★★★
+- `flex-direction: column` — do not revert to side-by-side
 
-### Song Row — Notes
-- `+ NOTE` expands to a full-width auto-growing textarea (min 3 rows)
-- Textarea grows with content — no scrollbar, no clipping
-- Green border + glow on focus, matches aesthetic
-- `▲ COLLAPSE` button bottom-right — collapses with note preserved
-- Collapsing with no text auto-dismisses back to `+ NOTE`
-- Note preview shows as `✎ note text` when collapsed with content
+### Song Notes
+- textarea, auto-expands, ▲ COLLAPSE — do not revert to single-line input
 
-### Song Row — Audio Player
-- ▶ button renders only when `audio.mp3_url` is present
-- Tapping ▶ expands `InlineAudioPlayer` below the song row
-- Player is `width: 100%; gridColumn: 1 / -1` — spans full width on both mobile flex and desktop grid
-- One player open at a time — tapping another ▶ closes current
-- ▶ button turns cyan when active
-- `InlineAudioPlayer` lives in `AudioPlayer.jsx` (named export), NOT a separate file
+### Audio Player
+- Full-width InlineAudioPlayer via `width:100%` + `gridColumn:1/-1`
 
-### Audio Proxy
-- `api/audio/stream.js` — ES module, no `require()` — streams via Web Streams reader loop
-- URL validation uses `new URL()` hostname check — allows `phish.in` and subdomains/CDNs containing "phish"
-- Errors log to Vercel runtime logs (not client admin error log — those are browser-only)
+---
 
-### Other Scorecard Elements
-- Search bar at top
-- Show masthead: date, venue, location, tour, audio badge
-- Attendance toggle: ATTENDED / WEBCAST / LISTENED
-- Phriends section (when attended or tagged)
-- Soundcheck bar, show notes collapsible
-- Vibe Check expandable below setlist
-- PHISH.NET SETLIST link, STREAM ON RELISTEN link
-- Community reviews section
+## Entry Animation (WelcomeCelebration)
+- Terminal boot sequence — NO particles, NO fireworks
+- PHREEZER SYSTEMS header
+- Lines type in with delays: INITIALIZING → DB LOADED → 2 random joke lines → IDENTITY CONFIRMED → DON'T SUCK AT PHISH
+- 8-line joke pool in Celebrations.jsx, 2 picked randomly per login
+- 5.8s total, tap to skip
+- Do NOT revert to particle/firework animation
 
 ---
 
 ## Onboarding Tour
-- 9-step centered modal — fires after onboarding completes
-- Ebenezer voice throughout
-- No spotlight/DOM targeting — centered overlay only, works on mobile and desktop
-- Steps: Intro → Scorecard → My Shows → OTD → Deep Phreeze → Community → Ebenezer → Profile → Outro
-- "Don't suck at Phish." is the outro closing line
-- Server-side `tour_completed` flag — admin can reset per user
+- 9-step centered modal — spotlight approach was explicitly abandoned
+- Server-side `tour_completed` flag
 
 ---
 
 ## Auth Screens
-- **MIKE SAID NO.** (past tense) — email not verified, hard block, resend option
-- **MIKE SAYS NO.** (present tense) — rate limited, cool your jets, back button only
-- Both use orange glow, 🐟, full-screen overlay
-- T&C modal has Privacy Policy link below accept button (subtle)
-
----
-
-## Community Tab
-- Mockingbird donation banner at very top (green left border)
-- Leaderboard, Top Shows, Top Songs, Top Venues sections
-- Phish Phreeze subtab (band-level stats) — planned, not yet built
+- **MIKE SAID NO.** — email not verified
+- **MIKE SAYS NO.** — rate limited
 
 ---
 
 ## Uncle Ebenezer
-- Desktop: persistent right rail, collapsible
-- Mobile: floating ❄ button opens drawer — label is "❄ ASK EBENEZER" (updated 2026-06-16)
-- Character: jaded veteran, genuine love for the band underneath the weariness
-- 10-turn fading memory, user show history as context
-- Tagline: "Helping you suck a little less at Phish."
-- Powers: Claude Sonnet
-
----
-
-## Error Monitoring
-- **Client-side:** Sentry wired in `main.jsx` — activates when `VITE_SENTRY_DSN` env var is set
-- **Server-side:** Wired — `@sentry/node` in `api/_sentry.js`, active on 5 high-risk endpoints
-- **Admin error log:** captures browser-side JS exceptions only — does NOT see Vercel serverless errors or build failures
-- **Vercel runtime logs:** where server-side errors (502s, proxy failures) appear — check via Vercel MCP tools
+- Desktop: persistent right rail
+- Mobile: floating ❄ button — label is "❄ ASK EBENEZER"
 
 ---
 
 ## Key Layout Decisions (Do Not Revisit Without Good Reason)
-- **Song row mobile:** column layout, title full width row 1, controls row 2 — do not revert to side-by-side
-- **Song notes:** textarea not input, auto-expands, has collapse button — do not revert to single-line input
-- **Audio player:** full-width span via `width:100%` + `gridColumn: 1/-1` — do not constrain to song row column
-- **Shop in ProfileModal, not nav** — low-frequency feature
-- **About in ProfileModal, not nav** — same reasoning
-- **Tour as centered modal** — spotlight approach failed on mobile, explicitly abandoned
-- **Feedback in sidebar only** — removed from floating/portal position
-- **Avatar pulse** — resets on every login, stops on first tap per session
-- **holographic/gradient text on orange** — fully reverted, plain `var(--orange)` only
-- **Scorecard keying** — always posKey, never song name — sandwiched songs break name-based lookups
-- **ProfileModal JSX** — return must be wrapped in a fragment (`<>`) so PrivacyModal renders as valid sibling
+- **Song row mobile:** column layout — do not revert
+- **Song notes:** textarea — do not revert to input
+- **Audio player:** full-width span
+- **Shop/About:** in ProfileModal, not nav
+- **Tour:** centered modal, no spotlight
+- **Feedback:** sidebar only
+- **Avatar pulse:** resets on every login, stops on first tap
+- **FEED:** default COMMUNITY landing, first in sidebar — do not revert
+- **Attendance type:** mandatory gate on first star tap — do not remove
+- **Entry animation:** terminal boot sequence — no particles — do not revert
+- **Scorecard keying:** always posKey, never song name
+- **ProfileModal JSX:** return must be wrapped in fragment
 
 ---
 
 ## What's Explicitly NOT There Yet
 - Desktop logo (Matthew to deliver from Canva)
-- Phish Phreeze community subtab
-- Server-side Sentry (`@sentry/node` in API functions)
+- Feed moderation in admin panel
+- Feed reply notifications
+- Phish Phreeze community subtab (band-level stats)
 - Etsy OAuth activation (pending Etsy app review)
-- Sentry + Posthog activation (Matthew adds env vars to Vercel)
