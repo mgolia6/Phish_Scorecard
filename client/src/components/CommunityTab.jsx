@@ -267,6 +267,7 @@ export function PhriendOverlapCommunity({ api }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [companions, setCompanions] = useState({});
   const debounceRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -306,12 +307,31 @@ export function PhriendOverlapCommunity({ api }) {
 
   const runSearch = async (username) => {
     if (!username?.trim()) return;
-    setLoading(true); setResult(null); setError('');
+    setLoading(true); setResult(null); setError(''); setCompanions({});
     try {
       const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(username.trim())}`);
       setResult(data);
+      // Fetch companion status for all overlapping shows
+      if (data.shows?.length && data.target?.user_id) {
+        const dates = data.shows.map(s => s.show_date).join(',');
+        try {
+          const cd = await api.get(`/community/companions?with_user_id=${data.target.user_id}&show_dates=${encodeURIComponent(dates)}`);
+          setCompanions(cd.companions || {});
+        } catch (e) {}
+      }
     } catch (e) { setError(e.message || 'User not found'); }
     finally { setLoading(false); }
+  };
+
+  const toggleCompanion = async (showDate) => {
+    if (!result?.target?.user_id) return;
+    try {
+      const updated = await api.post('/community/companions', {
+        companion_user_id: result.target.user_id,
+        show_date: showDate,
+      });
+      setCompanions(c => ({ ...c, [showDate]: updated }));
+    } catch (e) {}
   };
 
   const dropdownItems = input.trim()
@@ -525,22 +545,57 @@ export function PhriendOverlapCommunity({ api }) {
             </div>
           </div>
 
-          {result.shows.map((s, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.3)', marginBottom: 5 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
-                  {(() => { const [y,m,dd]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+dd}, ${y}`; })()}
+          {result.shows.map((s, i) => {
+            const cs = companions[s.show_date] || {};
+            const iMarked = cs.i_marked;
+            const mutual = cs.mutual;
+            return (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '8px 10px',
+                border: mutual ? '1px solid rgba(51,255,51,0.4)' : '1px solid var(--border)',
+                borderLeft: mutual ? '3px solid var(--green)' : iMarked ? '3px solid rgba(0,224,208,0.4)' : '1px solid var(--border)',
+                background: mutual ? 'rgba(51,255,51,0.04)' : 'rgba(0,0,0,0.3)',
+                marginBottom: 5,
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
+                    {(() => { const [y,m,dd]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+dd}, ${y}`; })()}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {s.venue}{s.city ? ` — ${s.city}` : ''}
+                  </div>
+                  {mutual && (
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--green)', letterSpacing: '2px', marginTop: 3 }}>
+                      ❄ MUTUAL COMPANION
+                    </div>
+                  )}
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.venue}{s.city ? ` — ${s.city}` : ''}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 30, textAlign: 'center' }}>{s.my_score || '—'}</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 30, textAlign: 'center' }}>{s.their_score || '—'}</span>
+                  </div>
+                  <button
+                    onClick={() => toggleCompanion(s.show_date)}
+                    style={{
+                      background: iMarked ? 'rgba(51,255,51,0.08)' : 'transparent',
+                      border: `1px solid ${iMarked ? 'rgba(51,255,51,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                      color: iMarked ? 'var(--green)' : 'rgba(255,255,255,0.3)',
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '0.3rem',
+                      letterSpacing: '1.5px',
+                      padding: '3px 8px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {iMarked ? '◈ COMPANION' : '+ COMPANION'}
+                  </button>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 30, textAlign: 'center' }}>{s.my_score || '—'}</span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 30, textAlign: 'center' }}>{s.their_score || '—'}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
           {result.shows.length === 0 && (
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0' }}>NO SHARED SHOWS FOUND</div>
