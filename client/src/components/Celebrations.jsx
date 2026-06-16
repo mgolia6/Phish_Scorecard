@@ -186,10 +186,10 @@ export function WelcomeCelebration({ username, onDone }) {
           src="/assets/phreezer-snowflake.png"
           alt=""
           style={{
-            width: 'clamp(56px, 14vw, 90px)',
-            height: 'clamp(56px, 14vw, 90px)',
+            width: 'clamp(100px, 28vw, 160px)',
+            height: 'clamp(100px, 28vw, 160px)',
             objectFit: 'contain',
-            marginBottom: 'clamp(20px, 5vw, 44px)',
+            marginBottom: 'clamp(28px, 6vw, 52px)',
             filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
           }}
         />
