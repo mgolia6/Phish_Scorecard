@@ -518,6 +518,14 @@ function UsersTab({ api, showError }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         setUsers(prev => prev.filter(u => u.id !== userId));
+      } else if (action === 'resend-verify') {
+        const u = users.find(u => u.id === userId);
+        const res = await fetch('/api/auth/verify-email', {
+          method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: u.email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
       } else {
         const res = await fetch(`/api/admin/user?id=${userId}&action=${action}`, {
           method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
@@ -612,6 +620,7 @@ function UsersTab({ api, showError }) {
                     { val: u.reviews,        lbl: 'REVIEWS',  col: D.green },
                     { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? D.green : 'rgba(51,255,51,0.2)' },
                     { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? D.green : 'rgba(51,255,51,0.2)' },
+                    { val: u.email_verified ? '✓' : '✗', lbl: 'VERIFIED', col: u.email_verified ? D.green : D.orange },
                   ].map(({ val, lbl, col }) => (
                     <div key={lbl} style={{ padding: '12px 4px', textAlign: 'center', borderRight: '1px solid rgba(51,255,51,0.06)' }}>
                       <div style={{ fontFamily: D.disp, fontSize: '1.3rem', color: col, lineHeight: 1 }}>{val}</div>
@@ -634,6 +643,12 @@ function UsersTab({ api, showError }) {
                       {working === `${u.id}-${action}` ? 'WORKING...' : label}
                     </button>
                   ))}
+                  {!u.email_verified && (
+                    <button onClick={() => doAction(u.id, 'resend-verify')} disabled={!!working}
+                      style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>
+                      {working === `${u.id}-resend-verify` ? 'SENDING...' : 'RESEND VERIFY'}
+                    </button>
+                  )}
                   {!u.is_admin && (
                     <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })} disabled={!!working}
                       style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${D.red}55`, background: 'transparent', color: D.red, cursor: 'pointer' }}>
