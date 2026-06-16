@@ -113,14 +113,19 @@ function PostCard({ post, api, currentUser }) {
   return (
     <div style={{
       border: '1px solid rgba(255,255,255,0.06)',
-      borderLeft: `3px solid ${color}`,
-      background: 'var(--bg-panel)',
+      borderLeft: post.pinned ? '3px solid var(--orange)' : `3px solid ${color}`,
+      background: post.pinned ? 'rgba(255,102,0,0.03)' : 'var(--bg-panel)',
       marginBottom: 10,
     }}>
       <div style={{ padding: '12px 14px 0' }}>
         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
           <FeedAvatar initials={post.username} size={36} color={color} />
           <div style={{ flex: 1, minWidth: 0 }}>
+            {post.pinned && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,102,0,0.4)', padding: '2px 8px', background: 'rgba(255,102,0,0.08)' }}>❄ PINNED · UNCLE EBENEZER</span>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: '#ffffff' }}>{post.username}</span>
               <span style={{
