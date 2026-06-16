@@ -600,18 +600,129 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         })()}
         </div>
 
-        {/* MOBILE FILTER — simple year/month selects, no complex grid */}
+        {/* MOBILE FILTER — 4 independent dropdowns: YEAR, MONTH, DAY, DOW */}
         <div className="mobile-filter-block">
-          <div className="era-filter-dropdowns">
-            <select className="era-select" value={selectedYear} onChange={e => { setSelectedYear(e.target.value); setSelectedMonth(''); setCurrentShow(null); if(e.target.value) setQuery(e.target.value); else setQuery(''); }}>
-              <option value="">ALL YEARS</option>
-              {['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'].map(yr => <option key={yr} value={yr}>{yr}</option>)}
-            </select>
-            <select className="era-select" value={selectedMonth} disabled={!selectedYear} onChange={e => { setSelectedMonth(e.target.value); setCurrentShow(null); if(e.target.value && selectedYear) setQuery(selectedYear+'-'+e.target.value); else setQuery(selectedYear); }}>
-              <option value="">ALL MONTHS</option>
-              {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => <option key={mn} value={String(i+1).padStart(2,'0')}>{mn}</option>)}
-            </select>
-          </div>
+          {(() => {
+            const ERAS_MAP = {'1.0':['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'],'2.0':['2002','2003','2004'],'3.0':['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'],'4.0':['2021', '2022', '2023', '2024', '2025']};
+            const ALL_YEARS_M = ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+            const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
+            const loaded = allShows.length > 0;
+
+            const pass = (s, skipYr, skipMo, skipDy, skipDow) => {
+              const yr=s.showdate?.slice(0,4), mo=s.showdate?.slice(5,7),
+                    dy=s.showdate?.slice(8,10),
+                    dow=s.showdate ? new Date(s.showdate+'T12:00:00').getDay() : -1;
+              if(eraYrs && !eraYrs.includes(yr)) return false;
+              if(!skipYr  && selectedYear  && yr!==selectedYear)  return false;
+              if(!skipMo  && selectedMonth && mo!==selectedMonth) return false;
+              if(!skipDy  && selectedDay   && dy!==selectedDay.padStart(2,'0')) return false;
+              if(!skipDow && selectedDow!=='' && dow!==parseInt(selectedDow)) return false;
+              return true;
+            };
+
+            const availYrs  = new Set(allShows.filter(s=>pass(s,true)).map(s=>s.showdate?.slice(0,4)));
+            const availMos  = new Set(allShows.filter(s=>pass(s,false,true)).map(s=>s.showdate?.slice(5,7)));
+            const availDays = new Set(allShows.filter(s=>pass(s,false,false,true)).map(s=>s.showdate?.slice(8,10)));
+            const availDows = new Set(allShows.filter(s=>pass(s,false,false,false,true)).map(s=>String(new Date((s.showdate||'')+'T12:00:00').getDay())));
+            const pool = allShows.filter(s=>pass(s));
+            const hasFilters = selectedYear||selectedMonth||selectedDay||selectedDow!=='';
+
+            const selStyle = (color) => ({
+              width: '100%',
+              background: 'var(--bg-elevated)',
+              border: `1px solid ${color}44`,
+              color: color,
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.68rem',
+              letterSpacing: '1.5px',
+              padding: '10px 12px',
+              cursor: 'pointer',
+              outline: 'none',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              textTransform: 'uppercase',
+            });
+
+            const labelStyle = (color) => ({
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.42rem',
+              color: color,
+              letterSpacing: '3px',
+              marginBottom: 4,
+              display: 'block',
+            });
+
+            return (
+              <div style={{ marginTop: 10 }}>
+                {hasFilters && loaded && (
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                    <span style={{ fontFamily:'var(--font-display)', fontSize:'0.6rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
+                    <button onClick={() => { setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setQuery('');setCurrentShow(null); }} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.48rem', letterSpacing:'2px', padding:'4px 10px', cursor:'pointer' }}>✕ CLEAR</button>
+                  </div>
+                )}
+
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:8 }}>
+                  {/* YEAR */}
+                  <div>
+                    <span style={labelStyle('rgba(0,224,208,0.6)')}>YEAR</span>
+                    <div style={{ position:'relative' }}>
+                      <select value={selectedYear} onChange={e => { setSelectedYear(e.target.value);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(e.target.value||''); }} style={selStyle('var(--cyan)')}>
+                        <option value="">ALL</option>
+                        {ALL_YEARS_M.map(yr => (
+                          <option key={yr} value={yr} style={{ color: availYrs.has(yr)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{yr}</option>
+                        ))}
+                      </select>
+                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--cyan)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
+                    </div>
+                  </div>
+
+                  {/* MONTH */}
+                  <div>
+                    <span style={labelStyle('rgba(51,255,51,0.6)')}>MONTH</span>
+                    <div style={{ position:'relative' }}>
+                      <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value);setSelectedDay('');setCurrentShow(null); }} style={selStyle('var(--green)')}>
+                        <option value="">ALL</option>
+                        {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
+                          const p=String(i+1).padStart(2,'0');
+                          return <option key={mn} value={p} style={{ color: availMos.has(p)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{mn}</option>;
+                        })}
+                      </select>
+                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--green)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
+                    </div>
+                  </div>
+
+                  {/* DAY */}
+                  <div>
+                    <span style={labelStyle('rgba(255,102,0,0.6)')}>DAY</span>
+                    <div style={{ position:'relative' }}>
+                      <select value={selectedDay} onChange={e => { setSelectedDay(e.target.value);setCurrentShow(null); }} style={selStyle('var(--orange)')}>
+                        <option value="">ALL</option>
+                        {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
+                          const p=d.padStart(2,'0');
+                          return <option key={d} value={d} style={{ color: availDays.has(p)||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{d}</option>;
+                        })}
+                      </select>
+                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--orange)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
+                    </div>
+                  </div>
+
+                  {/* DAY OF WEEK */}
+                  <div>
+                    <span style={labelStyle('rgba(0,224,208,0.6)')}>DAY OF WEEK</span>
+                    <div style={{ position:'relative' }}>
+                      <select value={selectedDow} onChange={e => { setSelectedDow(e.target.value);setCurrentShow(null); }} style={selStyle('var(--cyan)')}>
+                        <option value="">ALL</option>
+                        {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => (
+                          <option key={dow} value={String(i)} style={{ color: availDows.has(String(i))||!loaded ? 'var(--green)' : 'rgba(255,255,255,0.3)' }}>{dow}</option>
+                        ))}
+                      </select>
+                      <span style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'var(--cyan)', fontSize:'0.6rem', pointerEvents:'none' }}>▼</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
         <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 14, marginBottom: 4 }}>
           {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
