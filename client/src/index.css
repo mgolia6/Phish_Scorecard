@@ -1207,7 +1207,7 @@ select option { background: var(--bg); color: var(--green); }
   }
   .profile-modal-inner {
     width: 100%;
-    max-width: 560px;
+    max-width: 820px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -1215,6 +1215,13 @@ select option { background: var(--bg); color: var(--green); }
     border: 1px solid var(--cyan);
     box-shadow: 0 0 40px rgba(0,255,255,0.15);
   }
+  /* Larger tabs + fonts on desktop */
+  .profile-modal-tab { font-size: 0.62rem; padding: 14px 0; letter-spacing: 2.5px; }
+  .profile-modal-header { padding: 16px 22px; }
+  .profile-username { font-size: 2rem; }
+  .profile-email { font-size: 0.82rem; }
+  .profile-stat-val { font-size: 1.1rem; }
+  .profile-stat-lbl { font-size: 0.5rem; }
 
   /* Expand cards side by side on desktop where applicable */
   .expand-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -1418,7 +1425,7 @@ select option { background: var(--bg); color: var(--green); }
 }
 
 /* ── COMMUNITY CARD DESKTOP EXTRAS ──────────────────── */
-.desktop-card-stats { display: none !important; }
+.desktop-card-stats { display: none; }
 
 @media (min-width: 769px) {
   .desktop-card-stats {
@@ -1426,4 +1433,26 @@ select option { background: var(--bg); color: var(--green); }
     align-items: center;
     gap: 0;
   }
+}
+
+/* ── DESKTOP ENHANCEMENTS — feedback modal + font pass ────── */
+@media (min-width: 769px) {
+  /* Feedback modal — wider, bigger fonts */
+  .feedback-modal-inner {
+    max-width: 640px !important;
+    padding: 36px 32px !important;
+  }
+
+  /* Feed — wider post body, bigger text */
+  .phreeze-feed-post-body { font-size: 0.92rem !important; line-height: 1.8 !important; }
+  .phreeze-feed-action-btn { font-size: 0.46rem !important; }
+
+  /* Community cards — bigger name text */
+  .comm-card-name { font-size: 1.05rem !important; }
+
+  /* Global desktop body text bump */
+  .panel-body, .panel p { font-size: 0.9rem; }
+
+  /* Leaderboard rows bigger on desktop */
+  .leaderboard-row .leaderboard-user { font-size: 0.92rem !important; }
 }
