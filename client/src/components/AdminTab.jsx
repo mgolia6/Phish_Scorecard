@@ -397,7 +397,7 @@ function SystemTab({ api, showMessage }) {
             try {
               const res = await fetch('/api/admin/seed-founder-badges', {
                 method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('phish_token')}` }
               });
               const d = await res.json();
               if (d.ok) alert(`Badges assigned:\n${d.assigned.map(u => `#${u.rank} ${u.username} → ${u.badge}`).join('\n')}`);
