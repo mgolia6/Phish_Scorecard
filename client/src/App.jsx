@@ -23,6 +23,7 @@ import { ProfileTab } from './components/ProfileTab';
 import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
 import { TourGuide } from './components/TourGuide';
+import { DesktopLanding } from './components/DesktopLanding';
 import { Analytics, identifyUser, resetIdentity } from './analytics';
 
 export default function App() {
@@ -319,7 +320,10 @@ export default function App() {
             </span>
           </div>
           <div className="container">
-            {renderMain()}
+            {!user && tab === 'scorecard'
+              ? <DesktopLanding onLogin={openAuth} />
+              : renderMain()
+            }
           </div>
         </div>
       {user && (
