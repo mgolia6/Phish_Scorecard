@@ -18,6 +18,8 @@ export default async function handler(req, res) {
 
   const pool = getPool();
 
+  try {
+
   const targetRes = await pool.query('SELECT id, username FROM users WHERE username = $1', [username]);
   if (!targetRes.rows.length) return res.status(404).json({ error: 'User not found' });
   const target = targetRes.rows[0];
@@ -63,4 +65,9 @@ export default async function handler(req, res) {
     unique_years: years,
     shows,
   });
+
+  } catch (err) {
+    console.error('[phriend-overlap] DB error:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
 }
