@@ -525,15 +525,16 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       return (
                         <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null);setSongs([]); }} style={{
                           background: active?'rgba(255,102,0,0.14)':'rgba(255,255,255,0.03)',
-                          border:`1px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
+                          border:`2px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
                           color: active?'#ff6600':'rgba(255,255,255,0.65)',
                           fontFamily:'var(--font-display)', cursor:'pointer',
-                          padding:'6px 8px', textAlign:'center',
-                          boxShadow:active?'0 0 8px rgba(255,102,0,0.2)':'none',
-                          display:'flex', flexDirection:'column', alignItems:'center', gap:1,
+                          padding:'12px 14px', textAlign:'center',
+                          boxShadow:active?'0 0 16px rgba(255,102,0,0.3)':'none',
+                          display:'flex', flexDirection:'column', alignItems:'center', gap:3,
+                          transition:'all 0.15s',
                         }}>
-                          <span style={{ fontSize:'0.9rem', fontWeight:900, letterSpacing:'1.5px', lineHeight:1 }}>{era.l}</span>
-                          <span style={{ fontSize:'0.36rem', opacity:0.55, letterSpacing:'0.5px', whiteSpace:'nowrap' }}>{era.s}</span>
+                          <span style={{ fontSize:'1.6rem', fontWeight:900, letterSpacing:'2px', lineHeight:1 }}>{era.l}</span>
+                          <span style={{ fontSize:'0.42rem', opacity:0.6, letterSpacing:'1px', whiteSpace:'nowrap' }}>{era.s}</span>
                         </button>
                       );
                     })}
