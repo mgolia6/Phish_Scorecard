@@ -127,6 +127,18 @@
       "destination": "/api/community/overlap-suggestions"
     },
     {
+      "source": "/api/community/posts",
+      "destination": "/api/community/posts"
+    },
+    {
+      "source": "/api/community/posts/:id/replies",
+      "destination": "/api/community/posts/[id]/replies"
+    },
+    {
+      "source": "/api/community/posts/:id/react",
+      "destination": "/api/community/posts/[id]/react"
+    },
+    {
       "source": "/api/user/profile-options",
       "destination": "/api/user/profile-options"
     },
