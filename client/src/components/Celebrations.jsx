@@ -79,45 +79,74 @@ export function WelcomeCelebration({ username, onDone }) {
     <div
       className="celebrate-overlay"
       onClick={() => onDoneRef.current?.()}
-      style={{ cursor: 'pointer', background: 'rgba(0,0,0,0.97)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      style={{
+        cursor: 'pointer',
+        background: 'rgba(0,0,0,0.97)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
       <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: 0, padding: '60px 40px', maxWidth: 680, width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 32px',
+        maxWidth: 720,
+        width: '100%',
       }}>
         {/* Snowflake */}
         <img
           src="/assets/phreezer-snowflake.png"
-          alt="Phreezer"
-          style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 40,
-            filter: 'drop-shadow(0 0 20px rgba(0,224,208,0.7))',
-            animation: 'spin 4s linear infinite',
+          alt=""
+          style={{
+            width: 90, height: 90,
+            objectFit: 'contain',
+            marginBottom: 44,
+            filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
           }}
         />
-        {/* Boot lines */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+        {/* Boot lines — centered, large, spaced */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
           {lines.map((line, i) => (
             visible.includes(i) && (
               <div key={i} style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: line.big ? '1.6rem' : line.accent ? '1.1rem' : '0.95rem',
-                color: line.big ? 'var(--orange)' : line.accent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
-                letterSpacing: line.big ? '6px' : line.accent ? '4px' : '2px',
-                textShadow: line.big
-                  ? '0 0 30px rgba(255,102,0,0.7)'
+                fontFamily: line.big ? 'var(--font-display)' : 'var(--font-mono)',
+                fontSize: line.big ? '1.8rem' : line.accent ? '1.15rem' : '1rem',
+                color: line.big
+                  ? 'var(--orange)'
                   : line.accent
-                  ? '0 0 20px rgba(0,224,208,0.6)'
-                  : '0 0 8px rgba(51,255,51,0.3)',
-                animation: 'fadeIn 0.4s ease',
+                  ? 'var(--cyan)'
+                  : 'rgba(51,255,51,0.85)',
+                letterSpacing: line.big ? '8px' : line.accent ? '5px' : '3px',
+                textShadow: line.big
+                  ? '0 0 40px rgba(255,102,0,0.7)'
+                  : line.accent
+                  ? '0 0 24px rgba(0,224,208,0.7)'
+                  : '0 0 10px rgba(51,255,51,0.3)',
                 textAlign: 'center',
-                lineHeight: 1.4,
-              }}>{line.text}</div>
+                lineHeight: 1.5,
+                animation: 'fadeIn 0.5s ease',
+              }}>
+                {line.text}
+              </div>
             )
           ))}
         </div>
-        <div style={{ marginTop: 48, fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px' }}>
-          TAP TO SKIP
-        </div>
+
+        {/* Skip hint */}
+        {visible.length > 0 && (
+          <div style={{
+            marginTop: 56,
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.42rem',
+            color: 'rgba(255,255,255,0.18)',
+            letterSpacing: '4px',
+          }}>
+            TAP TO SKIP
+          </div>
+        )}
       </div>
     </div>
   );
