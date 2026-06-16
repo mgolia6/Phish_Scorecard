@@ -120,7 +120,7 @@ export default async function handler(req, res) {
 
       const result = await pool.query(`
         SELECT
-          p.id, p.body, p.category, p.created_at,
+          p.id, p.body, p.category, p.created_at, p.pinned, p.author_label,
           u.username,
           COUNT(DISTINCT pr.id) FILTER (WHERE pr.deleted_at IS NULL) AS reply_count,
           COUNT(DISTINCT react.id) AS up_count,
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
         WHERE p.deleted_at IS NULL
         ${categoryFilter}
         GROUP BY p.id, u.username
-        ORDER BY p.created_at DESC
+        ORDER BY p.pinned DESC, p.created_at DESC
         LIMIT $2 OFFSET $3
       `, [user.id, limit + 1, offset]);
 
