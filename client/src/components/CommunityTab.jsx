@@ -513,9 +513,7 @@ export function PhriendOverlapCommunity({ api, onRateShow }) {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                {result.total_shared} shared shows · {result.unique_venues} venues · {result.unique_years} years
-              </div>
+
             </div>
             <button
               onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }}
@@ -537,11 +535,11 @@ export function PhriendOverlapCommunity({ api, onRateShow }) {
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 2px', marginBottom: 6 }}>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SHOW</span>
-            <div style={{ display: 'flex', gap: 20 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: 'var(--cyan)' }}>YOU</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: 'var(--orange)' }}>THEM</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 2px 8px', marginBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SHOW</span>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '1.5px', color: 'var(--cyan)' }}>YOU</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '1.5px', color: 'var(--orange)' }}>THEM</span>
             </div>
           </div>
 
@@ -551,47 +549,48 @@ export function PhriendOverlapCommunity({ api, onRateShow }) {
             const mutual = cs.mutual;
             return (
               <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '8px 10px',
-                border: mutual ? '1px solid rgba(51,255,51,0.4)' : '1px solid var(--border)',
-                borderLeft: mutual ? '3px solid var(--green)' : iMarked ? '3px solid rgba(0,224,208,0.4)' : '1px solid var(--border)',
+                padding: '12px 12px',
+                border: mutual ? '1px solid rgba(51,255,51,0.5)' : '1px solid var(--border)',
+                borderLeft: mutual ? '3px solid var(--green)' : iMarked ? '3px solid rgba(0,224,208,0.5)' : '3px solid transparent',
                 background: mutual ? 'rgba(51,255,51,0.04)' : 'rgba(0,0,0,0.3)',
-                marginBottom: 5,
+                marginBottom: 6,
               }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: 2 }}>
+                {/* Top row: date + scores */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'var(--text-muted)', letterSpacing: '1.5px' }}>
                     {(() => { const [y,m,dd]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+dd}, ${y}`; })()}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-label)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {s.venue}{s.city ? ` — ${s.city}` : ''}
-                  </div>
-                  {mutual && (
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--green)', letterSpacing: '2px', marginTop: 3 }}>
-                      ❄ MUTUAL COMPANION
-                    </div>
-                  )}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
                       onClick={() => onRateShow && onRateShow(s.show_date)}
                       title={s.my_score ? 'View / edit your rating' : 'Rate this show'}
-                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: s.my_score ? 'var(--cyan)' : 'rgba(0,224,208,0.35)', minWidth: 30, textAlign: 'center', background: 'transparent', cursor: onRateShow ? 'pointer' : 'default' }}
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '3px 8px', border: '1px solid rgba(0,224,208,0.4)', color: s.my_score ? 'var(--cyan)' : 'rgba(0,224,208,0.4)', minWidth: 36, textAlign: 'center', background: 'transparent', cursor: 'pointer' }}
                     >{s.my_score || '+'}</button>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 30, textAlign: 'center' }}>{s.their_score || '—'}</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '3px 8px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 36, textAlign: 'center' }}>{s.their_score || '—'}</span>
                   </div>
+                </div>
+                {/* Middle row: venue */}
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--green)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {s.venue ? `${s.venue}${s.city ? ` — ${s.city}` : ''}` : '—'}
+                </div>
+                {/* Bottom row: companion button + mutual label */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {mutual ? (
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--green)', letterSpacing: '2px' }}>❄ MUTUAL COMPANION</span>
+                  ) : (
+                    <span />
+                  )}
                   <button
                     onClick={() => toggleCompanion(s.show_date)}
                     style={{
-                      background: iMarked ? 'rgba(51,255,51,0.08)' : 'transparent',
-                      border: `1px solid ${iMarked ? 'rgba(51,255,51,0.4)' : 'rgba(255,255,255,0.1)'}`,
-                      color: iMarked ? 'var(--green)' : 'rgba(255,255,255,0.3)',
+                      background: iMarked ? 'rgba(51,255,51,0.1)' : 'rgba(0,224,208,0.05)',
+                      border: `1px solid ${iMarked ? 'rgba(51,255,51,0.6)' : 'rgba(0,224,208,0.4)'}`,
+                      color: iMarked ? 'var(--green)' : 'var(--cyan)',
                       fontFamily: 'var(--font-display)',
-                      fontSize: '0.3rem',
-                      letterSpacing: '1.5px',
-                      padding: '3px 8px',
+                      fontSize: '0.48rem',
+                      letterSpacing: '2px',
+                      padding: '6px 14px',
                       cursor: 'pointer',
-                      whiteSpace: 'nowrap',
                     }}
                   >
                     {iMarked ? '◈ COMPANION' : '+ COMPANION'}
