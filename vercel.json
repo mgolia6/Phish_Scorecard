@@ -167,6 +167,10 @@
       "destination": "/api/admin/monitoring"
     },
     {
+      "source": "/api/admin/health",
+      "destination": "/api/admin/health"
+    },
+    {
       "source": "/api/audio/stream",
       "destination": "/api/audio/stream"
     },
