@@ -677,7 +677,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
       {currentShow && !loadingShow && (
         <div className="panel">
-          <div className="show-masthead">
+          <div className="show-masthead" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'start' }}>
+            {/* Left: date + venue + meta */}
             <div className="show-masthead-main">
               <div className="show-date-display">{formatDate(currentShow.showdate)}</div>
               <div className="show-venue-display">{currentShow.venue}</div>
@@ -687,11 +688,56 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               {currentShow.tour_name && <div className="show-tour">◈ {currentShow.tour_name}</div>}
               {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
             </div>
-            <div className="show-masthead-links">
-              <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link">{pnetLabel}</a>
-              {relistenUrl && (
-                <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link">STREAM ON RELISTEN</a>
+
+            {/* Right: data panel — fills dead space on desktop */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 240 }}>
+              {/* Quick stats row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                {[
+                  {
+                    label: 'PHAN REVIEWS',
+                    value: reviewCount > 0 ? reviewCount : '—',
+                    color: 'var(--cyan)',
+                  },
+                  {
+                    label: 'PHREEZERS RATED',
+                    value: currentShow.rater_count || (overallAvg ? '1+' : '—'),
+                    color: 'var(--orange)',
+                  },
+                  {
+                    label: 'PHRIENDS HERE',
+                    value: (phriends.tagged?.length || 0) + (phriends.also_attended?.length || 0) || '—',
+                    color: 'var(--green)',
+                  },
+                ].map(stat => (
+                  <div key={stat.label} style={{
+                    background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)',
+                    padding: '10px 8px', textAlign: 'center',
+                  }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: stat.color, lineHeight: 1, marginBottom: 4, textShadow: `0 0 12px ${stat.color}` }}>{stat.value}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Your score if rated */}
+              {overallAvg && (
+                <div style={{
+                  background: 'rgba(0,224,208,0.05)', border: '1px solid rgba(0,224,208,0.2)',
+                  padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,224,208,0.6)', letterSpacing: '2px' }}>YOUR SCORE</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--cyan)', textShadow: '0 0 16px rgba(0,224,208,0.5)' }}>{overallAvg}</span>
+                </div>
               )}
+
+              {/* Links */}
+              <div className="show-masthead-links" style={{ gap: 6 }}>
+                <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link" style={{ fontSize: '0.62rem', padding: '7px 10px' }}>{pnetLabel}</a>
+                {relistenUrl && (
+                  <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link" style={{ fontSize: '0.62rem', padding: '7px 10px' }}>STREAM ON RELISTEN</a>
+                )}
+              </div>
             </div>
           </div>
 
