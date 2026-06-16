@@ -254,7 +254,7 @@ export default function App() {
       {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"    onRateShow={handleRateShow} />}
       {tab === 'top-venues'        && <CommunityTab  api={api} subTab="top-venues"   onRateShow={handleRateShow} />}
       {tab === 'top-states'        && <CommunityTab  api={api} subTab="top-states"   onRateShow={handleRateShow} />}
-      {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" onRateShow={handleRateShow} />}
+      {tab === 'phriend-overlap'   && <CommunityTab  api={api} subTab="phriend-overlap" onRateShow={handleRateShow} user={user} onLogin={openAuth} />}
       {tab === 'profile'    && user && <ProfileTab api={api} user={user} />}
       {tab === 'admin' && user?.is_admin && <AdminTab api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'home' && !user && (
