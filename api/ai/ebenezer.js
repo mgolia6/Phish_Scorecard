@@ -208,6 +208,94 @@ function formatJamchartContext(jamcharts) {
   return ctx;
 }
 
+// ── Phreezer aggregate data ────────────────────────────────
+
+async function fetchPhreezeerAggregates(pool) {
+  try {
+    const [topShows, topSongs, stats] = await Promise.all([
+      pool.query(`
+        SELECT
+          TO_CHAR(s.show_date, 'YYYY-MM-DD') as show_date,
+          s.venue, s.city, s.state,
+          ROUND(AVG(r.rating)::numeric, 2) as avg_score,
+          COUNT(DISTINCT r.user_id) as rater_count
+        FROM ratings r
+        JOIN shows s ON r.show_date = s.show_date
+        WHERE r.rating IS NOT NULL
+        GROUP BY s.show_date, s.venue, s.city, s.state
+        HAVING COUNT(DISTINCT r.user_id) >= 1
+        ORDER BY avg_score DESC, rater_count DESC
+        LIMIT 15
+      `),
+      pool.query(`
+        SELECT
+          song_name,
+          ROUND(AVG(rating)::numeric, 2) as avg_score,
+          COUNT(*) as total_ratings,
+          COUNT(DISTINCT user_id) as unique_raters
+        FROM ratings
+        WHERE rating IS NOT NULL
+        GROUP BY song_name
+        HAVING COUNT(*) >= 2
+        ORDER BY avg_score DESC, total_ratings DESC
+        LIMIT 15
+      `),
+      pool.query(`
+        SELECT
+          COUNT(DISTINCT user_id) as total_raters,
+          COUNT(DISTINCT show_date) as shows_covered,
+          COUNT(*) as total_ratings,
+          ROUND(AVG(rating)::numeric, 2) as overall_avg
+        FROM ratings WHERE rating IS NOT NULL
+      `),
+    ]);
+
+    return {
+      topShows: topShows.rows,
+      topSongs: topSongs.rows,
+      stats: stats.rows[0],
+    };
+  } catch (e) {
+    return { topShows: [], topSongs: [], stats: null };
+  }
+}
+
+function formatPhreezeerContext({ topShows, topSongs, stats }) {
+  let ctx = '
+== PHREEZER COMMUNITY DATA ==
+';
+  ctx += '(Aggregated ratings from Phreezer users — never attributed to individuals)
+';
+
+  if (stats) {
+    ctx += `
+OVERALL: ${stats.total_raters} raters, ${stats.shows_covered} shows covered, ${stats.total_ratings} song ratings, community avg ${stats.overall_avg}/5
+`;
+  }
+
+  if (topShows.length) {
+    ctx += '
+TOP RATED SHOWS BY PHREEZER COMMUNITY:
+';
+    topShows.forEach((s, i) => {
+      ctx += `${i + 1}. ${s.show_date} — ${s.venue}, ${s.city}${s.state ? `, ${s.state}` : ''} — ${s.avg_score}/5 (${s.rater_count} raters)
+`;
+    });
+  }
+
+  if (topSongs.length) {
+    ctx += '
+TOP RATED SONGS BY PHREEZER COMMUNITY:
+';
+    topSongs.forEach((s, i) => {
+      ctx += `${i + 1}. ${s.song_name} — ${s.avg_score}/5 (${s.total_ratings} ratings from ${s.unique_raters} raters)
+`;
+    });
+  }
+
+  return ctx;
+}
+
 // ── Main handler ────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -260,6 +348,14 @@ STATS: ${shows.length} attended, ${rated.length} rated, ${unrated.length} unrate
     userContext = 'Could not load user history.';
   }
 
+  // ── 1b. Pull Phreezer aggregate data ──
+  let phreezeerContext = '';
+  try {
+    const pool = getPool();
+    const aggregates = await fetchPhreezeerAggregates(pool);
+    phreezeerContext = formatPhreezeerContext(aggregates);
+  } catch (e) {}
+
   // ── 2. Detect intent + fetch Phish.net data ──
   const intent = detectIntent(message);
   let phishNetContext = '';
@@ -283,7 +379,7 @@ STATS: ${shows.length} attended, ${rated.length} rated, ${unrated.length} unrate
   const MAX_HISTORY = 10;
   const recentHistory = history.slice(-MAX_HISTORY);
 
-  const contextBlock = `[CONTEXT — not part of conversation]\n${userContext}\n${phishNetContext}\n[END CONTEXT]`;
+  const contextBlock = `[CONTEXT — not part of conversation]\n${userContext}\n${phreezeerContext}\n${phishNetContext}\n[END CONTEXT]`;
 
   const messages = [
     { role: 'user', content: contextBlock },
