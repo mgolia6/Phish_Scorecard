@@ -27,6 +27,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedEra, setSelectedEra] = useState('');
+  const [selectedDow, setSelectedDow] = useState('');
   const [phriends, setPhriends] = useState({ tagged: [], also_attended: [] });
   const [phriendInput, setPhriendInput] = useState('');
   const [phriendLoading, setPhriendLoading] = useState(false);
