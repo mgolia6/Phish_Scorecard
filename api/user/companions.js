@@ -15,6 +15,7 @@ export default async function handler(req, res) {
 
   const pool = getPool();
 
+  try {
   // All companions for this user across all shows
   const result = await pool.query(`
     SELECT
@@ -42,4 +43,9 @@ export default async function handler(req, res) {
   }
 
   return res.json({ by_date: byDate });
+
+  } catch (err) {
+    console.error('[companions] DB error:', err.message);
+    return res.status(500).json({ error: 'Failed to load companions' });
+  }
 }
