@@ -465,142 +465,127 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         {/* ── DATE FILTERS ── */}
         {(() => {
           const ERAS_MAP = {'1.0': ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'], '2.0': ['2002', '2003', '2004'], '3.0': ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'], '4.0': ['2021', '2022', '2023', '2024', '2025']};
-          const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
-          const showsLoaded = allShows.length > 0;
-
-          // Available sets for visual dimming — what survives OTHER active filters
-          const withoutYear  = allShows.filter(s => { const yr=s.showdate?.slice(0,4),mo=s.showdate?.slice(5,7),dy=s.showdate?.slice(8,10),dow=s.showdate?new Date(s.showdate+'T12:00:00').getDay():-1; if(eraYrs&&!eraYrs.includes(yr))return false; if(selectedMonth&&mo!==selectedMonth)return false; if(selectedDay&&dy!==selectedDay.padStart(2,'0'))return false; if(selectedDow!==''&&dow!==parseInt(selectedDow))return false; return true; });
-          const withoutMonth = allShows.filter(s => { const yr=s.showdate?.slice(0,4),mo=s.showdate?.slice(5,7),dy=s.showdate?.slice(8,10),dow=s.showdate?new Date(s.showdate+'T12:00:00').getDay():-1; if(eraYrs&&!eraYrs.includes(yr))return false; if(selectedYear&&yr!==selectedYear)return false; if(selectedDay&&dy!==selectedDay.padStart(2,'0'))return false; if(selectedDow!==''&&dow!==parseInt(selectedDow))return false; return true; });
-          const withoutDay   = allShows.filter(s => { const yr=s.showdate?.slice(0,4),mo=s.showdate?.slice(5,7),dy=s.showdate?.slice(8,10),dow=s.showdate?new Date(s.showdate+'T12:00:00').getDay():-1; if(eraYrs&&!eraYrs.includes(yr))return false; if(selectedYear&&yr!==selectedYear)return false; if(selectedMonth&&mo!==selectedMonth)return false; if(selectedDow!==''&&dow!==parseInt(selectedDow))return false; return true; });
-          const withoutDow   = allShows.filter(s => { const yr=s.showdate?.slice(0,4),mo=s.showdate?.slice(5,7),dy=s.showdate?.slice(8,10); if(eraYrs&&!eraYrs.includes(yr))return false; if(selectedYear&&yr!==selectedYear)return false; if(selectedMonth&&mo!==selectedMonth)return false; if(selectedDay&&dy!==selectedDay.padStart(2,'0'))return false; return true; });
-
-          const availYears  = new Set(withoutYear.map(s=>s.showdate?.slice(0,4)));
-          const availMonths = new Set(withoutMonth.map(s=>s.showdate?.slice(5,7)));
-          const availDays   = new Set(withoutDay.map(s=>s.showdate?.slice(8,10)));
-          const availDows   = new Set(withoutDow.map(s=>String(new Date((s.showdate||'')+'T12:00:00').getDay())));
-
           const ALL_YEARS = ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+          const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
+          const loaded = allShows.length > 0;
+
+          const pass = (s, skipEra, skipYr, skipMo, skipDy, skipDow) => {
+            const yr=s.showdate?.slice(0,4), mo=s.showdate?.slice(5,7),
+                  dy=s.showdate?.slice(8,10),
+                  dow=s.showdate ? new Date(s.showdate+'T12:00:00').getDay() : -1;
+            if(!skipEra && eraYrs && !eraYrs.includes(yr)) return false;
+            if(!skipYr  && selectedYear  && yr!==selectedYear)  return false;
+            if(!skipMo  && selectedMonth && mo!==selectedMonth) return false;
+            if(!skipDy  && selectedDay   && dy!==selectedDay.padStart(2,'0')) return false;
+            if(!skipDow && selectedDow!=='' && dow!==parseInt(selectedDow)) return false;
+            return true;
+          };
+
+          const pool      = allShows.filter(s=>pass(s));
+          const availYrs  = new Set(allShows.filter(s=>pass(s,false,true)).map(s=>s.showdate?.slice(0,4)));
+          const availMos  = new Set(allShows.filter(s=>pass(s,false,false,true)).map(s=>s.showdate?.slice(5,7)));
+          const availDays = new Set(allShows.filter(s=>pass(s,false,false,false,true)).map(s=>s.showdate?.slice(8,10)));
+          const availDows = new Set(allShows.filter(s=>pass(s,false,false,false,false,true)).map(s=>String(new Date((s.showdate||'')+'T12:00:00').getDay())));
           const eraYearsFiltered = eraYrs ? ALL_YEARS.filter(y=>eraYrs.includes(y)) : ALL_YEARS;
           const hasFilters = selectedEra||selectedYear||selectedMonth||selectedDay||selectedDow!=='';
-          const filteredCount = allShows.filter(s => {
-            const yr=s.showdate?.slice(0,4),mo=s.showdate?.slice(5,7),dy=s.showdate?.slice(8,10),dow=s.showdate?new Date(s.showdate+'T12:00:00').getDay():-1;
-            if(eraYrs&&!eraYrs.includes(yr))return false;
-            if(selectedYear&&yr!==selectedYear)return false;
-            if(selectedMonth&&mo!==selectedMonth)return false;
-            if(selectedDay&&dy!==selectedDay.padStart(2,'0'))return false;
-            if(selectedDow!==''&&dow!==parseInt(selectedDow))return false;
-            return true;
-          }).length;
-
           const clearAll = () => { setSelectedEra('');setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setQuery('');setCurrentShow(null); };
 
-          // Button style helpers
-          const eraBtn = (active) => ({
-            background: active ? 'rgba(255,102,0,0.15)' : 'rgba(255,255,255,0.03)',
-            border: `2px solid ${active ? 'var(--orange)' : 'rgba(255,255,255,0.15)'}`,
-            color: active ? 'var(--orange)' : 'rgba(255,255,255,0.7)',
+          // Style helpers
+          const activeColor = { era:'var(--orange)', yr:'var(--cyan)', mo:'var(--green)', dy:'var(--orange)', dow:'var(--cyan)' };
+          const btn = (type, active, avail) => ({
+            background: active ? `rgba(${type==='yr'?'0,224,208':type==='mo'?'51,255,51':type==='dow'?'0,224,208':'255,102,0'},0.15)` : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${active ? activeColor[type] : avail||!loaded ? `rgba(${type==='yr'?'0,224,208':type==='mo'?'51,255,51':type==='dow'?'0,224,208':'255,102,0'},0.3)` : 'rgba(255,255,255,0.1)'}`,
+            color: active ? activeColor[type] : avail||!loaded ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.22)',
             fontFamily: 'var(--font-display)', cursor: 'pointer', textAlign: 'center',
-            padding: '18px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-            minWidth: 130, boxShadow: active ? '0 0 20px rgba(255,102,0,0.25)' : 'none', transition: 'all 0.15s',
-          });
-          const yearBtn = (active, avail) => ({
-            background: active ? 'rgba(0,224,208,0.18)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? 'var(--cyan)' : avail||!showsLoaded ? 'rgba(0,224,208,0.25)' : 'rgba(255,255,255,0.08)'}`,
-            color: active ? 'var(--cyan)' : avail||!showsLoaded ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.2)',
-            fontFamily: 'var(--font-display)', fontSize: '0.68rem', letterSpacing: '1px',
-            padding: '9px 11px', cursor: 'pointer', minWidth: 50, textAlign: 'center',
-            boxShadow: active ? '0 0 8px rgba(0,224,208,0.3)' : 'none',
-          });
-          const monthBtn = (active, avail) => ({
-            background: active ? 'rgba(51,255,51,0.15)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? 'var(--green)' : avail||!showsLoaded ? 'rgba(51,255,51,0.25)' : 'rgba(255,255,255,0.08)'}`,
-            color: active ? 'var(--green)' : avail||!showsLoaded ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.2)',
-            fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '1.5px',
-            padding: '9px 10px', cursor: 'pointer', textAlign: 'center',
-            boxShadow: active ? '0 0 8px rgba(51,255,51,0.3)' : 'none',
-          });
-          const dayBtn = (active, avail) => ({
-            background: active ? 'rgba(255,102,0,0.15)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? 'var(--orange)' : avail||!showsLoaded ? 'rgba(255,102,0,0.2)' : 'rgba(255,255,255,0.08)'}`,
-            color: active ? 'var(--orange)' : avail||!showsLoaded ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.2)',
-            fontFamily: 'var(--font-display)', fontSize: '0.65rem',
-            padding: '7px 6px', cursor: 'pointer', minWidth: 34, textAlign: 'center',
-            boxShadow: active ? '0 0 8px rgba(255,102,0,0.3)' : 'none',
-          });
-          const dowBtn = (active, avail) => ({
-            background: active ? 'rgba(0,224,208,0.12)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? 'var(--cyan)' : avail||!showsLoaded ? 'rgba(0,224,208,0.2)' : 'rgba(255,255,255,0.08)'}`,
-            color: active ? 'var(--cyan)' : avail||!showsLoaded ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.15)',
-            fontFamily: 'var(--font-display)', fontSize: '0.72rem', letterSpacing: '2px',
-            padding: '10px 20px', cursor: 'pointer', minWidth: 78, textAlign: 'center',
-            boxShadow: active ? '0 0 12px rgba(0,224,208,0.25)' : 'none', transition: 'all 0.12s',
+            boxShadow: active ? `0 0 8px ${activeColor[type]}55` : 'none', transition: 'all 0.1s',
           });
 
           return (
-            <div style={{ marginTop: 12 }}>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, minHeight: 24 }}>
-                {hasFilters ? (
-                  <>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--cyan)', letterSpacing: '2px' }}>{filteredCount} SHOWS MATCH</div>
-                    <button onClick={clearAll} style={{ background: 'transparent', border: '1px solid rgba(255,80,80,0.5)', color: 'rgba(255,100,100,0.85)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', padding: '5px 14px', cursor: 'pointer' }}>✕ CLEAR ALL</button>
-                  </>
-                ) : (
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '2px' }}>FILTER BY ERA · YEAR · MONTH · DAY · DAY OF WEEK</div>
-                )}
-              </div>
+            <div style={{ marginTop: 10 }}>
 
-              {/* ERA — big, centered */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 18 }}>
-                {[{l:'1.0',s:'1983–2000',v:'1.0'},{l:'2.0',s:'2002–2004',v:'2.0'},{l:'3.0',s:'2009–2020',v:'3.0'},{l:'4.0',s:'2021–NOW',v:'4.0'}].map(era => (
-                  <button key={era.v} onClick={() => { setSelectedEra(selectedEra===era.v?'':era.v); setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null); }} style={eraBtn(selectedEra===era.v)}>
-                    <span style={{ fontSize: '1.5rem', letterSpacing: '2px', fontWeight: 900 }}>{era.l}</span>
-                    <span style={{ fontSize: '0.52rem', letterSpacing: '1.5px', opacity: 0.65 }}>{era.s}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Count + clear */}
+              {hasFilters && (
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                  <span style={{ fontFamily:'var(--font-display)', fontSize:'0.62rem', color:'var(--cyan)', letterSpacing:'2px' }}>{pool.length} SHOWS MATCH</span>
+                  <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.5)', color:'rgba(255,100,100,0.85)', fontFamily:'var(--font-display)', fontSize:'0.5rem', letterSpacing:'2px', padding:'4px 12px', cursor:'pointer' }}>✕ CLEAR ALL</button>
+                </div>
+              )}
 
-              {/* YEAR + MONTH + DAY in one row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: 18, justifyContent: 'start', marginBottom: 14 }}>
-                {/* YEAR */}
+              {/* Full-width grid: ERA left | YEAR 3-col | MONTH 2-col | DAY 3-col | DOW 2-col */}
+              <div style={{ display:'grid', gridTemplateColumns:'auto 1fr auto auto', gap:16, alignItems:'start' }}>
+
+                {/* ERA — left column, stacked */}
                 <div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '3px', marginBottom: 6 }}>YEAR</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4 }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:6 }}>ERA</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                    {[{l:'1.0',s:'1983–2000',v:'1.0'},{l:'2.0',s:'2002–2004',v:'2.0'},{l:'3.0',s:'2009–2020',v:'3.0'},{l:'4.0',s:'2021–NOW',v:'4.0'}].map(era => {
+                      const active = selectedEra===era.v;
+                      return (
+                        <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null); }} style={{
+                          background: active?'rgba(255,102,0,0.15)':'rgba(255,255,255,0.03)',
+                          border:`1px solid ${active?'var(--orange)':'rgba(255,255,255,0.12)'}`,
+                          color: active?'var(--orange)':'rgba(255,255,255,0.65)',
+                          fontFamily:'var(--font-display)', cursor:'pointer',
+                          padding:'10px 14px', display:'flex', gap:10, alignItems:'center',
+                          boxShadow: active?'0 0 12px rgba(255,102,0,0.25)':'none',
+                          whiteSpace:'nowrap',
+                        }}>
+                          <span style={{ fontSize:'1.1rem', fontWeight:900, letterSpacing:'2px' }}>{era.l}</span>
+                          <span style={{ fontSize:'0.5rem', opacity:0.65, letterSpacing:'1px' }}>{era.s}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* YEAR — 3 columns */}
+                <div>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:6 }}>YEAR</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:4 }}>
                     {eraYearsFiltered.map(yr => {
-                      const active = selectedYear===yr;
-                      const avail = availYears.has(yr);
-                      return <button key={yr} onClick={() => { const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(n||(selectedEra?'__filter__':'')); }} style={yearBtn(active,avail)}>'{yr.slice(2)}</button>;
+                      const active=selectedYear===yr, avail=availYrs.has(yr);
+                      return <button key={yr} onClick={()=>{ const n=active?'':yr; setSelectedYear(n);setSelectedMonth('');setSelectedDay('');setCurrentShow(null);setQuery(n||(selectedEra?'__filter__':'')); }} style={{...btn('yr',active,avail), fontSize:'0.68rem', letterSpacing:'1px', padding:'9px 6px'}}>{yr}</button>;
                     })}
                   </div>
                 </div>
-                {/* MONTH */}
-                <div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'rgba(51,255,51,0.5)', letterSpacing: '3px', marginBottom: 6 }}>MONTH</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
-                    {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
-                      const p=String(i+1).padStart(2,'0'); const active=selectedMonth===p; const avail=availMonths.has(p);
-                      return <button key={mn} onClick={() => { setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null); }} style={monthBtn(active,avail)}>{mn}</button>;
-                    })}
-                  </div>
-                </div>
-                {/* DAY */}
-                <div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '3px', marginBottom: 6 }}>DAY</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 4 }}>
-                    {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
-                      const p=d.padStart(2,'0'); const active=selectedDay===d; const avail=availDays.has(p);
-                      return <button key={d} onClick={() => { setSelectedDay(active?'':d);setCurrentShow(null); }} style={dayBtn(active,avail)}>{d}</button>;
-                    })}
-                  </div>
-                </div>
-              </div>
 
-              {/* DAY OF WEEK — centered */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => {
-                  const active=selectedDow===String(i); const avail=availDows.has(String(i));
-                  return <button key={dow} onClick={() => { setSelectedDow(active?'':String(i));setCurrentShow(null); }} style={dowBtn(active,avail)}>{dow}</button>;
-                })}
+                {/* MONTH — 2 columns */}
+                <div>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(51,255,51,0.55)', letterSpacing:'3px', marginBottom:6 }}>MONTH</div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:4 }}>
+                    {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i)=>{
+                      const p=String(i+1).padStart(2,'0'), active=selectedMonth===p, avail=availMos.has(p);
+                      return <button key={mn} onClick={()=>{ setSelectedMonth(active?'':p);setSelectedDay('');setCurrentShow(null); }} style={{...btn('mo',active,avail), fontSize:'0.65rem', letterSpacing:'1.5px', padding:'9px 8px'}}>{mn}</button>;
+                    })}
+                  </div>
+                </div>
+
+                {/* DAY — 3 columns + DOW 2 columns stacked */}
+                <div>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+                    {/* DAY 3x10+1 */}
+                    <div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(255,102,0,0.55)', letterSpacing:'3px', marginBottom:6 }}>DAY</div>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:4 }}>
+                        {Array.from({length:31},(_,i)=>String(i+1)).map(d=>{
+                          const p=d.padStart(2,'0'), active=selectedDay===d, avail=availDays.has(p);
+                          return <button key={d} onClick={()=>{ setSelectedDay(active?'':d);setCurrentShow(null); }} style={{...btn('dy',active,avail), fontSize:'0.65rem', padding:'8px 4px', minWidth:32}}>{d}</button>;
+                        })}
+                      </div>
+                    </div>
+                    {/* DOW 2x4 */}
+                    <div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.44rem', color:'rgba(0,224,208,0.55)', letterSpacing:'3px', marginBottom:6 }}>DAY OF WEEK</div>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:4 }}>
+                        {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i)=>{
+                          const active=selectedDow===String(i), avail=availDows.has(String(i));
+                          return <button key={dow} onClick={()=>{ setSelectedDow(active?'':String(i));setCurrentShow(null); }} style={{...btn('dow',active,avail), fontSize:'0.65rem', letterSpacing:'1.5px', padding:'9px 6px'}}>{dow}</button>;
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           );
