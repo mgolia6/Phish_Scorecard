@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       sentry_client:  !!process.env.VITE_SENTRY_DSN,
       posthog:        !!process.env.VITE_POSTHOG_KEY,
       sentry_server:  !!process.env.SENTRY_DSN,
-      resend:         !!process.env.RESEND_API_KEY,
+      resend:         !!process.env.PHREEZER_RESEND_API_KEY,
       etsy_oauth:     !!process.env.ETSY_ACCESS_TOKEN,
       anthropic:      !!process.env.ANTHROPIC_API_KEY,
       phishnet:       !!process.env.PHISH_NET_API_KEY,
