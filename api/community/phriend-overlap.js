@@ -40,14 +40,21 @@ export default async function handler(req, res) {
     )
     SELECT
       m.show_date,
-      s.venue,
-      s.city,
-      s.state,
+      COALESCE(s.venue, a.venue) AS venue,
+      COALESCE(s.city, a.city) AS city,
+      COALESCE(s.state, a.state) AS state,
       ur.overall_rating AS my_score,
       tr.overall_rating AS their_score
     FROM my_shows m
     JOIN their_shows t ON t.show_date = m.show_date
     LEFT JOIN shows s ON s.show_date::text = m.show_date
+    LEFT JOIN (
+      SELECT show_date::text, venue, city, state
+      FROM attendance
+      WHERE venue IS NOT NULL
+      ORDER BY imported_at DESC
+      LIMIT 1
+    ) a ON a.show_date = m.show_date
     LEFT JOIN (
       SELECT show_date::text, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $1
