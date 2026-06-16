@@ -247,6 +247,7 @@ export default function App() {
       {tab === 'my-states'     && user && <MyStatesTab  api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-phriends'      && user && <MyPhriends      api={api} showMessage={showMessage} showError={showError} />}
       {tab === 'my-deep-phreeze'  && user && <DeepPhreezeTab  api={api} showMessage={showMessage} showError={showError} onOpenScorecard={handleRateShow} />}
+      {tab === 'feed'              && <CommunityTab  api={api} subTab="feed"        />}
       {tab === 'community'         && <CommunityTab  api={api} subTab="leaderboard" />}
       {tab === 'top-shows'         && <CommunityTab  api={api} subTab="top-shows"   />}
       {tab === 'top-songs'         && <CommunityTab  api={api} subTab="top-songs"   />}
@@ -387,7 +388,7 @@ export default function App() {
           <nav className="tab-nav">
             {user && <>
               <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
-              <button className={`tab-btn ${['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('community')}>COMMUNITY</button>
+              <button className={`tab-btn ${['feed','community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('feed')}>COMMUNITY</button>
             </>}
             <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
           </nav>
@@ -401,8 +402,9 @@ export default function App() {
               <button className={`sub-tab-btn ${tab === 'my-deep-phreeze' ? 'active' : ''}`} onClick={() => setTab('my-deep-phreeze')}>DEEP PHREEZE</button>
             </div>
           )}
-          {['community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) && (
+          {['feed','community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) && (
             <div className="sub-tab-nav">
+              <button className={`sub-tab-btn ${tab === 'feed'         ? 'active' : ''}`} onClick={() => setTab('feed')}>FEED</button>
               <button className={`sub-tab-btn ${tab === 'community'   ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
               <button className={`sub-tab-btn ${tab === 'phriend-overlap' ? 'active' : ''}`} onClick={() => setTab('phriend-overlap')}>PHRIEND OVERLAP</button>
               <button className={`sub-tab-btn ${tab === 'top-shows'   ? 'active' : ''}`} onClick={() => setTab('top-shows')}>TOP SHOWS</button>
