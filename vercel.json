@@ -219,6 +219,14 @@
       "destination": "/api/admin/seed-ebenezer"
     },
     {
+      "source": "/api/admin/seed-founder-badges",
+      "destination": "/api/admin/seed-founder-badges"
+    },
+    {
+      "source": "/api/users/badges",
+      "destination": "/api/users/badges"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
