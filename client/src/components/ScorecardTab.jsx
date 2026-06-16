@@ -620,6 +620,89 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           );
         })()}
         </div>}
+
+        {/* ── DATE FILTERS — MOBILE ONLY ── */}
+        {!currentShow && <div className="mobile-filter-block" style={{ marginTop: 8 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {/* YEAR */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>YEAR</div>
+              <div style={{ position: 'relative' }}>
+                <select value={selectedYear} onChange={e => { setSelectedYear(e.target.value); setCurrentShow(null); setSongs([]); }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedYear ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedYear ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedYear ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">YEAR</option>
+                  {['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'].map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+              </div>
+            </div>
+            {/* MONTH */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(51,255,51,0.55)', letterSpacing: '2px', marginBottom: 3 }}>MONTH</div>
+              <div style={{ position: 'relative' }}>
+                <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value); setCurrentShow(null); setSongs([]); }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedMonth ? 'rgba(51,255,51,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedMonth ? 'rgba(51,255,51,0.6)' : 'rgba(51,255,51,0.25)'}`, color: selectedMonth ? 'var(--green)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">MONTH</option>
+                  {[['01','JAN'],['02','FEB'],['03','MAR'],['04','APR'],['05','MAY'],['06','JUN'],['07','JUL'],['08','AUG'],['09','SEP'],['10','OCT'],['11','NOV'],['12','DEC']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--green)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+              </div>
+            </div>
+            {/* DAY */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DAY</div>
+              <div style={{ position: 'relative' }}>
+                <select value={selectedDay} onChange={e => { setSelectedDay(e.target.value); setCurrentShow(null); setSongs([]); }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDay ? 'rgba(255,102,0,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDay ? 'rgba(255,102,0,0.6)' : 'rgba(255,102,0,0.25)'}`, color: selectedDay ? 'var(--orange)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">DAY</option>
+                  {Array.from({length:31},(_,i)=>String(i+1).padStart(2,'0')).map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--orange)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+              </div>
+            </div>
+            {/* DAY OF WEEK */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DOW</div>
+              <div style={{ position: 'relative' }}>
+                <select value={selectedDow} onChange={e => { setSelectedDow(e.target.value); setCurrentShow(null); setSongs([]); }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDow !== '' ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDow !== '' ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedDow !== '' ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">DOW</option>
+                  {[['0','SUN'],['1','MON'],['2','TUE'],['3','WED'],['4','THU'],['5','FRI'],['6','SAT']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+              </div>
+            </div>
+          </div>
+          {/* Mobile match count + clear */}
+          {(selectedYear || selectedMonth || selectedDay || selectedDow !== '') && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+              <div style={{ background: 'rgba(255,102,0,0.08)', border: '1px solid rgba(255,102,0,0.4)', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--orange)', fontWeight: 900, lineHeight: 1 }}>
+                  {(() => {
+                    const ERAS_MAP = {'1.0':['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000'],'2.0':['2002','2003','2004'],'3.0':['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020'],'4.0':['2021','2022','2023','2024','2025']};
+                    const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
+                    return allShows.filter(s => {
+                      const yr=s.showdate?.slice(0,4), mo=s.showdate?.slice(5,7), dy=s.showdate?.slice(8,10);
+                      const dow=s.showdate ? new Date(s.showdate+'T12:00:00').getDay() : -1;
+                      if(eraYrs && !eraYrs.includes(yr)) return false;
+                      if(selectedYear && yr!==selectedYear) return false;
+                      if(selectedMonth && mo!==selectedMonth) return false;
+                      if(selectedDay && dy!==selectedDay) return false;
+                      if(selectedDow!=='' && dow!==parseInt(selectedDow)) return false;
+                      return true;
+                    }).length;
+                  })()}
+                </span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px' }}>SHOWS</span>
+              </div>
+              <button onClick={() => { setSelectedEra(''); setSelectedYear(''); setSelectedMonth(''); setSelectedDay(''); setSelectedDow(''); setQuery(''); setCurrentShow(null); setSongs([]); setResults(allShows.slice(0, 20)); }}
+                style={{ background: 'transparent', border: '1px solid rgba(255,80,80,0.45)', color: 'rgba(255,100,100,0.85)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '6px 10px', cursor: 'pointer' }}>
+                ✕ CLEAR
+              </button>
+            </div>
+          )}
+        </div>}
+
         {!currentShow && (
           <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 10, marginBottom: 4 }}>
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
@@ -671,7 +754,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
 
             {/* Right: data panel — fills dead space on desktop */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 240 }}>
+            <div className="show-masthead-right" style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 240 }}>
               {/* Quick stats row */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                 {[
