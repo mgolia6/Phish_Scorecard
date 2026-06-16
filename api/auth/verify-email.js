@@ -110,7 +110,9 @@ function generateToken() {
 
 export async function sendVerificationEmail(email, token) {
   const verifyUrl = `https://phreezer.mpgink.com/api/auth/verify-email?token=${token}`;
-  await fetch('https://api.resend.com/emails', {
+  const keyPresent = !!process.env.PHREEZER_RESEND_API_KEY;
+  console.log('[verify-email] sending to:', email, '| key present:', keyPresent);
+  const resendRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.PHREEZER_RESEND_API_KEY}`,
@@ -123,6 +125,11 @@ export async function sendVerificationEmail(email, token) {
       html: emailTemplate(verifyUrl),
     }),
   });
+  const resendBody = await resendRes.json().catch(() => ({}));
+  console.log('[verify-email] Resend status:', resendRes.status, '| body:', JSON.stringify(resendBody));
+  if (!resendRes.ok) {
+    throw new Error(`Resend rejected: ${resendRes.status} ${JSON.stringify(resendBody)}`);
+  }
 }
 
 function emailTemplate(verifyUrl) {
