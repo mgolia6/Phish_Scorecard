@@ -2,6 +2,80 @@
 
 ---
 
+## Session: 2026-06-16
+
+### What shipped
+
+**Email verification fix**
+- Root cause: `RESEND_API_KEY` env var was invalid/broken in Vercel production
+- Created new Resend API key as `PHREEZER_RESEND_API_KEY`
+- Updated all 4 files that referenced `RESEND_API_KEY` → `PHREEZER_RESEND_API_KEY`: `api/_email.js`, `api/auth/verify-email.js`, `api/admin/monitoring.js`, `api/admin/user.js`
+- Added proper `res.ok` check + error throw to `sendVerificationEmail` (was silently swallowing failures)
+- Added/removed diagnostic logging during debugging — cleaned up before close
+- Email verified working end-to-end ✅
+
+**Admin USERS tab — KPI bar**
+- 4-stat grid at top: TOTAL · VERIFIED · RATED · .NET LINKED
+- Computed from already-loaded user list — no extra API call
+- `phishnet_username` added to admin users query in `api/admin/users.js`
+- `email_verified` also added to query (was missing)
+
+**Admin USERS tab — RESEND VERIFY button**
+- Appears only on unverified users (cyan)
+- Calls `POST /api/auth/verify-email` with user's email
+- VERIFIED ✓/✗ stat added to expanded user card (orange ✗ for unverified)
+
+**Admin EXTERNAL tab — fixed false failures**
+- Phish.net, Anthropic, Resend were being probed directly from browser — CORS-blocked and no API keys available client-side
+- Created `api/admin/health.js` — server-side proxy that probes all three with real keys
+- Added route to `vercel.json`
+- EXTERNAL tab now calls `/api/admin/health` for those three; Phish.in remains direct (public, CORS-friendly)
+
+**Floating button — ASK EBENEZER**
+- Updated label from "ASK" to "ASK EBENEZER" in `EbenezerDrawer.jsx`
+- Slightly reduced font size to fit
+
+**Phriend Overlap — fixed**
+- Bug 1: `s.showdate` → `s.show_date` (wrong column name, caused 500)
+- Bug 2: Query only checked `user_show_attendance` for both users — missed Phish.net imported attendance in `attendance` table. Rewrote using CTEs that UNION both tables for each user.
+
+**Error handling audit**
+- `api/user/companions.js` — added try/catch (was unprotected)
+- `api/user/deep-phreeze.js` — added try/catch (was unprotected)
+- `api/community/phriend-overlap.js` — added try/catch, surfaces real DB error message
+- `api/ratings/[showDate].js` — confirmed already had try/catch on GET and POST
+- All other high-traffic endpoints confirmed protected
+
+**Wrap protocol overhaul**
+- `INSTRUCTIONS.md` rewritten with explicit 8-step checklist wrap protocol
+- LAYOUT.md now has section-by-section audit checklist
+- INSTRUCTIONS.md itself is now a wrap target
+- STYLE_GUIDE.md explicitly called out
+- Deploy health check added as step 7
+- `RESEND_API_KEY` → `PHREEZER_RESEND_API_KEY` in env vars section
+- `api/admin/health.js` added to architecture section
+
+### Decisions made
+- `PHREEZER_RESEND_API_KEY` is the canonical env var name going forward — do not revert to shared `RESEND_API_KEY`
+- Phriend Overlap must union both `attendance` and `user_show_attendance` for any attendance-based query — this is the pattern going forward
+- External API health checks must always be proxied server-side — never call third-party APIs with keys from the browser
+- Wrap protocol is now 8 explicit steps — enforce going forward
+
+### Known issues / open debt
+- Phriend Overlap will still show 0 for users who haven't imported Phish.net OR marked attendance in-app
+- `user_show_attendance` vs `attendance` dual-table pattern exists throughout the app — other queries may have the same blind spot (companions, deep-phreeze era data, etc.)
+- Frontend error messages still show raw API error strings in some places — needs a pass to standardize to "Something went wrong. Try again."
+- Top Shows / Top Songs community tabs still thin — data problem, not code
+
+### Next session priorities
+1. Audit other queries that join on attendance for the same dual-table blind spot
+2. Frontend error message standardization pass
+3. Monitor new users — signups, ratings, feedback
+4. Watch for STTF reply
+
+
+---
+
 ## Session: 2026-06-14 (evening)
 
 ### What was confirmed / closed out
