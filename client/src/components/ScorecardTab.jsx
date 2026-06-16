@@ -40,6 +40,35 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [activeAudio, setActiveAudio] = useState(null); // posKey of currently open player
   const [slotTargetDate, setSlotTargetDate] = useState(null);
   const debounceRef = useRef(null);
+
+  // Sync filtered results whenever filter state changes
+  useEffect(() => {
+    const hasFilters = selectedEra || selectedYear || selectedMonth || selectedDay || selectedDow !== '';
+    if (!hasFilters) return; // let the query/debounce logic handle empty state
+    if (currentShow) return; // don't clobber a loaded show
+
+    const ERAS_MAP = {
+      '1.0': ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'],
+      '2.0': ['2002','2003','2004'],
+      '3.0': ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'],
+      '4.0': ['2021', '2022', '2023', '2024', '2025'],
+    };
+    const eraYrs = selectedEra ? ERAS_MAP[selectedEra] : null;
+    const filtered = allShows.filter(s => {
+      const yr = s.showdate?.slice(0,4);
+      const mo = s.showdate?.slice(5,7);
+      const dy = s.showdate?.slice(8,10);
+      const dow = s.showdate ? new Date(s.showdate + 'T12:00:00').getDay() : -1;
+      if (eraYrs && !eraYrs.includes(yr)) return false;
+      if (selectedYear && yr !== selectedYear) return false;
+      if (selectedMonth && mo !== selectedMonth) return false;
+      if (selectedDay && dy !== selectedDay.padStart(2,'0')) return false;
+      if (selectedDow !== '' && dow !== parseInt(selectedDow)) return false;
+      return true;
+    });
+    setResults(filtered.slice(0, 100));
+    setQuery('__filter__');
+  }, [selectedEra, selectedYear, selectedMonth, selectedDay, selectedDow, allShows]);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
   const initialLoadDone = useRef(false);
@@ -109,7 +138,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
     setPhriendInput('');
     try {
       const [showData, ratingsResp, audioData, phriendData] = await Promise.all([
-        api.get(`/shows/${date}`),
+        fetch(`${API}/shows/${date}`, { headers: { 'Content-Type': 'application/json', ...(isAuthed ? { Authorization: `Bearer ${localStorage.getItem('phish_token')}` } : {}) } }).then(r => r.json()).then(d => { if (d.error) throw new Error(d.error); return d; }),
         isAuthed ? api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })) : Promise.resolve({ ratings: [], attendance_type: null }),
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
         isAuthed ? api.get(`/shows/companions?date=${date}`).catch(() => ({ tagged: [], also_attended: [] })) : Promise.resolve({ tagged: [], also_attended: [] }),
@@ -467,11 +496,6 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             setQuery(''); setCurrentShow(null);
           };
 
-          // Sync results to filtered pool when filters are active
-          if (hasFilters && !currentShow && !query.trim()) {
-            setTimeout(() => setResults(filteredPool.slice(0, 100)), 0);
-          }
-
           return (
             <div style={{ marginTop: 16 }}>
 
@@ -647,7 +671,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
-              {query === '__era__' ? `${results.length} shows in this era` : query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
+              {(query === '__era__' || query === '__filter__') ? `${results.length} shows match` : query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
             </div>
             <div className="results-list">
               {results.map(show => (
