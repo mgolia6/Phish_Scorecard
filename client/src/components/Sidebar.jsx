@@ -13,12 +13,12 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
 
   const communityItems = [
     { id: 'feed',            label: 'FEED',            glyph: '◈' },
+    { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
     { id: 'community',       label: 'LEADERBOARD',     glyph: '★' },
     { id: 'top-shows',       label: 'TOP SHOWS',       glyph: '◈' },
     { id: 'top-songs',       label: 'TOP SONGS',       glyph: '♪' },
     { id: 'top-venues',      label: 'TOP VENUES',      glyph: '⌖' },
     { id: 'top-states',      label: 'TOP STATES',      glyph: '⬡' },
-    { id: 'phriend-overlap', label: 'PHRIEND OVERLAP', glyph: '⚇' },
   ];
 
   const renderItem = (item) => {
