@@ -66,7 +66,7 @@ At the start of every session, before anything else:
 ├── client/src/
 │   ├── App.jsx
 │   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
-│   ├── components/          27 component files (incl. PrivacyModal)
+│   ├── components/          29 component files (incl. PhreezeFeed, PhriendOverlap)
 │   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
 ├── init-db.sql
