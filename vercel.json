@@ -211,6 +211,10 @@
       "destination": "/api/etsy/sync"
     },
     {
+      "source": "/api/community/companions",
+      "destination": "/api/community/companions"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
