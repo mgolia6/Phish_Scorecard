@@ -3,17 +3,30 @@ import { PhreezeFeed } from './PhreezeFeed';
 import { FullPageLoader } from './FullPageLoader';
 import { formatDate } from '../utils';
 
-export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', accent = 'var(--cyan)', children }) {
+export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', accent = 'var(--cyan)', extraStats = [], children }) {
   const [open, setOpen] = useState(false);
   const scoreColor = parseFloat(avg) >= 4.7 ? 'var(--orange)' : 'var(--cyan)';
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderLeft: `3px solid ${accent}` }}>
         <div style={{ padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          {/* Name + sub */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-            {sub && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>}
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--white)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+            {sub && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{sub}</div>}
           </div>
+          {/* Extra stats — desktop only */}
+          {extraStats.length > 0 && (
+            <div style={{ display: 'none' }} className="desktop-card-stats">
+              {extraStats.map((s, i) => (
+                <div key={i} style={{ textAlign: 'center', padding: '0 12px', borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', color: s.color || 'var(--green)', lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Score + expand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', color: scoreColor, textShadow: `0 0 12px ${scoreColor}55`, letterSpacing: 1, lineHeight: 1 }}>{avg}</div>
