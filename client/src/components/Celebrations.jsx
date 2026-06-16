@@ -111,16 +111,20 @@ export function WelcomeCelebration({ username, onDone }) {
     { text: jokeLines[0], pauseAfter: 120 },
     { text: jokeLines[1], pauseAfter: 300 },
     { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, pauseAfter: 500, accent: true },
-    { text: "DON'T SUCK AT PHISH.", pauseAfter: 9999, big: true },
+    { text: "DON'T SUCK", pauseAfter: 180, big: true },
+    { text: 'AT PHISH.', pauseAfter: 9999, big: true },
   ];
 
   const { completedLines, currentLine, currentText, done } = useTypewriter(lines, 36, 300);
 
-  // Auto-dismiss after big line finishes typing
+  const [glitching, setGlitching] = useState(false);
+
+  // Auto-dismiss after last line finishes — glitch then exit
   useEffect(() => {
     if (currentLine >= lines.length - 1 && currentText === lines[lines.length - 1]?.text) {
-      const t = setTimeout(() => onDoneRef.current?.(), 2200);
-      return () => clearTimeout(t);
+      const t1 = setTimeout(() => setGlitching(true), 600);
+      const t2 = setTimeout(() => onDoneRef.current?.(), 2000);
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [currentLine, currentText]);
 
@@ -144,7 +148,7 @@ export function WelcomeCelebration({ username, onDone }) {
           : '0 0 10px rgba(51,255,51,0.3)',
         textAlign: 'center',
         lineHeight: 1.5,
-        whiteSpace: 'pre',
+        whiteSpace: 'nowrap',
       }}>
         {text}
         {isTyping && (
@@ -164,7 +168,7 @@ export function WelcomeCelebration({ username, onDone }) {
 
   return (
     <div
-      className="celebrate-overlay"
+      className={`celebrate-overlay${glitching ? ' boot-glitch' : ''}`}
       onClick={() => onDoneRef.current?.()}
       style={{
         cursor: 'pointer',
@@ -172,6 +176,8 @@ export function WelcomeCelebration({ username, onDone }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        transition: glitching ? 'opacity 0.4s ease' : 'none',
+        opacity: glitching ? 0 : 1,
       }}
     >
       <div style={{
