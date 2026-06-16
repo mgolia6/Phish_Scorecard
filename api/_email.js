@@ -94,9 +94,9 @@ export function onboardingEmail(username) {
   const html = layout(`
     ${heading('YOU\'RE IN THE PHREEZER.')}
     ${body(`Hey ${name},<br><br>
-I've been part of the Phish community for over three decades. I built Phreezer because I wanted to participate more — not just attend shows, but actually record how I experienced them. Song by song. Show by show.<br><br>
-Phish.net is incredible. The record-keeping, the stats, the reviews — it's one of the great fan institutions. Phreezer builds on that foundation and adds a layer of granularity: the ability to rate each song, surface your own patterns, and see your history in a way that actually means something.<br><br>
-Here's how to get started:`)}
+There is a comfort that comes from being in a crowd of thousands at a Phish show that is hard to find anywhere else. That felt sense of joy and critical analysis — both at the same time — is what keeps it fresh.<br><br>
+Phreezer is a place to record that. Not just that you were there, but how it landed. Song by song. Set by set. Show by show. The honest inspiration is ihoz.com — Phishtistics. The data this community has built over decades is extraordinary. Phreezer tries to give it a home that reflects how seriously we all take the music.<br><br>
+Here\'s how to get started:`)}
     <!-- THREE PILLARS -->
     <tr><td style="padding-bottom:28px;">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
