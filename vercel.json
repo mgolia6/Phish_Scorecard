@@ -215,6 +215,10 @@
       "destination": "/api/community/companions"
     },
     {
+      "source": "/api/admin/seed-ebenezer",
+      "destination": "/api/admin/seed-ebenezer"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
