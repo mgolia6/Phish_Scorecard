@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export function SaveCelebration({ onDone }) {
   const onDoneRef = React.useRef(onDone);
@@ -34,7 +34,6 @@ export function SaveCelebration({ onDone }) {
 }
 
 // Pool of rotating Phish inside-joke boot lines
-// 2 are picked randomly each login — keeps it fresh for returning users
 const JOKE_LINES = [
   'INITIATING SIREN LOOPS...........OK',
   'CHILLING THE PHREEZER............OK',
@@ -51,29 +50,117 @@ function pickJokeLines(count = 2) {
   return shuffled.slice(0, count);
 }
 
-export function WelcomeCelebration({ username, onDone }) {
-  const onDoneRef = React.useRef(onDone);
-  const [visible, setVisible] = useState([]);
-
-  // Pick joke lines once on mount — stable for this render
-  const jokeLines = React.useRef(pickJokeLines(2)).current;
-
-  const lines = [
-    { text: 'PHREEZER v2.0 — INITIALIZING...', delay: 0 },
-    { text: 'LOADING SHOW DATABASE............OK', delay: 600 },
-    { text: jokeLines[0], delay: 1200 },
-    { text: jokeLines[1], delay: 1800 },
-    { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, delay: 2600, accent: true },
-    { text: "DON'T SUCK AT PHISH.", delay: 3500, big: true },
-  ];
+// Typewriter hook — types out text char by char at given speed
+function useTypewriter(lines, charDelay = 38, lineGap = 320) {
+  // completedLines: array of fully typed strings
+  // currentLine: index of line being typed
+  // currentChars: how many chars of current line are visible
+  const [completedLines, setCompletedLines] = useState([]);
+  const [currentLine, setCurrentLine] = useState(0);
+  const [currentChars, setCurrentChars] = useState(0);
+  const [done, setDone] = useState(false);
+  const rafRef = useRef(null);
+  const lastTickRef = useRef(null);
 
   useEffect(() => {
-    lines.forEach((l, i) => {
-      setTimeout(() => setVisible(v => [...v, i]), l.delay);
-    });
-    const t = setTimeout(() => onDoneRef.current?.(), 5800);
-    return () => clearTimeout(t);
-  }, []);
+    if (currentLine >= lines.length) { setDone(true); return; }
+
+    const line = lines[currentLine];
+    const totalChars = line.text.length;
+
+    if (currentChars < totalChars) {
+      // Type next character
+      const tick = () => {
+        const now = Date.now();
+        if (!lastTickRef.current) lastTickRef.current = now;
+        const elapsed = now - lastTickRef.current;
+        if (elapsed >= charDelay) {
+          lastTickRef.current = now;
+          setCurrentChars(c => c + 1);
+        }
+        rafRef.current = requestAnimationFrame(tick);
+      };
+      rafRef.current = requestAnimationFrame(tick);
+      return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    } else {
+      // Line complete — pause then move to next
+      const t = setTimeout(() => {
+        setCompletedLines(prev => [...prev, line]);
+        setCurrentLine(l => l + 1);
+        setCurrentChars(0);
+        lastTickRef.current = null;
+      }, line.pauseAfter !== undefined ? line.pauseAfter : lineGap);
+      return () => clearTimeout(t);
+    }
+  }, [currentLine, currentChars, lines]);
+
+  const currentText = currentLine < lines.length
+    ? lines[currentLine].text.slice(0, currentChars)
+    : null;
+
+  return { completedLines, currentLine, currentText, done };
+}
+
+export function WelcomeCelebration({ username, onDone }) {
+  const onDoneRef = useRef(onDone);
+  const jokeLines = useRef(pickJokeLines(2)).current;
+
+  const lines = [
+    { text: 'PHREEZER v2.0 — INITIALIZING...', pauseAfter: 200 },
+    { text: 'LOADING SHOW DATABASE............OK', pauseAfter: 120 },
+    { text: jokeLines[0], pauseAfter: 120 },
+    { text: jokeLines[1], pauseAfter: 300 },
+    { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, pauseAfter: 500, accent: true },
+    { text: "DON'T SUCK AT PHISH.", pauseAfter: 9999, big: true },
+  ];
+
+  const { completedLines, currentLine, currentText, done } = useTypewriter(lines, 36, 300);
+
+  // Auto-dismiss after big line finishes typing
+  useEffect(() => {
+    if (currentLine >= lines.length - 1 && currentText === lines[lines.length - 1]?.text) {
+      const t = setTimeout(() => onDoneRef.current?.(), 2200);
+      return () => clearTimeout(t);
+    }
+  }, [currentLine, currentText]);
+
+  const renderLine = (text, meta, key, isTyping = false) => {
+    const isBig = meta?.big;
+    const isAccent = meta?.accent;
+    return (
+      <div key={key} style={{
+        fontFamily: isBig ? 'var(--font-display)' : 'var(--font-mono)',
+        fontSize: isBig
+          ? 'clamp(1.1rem, 4.5vw, 1.8rem)'
+          : isAccent
+          ? 'clamp(0.82rem, 2.8vw, 1.15rem)'
+          : 'clamp(0.7rem, 2.4vw, 1rem)',
+        color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
+        letterSpacing: isBig ? '8px' : isAccent ? '5px' : '3px',
+        textShadow: isBig
+          ? '0 0 40px rgba(255,102,0,0.7)'
+          : isAccent
+          ? '0 0 24px rgba(0,224,208,0.7)'
+          : '0 0 10px rgba(51,255,51,0.3)',
+        textAlign: 'center',
+        lineHeight: 1.5,
+        whiteSpace: 'pre',
+      }}>
+        {text}
+        {isTyping && (
+          <span style={{
+            display: 'inline-block',
+            width: '0.6em',
+            background: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
+            marginLeft: 2,
+            verticalAlign: 'middle',
+            height: '1em',
+            animation: 'cursorBlink 0.7s step-end infinite',
+          }} />
+        )}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -95,7 +182,6 @@ export function WelcomeCelebration({ username, onDone }) {
         maxWidth: 720,
         width: '100%',
       }}>
-        {/* Snowflake */}
         <img
           src="/assets/phreezer-snowflake.png"
           alt=""
@@ -108,36 +194,23 @@ export function WelcomeCelebration({ username, onDone }) {
           }}
         />
 
-        {/* Boot lines — centered, large, spaced */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(10px, 3vw, 20px)' }}>
-          {lines.map((line, i) => (
-            visible.includes(i) && (
-              <div key={i} style={{
-                fontFamily: line.big ? 'var(--font-display)' : 'var(--font-mono)',
-                fontSize: line.big ? 'clamp(1.1rem, 4.5vw, 1.8rem)' : line.accent ? 'clamp(0.82rem, 2.8vw, 1.15rem)' : 'clamp(0.7rem, 2.4vw, 1rem)',
-                color: line.big
-                  ? 'var(--orange)'
-                  : line.accent
-                  ? 'var(--cyan)'
-                  : 'rgba(51,255,51,0.85)',
-                letterSpacing: line.big ? '8px' : line.accent ? '5px' : '3px',
-                textShadow: line.big
-                  ? '0 0 40px rgba(255,102,0,0.7)'
-                  : line.accent
-                  ? '0 0 24px rgba(0,224,208,0.7)'
-                  : '0 0 10px rgba(51,255,51,0.3)',
-                textAlign: 'center',
-                lineHeight: 1.5,
-                animation: 'fadeIn 0.5s ease',
-              }}>
-                {line.text}
-              </div>
-            )
-          ))}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 'clamp(10px, 3vw, 20px)',
+        }}>
+          {/* Completed lines */}
+          {completedLines.map((line, i) => renderLine(line.text, line, `done-${i}`, false))}
+
+          {/* Currently typing line */}
+          {currentLine < lines.length && currentText !== null && (
+            renderLine(currentText, lines[currentLine], 'current', true)
+          )}
         </div>
 
-        {/* Skip hint */}
-        {visible.length > 0 && (
+        {completedLines.length >= 2 && (
           <div style={{
             marginTop: 'clamp(24px, 6vw, 56px)',
             fontFamily: 'var(--font-display)',
