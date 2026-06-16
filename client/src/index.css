@@ -1066,7 +1066,8 @@ select option { background: var(--bg); color: var(--green); }
 .empty-state{ text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 2px; border: 1px dashed var(--border); }
 
 /* Celebrations */
-.celebrate-overlay  { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.celebrate-overlay  { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; }
+.celebrate-overlay.save-burst { pointer-events: none; }
 .celebrate-burst    { position: absolute; inset: 0; overflow: hidden; }
 .celebrate-particle { position: absolute; font-size: 1.4rem; bottom: 0; animation: burst linear forwards; opacity: 0; }
 @keyframes burst { 0% { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 0; } 15% { opacity: 1; } 60% { opacity: 0.9; } 100% { transform: translateY(-90vh) rotate(720deg) scale(1.2); opacity: 0; } }
