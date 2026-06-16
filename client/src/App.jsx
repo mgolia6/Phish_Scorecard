@@ -306,6 +306,7 @@ export default function App() {
           onLogout={handleLogout}
           expanded={sidebarExpanded}
           setExpanded={setSidebarExpanded}
+          onGoHome={() => setTab('home')}
           onOpenProfile={() => { setProfileInitSection('phish'); setShowProfileModal(true); }}
           onFeedback={() => setFeedbackModal('passive')}
         />
