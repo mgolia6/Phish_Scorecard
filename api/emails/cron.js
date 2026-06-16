@@ -1,19 +1,19 @@
 // GET /api/emails/cron
 // Daily cron job — checks all cadence conditions and fires emails.
-// Secured with CRON_SECRET header.
+// Secured with CRON_SECRET header or ?secret= query param.
 //
 // Cadence:
+//   onboarding    — any verified user who hasn't gotten it yet
 //   day3_nudge    — 3+ days since signup, 0 ratings, not yet sent
 //   day7_engage   — 7+ days since signup, 1+ ratings, not yet sent
-//   day30_reengage — inactive 30+ days (no login), not yet sent in last 60 days
-//   milestone_5   — exactly crossed 5 shows rated
-//   milestone_25  — exactly crossed 25 shows rated
-//   milestone_50  — exactly crossed 50 shows rated
+//   day30_reengage — inactive 30+ days, not yet sent in last 60 days
+//   milestone_5/25/50 — crossed show count threshold
 
 import { getPool } from '../_db.js';
 import { cors } from '../_auth.js';
 import {
   sendEmail,
+  onboardingEmail,
   day3NudgeEmail,
   day7EngageEmail,
   day30ReengageEmail,
@@ -59,7 +59,6 @@ export default async function handler(req, res) {
   cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Auth — must provide CRON_SECRET
   const secret = req.headers['x-cron-secret'] || req.query.secret;
   if (!secret || secret !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -71,7 +70,6 @@ export default async function handler(req, res) {
   const results = [];
 
   try {
-    // ── All verified users with key stats ──────────────────────────────────────
     const usersRes = await pool.query(`
       SELECT
         u.id, u.email, u.username, u.created_at, u.last_login_date,
@@ -91,6 +89,10 @@ export default async function handler(req, res) {
         : daysSinceSignup;
       const showsRated = parseInt(user.shows_rated, 10);
 
+      // Onboarding — any verified user who hasn't gotten it
+      const r0 = await fire(pool, user, 'onboarding', onboardingEmail);
+      results.push(r0);
+
       // Day 3 nudge — no ratings yet
       if (daysSinceSignup >= 3 && showsRated === 0) {
         const r = await fire(pool, user, 'day3_nudge', day3NudgeEmail);
@@ -103,8 +105,7 @@ export default async function handler(req, res) {
         results.push(r);
       }
 
-      // Day 30 re-engage — inactive 30+ days
-      // Uses a separate key so it can fire again after 60 days if they go dark again
+      // Day 30 re-engage
       if (daysSinceLogin >= 30) {
         const recentLog = await pool.query(
           `SELECT id FROM email_log WHERE user_id = $1 AND email_type = 'day30_reengage'
@@ -114,7 +115,6 @@ export default async function handler(req, res) {
         if (!recentLog.rows.length) {
           const { subject, html } = day30ReengageEmail(user.username);
           await sendEmail({ to: user.email, subject, html });
-          // Delete old log entry so the 60-day window resets
           await pool.query(
             `DELETE FROM email_log WHERE user_id = $1 AND email_type = 'day30_reengage'`,
             [user.id]
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // Milestone emails — 5, 25, 50
+      // Milestones
       for (const milestone of [5, 25, 50]) {
         if (showsRated >= milestone) {
           const r = await fire(pool, user, `milestone_${milestone}`, milestoneEmail, milestone);
@@ -135,7 +135,7 @@ export default async function handler(req, res) {
 
     const sent = results.filter(r => r.sent).length;
     const skipped = results.filter(r => r.skipped).length;
-    res.json({ ok: true, sent, skipped, total: results.length });
+    res.json({ ok: true, sent, skipped, total: results.length, detail: results.filter(r => r.sent) });
 
   } catch (err) {
     console.error('Email cron error:', err);
