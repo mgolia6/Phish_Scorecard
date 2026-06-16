@@ -11,7 +11,6 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
     { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
   ];
 
-  // All community items at same level
   const communityItems = [
     { id: 'feed',            label: 'FEED',            glyph: '◈' },
     { id: 'community',       label: 'LEADERBOARD',     glyph: '★' },
@@ -24,13 +23,13 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
 
   const renderItem = (item) => {
     const disabled = item.authRequired && !user;
+    if (disabled) return null; // hide auth-required items entirely when logged out
     return (
       <button
         key={item.id}
-        className={`sidebar-nav-btn sidebar-nav-sub-item ${tab === item.id ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
-        onClick={() => !disabled && setTab(item.id)}
+        className={`sidebar-nav-btn sidebar-nav-sub-item ${tab === item.id ? 'active' : ''}`}
+        onClick={() => setTab(item.id)}
         title={item.label}
-        disabled={disabled}
       >
         <span className="sidebar-nav-glyph">{item.glyph}</span>
         {expanded && <span className="sidebar-nav-label">{item.label}</span>}
@@ -73,27 +72,32 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
         {/* NAV */}
         <nav className="sidebar-nav">
 
-          {/* MY PHREEZER */}
-          {expanded
-            ? <div className="sidebar-section-label section-my-phreezer" data-tour="my-phreezer">◈ MY PHREEZER</div>
-            : sectionDot('var(--cyan)')
-          }
-          {myPhreezerItems.map(item => {
-            const el = renderItem(item);
-            if (item.id === 'my-deep-phreeze') {
-              return <div key={item.id} data-tour="deep-phreeze">{el}</div>;
-            }
-            return el;
-          })}
+          {/* MY PHREEZER — only shown when logged in */}
+          {user && (
+            <>
+              {expanded
+                ? <div className="sidebar-section-label section-my-phreezer" data-tour="my-phreezer">◈ MY PHREEZER</div>
+                : sectionDot('var(--cyan)')
+              }
+              {myPhreezerItems.map(item => {
+                const el = renderItem(item);
+                if (!el) return null;
+                if (item.id === 'my-deep-phreeze') {
+                  return <div key={item.id} data-tour="deep-phreeze">{el}</div>;
+                }
+                return el;
+              })}
+            </>
+          )}
 
-          {/* COMMUNITY — all items same level */}
+          {/* COMMUNITY — always visible */}
           {expanded
             ? <div className="sidebar-section-label section-community" data-tour="community">★ COMMUNITY</div>
             : sectionDot('var(--orange)')
           }
           {communityItems.map(renderItem)}
 
-          {/* SCORECARD — standalone */}
+          {/* SCORECARD — always visible */}
           <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
           {expanded ? (
             <div
@@ -117,60 +121,91 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
             </>
           )}
 
-          {/* FEEDBACK */}
-          <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
-          <button
-            className="sidebar-nav-btn sidebar-nav-sub-item"
-            onClick={onFeedback}
-            title="Send Feedback"
-            style={{ color: 'rgba(51,255,51,0.4)' }}
-          >
-            <span className="sidebar-nav-glyph">◈</span>
-            {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
-          </button>
+          {/* FEEDBACK — logged in only */}
+          {user && (
+            <>
+              <div className="sidebar-divider" style={{ margin: '12px 16px' }} />
+              <button
+                className="sidebar-nav-btn sidebar-nav-sub-item"
+                onClick={onFeedback}
+                title="Send Feedback"
+                style={{ color: 'rgba(51,255,51,0.4)' }}
+              >
+                <span className="sidebar-nav-glyph">◈</span>
+                {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
+              </button>
+            </>
+          )}
 
         </nav>
 
-        {/* FOOTER — profile only, NO collapse button */}
+        {/* FOOTER */}
         <div className="sidebar-footer">
           {user ? (
-            <>
-              <div
-                className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
-                onClick={onOpenProfile}
-          data-tour="profile-avatar"
-                title="My Profile"
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="sidebar-avatar">
-                  {user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}
-                </div>
-                {expanded && (
-                  <div style={{ overflow: 'hidden' }}>
-                    <div className="sidebar-username">{user.username}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>VIEW PROFILE</div>
-                  </div>
-                )}
+            <div
+              className={`sidebar-user ${expanded ? '' : 'sidebar-user-collapsed'}`}
+              onClick={onOpenProfile}
+              data-tour="profile-avatar"
+              title="My Profile"
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="sidebar-avatar">
+                {user.avatar_icon || user.username?.[0]?.toUpperCase() || '?'}
               </div>
-
-            </>
+              {expanded && (
+                <div style={{ overflow: 'hidden' }}>
+                  <div className="sidebar-username">{user.username}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>VIEW PROFILE</div>
+                </div>
+              )}
+            </div>
           ) : (
-            <>
-              <button className="sidebar-nav-btn" onClick={() => onLogin('login')} title="Login">
-                <span className="sidebar-nav-glyph">→</span>
-                {expanded && <span className="sidebar-nav-label">LOGIN</span>}
-              </button>
-              <button className="sidebar-nav-btn sidebar-register" onClick={() => onLogin('signup')} title="Register">
-                <span className="sidebar-nav-glyph">+</span>
-                {expanded && <span className="sidebar-nav-label">REGISTER</span>}
-              </button>
-            </>
+            /* Logged-out CTA — prominent, not buried */
+            expanded ? (
+              <div style={{ padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(51,255,51,0.45)', letterSpacing: '2px', marginBottom: 4, textAlign: 'center' }}>
+                  RATE. TRACK. RELIVE.
+                </div>
+                <button
+                  className="btn-primary"
+                  onClick={() => onLogin('signup')}
+                  style={{ width: '100%', padding: '12px', fontSize: '0.62rem', letterSpacing: '2px', fontFamily: 'var(--font-display)' }}
+                >
+                  + CREATE ACCOUNT
+                </button>
+                <button
+                  onClick={() => onLogin('login')}
+                  style={{ width: '100%', padding: '10px', fontSize: '0.58rem', letterSpacing: '2px', fontFamily: 'var(--font-display)', border: '1px solid rgba(51,255,51,0.25)', color: 'rgba(51,255,51,0.6)', background: 'transparent' }}
+                >
+                  → LOGIN
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 0', alignItems: 'center' }}>
+                <button
+                  className="sidebar-nav-btn"
+                  onClick={() => onLogin('signup')}
+                  title="Register"
+                  style={{ color: 'var(--orange)', justifyContent: 'center', padding: '10px 0' }}
+                >
+                  <span className="sidebar-nav-glyph">+</span>
+                </button>
+                <button
+                  className="sidebar-nav-btn"
+                  onClick={() => onLogin('login')}
+                  title="Login"
+                  style={{ justifyContent: 'center', padding: '10px 0' }}
+                >
+                  <span className="sidebar-nav-glyph">→</span>
+                </button>
+              </div>
+            )
           )}
         </div>
 
       </aside>
 
-      {/* COLLAPSE TAB — original style, outside sidebar */}
+      {/* COLLAPSE TAB */}
       <button
         className="sidebar-tab"
         onClick={() => setExpanded(e => !e)}
@@ -181,9 +216,3 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
     </div>
   );
 }
-
-
-
-
-
-
