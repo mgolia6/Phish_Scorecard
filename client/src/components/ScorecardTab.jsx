@@ -4,6 +4,7 @@ import { API, PNET, RELISTEN, TODAY, formatDate, formatDuration, filterByQuery }
 import { SaveCelebration } from './Celebrations';
 import { SongRating, SetScore } from './ScorecardHelpers';
 import { InlineAudioPlayer } from './AudioPlayer';
+import { ShowSlotMachine } from './ShowSlotMachine';
 
 export function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShowDate, onShowLoaded, onFeedbackTrigger }) {
   const [query, setQuery] = useState('');
@@ -35,6 +36,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [loadingVibe, setLoadingVibe] = useState(false);
   const [vibeError, setVibeError] = useState(false);
   const [activeAudio, setActiveAudio] = useState(null); // posKey of currently open player
+  const [slotTargetDate, setSlotTargetDate] = useState(null);
   const debounceRef = useRef(null);
   const spinnerTimerRef = useRef(null);
   const isAuthed = !!localStorage.getItem('phish_token');
@@ -95,7 +97,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   }, [query, allShows]);
 
   const loadShow = async (date) => {
-    if (!isAuthed) { onAuthRequired(); return; }
+    // Allow unauthenticated users to browse setlists — gate on rating actions only
     setLoadingShow(true);
     setCurrentShow(null);
     setSongs([]);
@@ -107,9 +109,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
     try {
       const [showData, ratingsResp, audioData, phriendData] = await Promise.all([
         api.get(`/shows/${date}`),
-        api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })),
+        isAuthed ? api.get(`/ratings/${date}`).catch(() => ({ ratings: [], attendance_type: null })) : Promise.resolve({ ratings: [], attendance_type: null }),
         fetch(`${API}/audio/${date}`).then(r => r.json()).catch(() => ({ tracks: [] })),
-        api.get(`/shows/companions?date=${date}`).catch(() => ({ tagged: [], also_attended: [] })),
+        isAuthed ? api.get(`/shows/companions?date=${date}`).catch(() => ({ tagged: [], also_attended: [] })) : Promise.resolve({ tagged: [], also_attended: [] }),
       ]);
       // Annotate songs with globalIdx and posKey to handle sandwiched/reprised songs
       const annotated = (showData.songs || []).map((s, globalIdx) => ({
@@ -223,19 +225,41 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
   const handleRandom = async () => {
     setRandomizing(true);
+    setSlotTargetDate(null);
+    setCurrentShow(null);
+    setSongs([]);
     try {
       const res = await fetch(`${API}/random-show`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.showdate) { setQuery(''); setResults([]); await loadShow(data.showdate); }
-      else showError(data.error || `Random show returned no date.`);
-    } catch (err) { showError(`Random show: ${err.message}`); }
-    finally { setRandomizing(false); }
+      if (data.showdate) {
+        setSlotTargetDate(data.showdate);
+        setQuery('');
+        setResults([]);
+        // Delay actual load until slot animation completes (~2.4s)
+        setTimeout(async () => {
+          await loadShow(data.showdate);
+          setSlotTargetDate(null);
+          setRandomizing(false);
+        }, 2400);
+      } else {
+        showError(data.error || 'Random show returned no date.');
+        setRandomizing(false);
+      }
+    } catch (err) {
+      showError(`Random show: ${err.message}`);
+      setRandomizing(false);
+    }
   };
 
   const getAudioForSong = (songName) => audioTracks[songName?.toLowerCase().trim()] || null;
 
   const updateRating = (songName, field, value) => {
+    // Gate behind auth — unauthenticated users get login prompt
+    if (!isAuthed) {
+      onAuthRequired();
+      return;
+    }
     // If user taps a star and hasn't declared attendance, intercept and prompt
     if (field === 'rating' && !attendanceType) {
       setPendingRating({ key: songName, field, value });
@@ -409,52 +433,99 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
           </button>
         </div>
-        <div className="era-filter-dropdowns">
-          <select
-            className="era-select"
-            value={selectedYear}
-            onChange={e => {
-              setSelectedYear(e.target.value);
-              setSelectedMonth('');
-              if (e.target.value) {
-                setQuery(e.target.value);
-                setCurrentShow(null);
-              } else {
-                setQuery('');
-              }
-            }}
-          >
-            <option value="">ALL YEARS</option>
-            {[...Array(new Date().getFullYear() - 1983 + 1)].map((_, i) => {
-              const yr = String(new Date().getFullYear() - i);
-              if (['2005','2006','2007'].includes(yr)) return null;
-              return <option key={yr} value={yr}>{yr}</option>;
-            })}
-          </select>
-          <select
-            className="era-select"
-            value={selectedMonth}
-            disabled={!selectedYear}
-            onChange={e => {
-              setSelectedMonth(e.target.value);
-              if (e.target.value && selectedYear) {
-                setQuery(`${selectedYear}-${e.target.value}`);
-              } else {
-                setQuery(selectedYear);
-              }
-              setCurrentShow(null);
-            }}
-          >
-            <option value="">ALL MONTHS</option>
-            {['01','02','03','04','05','06','07','08','09','10','11','12'].map((m, i) => (
-              <option key={m} value={m}>{['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][i]}</option>
+        {/* Era quick-filter — eras first, then year drill-down */}
+        <div style={{ marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            {[
+              { label: 'ALL', value: '' },
+              { label: "'83–'92", value: 'early', years: ['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992'] },
+              { label: "'93–'00", value: 'classic', years: ['1993','1994','1995','1996','1997','1998','1999','2000'] },
+              { label: "1.0", value: '1.0', years: ['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004'] },
+              { label: "3.0", value: '3.0', years: ['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'] },
+            ].map(era => (
+              <button
+                key={era.value}
+                onClick={() => {
+                  if (!era.value) { setQuery(''); setSelectedYear(''); setSelectedMonth(''); setCurrentShow(null); return; }
+                  if (era.years) {
+                    // Filter allShows to this era inline
+                    const filtered = allShows.filter(s => era.years.includes(s.showdate?.slice(0,4)));
+                    setResults(filtered.slice(0,50));
+                    setQuery('__era__');
+                    setSelectedYear('');
+                    setSelectedMonth('');
+                    setCurrentShow(null);
+                  }
+                }}
+                style={{
+                  background: selectedYear === era.value ? 'rgba(255,102,0,0.12)' : 'transparent',
+                  border: `1px solid ${selectedYear === era.value ? 'rgba(255,102,0,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                  color: selectedYear === era.value ? 'var(--orange)' : 'rgba(255,255,255,0.45)',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '0.52rem',
+                  letterSpacing: '1.5px',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                }}
+              >{era.label}</button>
             ))}
-          </select>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'].map(yr => (
+              <button
+                key={yr}
+                onClick={() => {
+                  const isActive = selectedYear === yr;
+                  if (isActive) { setSelectedYear(''); setQuery(''); setCurrentShow(null); }
+                  else { setSelectedYear(yr); setSelectedMonth(''); setQuery(yr); setCurrentShow(null); }
+                }}
+                style={{
+                  background: selectedYear === yr ? 'rgba(0,224,208,0.1)' : 'transparent',
+                  border: `1px solid ${selectedYear === yr ? 'rgba(0,224,208,0.5)' : 'rgba(255,255,255,0.07)'}`,
+                  color: selectedYear === yr ? 'var(--cyan)' : 'rgba(255,255,255,0.3)',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '0.46rem',
+                  letterSpacing: '1px',
+                  padding: '4px 8px',
+                  cursor: 'pointer',
+                  minWidth: 36,
+                  textAlign: 'center',
+                }}
+              >{yr.slice(2)}</button>
+            ))}
+          </div>
+          {selectedYear && (
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
+              {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn, i) => {
+                const padded = String(i+1).padStart(2,'0');
+                return (
+                  <button
+                    key={mn}
+                    onClick={() => {
+                      const isActive = selectedMonth === padded;
+                      if (isActive) { setSelectedMonth(''); setQuery(selectedYear); setCurrentShow(null); }
+                      else { setSelectedMonth(padded); setQuery(`${selectedYear}-${padded}`); setCurrentShow(null); }
+                    }}
+                    style={{
+                      background: selectedMonth === padded ? 'rgba(51,255,51,0.1)' : 'transparent',
+                      border: `1px solid ${selectedMonth === padded ? 'rgba(51,255,51,0.4)' : 'rgba(255,255,255,0.07)'}`,
+                      color: selectedMonth === padded ? 'var(--green)' : 'rgba(255,255,255,0.3)',
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '0.46rem',
+                      letterSpacing: '1px',
+                      padding: '4px 8px',
+                      cursor: 'pointer',
+                    }}
+                  >{mn}</button>
+                );
+              })}
+            </div>
+          )}
         </div>
         {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
-              {query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
+              {query === '__era__' ? `${results.length} shows in this era` : query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
             </div>
             <div className="results-list">
               {results.map(show => (
@@ -475,11 +546,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
       {loadingShow && <div className="loading">LOADING SETLIST FROM PHISH.NET...</div>}
 
       {!loadingShow && !currentShow && (
-        <div style={{ padding: '60px 20px', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 2 }}>
-          <div style={{ fontSize: '1.4rem', marginBottom: 12 }}>◈</div>
-          SHOW NOT FOUND
-          <div style={{ fontSize: '0.52rem', marginTop: 8, color: 'rgba(51,255,51,0.3)' }}>This show may not be in the Phreezer database yet.</div>
-        </div>
+        <ShowSlotMachine
+          onRandomClick={handleRandom}
+          randomizing={randomizing}
+          targetDate={slotTargetDate}
+        />
       )}
 
       {currentShow && !loadingShow && (
@@ -725,7 +796,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               <div className="submit-section">
                 <button
                   className={`btn-primary btn-submit ${saved ? 'btn-saved' : ''}`}
-                  onClick={submitRatings} disabled={submitting || saved}
+                  onClick={() => { if (!isAuthed) { onAuthRequired(); return; } submitRatings(); }} disabled={submitting || saved}
                 >
                   {submitting ? 'SAVING...' : saved ? '✓ RATINGS SAVED' : 'SAVE RATINGS'}
                 </button>
