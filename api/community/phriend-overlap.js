@@ -49,11 +49,10 @@ export default async function handler(req, res) {
     JOIN their_shows t ON t.show_date = m.show_date
     LEFT JOIN shows s ON s.show_date::text = m.show_date
     LEFT JOIN (
-      SELECT show_date::text, venue, city, state
+      SELECT DISTINCT ON (show_date::text) show_date::text AS show_date, venue, city, state
       FROM attendance
       WHERE venue IS NOT NULL
-      ORDER BY imported_at DESC
-      LIMIT 1
+      ORDER BY show_date::text, imported_at DESC
     ) a ON a.show_date = m.show_date
     LEFT JOIN (
       SELECT show_date::text, AVG(rating)::numeric(4,2) AS overall_rating
