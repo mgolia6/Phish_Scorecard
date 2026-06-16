@@ -1416,3 +1416,14 @@ select option { background: var(--bg); color: var(--green); }
   .expand-toggle { font-size: 0.52rem; }
   .sec-label { font-size: 0.58rem; }
 }
+
+/* ── COMMUNITY CARD DESKTOP EXTRAS ──────────────────── */
+.desktop-card-stats { display: none !important; }
+
+@media (min-width: 769px) {
+  .desktop-card-stats {
+    display: flex !important;
+    align-items: center;
+    gap: 0;
+  }
+}
