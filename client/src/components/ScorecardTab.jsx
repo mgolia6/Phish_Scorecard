@@ -610,10 +610,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         {!currentShow && <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 10, marginBottom: 4 }}>
           {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
         </button>}
-                {!currentShow && !loadingShow && results.length > 0 && (
+                {!currentShow && !loadingShow && results.length > 0 && (query.trim() || query === '__filter__' || query === '__era__') && (
           <>
             <div className="results-header">
-              {(query === '__era__' || query === '__filter__') ? `${results.length} shows match` : query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
+              {(query === '__era__' || query === '__filter__') ? `${results.length} shows match` : `${results.length} result${results.length !== 1 ? 's' : ''}`}
             </div>
             <div className="results-list">
               {results.map(show => (
