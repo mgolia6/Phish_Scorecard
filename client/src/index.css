@@ -1429,7 +1429,7 @@ select option { background: var(--bg); color: var(--green); }
 
 @media (min-width: 769px) {
   .desktop-card-stats {
-    display: flex !important;
+    display: flex;
     align-items: center;
     gap: 0;
   }
@@ -1455,4 +1455,12 @@ select option { background: var(--bg); color: var(--green); }
 
   /* Leaderboard rows bigger on desktop */
   .leaderboard-row .leaderboard-user { font-size: 0.92rem !important; }
+}
+
+/* ── SHOW MASTHEAD RIGHT PANEL — desktop only ── */
+.show-masthead-right { display: none; }
+@media (min-width: 769px) {
+  .show-masthead-right { display: flex; }
+  /* On mobile, masthead goes single column */
+  .show-masthead { grid-template-columns: 1fr !important; }
 }
