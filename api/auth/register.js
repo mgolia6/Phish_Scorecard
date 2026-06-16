@@ -71,8 +71,12 @@ export default async function handler(req, res) {
       [user.id, token, expires]
     );
 
-    // Send verification email — fire and forget, don't block registration response
-    sendVerificationEmail(email, token).catch(err => console.error('Email send failed:', err));
+    // Send verification email — log key presence and full error for debugging
+    const keyPresent = !!process.env.PHREEZER_RESEND_API_KEY;
+    console.log('[register] PHREEZER_RESEND_API_KEY present:', keyPresent);
+    sendVerificationEmail(email, token)
+      .then(() => console.log('[register] Verification email sent OK to:', email))
+      .catch(err => console.error('[register] Email send FAILED:', err?.message || err, 'Stack:', err?.stack));
 
     // Return needs_verification instead of a session token
     res.status(201).json({ needs_verification: true, email });
@@ -80,4 +84,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
-
