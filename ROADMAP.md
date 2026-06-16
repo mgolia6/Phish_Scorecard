@@ -1,179 +1,92 @@
-# Phreezer — Roadmap
+# ROADMAP
 
-## Target: Beta launch to Phish.net community. Phish summer tour starts July 7.
-## Last updated: 2026-06-17
-
----
-
-## BETA SUCCESS CRITERIA
-
-**Beta is done when all three are true:**
-- **50 registered users** with verified email addresses
-- **500 shows rated** (aggregate across all users)
-- **14 consecutive days** with no P0 bugs (app down, data loss, auth broken, security issue)
-
-**P0 definition:** App is unreachable · User data is lost or corrupted · Auth is bypassed or broken · Security vulnerability actively exploited
+## Beta Launch Criteria
+- 50 registered users
+- 500 shows rated  
+- 14 consecutive days with no P0 bugs
+- Target: before July 7 summer tour start
 
 ---
 
-## SHIPPED ✅
+## ✅ COMPLETED THIS SESSION (2026-06-16)
 
-### Core App
-- JWT auth, bcrypt passwords, show rating/tracking
-- Phish.net import (attendance + reviews), attended/rated toggles
-- Scorecard as full-screen overlay with ◀ BACK
-- Smart default tab (returning users land on My Shows)
-- Avatar tap → ProfileModal
+### Crashes / P0
+- Fixed `selectedDow is not defined` crash on scorecard (missing useState)
+- Fixed `donations is not defined` crash on Top Venues/Songs expand (two occurrences)
+- Fixed `setState during render` in filter IIFE → proper useEffect
+- Fixed `__filter__` leaking into search input display
+- Fixed shows API ignoring `?limit=2000` param (was always returning 20 shows)
+- Fixed DesktopLanding apostrophe JSX build errors (x3)
+- Fixed EbenezerRail dead space when logged out (flexShrink:0)
 
-### Security / Auth
-- Email verification — register sends email, login hard-blocks unverified (MIKE SAID NO screen)
-- Rate limiting — login (10/15min), register (5/60min) per IP
-- CORS locked to phreezer.mpgink.com
-- Explicit HS256 algorithm in JWT sign + verify
-- Disposable email blocklist
-- All 45 API handlers updated for origin-aware CORS
-
-### Analytics + Error Monitoring
-- Sentry client + server ✅ ACTIVE
-- Posthog ✅ ACTIVE
-- analytics.js — 20+ named events
-
-### Email System
-- Onboarding, Day 3/7/30 nudge, milestone emails
-- Daily cron at 2pm UTC
-- email_log table prevents duplicates
-
-### Privacy Policy
-- PrivacyModal.jsx — plain-language, retro styled
-
-### Onboarding Tour
-- 9-step centered modal, server-side tour_completed flag
-
-### Shop + Donations
-- Shop tab in ProfileModal — 3 Etsy listings
-- Mockingbird Foundation donation tracker
-- Etsy OAuth built — pending Etsy app review
-
-### AI Usage Logging
-- ai_usage_log table, admin AI USAGE tab
-
-### Admin Panel
-- USERS, SYSTEM, API, EXTERNAL, AI USAGE, ERRORS, FEEDBACK, DONATIONS, MONITORING tabs
-
-### Audio
-- Audio proxy endpoint + InlineAudioPlayer ✅ UAT confirmed
-
-### Scorecard
-- Song card redesign (column layout mobile) ✅ UAT confirmed
-- Notes auto-expanding textarea ✅ UAT confirmed
-- **Attendance type mandatory** — prompt modal on first star tap (2026-06-17) ✅
-
-### Community
-- Leaderboard, Top Shows, Top Songs, Top Venues, Top States
-- Mockingbird donation banner
-
-### Phriend Overlap (2026-06-17) ✅
-- Autocomplete dropdown with attendance-based suggestions
-- Suggestions union attendance + Phish.net import + ratings
-- Tap to select, no handle memorization required
-- Fixed column name bug + dual-table blind spot
-
-### Phish Phreeze Feed (2026-06-17) ✅
-- `PhreezeFeed.jsx` component
-- Posts API: GET (paginated, category-filtered) + POST
-- Replies API: GET + POST
-- React (upvote toggle) API
-- Tables: posts, post_replies, post_reactions (auto-created on first request)
-- Categories: GENERAL / SHOW / SONG / VENUE / FEEDBACK
-- FEED is first/default COMMUNITY subtab
-- Sidebar updated
-
-### Entry animation (2026-06-17) ✅
-- Terminal boot sequence replaces particle fireworks
-- 8-line rotating Phish joke pool (2 picked per login)
-- 5.8s runtime, tap to skip
-
-### Forum Post
-- Posted 2026-06-15 ✅
-- First real users signed up same day ✅
-
-### Email Verification (fixed 2026-06-16) ✅
-### Admin Panel improvements (2026-06-16) ✅
-### Error handling audit (2026-06-16) ✅
-### Wrap protocol overhaul (2026-06-16) ✅
+### Features
+- DesktopLanding as own `home` tab (not tied to scorecard)
+- Sidebar logo click → home for logged-out users
+- ShowSlotMachine — 3-reel animation on RANDOM SHOW
+- Scorecard browse without login (auth gate on star/submit only)
+- Filter system: ERA/YEAR/MONTH/DAY/DOW — stacked, all independent
+  - Desktop: full button grid (YEAR 10×4, MONTH 6×2, DAY 8×4, DOW 4×2)
+  - Mobile: 4 independent dropdowns with terminal styling
+  - ERA 2×2 grid with big labels
+  - Match count orange box + CLEAR ALL
+  - Filters collapse when show loads
+- Companion system (show_companions table, API, mutual detection)
+- Phriend Overlap: companion buttons, mutual state, venue fallback, tap-to-rate
+- Phriend Overlap logged-out gate (⚇ icon, login CTA)
+- PHRIEND OVERLAP moved to #2 after FEED in sidebar + mobile
+- Pinned Ebenezer post system (columns, seed endpoint, badge, orange border)
+- Feed pinned post copy: "We are still workshopping this new song..."
+- Boot sequence: centered, large fonts, breathing space, snowflake
+- Error boundary: ALL React errors now show Mike Says No (not Ebenezer)
+- Desktop logo updated from Canva (white text, transparent bg)
+- Snowflake asset updated from Canva
+- Show masthead desktop data panel (reviews, raters, phriends, score)
+- Community card extra stats on desktop (raters, show count, total ratings)
+- Desktop font scale-up (community rows, cards, KPIs, result items)
+- Desktop filter CSS gating (desktop-filter-block / mobile-filter-block)
 
 ---
 
-## PENDING / IN PROGRESS
+## 🔴 OPEN — NEXT SESSION PRIORITIES
 
-### Etsy OAuth Integration
-- Built and ready — pending Etsy developer app review
+### P0 — Must fix before beta
+- **Ebenezer post showing as mpgink not Uncle Ebenezer** — the seed inserts with admin user_id, need to either: (a) create a dedicated system user for Ebenezer, or (b) store author_label and override username display in feed. Feed currently shows `post.username` even when `author_label` is set — the display logic needs to check `author_label` first and render it differently (different color, no avatar initials from username).
+- **Rate limiting on auth endpoints** — still top security priority before launch
 
-### GitHub Repo — Make Private
-- Matthew to do in GitHub Settings → Danger Zone tomorrow
+### P1 — Desktop layout pass (BIG session)
+- **Global font bump** — everything is too small on desktop. Need systematic 1.2–1.4× scale across: feed posts, profile modal, feedback modal, community cards, top shows/songs/venues/states rows, scorecard results, show masthead, setlist rows, attendance buttons, notes.
+- **Feed built for mobile** — reply/upvote buttons not visible on desktop. Need desktop layout: wider post body, buttons visible inline not hidden.
+- **Profile modal built for mobile** — on desktop should be a wider panel (700–900px), not a narrow mobile modal. Tabs should be horizontal, font larger.
+- **Feedback modal too small** — font up, modal wider on desktop.
+- **Delete mpgink's earlier weaker feed post** — the one about "early communal feedback." Admin delete via DB or admin panel.
 
----
+### P2 — Community card data expansion (desktop)
+- **Top Shows**: currently has rater count. ADD: song count, set count, set lengths, day of week the show fell on.
+- **Top Songs**: remove duplicate ratings display. ADD: times played total, times played by set (Set 1 / Set 2 / Encore), average slot in set, first/last played date.
+- **Top Venues**: ADD: total shows at venue, number of users who attended (Phreezer + Phish.net deduped estimate), "I WAS THERE" / "I RATED" tag per logged-in user, day-of-week breakdown (what day are shows at this venue most often).
+- **Top States**: similar treatment — show count, top venue in state, day-of-week breakdown.
+- All extra stats desktop-only via `.desktop-card-stats` class pattern already in place.
 
-## OPEN BUGS / DEBT
+### P3 — My Section desktop pass
+- Profile modal → desktop panel (wider, bigger fonts, better tab layout)
+- Stats page: same data expansion treatment as community cards
+- Attendance history: use desktop space better
 
-- Feed: no moderation UI in admin panel yet (soft delete exists in DB)
-- Feed: no reply notifications
-- Top Shows blank until more community ratings exist (data problem)
-- Deep Phreeze new data fields won't populate until users run full sync
-- In-memory rate limiter: less effective across multiple Vercel instances
-- Dual attendance table pattern — other queries may have same blind spot (companions, deep-phreeze era data, etc.)
-- Frontend error messages: some still show raw API error strings
-
----
-
-## PROJECT MANAGEMENT PRIORITIES
-
-### 🔴 IMMEDIATE
-1. **Monitor** — signups, errors (Sentry), usage (Posthog), Feed posts
-2. **Feed moderation** — admin surface to soft-delete posts/replies
-3. **Attendance query audit** — other endpoints that join on attendance for dual-table blind spot
-
-### 🟠 WEEK 1 POST-LAUNCH
-4. **Enable GitHub Issues** — Matthew flips switch in repo settings
-5. **Etsy OAuth activation** — once Etsy approves
-6. **Watch for STTF reply**
-
-### 🟡 MONTH 1
-7. **In-App Changelog** — "What's New" modal on version bump
-8. **Feature Flags** — feature_flags table, admin toggle
-9. **Backup / Disaster Recovery** — document Neon recovery, verify PITR
-10. **Data Retention Policy** — define before 1000 users
-11. **Feed notifications** — reply alerts
-
----
-
-## POST-LAUNCH (after beta stabilizes)
-
-- Desktop logo — Matthew to deliver Canva version
-- Middle section desktop expansion
-- Scheduled phish.net sync via Vercel cron
-- Tour grouping in My Shows
-- Export ratings to CSV
-- Jam chart filter in setlist view
-- Live show mode
-- More Etsy listings as created
-- Feed: category filtering, user profile pages, pinned posts, mod tools
+### P4 — Pre-launch checklist
+- Fix Sentry DSN (org ID malformed in VITE_SENTRY_DSN env var)
+- GoDaddy DNS for phreezer.mpgink.com in Resend
+- Email triggers: welcome, onboarding nudge, show rating reminder
+- iOS Safari UAT pass
+- Publish Phish.net community forum post (drafted, held)
+- Rate limiting on /api/auth/* endpoints
 
 ---
 
 ## Architecture Notes
-
-- **phish.in**: fail gracefully, audio proxy via /api/audio/stream
-- **phish.net API v5**: artistid=1 filter mandatory
-- **Neon**: Never direct connect from Claude env
-- **GitHub token**: Rotates each session
-- **Vercel**: list_deployments requires projectId AND teamId
-- **CSS**: Always pull full file, rewrite clean, push. Never append
-- **JSX**: CSS property names are camelCase
-- **Postgres**: posKey consistently — never mix keys in ratings map
-- **SaveCelebration**: onDone must be a ref, not inline
-- **vercel.json**: Every new API route must be explicitly added before catch-all
-- **ProfileModal**: return must be wrapped in fragment
-- **Feed tables**: auto-created via CREATE TABLE IF NOT EXISTS — no separate migration needed
-- **Attendance suggestions**: union all three sources (user_show_attendance + attendance + ratings)
-- **Boot joke pool**: in Celebrations.jsx JOKE_LINES array — add new lines there
+- Shows loaded once on mount (?limit=2000), all filtering client-side — no API spam
+- `desktop-filter-block` / `mobile-filter-block` CSS classes gate filter UI per breakpoint
+- `desktop-card-stats` class shows extra metrics only on desktop (≥769px)
+- Error boundary in main.jsx → Mike Says No for ALL React render errors
+- API try/catch errors → Mike Says No via showError()
+- Pinned Ebenezer post: seed via POST /api/admin/seed-ebenezer (admin only, re-seeds on every call)
+- Show companions table: show_companions (user_id, companion_id, show_date)
