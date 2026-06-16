@@ -1378,3 +1378,41 @@ select option { background: var(--bg); color: var(--green); }
   .desktop-filter-block { display: none; }
   .mobile-filter-block  { display: block; }
 }
+
+/* ── DESKTOP GLOBAL FONT SCALE ──────────────────────── */
+@media (min-width: 769px) {
+  /* Base body text larger on desktop */
+  html, body { font-size: 16px; }
+
+  /* Community page rows */
+  .mini-bar-name  { font-size: 1rem; }
+  .mini-bar-val   { font-size: 0.92rem; }
+  .leaderboard-user { font-size: 1rem; }
+  .leaderboard-avg  { font-size: 0.92rem; }
+  .leaderboard-stat { font-size: 0.82rem; }
+  .lb-username { font-size: 1rem; }
+  .lb-val      { font-size: 0.88rem; }
+
+  /* Result items in scorecard */
+  .result-date  { font-size: 1.05rem; }
+  .result-venue { font-size: 1rem; }
+  .result-location { font-size: 0.88rem; }
+
+  /* Show cards */
+  .show-card-datestr { font-size: 1.1rem; }
+  .show-card-venue   { font-size: 1.05rem; }
+  .show-venue-v2     { font-size: 1rem; }
+
+  /* Inner rows in expanded cards */
+  .inner-row-date  { font-size: 0.92rem; }
+  .inner-row-venue { font-size: 0.76rem; }
+  .inner-row-score { font-size: 0.95rem; }
+
+  /* KPI values */
+  .kpi-value { font-size: 2rem; }
+  .kpi-label { font-size: 0.65rem; }
+
+  /* Expand toggle */
+  .expand-toggle { font-size: 0.52rem; }
+  .sec-label { font-size: 0.58rem; }
+}
