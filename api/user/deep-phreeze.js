@@ -14,6 +14,7 @@ export default async function handler(req, res) {
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
   const pool = getPool();
+  try {
   const result = await pool.query(
     `SELECT stats, computed_at FROM user_stats WHERE user_id = $1`,
     [user.id]
@@ -26,4 +27,9 @@ export default async function handler(req, res) {
     stats: result.rows[0].stats,
     computed_at: result.rows[0].computed_at,
   });
+
+  } catch (err) {
+    console.error('[deep-phreeze] DB error:', err.message);
+    return res.status(500).json({ error: 'Failed to load stats' });
+  }
 }
