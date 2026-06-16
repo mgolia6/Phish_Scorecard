@@ -595,11 +595,22 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   </div>
                 </div>
 
-                {/* CLEAR — far right, vertically centered */}
+                {/* MATCH COUNT + CLEAR — far right, stacked vertically, readable */}
                 {hasFilters && (
-                  <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', alignSelf:'stretch', paddingTop:18 }}>
-                    <span style={{ fontFamily:'var(--font-display)', fontSize:'0.52rem', color:'var(--cyan)', letterSpacing:'1.5px', writingMode:'vertical-rl', transform:'rotate(180deg)', opacity:0.8 }}>{pool.length} MATCH</span>
-                    <button onClick={clearAll} style={{ background:'transparent', border:'1px solid rgba(255,80,80,0.45)', color:'rgba(255,100,100,0.8)', fontFamily:'var(--font-display)', fontSize:'0.44rem', letterSpacing:'1.5px', padding:'5px 8px', cursor:'pointer', whiteSpace:'nowrap' }}>✕ CLEAR</button>
+                  <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8, alignSelf:'stretch', paddingTop:18 }}>
+                    <div style={{
+                      background:'rgba(0,224,208,0.08)', border:'1px solid rgba(0,224,208,0.35)',
+                      padding:'8px 10px', textAlign:'center', minWidth:60,
+                    }}>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1rem', color:'var(--cyan)', lineHeight:1, textShadow:'0 0 10px rgba(0,224,208,0.5)' }}>{pool.length}</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.34rem', color:'rgba(0,224,208,0.6)', letterSpacing:'1.5px', marginTop:3 }}>SHOWS</div>
+                    </div>
+                    <button onClick={clearAll} style={{
+                      background:'transparent', border:'1px solid rgba(255,80,80,0.45)',
+                      color:'rgba(255,100,100,0.85)', fontFamily:'var(--font-display)',
+                      fontSize:'0.44rem', letterSpacing:'1.5px', padding:'6px 8px',
+                      cursor:'pointer', whiteSpace:'nowrap', width:'100%',
+                    }}>✕ CLEAR</button>
                   </div>
                 )}
 
