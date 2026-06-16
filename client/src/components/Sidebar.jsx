@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, onFeedback, expanded, setExpanded }) {
+export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, onFeedback, expanded, setExpanded, onGoHome }) {
 
   const myPhreezerItems = [
     { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', authRequired: true },
@@ -55,6 +55,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
               alt="The Phreezer"
               className="sidebar-logo-img-expanded"
               onClick={() => {
+                if (!user) { onGoHome && onGoHome(); return; }
                 if (!user?.is_admin) return;
                 const now = Date.now();
                 if (!window._logoTaps) window._logoTaps = [];
@@ -65,7 +66,13 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
               style={{ cursor: user?.is_admin ? 'pointer' : 'default' }}
             />
           ) : (
-            <img src="/assets/phreezer-snowflake.png" alt="Phreezer" className="sidebar-logo-img-collapsed" />
+            <img
+              src="/assets/phreezer-snowflake.png"
+              alt="Phreezer"
+              className="sidebar-logo-img-collapsed"
+              onClick={() => !user && onGoHome && onGoHome()}
+              style={{ cursor: !user ? 'pointer' : 'default' }}
+            />
           )}
         </div>
 
