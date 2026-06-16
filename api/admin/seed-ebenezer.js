@@ -16,30 +16,27 @@ export default async function handler(req, res) {
     await pool.query(`ALTER TABLE posts ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT FALSE`);
     await pool.query(`ALTER TABLE posts ADD COLUMN IF NOT EXISTS author_label VARCHAR(50)`);
 
-    // Check if Ebenezer post already exists
-    const existing = await pool.query(
-      `SELECT id FROM posts WHERE author_label = 'Uncle Ebenezer' AND pinned = TRUE LIMIT 1`
-    );
-    if (existing.rows.length > 0) {
-      return res.json({ message: 'Ebenezer post already exists', id: existing.rows[0].id });
-    }
+    // Delete existing pinned post so we can re-seed with updated copy
+    await pool.query(`DELETE FROM posts WHERE author_label = 'Uncle Ebenezer' AND pinned = TRUE`);
 
-    const body = `WELCOME TO THE PHREEZE FEED.
+    const body = `We are still workshopping this new song.
 
-This is where the community lives. Use it.
+You know that moment in a show when they drop into something that does not have a name yet? Everyone in the room knows it is happening. Nobody is sure where it is going. That is where we are with Phreezer right now.
 
-HOW IT WORKS:
-→ Post about shows, songs, venues, or whatever is rattling around in your head
-→ Use the category buttons to tag your post (SHOW, SONG, VENUE, FEEDBACK, GENERAL)
-→ ▲ to upvote posts you agree with or want to see more of
-→ Reply to start a thread
+This is beta. The setlist is being written in real time. Expect some noodling. Expect some false starts. Expect a version of this that is better next time you check in.
 
-A few ground rules from your host:
-◈ Keep it about the music. Debates are fine. Personal shots are not.
-◈ If you went to a show, tell us about it. That is what this is for.
-◈ Phish.net exists for reviews. This is for the stuff between the notes.
+While we figure it out, here is what this place is for:
 
-Rate shows. Track your run. Find out who you were standing next to in 1997.
+→ POST about shows, songs, venues, moments, debates, whatever is living rent-free in your head
+→ TAG your post so people can find it — SHOW, SONG, VENUE, FEEDBACK, or just GENERAL
+→ ▲ anything that earns it. This is the upvote, not the participation trophy.
+→ REPLY to start a thread. Disagree with someone. Be right about it.
+
+One rule from me: keep it about the music. Everything else follows from that.
+
+Rate the shows. Track your run. Find out who was standing three people to your left at MSG on New Year's Eve 1995.
+
+We are still in the jam. Stay in the room.
 
 — Uncle Ebenezer`;
 
