@@ -564,9 +564,28 @@ function UsersTab({ api, showError }) {
         </div>
       )}
 
-      <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '2px', marginBottom: 12 }}>
-        {users.length} REGISTERED USER{users.length !== 1 ? 'S' : ''}
-      </div>
+      {/* KPI bar */}
+      {(() => {
+        const total    = users.length;
+        const verified = users.filter(u => u.email_verified).length;
+        const rated    = users.filter(u => parseInt(u.shows_rated) > 0).length;
+        const linked   = users.filter(u => u.phishnet_username).length;
+        return (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 16 }}>
+            {[
+              { val: total,    lbl: 'TOTAL',    col: D.cyan },
+              { val: verified, lbl: 'VERIFIED', col: D.green },
+              { val: rated,    lbl: 'RATED',    col: D.orange },
+              { val: linked,   lbl: '.NET LINKED', col: D.cyan },
+            ].map(({ val, lbl, col }) => (
+              <div key={lbl} style={{ padding: '10px 4px', background: 'rgba(0,0,0,0.4)', borderTop: `2px solid ${col}`, textAlign: 'center' }}>
+                <div style={{ fontFamily: D.disp, fontSize: '1.4rem', color: col, lineHeight: 1 }}>{val}</div>
+                <div style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {users.map(u => (
