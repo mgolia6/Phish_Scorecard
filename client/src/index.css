@@ -1278,40 +1278,35 @@ select option { background: var(--bg); color: var(--green); }
 
 
 
-/* ── DESKTOP FONT SCALE-UP ───────────────────────────── */
-@media (min-width: 769px) {
-  /* Container — use the space */
-  .container { max-width: 100%; padding: 20px 28px; }
-
-  /* Tab navigation */
-  .tab-btn { font-size: 0.8rem !important; padding: 12px 24px !important; letter-spacing: 3px !important; }
-  .sub-tab-btn { font-size: 0.68rem !important; padding: 9px 18px !important; }
-
-  /* Marquee bigger on desktop */
-  .marquee-track { font-size: 0.85rem; letter-spacing: 3px; }
-
-  /* Hide floating ASK button on desktop — rail handles it */
-  .ebenezer-float-btn { display: none !important; }
-
-  /* Move feedback button so it doesn't overlap profile */
-  .passive-feedback-btn {
-    bottom: 200px;
-    left: 0 !important;
-    transform: none !important;
-    right: auto !important;
-    border-radius: 0 4px 4px 0;
-  }
-}
+/* desktop font scale-up — consolidated into DESKTOP ENHANCEMENTS above */
 
 
 /* ── DESKTOP ENHANCEMENTS ────────────────────────────── */
 @media (min-width: 769px) {
-  .container { max-width: 100%; padding: 20px 28px; }
+  .container { max-width: 100%; width: 100%; padding: 20px 36px; box-sizing: border-box; }
   .tab-btn { font-size: 0.8rem !important; padding: 12px 24px !important; letter-spacing: 3px !important; }
   .sub-tab-btn { font-size: 0.68rem !important; padding: 9px 18px !important; }
   .marquee-track { font-size: 0.85rem; letter-spacing: 3px; }
   .ebenezer-float-btn { display: none !important; }
   .passive-feedback-btn { bottom: 16px; left: 50%; transform: translateX(-50%); right: auto; }
+
+  /* Main area fills all available space */
+  .desktop-layout .main-area { flex: 1; min-width: 0; overflow-x: hidden; }
+
+  /* Community content full width on desktop */
+  .community-content { width: 100%; }
+
+  /* KPI grid — more columns on desktop */
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Leaderboard rows wider */
+  .leaderboard-row { grid-template-columns: 32px 1fr auto auto auto; gap: 16px; padding: 13px 16px; }
+  .leaderboard-row .leaderboard-user { font-size: 0.95rem; }
+  .leaderboard-row .leaderboard-avg  { font-size: 0.88rem; }
+
+  /* Show rows on community pages */
+  .mini-bar-name { font-size: 0.92rem; }
+  .mini-bar-val  { font-size: 0.88rem; }
 }
 
 /* ── DESKTOP SONG ROW FIX ────────────────────────────── */
