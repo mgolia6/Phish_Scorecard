@@ -24,33 +24,41 @@ export default async function handler(req, res) {
   if (!targetRes.rows.length) return res.status(404).json({ error: 'User not found' });
   const target = targetRes.rows[0];
 
-  // Shows both attended
+  // Shows both attended — union user_show_attendance + phish.net attendance table for both sides
   const overlapRes = await pool.query(`
+    WITH my_shows AS (
+      SELECT show_date FROM user_show_attendance
+        WHERE user_id = $1 AND attendance_type = 'attended'
+      UNION
+      SELECT show_date FROM attendance WHERE user_id = $1
+    ),
+    their_shows AS (
+      SELECT show_date FROM user_show_attendance
+        WHERE user_id = $2 AND attendance_type = 'attended'
+      UNION
+      SELECT show_date FROM attendance WHERE user_id = $2
+    )
     SELECT
-      a.show_date,
+      m.show_date,
       s.venue,
       s.city,
       s.state,
       ur.overall_rating AS my_score,
       tr.overall_rating AS their_score
-    FROM user_show_attendance a
-    JOIN user_show_attendance b
-      ON b.show_date = a.show_date
-      AND b.attendance_type = 'attended'
-      AND b.user_id = $2
-    LEFT JOIN shows s ON s.show_date = a.show_date
+    FROM my_shows m
+    JOIN their_shows t ON t.show_date = m.show_date
+    LEFT JOIN shows s ON s.show_date = m.show_date
     LEFT JOIN (
       SELECT show_date, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $1
       GROUP BY show_date
-    ) ur ON ur.show_date = a.show_date
+    ) ur ON ur.show_date = m.show_date
     LEFT JOIN (
       SELECT show_date, AVG(rating)::numeric(4,2) AS overall_rating
       FROM ratings WHERE user_id = $2
       GROUP BY show_date
-    ) tr ON tr.show_date = a.show_date
-    WHERE a.user_id = $1 AND a.attendance_type = 'attended'
-    ORDER BY a.show_date DESC
+    ) tr ON tr.show_date = m.show_date
+    ORDER BY m.show_date DESC
   `, [user.id, target.id]);
 
   const shows = overlapRes.rows;
