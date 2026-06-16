@@ -56,13 +56,10 @@ const API_PROBES = [
   { name: 'FEEDBACK / SUBMIT',   path: '/api/feedback/submit',          method: 'GET', expectError: true },
 ];
 
-// External API health probes — these hit third-party services directly
-const EXTERNAL_PROBES = [
-  { name: 'PHISH.NET API',  url: 'https://api.phish.net/v5/shows/recent.json?apikey=&limit=1', label: 'Phish.net' },
-  { name: 'PHISH.IN API',   url: 'https://phish.in/api/v2/shows?per_page=1', label: 'Phish.in' },
-  { name: 'ANTHROPIC API',  url: 'https://api.anthropic.com/v1/models', label: 'Anthropic', expectApiKey: true },
-  { name: 'RESEND API',     url: 'https://api.resend.com/emails', label: 'Resend', expectError: true },
-];
+// External API health probes
+// Phish.in — direct (public, CORS-friendly)
+// Phish.net / Anthropic / Resend — proxied through /api/admin/health (require server-side keys)
+const PHISHIN_PROBE = { name: 'PHISH.IN API', url: 'https://phish.in/api/v2/shows?per_page=1' };
 
 function ApiHealthTab() {
   const [results, setResults] = useState([]);
@@ -673,27 +670,56 @@ function ExternalApiHealthTab() {
 
   const runProbes = useCallback(async () => {
     setRunning(true);
-    const fresh = EXTERNAL_PROBES.map(p => ({ ...p, status: 'pending', ms: null, statusCode: null }));
-    setResults(fresh);
+    const token = localStorage.getItem('phish_token');
+
+    // Seed pending state for 4 services
+    const names = ['PHISH.NET API', 'PHISH.IN API', 'ANTHROPIC API', 'RESEND API'];
+    const fresh = names.map(name => ({ name, status: 'pending', ms: null, statusCode: null }));
+    setResults([...fresh]);
     const updated = [...fresh];
 
-    await Promise.all(EXTERNAL_PROBES.map(async (probe, i) => {
+    // Server-side probe (Phish.net, Anthropic, Resend)
+    const serverProbe = (async () => {
       const t0 = Date.now();
       try {
-        const res = await fetch(probe.url, {
-          method: 'GET',
-          signal: AbortSignal.timeout(8000),
+        const res = await fetch('/api/admin/health', {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(10000),
         });
-        const ms = Date.now() - t0;
-        // 401/403 means the service is up but rejected us — that's fine, means it's alive
-        const ok = res.status < 500;
-        updated[i] = { ...probe, status: ok ? (ms > 3000 ? 'slow' : 'ok') : 'error', ms, statusCode: res.status };
+        const body = await res.json();
+        const elapsed = Date.now() - t0;
+        const map = { 'PHISH.NET API': body.phishnet, 'ANTHROPIC API': body.anthropic, 'RESEND API': body.resend };
+        for (const [name, result] of Object.entries(map)) {
+          const idx = updated.findIndex(r => r.name === name);
+          if (idx === -1 || !result) continue;
+          const ms = result.ms ?? elapsed;
+          updated[idx] = { ...updated[idx], status: result.ok ? (ms > 3000 ? 'slow' : 'ok') : 'error', ms, statusCode: result.status };
+          setResults([...updated]);
+        }
       } catch (e) {
-        updated[i] = { ...probe, status: 'error', ms: Date.now() - t0, statusCode: null, err: e.message };
+        ['PHISH.NET API', 'ANTHROPIC API', 'RESEND API'].forEach(name => {
+          const idx = updated.findIndex(r => r.name === name);
+          if (idx !== -1) { updated[idx] = { ...updated[idx], status: 'error', ms: null }; }
+        });
+        setResults([...updated]);
+      }
+    })();
+
+    // Direct probe — Phish.in (public, no key)
+    const phishinProbe = (async () => {
+      const t0 = Date.now();
+      const idx = updated.findIndex(r => r.name === 'PHISH.IN API');
+      try {
+        const res = await fetch(PHISHIN_PROBE.url, { signal: AbortSignal.timeout(8000) });
+        const ms = Date.now() - t0;
+        updated[idx] = { ...updated[idx], status: res.status < 500 ? (ms > 3000 ? 'slow' : 'ok') : 'error', ms, statusCode: res.status };
+      } catch (e) {
+        updated[idx] = { ...updated[idx], status: 'error', ms: Date.now() - t0 };
       }
       setResults([...updated]);
-    }));
+    })();
 
+    await Promise.all([serverProbe, phishinProbe]);
     setLastRun(new Date());
     setRunning(false);
   }, []);
