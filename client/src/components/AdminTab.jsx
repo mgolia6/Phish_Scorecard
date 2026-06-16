@@ -390,6 +390,24 @@ function SystemTab({ api, showMessage }) {
           fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '15px',
           border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer',
         }}>{working === 'migrate' ? 'RUNNING...' : '⚙ RUN MIGRATIONS'}</button>
+
+        <button
+          onClick={async () => {
+            setWorking('seed-badges');
+            try {
+              const res = await fetch('/api/admin/seed-founder-badges', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const d = await res.json();
+              if (d.ok) alert(`Badges assigned:\n${d.assigned.map(u => `#${u.rank} ${u.username} → ${u.badge}`).join('\n')}`);
+              else alert('Error: ' + JSON.stringify(d));
+            } catch (e) { alert('Failed: ' + e.message); }
+            finally { setWorking(null); }
+          }}
+          disabled={working === 'seed-badges'}
+          style={{ fontFamily: D.fontDisplay, fontSize: '0.48rem', letterSpacing: '2px', padding: '10px 18px', background: 'transparent', border: `1px solid ${D.orange}`, color: D.orange, cursor: 'pointer', opacity: working === 'seed-badges' ? 0.4 : 1, marginTop: 8 }}
+        >{working === 'seed-badges' ? 'SEEDING...' : '⬡ SEED FOUNDER BADGES'}</button>
         <button onClick={clearCache} disabled={!!working} style={{
           fontFamily: D.disp, fontSize: '0.5rem', letterSpacing: '2px', padding: '13px',
           border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer',
