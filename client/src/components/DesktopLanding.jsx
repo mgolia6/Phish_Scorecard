@@ -44,9 +44,9 @@ export function DesktopLanding({ onLogin }) {
         marginBottom: 48,
       }}>
         {[
-          { glyph: '★', label: 'RATE SHOWS', sub: 'Song-by-song ratings for every show you've seen' },
+          { glyph: '★', label: 'RATE SHOWS', sub: "Song-by-song ratings for every show you've seen" },
           { glyph: '◉', label: 'TRACK YOUR RUN', sub: 'Import your attendance history from Phish.net' },
-          { glyph: '⚇', label: 'FIND PHRIENDS', sub: 'See who you've shared setlists with without knowing' },
+          { glyph: '⚇', label: 'FIND PHRIENDS', sub: "See who you've shared setlists with without knowing" },
         ].map(({ glyph, label, sub }) => (
           <div key={label} style={{
             padding: '20px 16px',
