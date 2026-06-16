@@ -242,6 +242,100 @@ function BadgesTab({ api, user }) {
   );
 }
 
+
+function AITab() {
+  const D = {
+    cyan: 'var(--cyan)',
+    orange: 'var(--orange)',
+    green: 'var(--green)',
+    muted: 'var(--text-muted)',
+    label: 'var(--text-label)',
+    mono: 'var(--font-mono)',
+    display: 'var(--font-display)',
+    panel: 'var(--bg-panel)',
+    border: 'var(--border)',
+  };
+
+  const features = [
+    {
+      icon: '◈',
+      color: D.orange,
+      title: 'ASK EBENEZER',
+      where: 'Floating button — available on every show',
+      what: 'A conversational agent with deep knowledge of Phish history, eras, setlists, and key jams. Ask him about a show, a tour, a song, or what to listen to next. He has access to your attended shows and ratings and will reference them when relevant.',
+      loop: 'You ask. He responds. You decide what to do with it. He never rates shows on your behalf, never modifies your data, and never has access to any other user\'s information.',
+    },
+    {
+      icon: '✦',
+      color: D.cyan,
+      title: 'VIBE CHECK',
+      where: 'Show masthead — loads automatically when you open a show',
+      what: 'Reads publicly available Phish.net community reviews for a show and generates a structured summary: what the community said, what stood out, what the consensus was. Results are cached so the same show doesn\'t regenerate on every visit.',
+      loop: 'The source is public community reviews — not your ratings, not our data. You see the summary. You form your own opinion. Then you rate.',
+    },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+      {/* Header */}
+      <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
+        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>◈ AI IN THE PHREEZER</div>
+        <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 10px' }}>
+          Two AI features. Both have a clear job. Neither makes decisions for you.
+        </p>
+        <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: 0 }}>
+          The principle is simple: your ratings are yours. AI can inform, contextualize, and add personality — but it does not touch your data, influence your scores, or operate without you in the loop.
+        </p>
+      </div>
+
+      {/* Feature cards */}
+      {features.map((f, i) => (
+        <div key={i} style={{ borderLeft: `3px solid ${f.color}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: `${f.color}05` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: f.color, textShadow: `0 0 16px ${f.color}66` }}>{f.icon}</span>
+            <div>
+              <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: f.color, letterSpacing: '2.5px' }}>{f.title}</div>
+              <div style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.muted, marginTop: 2 }}>{f.where}</div>
+            </div>
+          </div>
+          <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>{f.what}</p>
+          <div style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${f.color}22`, borderLeft: `2px solid ${f.color}66`, padding: '10px 12px' }}>
+            <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: f.color, letterSpacing: '2px', marginBottom: 5, opacity: 0.7 }}>HUMAN IN THE LOOP</div>
+            <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, margin: 0 }}>{f.loop}</p>
+          </div>
+        </div>
+      ))}
+
+      {/* Principles */}
+      <div style={{ borderLeft: '3px solid rgba(51,255,51,0.4)', padding: '20px 16px', background: 'rgba(51,255,51,0.02)' }}>
+        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>◈ WHAT WE DON'T DO</div>
+        {[
+          'No AI-generated ratings. Every score in this app came from a human.',
+          'No recommendation engine shaping what you see or rate next.',
+          'No user data shared between sessions or used to train models.',
+          'No black box. Both features have a defined scope and stay in it.',
+          'No AI that operates without you explicitly asking it to.',
+        ].map((line, i) => (
+          <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+            <span style={{ color: 'var(--green)', fontFamily: D.mono, fontSize: '0.75rem', flexShrink: 0, marginTop: 1 }}>—</span>
+            <span style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.7 }}>{line}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Model disclosure */}
+      <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>MODEL</div>
+        <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7 }}>
+          Powered by Claude (Anthropic). Prompts are designed to keep responses grounded in Phish-specific knowledge and user context. Ebenezer does not have access to the internet, other users, or anything outside what you and the show record provide.
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
   const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
   const [showPrivacy, setShowPrivacy] = React.useState(false);
@@ -317,7 +411,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         </div>
         {/* Section tabs */}
         <div className="profile-modal-tabs">
-          {[['phish','MY PHISH'],['badges','BADGES'],['about','ABOUT'],['shop','SHOP']].map(([k,l]) => (
+          {[['phish','MY PHISH'],['badges','BADGES'],['about','ABOUT'],['ai','AI'],['shop','SHOP']].map(([k,l]) => (
             <button key={k} onClick={() => setSec(k)}
               className={`profile-modal-tab ${sec === k ? 'active' : ''}`}>{l}</button>
           ))}
@@ -556,6 +650,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           )}
 
           {/* ── SHOP TAB ── */}
+          {sec === 'ai' && <AITab />}
           {sec === 'shop' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 0 40px' }}>
 
