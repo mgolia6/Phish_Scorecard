@@ -25,6 +25,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [pendingRating, setPendingRating] = useState(null); // { key, field, value }
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedEra, setSelectedEra] = useState('');
   const [phriends, setPhriends] = useState({ tagged: [], also_attended: [] });
   const [phriendInput, setPhriendInput] = useState('');
   const [phriendLoading, setPhriendLoading] = useState(false);
@@ -66,9 +68,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
     if (spinnerTimerRef.current) clearTimeout(spinnerTimerRef.current);
     setShowSpinner(false);
 
-    if (!query.trim()) {
+    if (!query.trim() && !selectedYear && !selectedMonth && !selectedDay && !selectedEra) {
       setResults(allShows.slice(0, 20));
-      if (!selectedYear) { setSelectedYear(''); setSelectedMonth(''); }
       return;
     }
     if (query.trim().length < 2) { setResults([]); return; }
@@ -429,98 +430,186 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             />
             {showSpinner && <span className="search-spinner">◈</span>}
           </div>
-          <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow}>
-            {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
-          </button>
+
         </div>
-        {/* ── DATE FILTER — three columns: ERA | YEAR | MONTH ── */}
-        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '180px 1fr 120px', gap: 16, alignItems: 'start' }}>
+        {/* ── DATE FILTERS — stacked, all independent ── */}
+        {(() => {
+          // Compute filtered pool from all active filters (independent — any combo works)
+          const eraYears = selectedEra ? {'1.0': ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'], '2.0': ['2002', '2003', '2004'], '3.0': ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'], '4.0': ['2021', '2022', '2023', '2024', '2025']}[selectedEra] || [] : null;
+          const filteredPool = allShows.filter(s => {
+            const yr = s.showdate?.slice(0,4);
+            const mo = s.showdate?.slice(5,7);
+            const dy = s.showdate?.slice(8,10);
+            if (eraYears && !eraYears.includes(yr)) return false;
+            if (selectedYear && yr !== selectedYear) return false;
+            if (selectedMonth && mo !== selectedMonth) return false;
+            if (selectedDay && dy !== selectedDay.padStart(2,'0')) return false;
+            return true;
+          });
+          // Years available given era filter
+          const availableYears = eraYears
+            ? ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'].filter(y => eraYears.includes(y))
+            : ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+          // Months available given year+era
+          const yearPool = allShows.filter(s => {
+            const yr = s.showdate?.slice(0,4);
+            if (eraYears && !eraYears.includes(yr)) return false;
+            if (selectedYear && yr !== selectedYear) return false;
+            return true;
+          });
+          const availableMonths = new Set(yearPool.map(s => s.showdate?.slice(5,7)));
+          // Days available given year+month+era
+          const monthPool = yearPool.filter(s => !selectedMonth || s.showdate?.slice(5,7) === selectedMonth);
+          const availableDays = new Set(monthPool.map(s => s.showdate?.slice(8,10)));
 
-          {/* ERA column */}
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '3px', marginBottom: 8 }}>ERA</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {[
-                { label: 'ALL', sub: '', value: '', years: null },
-                { label: '1.0', sub: '1983–2000', value: '1.0', years: ['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000'] },
-                { label: '2.0', sub: '2002–2004', value: '2.0', years: ['2002', '2003', '2004'] },
-                { label: '3.0', sub: '2009–2020', value: '3.0', years: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'] },
-                { label: '4.0', sub: '2021–NOW',  value: '4.0', years: ['2021', '2022', '2023', '2024', '2025'] },
-              ].map(era => {
-                const eraActive = era.value
-                  ? (era.years?.includes(selectedYear) || (query === '__era__' && !selectedYear))
-                  : (!selectedYear && query !== '__era__');
-                return (
-                  <button key={era.value} onClick={() => {
-                    if (!era.value) { setQuery(''); setSelectedYear(''); setSelectedMonth(''); setCurrentShow(null); return; }
-                    const filtered = allShows.filter(s => era.years.includes(s.showdate?.slice(0,4)));
-                    setResults(filtered.slice(0, 100));
-                    setQuery('__era__'); setSelectedYear(''); setSelectedMonth(''); setCurrentShow(null);
-                  }} style={{
-                    background: eraActive ? 'rgba(255,102,0,0.1)' : 'transparent',
-                    border: `1px solid ${eraActive ? 'rgba(255,102,0,0.55)' : 'rgba(255,255,255,0.08)'}`,
-                    color: eraActive ? 'var(--orange)' : 'rgba(255,255,255,0.4)',
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '0.58rem', letterSpacing: '1.5px',
-                    padding: '10px 12px', cursor: 'pointer', textAlign: 'left', width: '100%',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}>
-                    <span>{era.label}</span>
-                    {era.sub && <span style={{ fontSize: '0.44rem', opacity: 0.6, letterSpacing: '0.5px' }}>{era.sub}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          const hasFilters = selectedEra || selectedYear || selectedMonth || selectedDay;
 
-          {/* YEAR grid */}
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(255,255,255,0.25)', letterSpacing: '3px', marginBottom: 8 }}>YEAR</div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {['1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'].map(yr => (
-                <button key={yr} onClick={() => {
-                  const isActive = selectedYear === yr;
-                  if (isActive) { setSelectedYear(''); setSelectedMonth(''); setQuery(''); setCurrentShow(null); }
-                  else { setSelectedYear(yr); setSelectedMonth(''); setQuery(yr); setCurrentShow(null); }
-                }} style={{
-                  background: selectedYear === yr ? 'rgba(0,224,208,0.12)' : 'transparent',
-                  border: `1px solid ${selectedYear === yr ? 'rgba(0,224,208,0.6)' : 'rgba(255,255,255,0.08)'}`,
-                  color: selectedYear === yr ? 'var(--cyan)' : 'rgba(255,255,255,0.35)',
-                  fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px',
-                  padding: '8px 10px', cursor: 'pointer', minWidth: 46, textAlign: 'center',
-                }}>'{yr.slice(2)}</button>
-              ))}
-            </div>
-          </div>
+          const clearAll = () => {
+            setSelectedEra(''); setSelectedYear(''); setSelectedMonth(''); setSelectedDay('');
+            setQuery(''); setCurrentShow(null); setResults(allShows.slice(0,20));
+          };
 
-          {/* MONTH column — filters to only months with actual shows */}
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: selectedYear ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)', letterSpacing: '3px', marginBottom: 8 }}>MONTH</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn, i) => {
-                const padded = String(i+1).padStart(2,'0');
-                const hasShows = selectedYear && allShows.some(s => s.showdate?.startsWith(selectedYear + '-' + padded));
-                if (selectedYear && !hasShows) return null;
-                const isActive = selectedMonth === padded;
-                return (
-                  <button key={mn} disabled={!selectedYear} onClick={() => {
-                    const active = selectedMonth === padded;
-                    if (active) { setSelectedMonth(''); setQuery(selectedYear); setCurrentShow(null); }
-                    else { setSelectedMonth(padded); setQuery(selectedYear + '-' + padded); setCurrentShow(null); }
-                  }} style={{
-                    background: isActive ? 'rgba(51,255,51,0.1)' : 'transparent',
-                    border: `1px solid ${isActive ? 'rgba(51,255,51,0.5)' : selectedYear ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}`,
-                    color: isActive ? 'var(--green)' : selectedYear ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)',
-                    fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '2px',
-                    padding: '8px 10px', cursor: selectedYear ? 'pointer' : 'not-allowed',
-                    width: '100%', textAlign: 'left',
-                  }}>{mn}</button>
-                );
-              })}
+          // Apply filters to results whenever they change
+          if (hasFilters && !currentShow) {
+            const q = query.trim();
+            if (!q || q === '__era__' || /^\d{4}/.test(q)) {
+              // Sync results to filtered pool
+              setTimeout(() => setResults(filteredPool.slice(0, 100)), 0);
+            }
+          }
+
+          return (
+            <div style={{ marginTop: 14, marginBottom: 4 }}>
+
+              {/* Header row with CLEAR */}
+              {hasFilters && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'var(--cyan)', letterSpacing: '2px' }}>
+                    {filteredPool.length} SHOWS MATCH
+                  </div>
+                  <button onClick={clearAll} style={{
+                    background: 'transparent', border: '1px solid rgba(255,51,51,0.4)',
+                    color: 'rgba(255,51,51,0.7)', fontFamily: 'var(--font-display)',
+                    fontSize: '0.5rem', letterSpacing: '2px', padding: '4px 10px', cursor: 'pointer',
+                  }}>✕ CLEAR</button>
+                </div>
+              )}
+
+              {/* ROW 1: ERAS */}
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px', marginBottom: 6 }}>ERA</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {[
+                    { label: '1.0', sub: '1983–2000', value: '1.0' },
+                    { label: '2.0', sub: '2002–2004', value: '2.0' },
+                    { label: '3.0', sub: '2009–2020', value: '3.0' },
+                    { label: '4.0', sub: '2021–NOW',  value: '4.0' },
+                  ].map(era => {
+                    const active = selectedEra === era.value;
+                    return (
+                      <button key={era.value} onClick={() => {
+                        setSelectedEra(active ? '' : era.value);
+                        setSelectedYear(''); setSelectedMonth(''); setSelectedDay('');
+                        setCurrentShow(null);
+                      }} style={{
+                        background: active ? 'rgba(255,102,0,0.12)' : 'transparent',
+                        border: `1px solid ${active ? 'rgba(255,102,0,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                        color: active ? 'var(--orange)' : 'rgba(255,255,255,0.45)',
+                        fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '2px',
+                        padding: '8px 18px', cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'center',
+                      }}>
+                        <span>{era.label}</span>
+                        <span style={{ fontSize: '0.48rem', opacity: 0.6 }}>{era.sub}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ROW 2: YEARS — 8 cols, filtered by era */}
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px', marginBottom: 6 }}>YEAR</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: 5, justifyContent: 'start' }}>
+                  {availableYears.map(yr => {
+                    const active = selectedYear === yr;
+                    return (
+                      <button key={yr} onClick={() => {
+                        setSelectedYear(active ? '' : yr);
+                        setSelectedMonth(''); setSelectedDay(''); setCurrentShow(null);
+                        if (!active) setQuery(yr); else setQuery(selectedEra ? '__era__' : '');
+                      }} style={{
+                        background: active ? 'rgba(0,224,208,0.15)' : 'transparent',
+                        border: `1px solid ${active ? 'rgba(0,224,208,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                        color: active ? 'var(--cyan)' : 'rgba(255,255,255,0.4)',
+                        fontFamily: 'var(--font-display)', fontSize: '0.65rem', letterSpacing: '1px',
+                        padding: '8px 12px', cursor: 'pointer', minWidth: 52, textAlign: 'center',
+                      }}>'{yr.slice(2)}</button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ROW 3: MONTH + DAY side by side */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 16, alignItems: 'start' }}>
+
+                {/* MONTH — 4x3 grid */}
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px', marginBottom: 6 }}>MONTH</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto)', gap: 5 }}>
+                    {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn, i) => {
+                      const padded = String(i+1).padStart(2,'0');
+                      const available = availableMonths.has(padded);
+                      const active = selectedMonth === padded;
+                      return (
+                        <button key={mn} onClick={() => {
+                          if (!available) return;
+                          setSelectedMonth(active ? '' : padded);
+                          setSelectedDay(''); setCurrentShow(null);
+                        }} style={{
+                          background: active ? 'rgba(51,255,51,0.12)' : 'transparent',
+                          border: `1px solid ${active ? 'rgba(51,255,51,0.6)' : available ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
+                          color: active ? 'var(--green)' : available ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.12)',
+                          fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px',
+                          padding: '8px 10px', cursor: available ? 'pointer' : 'default', textAlign: 'center',
+                        }}>{mn}</button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* DAY — 8x4 grid (1-31) */}
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '3px', marginBottom: 6 }}>DAY</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: 5, justifyContent: 'start' }}>
+                    {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
+                      const padded = d.padStart(2,'0');
+                      const available = availableDays.has(padded);
+                      const active = selectedDay === d;
+                      return (
+                        <button key={d} onClick={() => {
+                          if (!available) return;
+                          setSelectedDay(active ? '' : d);
+                          setCurrentShow(null);
+                        }} style={{
+                          background: active ? 'rgba(255,102,0,0.12)' : 'transparent',
+                          border: `1px solid ${active ? 'rgba(255,102,0,0.6)' : available ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)'}`,
+                          color: active ? 'var(--orange)' : available ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)',
+                          fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '0.5px',
+                          padding: '7px 8px', cursor: available ? 'pointer' : 'default',
+                          minWidth: 36, textAlign: 'center',
+                        }}>{d}</button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        {!currentShow && !loadingShow && results.length > 0 && (
+          );
+        })()}
+        <button className="btn-random" onClick={handleRandom} disabled={randomizing || loadingShow} style={{ marginTop: 14, marginBottom: 4 }}>
+          {randomizing ? '◈ SUMMONING...' : '⚄ RANDOM SHOW'}
+        </button>
+                {!currentShow && !loadingShow && results.length > 0 && (
           <>
             <div className="results-header">
               {query === '__era__' ? `${results.length} shows in this era` : query.trim() ? `${results.length} result${results.length !== 1 ? 's' : ''}` : 'Recent shows — tap to load'}
