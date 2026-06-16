@@ -322,20 +322,22 @@ export default function App() {
             {renderMain()}
           </div>
         </div>
-      <div data-tour="ebenezer" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-      <EbenezerRail
-          history={ebenHistory}
-          setHistory={setEbenHistory}
-          loading={ebenLoading}
-          setLoading={setEbenLoading}
-          error={ebenError}
-          setError={setEbenError}
-          input={ebenInput}
-          setInput={setEbenInput}
-          railOpen={ebenRailOpen}
-          setRailOpen={setEbenRailOpen}
-        />
-      </div>
+      {user && (
+        <div data-tour="ebenezer" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+          <EbenezerRail
+            history={ebenHistory}
+            setHistory={setEbenHistory}
+            loading={ebenLoading}
+            setLoading={setEbenLoading}
+            error={ebenError}
+            setError={setEbenError}
+            input={ebenInput}
+            setInput={setEbenInput}
+            railOpen={ebenRailOpen}
+            setRailOpen={setEbenRailOpen}
+          />
+        </div>
+      )}
       </div>
 
       {/* MOBILE LAYOUT: original header + tabs */}
