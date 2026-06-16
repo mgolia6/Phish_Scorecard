@@ -139,6 +139,109 @@ export function BadgesSection({ api }) {
 // ============================================================
 // PROFILE MODAL — launched from avatar (Phase 1)
 // ============================================================
+
+// ── BADGE METADATA ──────────────────────────────────────────
+const BADGE_META = {
+  phab_phive: {
+    icon: '⬡',
+    color: 'var(--orange)',
+    label: 'PHAB PHIVE',
+    desc: 'One of the first five Phreezers. Were here before anyone knew what this was.',
+  },
+  early_phreeze: {
+    icon: '◈',
+    color: 'var(--cyan)',
+    label: 'EARLY PHREEZE',
+    desc: 'Founding member. Showed up early and helped shape the room.',
+  },
+  milestone_5: {
+    icon: '✦',
+    color: 'var(--green)',
+    label: '5 SHOWS RATED',
+    desc: 'Rated 5 shows. You\'re in it.',
+  },
+  milestone_25: {
+    icon: '✦',
+    color: 'var(--cyan)',
+    label: '25 SHOWS RATED',
+    desc: 'Rated 25 shows. Serious Phreezer.',
+  },
+  milestone_50: {
+    icon: '✦',
+    color: 'var(--orange)',
+    label: '50 SHOWS RATED',
+    desc: 'Rated 50 shows. This is your thing now.',
+  },
+};
+
+function BadgesTab({ api, user }) {
+  const [badges, setBadges] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!user?.id) { setLoading(false); return; }
+    api.get(`/users/badges?user_id=${user.id}`)
+      .then(d => setBadges(d.badges || []))
+      .catch(() => setBadges([]))
+      .finally(() => setLoading(false));
+  }, [user?.id]);
+
+  if (loading) return (
+    <div style={{ padding: '32px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+      LOADING...
+    </div>
+  );
+
+  if (!badges.length) return (
+    <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
+      <div style={{ fontSize: '2.5rem', opacity: 0.2 }}>⬡</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '3px' }}>NO BADGES YET</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)', lineHeight: 1.7 }}>
+        Rate shows, stay active, and badges will find you.
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 4 }}>
+        ◈ YOUR BADGES — {badges.length}
+      </div>
+      {badges.map(b => {
+        const meta = BADGE_META[b.badge_key] || { icon: '◉', color: 'var(--green)', label: b.badge_label, desc: '' };
+        return (
+          <div key={b.badge_key} style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '14px 16px',
+            background: `${meta.color}08`,
+            border: `1px solid ${meta.color}33`,
+            borderLeft: `3px solid ${meta.color}`,
+          }}>
+            <div style={{
+              width: 48, height: 48, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.6rem', color: meta.color,
+              textShadow: `0 0 20px ${meta.color}88`,
+              border: `1px solid ${meta.color}33`,
+              background: `${meta.color}0d`,
+            }}>
+              {meta.icon}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: meta.color, letterSpacing: '2.5px', marginBottom: 4 }}>
+                {meta.label}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+                {meta.desc}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
   const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
   const [showPrivacy, setShowPrivacy] = React.useState(false);
@@ -349,7 +452,8 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           )}
 
           {/* ── BADGES TAB ── */}
-          {sec === 'badges' && (
+          {sec === 'badges' && <BadgesTab api={api} user={user} />}
+          {sec === 'badges_placeholder' && (
             <BadgesSection api={api} />
           )}
 
