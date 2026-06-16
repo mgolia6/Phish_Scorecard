@@ -12,38 +12,31 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
       textAlign: 'center',
     }}>
 
-      {/* Real snowflake logo */}
-      <img
-        src="/assets/phreezer-snowflake.png"
-        alt="Phreezer"
-        style={{
-          width: 96,
-          height: 96,
-          objectFit: 'contain',
-          marginBottom: 28,
-          filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.7)) drop-shadow(0 0 48px rgba(0,224,208,0.3))',
-        }}
-      />
-
-      {/* Wordmark */}
+      {/* Logo row: snowflake left + wordmark+tagline right */}
       <div style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: '4.5rem',
-        fontWeight: 900,
-        color: 'var(--cyan)',
-        letterSpacing: '10px',
-        textShadow: '0 0 40px rgba(0,224,208,0.5), 0 0 80px rgba(0,224,208,0.2)',
-        marginBottom: 10,
-        lineHeight: 1,
-      }}>PHREEZER</div>
-
-      <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '1rem',
-        color: 'rgba(51,255,51,0.5)',
-        letterSpacing: '6px',
-        marginBottom: 56,
-      }}>RATE · TRACK · RELIVE</div>
+        display: 'flex', alignItems: 'center', gap: 32, marginBottom: 52,
+      }}>
+        <img
+          src="/assets/phreezer-snowflake.png"
+          alt="Phreezer"
+          style={{
+            width: 160, height: 160,
+            objectFit: 'contain', flexShrink: 0,
+            filter: 'drop-shadow(0 0 30px rgba(0,224,208,0.7)) drop-shadow(0 0 60px rgba(0,224,208,0.25))',
+          }}
+        />
+        <div style={{ textAlign: 'left' }}>
+          <img
+            src="/assets/phreezer-logo.png"
+            alt="PHREEZER"
+            style={{ height: 72, objectFit: 'contain', display: 'block', marginBottom: 8 }}
+          />
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.95rem',
+            color: 'rgba(51,255,51,0.5)', letterSpacing: '5px',
+          }}>RATE · TRACK · RELIVE</div>
+        </div>
+      </div>
 
       {/* Value prop cards — clickable */}
       <div style={{
