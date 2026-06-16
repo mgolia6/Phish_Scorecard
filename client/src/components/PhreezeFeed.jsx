@@ -122,7 +122,7 @@ function PostCard({ post, api, currentUser }) {
           <FeedAvatar initials={post.username} size={36} color={color} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--white)' }}>{post.username}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: '#ffffff' }}>{post.username}</span>
               <span style={{
                 fontFamily: 'var(--font-display)', fontSize: '0.3rem', letterSpacing: '2px',
                 padding: '2px 6px', border: `1px solid ${color}44`, color,
@@ -228,10 +228,10 @@ function ComposeBox({ api, onPosted }) {
     <button onClick={() => setOpen(true)} style={{
       width: '100%', padding: '12px 14px', textAlign: 'left', marginBottom: 14,
       background: 'var(--bg-panel)', border: '1px solid rgba(0,224,208,0.2)',
-      color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--font-mono)',
+      color: 'rgba(255,255,255,0.55)', fontFamily: 'var(--font-mono)',
       fontSize: '0.78rem', cursor: 'pointer',
     }}>
-      + what's on your mind, phreek?
+      + what's on your mind, phan?
     </button>
   );
 
@@ -251,7 +251,7 @@ function ComposeBox({ api, onPosted }) {
       <textarea
         value={body}
         onChange={e => setBody(e.target.value.slice(0, limit))}
-        placeholder="what's on your mind, phreek?"
+        placeholder="what's on your mind, phan?"
         rows={4}
         autoFocus
         style={{
