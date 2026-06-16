@@ -153,7 +153,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
         className="ebenezer-float-btn"
       >
         <span style={{ fontSize: '1.2rem' }}>❄</span>
-        <span style={{ fontSize: '0.48rem', letterSpacing: '2px', fontWeight: 700 }}>ASK</span>
+        <span style={{ fontSize: '0.42rem', letterSpacing: '2px', fontWeight: 700 }}>ASK EBENEZER</span>
       </button>
 
       {/* Drawer */}
