@@ -91,7 +91,7 @@ export function WelcomeCelebration({ username, onDone }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '0 32px',
+        padding: '0 clamp(16px, 4vw, 32px)',
         maxWidth: 720,
         width: '100%',
       }}>
@@ -100,20 +100,21 @@ export function WelcomeCelebration({ username, onDone }) {
           src="/assets/phreezer-snowflake.png"
           alt=""
           style={{
-            width: 90, height: 90,
+            width: 'clamp(56px, 14vw, 90px)',
+            height: 'clamp(56px, 14vw, 90px)',
             objectFit: 'contain',
-            marginBottom: 44,
+            marginBottom: 'clamp(20px, 5vw, 44px)',
             filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
           }}
         />
 
         {/* Boot lines — centered, large, spaced */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(10px, 3vw, 20px)' }}>
           {lines.map((line, i) => (
             visible.includes(i) && (
               <div key={i} style={{
                 fontFamily: line.big ? 'var(--font-display)' : 'var(--font-mono)',
-                fontSize: line.big ? '1.8rem' : line.accent ? '1.15rem' : '1rem',
+                fontSize: line.big ? 'clamp(1.1rem, 4.5vw, 1.8rem)' : line.accent ? 'clamp(0.82rem, 2.8vw, 1.15rem)' : 'clamp(0.7rem, 2.4vw, 1rem)',
                 color: line.big
                   ? 'var(--orange)'
                   : line.accent
@@ -138,7 +139,7 @@ export function WelcomeCelebration({ username, onDone }) {
         {/* Skip hint */}
         {visible.length > 0 && (
           <div style={{
-            marginTop: 56,
+            marginTop: 'clamp(24px, 6vw, 56px)',
             fontFamily: 'var(--font-display)',
             fontSize: '0.42rem',
             color: 'rgba(255,255,255,0.18)',
