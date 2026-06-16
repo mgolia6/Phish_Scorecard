@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       const result = await pool.query(
         `SELECT
           u.id, u.username, u.email, u.first_name, u.is_admin,
-          u.tandc_accepted, u.onboarding_complete,
+          u.tandc_accepted, u.onboarding_complete, u.email_verified,
           TO_CHAR(u.created_at, 'YYYY-MM-DD') as joined,
           COUNT(DISTINCT a.show_date) as shows_attended,
           COUNT(DISTINCT r.show_date) as shows_rated,
