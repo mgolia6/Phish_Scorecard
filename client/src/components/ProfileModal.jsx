@@ -312,7 +312,7 @@ function AITab() {
         <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>◈ WHAT WE DON'T DO</div>
         {[
           'No AI-generated ratings. Every score in this app came from a human.',
-          'No recommendation engine shaping what you see or rate next.',
+          'No algorithmic recommendation engine. Ebenezer will suggest shows when you ask — that's a conversation, not a system working on you in the background.',
           'No user data shared between sessions or used to train models.',
           'No black box. Both features have a defined scope and stay in it.',
           'No AI that operates without you explicitly asking it to.',
