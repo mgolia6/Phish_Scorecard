@@ -1368,3 +1368,13 @@ select option { background: var(--bg); color: var(--green); }
   animation: avatar-pulse 2s ease-in-out infinite;
 }
 
+
+/* ── SCORECARD FILTER GATING ────────────────────────── */
+/* Desktop filter grid — hidden on mobile */
+.desktop-filter-block { display: block; }
+.mobile-filter-block  { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-filter-block { display: none; }
+  .mobile-filter-block  { display: block; }
+}
