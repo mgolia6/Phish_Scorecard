@@ -1,5 +1,60 @@
 # SESSION LOG
 
+## Session: 2026-06-16 Part 2 (Desktop Pass)
+
+### Shipped
+
+**P0 fixes**
+- Ebenezer author_label display fixed in PhreezeFeed — `displayName(post)` helper checks `author_label` first, falls back to `username`. Ebenezer posts now show "Uncle Ebenezer" in orange with matching avatar color.
+- Feed action buttons (▲ react, ◈ replies, + reply) bumped from 0.36rem to 0.42rem and always visible on desktop
+- NewPostBox added to PhreezeFeed — logged-in users can create posts inline (category selector + body + char count)
+- `currentUser` prop threaded through CommunityTab → PhreezeFeed for auth-gated post box
+
+**API upgrades — all 4 community analytics endpoints enhanced**
+- `top-songs.js`: by-set breakdown (set1/set2/encore rating counts + avgs), first/last rated date, unique shows rated, user avg per song (optional auth)
+- `top-shows.js`: song count, set breakdown (S1·S2·Encore counts), day of week, user's own score + delta vs community (optional auth)
+- `top-venues.js`: "I WAS THERE" / "I RATED" tags per logged-in user, weekend DOW breakdown (Fri/Sat/Sun counts), user show count at venue
+- `top-states.js`: coverage % (rated shows / total shows in state from shows table), venue count, total_shows_in_state
+
+**CommunityTab full rewrite**
+- `UserDelta` component: shows user score vs community avg with color-coded delta (orange=above, red=below, green=neutral)
+- Badge prop on CommExpandCard: shows user context chip inline (YOU +0.3, I WAS THERE, I RATED)
+- SetBreakdown pill row: SET 1 / SET 2 / ENCORE count chips with color coding
+- Top Shows: extraStats = RATERS · SONGS · DAY · S1·S2·E breakdown
+- Top Songs: extraStats = RATERS · VERSIONS · HOME SET · FIRST RATED year; first/last rated dates in expanded view; set breakdown pills
+- Top Venues: extraStats = SHOWS · RATERS · RATINGS · DOW; I WAS THERE / I RATED badge; weekend DOW breakdown in expanded view
+- Top States: extraStats = RATED · VENUES · RATERS · COVERAGE%; Phreezer Coverage bar in expanded view
+- CommShowRows: DOW label added inline on each show row
+
+**Desktop CSS pass**
+- Profile modal widened: 560px → 820px on desktop
+- Profile modal tab font bumped: 0.49rem → 0.62rem, padding 10px → 14px
+- Profile modal header/username/email/stat fonts all bumped on desktop
+- `desktop-card-stats` !important removed — was blocking flex display
+- FeedbackModal: maxWidth 480 → 520, textarea font 0.75rem → 0.82rem, minHeight 72 → 80, className for CSS targeting
+- Desktop media query additions: feedback modal wider (640px), body text bumps
+
+### Decisions Made
+- Song duration/avg length deferred — not stored in our DB (no `duration` column on ratings). Will need to store at rating time or pull from Phish.in. Flagged as future analytics surface.
+- "I WAS THERE" for venues queries `user_show_attendance` table — gracefully handles if table doesn't exist (try/catch with fallback). Will silently return false until that table has data.
+- User score delta: optional auth on API — unauthenticated requests just skip user_score/user_delta fields, no error.
+
+### Open Debt Introduced
+- Ebenezer seed still not triggered — need to call POST /api/admin/seed-ebenezer as admin to make pinned post live
+- `user_show_attendance` table join in top-venues.js may be no-op if table is empty — that's fine, will populate as users mark attendance
+- Rate limiting on auth endpoints still P0 — not touched this session
+- Sentry DSN still malformed — not touched this session
+- mpgink weaker feed post still live — needs deletion
+- Desktop font pass is partially done via CSS classes — some inline JSX font sizes still mobile-sized (setlist rows, show masthead stats, notes textarea)
+
+### Next Session Priorities
+1. Trigger Ebenezer seed (1 fetch call from admin console)
+2. Rate limiting on /api/auth/* — P0 before beta
+3. Delete mpgink weaker feed post
+4. Remaining desktop font pass: setlist rows, show masthead, notes textarea, attendance buttons
+5. Sentry DSN fix
+6. Song duration storage — add `duration_seconds` column to ratings, populate from Phish.in setlist data at load time
+
 ## Session: 2026-06-16 (Full Day)
 
 ### Shipped
@@ -28,8 +83,8 @@
 - DesktopLanding as own `home` tab (not tied to scorecard)
 - Logged-out desktop users land on home; scorecard stays clean
 - Sidebar logo click → home for logged-out users
-- Logo: Canva "Copy of Full 1200x300" with white text, transparent bg
-- Snowflake: Canva "The Phreezer full logo" (1024×1536), transparent bg
+- Logo: Canva with white text, transparent bg
+- Snowflake: Canva asset, transparent bg
 - Landing page: single logo asset (snowflake + wordmark baked in), 3 feature cards, CTAs
 
 **Scorecard**
@@ -48,62 +103,26 @@
 
 **Feed / Ebenezer**
 - Pinned post system: `pinned` BOOLEAN + `author_label` VARCHAR(50) columns added to posts
-- `api/admin/seed-ebenezer.js` — seeds pinned Uncle Ebenezer welcome post, deletes and re-inserts
-- Post copy: "We are still workshopping this new song..." (beta energy, stay in the room)
+- `api/admin/seed-ebenezer.js` — seeds pinned Uncle Ebenezer welcome post
 - Feed: pinned posts sort first, orange left border, ❄ PINNED · UNCLE EBENEZER badge
-- KNOWN ISSUE: post displays as mpgink not Uncle Ebenezer — author_label display not wired yet
-- Seed not triggered yet — needs admin console call after deploy
 
 **Error handling**
-- ALL React render errors → Mike Says No (replaced Ebenezer frozen error boundary in main.jsx)
+- ALL React render errors → Mike Says No
 - Mike boundary shows actual error.message + "Mike does not care."
-- Tap anywhere to try again
 
 **Boot sequence**
 - Centered, max-width 720px
 - Snowflake at top with cyan glow
 - Lines: 1rem / 1.15rem / 1.8rem (DON'T SUCK AT PHISH in orange at 1.8rem)
-- 20px gap between lines, 44px above lines, 56px before TAP TO SKIP
 
 **Community cards — desktop extras**
 - CommExpandCard: `extraStats` prop for inline metrics between name and score
-- Top Shows: RATERS · TOTAL RATINGS · VENUE inline
-- Top Venues: SHOWS RATED · RATERS · TOTAL RATINGS inline
-- Top Songs: RATERS · TIMES RATED inline
 - `desktop-card-stats` CSS class: hidden on mobile, flex on desktop ≥769px
 
-**Assets**
-- Both Canva exports grabbed via browser JS → pushed directly to GitHub
-- White background stripped via canvas pixel manipulation
-
-### Decisions Made
-- Filters are client-side only — one fetch on mount (?limit=2000), no API calls per filter interaction
-- ERA is 2×2 not 4×1 to match height of YEAR grid
-- Filter layout: all on one horizontal row (ERA | sep | YEAR | sep | MONTH | sep | DAY | sep | DOW | match box)
-- Day of Week added as a filter — fans care about Sunday shows, Halloween, NYE patterns
-- Error boundary → Mike not Ebenezer (funnier, consistent with app voice)
-- Phriend Overlap is #2 in nav (was last) — it's a key social feature, needs visibility
-- Default show list hidden on scorecard — cleaner, arrow CTA more prominent
-
-### Open Debt Introduced
-- Ebenezer post shows as mpgink username — author_label not overriding display in PhreezeFeed
-- Seed endpoint exists but not triggered — needs: `fetch('/api/admin/seed-ebenezer',{method:'POST',headers:{'Authorization':'Bearer '+localStorage.getItem('phish_token'),'Content-Type':'application/json'}}).then(r=>r.json()).then(console.log)`
-- Sentry DSN still malformed (org ID 16 digits, should be 7) — fix in Vercel env vars
-- `desktop-card-stats` div uses `display: none !important` inline override — fragile, should move to CSS class properly
-- Font sizes on desktop still too small globally — systematic pass deferred to next session
-- Profile modal and feedback modal built for mobile — desktop pass deferred
-- Feed built for mobile — reply/upvote buttons not visible on desktop — deferred
-- mpgink's weaker feed post ("early communal feedback") still live — needs deletion
-
-### Next Session Priorities
-1. Ebenezer post: fix author_label display in PhreezeFeed, trigger seed
-2. Global desktop font pass — systematic 1.2–1.4× scale across all surfaces
-3. Feed desktop layout — wider post body, reply/upvote buttons visible
-4. Profile modal desktop — wider panel (700–900px), larger fonts
-5. Feedback modal — bigger, wider on desktop
-6. Community card data expansion:
-   - Top Shows: song count, set count, day of week
-   - Top Songs: times played, by-set breakdown, avg slot in set, first/last played
-   - Top Venues: total shows, attendance estimates, day-of-week breakdown, "I WAS THERE" tag
-7. Delete mpgink's weaker feed post
-8. Rate limiting on auth endpoints (security)
+### Next Session Priorities (carried from Part 2)
+1. Trigger Ebenezer seed
+2. Rate limiting on auth endpoints (P0)
+3. Delete mpgink weaker feed post
+4. Remaining desktop font pass (setlist rows, masthead, notes)
+5. Sentry DSN fix
+6. Song duration storage foundation
