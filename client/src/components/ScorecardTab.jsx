@@ -20,6 +20,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   const [saved, setSaved] = useState(false);
   const [randomizing, setRandomizing] = useState(false);
   const [attendanceType, setAttendanceType] = useState(null);
+  const [attendancePrompt, setAttendancePrompt] = useState(false); // modal visible
+  const [pendingRating, setPendingRating] = useState(null); // { key, field, value }
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [phriends, setPhriends] = useState({ tagged: [], also_attended: [] });
@@ -232,8 +234,25 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
   };
 
   const getAudioForSong = (songName) => audioTracks[songName?.toLowerCase().trim()] || null;
-  const updateRating = (songName, field, value) =>
+
+  const updateRating = (songName, field, value) => {
+    // If user taps a star and hasn't declared attendance, intercept and prompt
+    if (field === 'rating' && !attendanceType) {
+      setPendingRating({ key: songName, field, value });
+      setAttendancePrompt(true);
+      return;
+    }
     setRatings(prev => ({ ...prev, [songName]: { ...prev[songName], [field]: value } }));
+  };
+
+  const handleAttendancePick = (type) => {
+    setAttendanceType(type);
+    setAttendancePrompt(false);
+    if (pendingRating) {
+      setRatings(prev => ({ ...prev, [pendingRating.key]: { ...prev[pendingRating.key], [pendingRating.field]: pendingRating.value } }));
+      setPendingRating(null);
+    }
+  };
 
   const submitRatings = async () => {
     setSubmitting(true);
@@ -291,6 +310,60 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
   return (
     <div>
+      {/* ── ATTENDANCE PROMPT MODAL ── */}
+      {attendancePrompt && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(0,0,0,0.88)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 24px',
+        }}>
+          <div style={{
+            background: '#0d0d0d',
+            border: '1px solid rgba(255,140,0,0.4)',
+            maxWidth: 360, width: '100%',
+            padding: '28px 24px',
+          }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '3px', color: 'var(--orange)', marginBottom: 8 }}>
+              BEFORE YOU RATE
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 22 }}>
+              How did you experience this show?
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                { value: 'attended', label: '🎸 I WAS THERE', sub: 'Attended in person' },
+                { value: 'webcast', label: '📺 WATCHED WEBCAST', sub: 'Caught the live stream' },
+                { value: 'listened', label: '🎧 HEARD THE RECORDING', sub: 'Listened after the fact' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleAttendancePick(opt.value)}
+                  style={{
+                    background: 'rgba(255,140,0,0.04)',
+                    border: '1px solid rgba(255,140,0,0.3)',
+                    color: 'var(--white)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.82rem',
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.7)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.3)'}
+                >
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', color: 'var(--orange)' }}>{opt.label}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {celebrating && <SaveCelebration onDone={() => {
         setCelebrating(false);
         showMessage(`Saved ${songs.filter(s => ratings[s.posKey || s.song]?.rating).length} ratings`, 'success');
