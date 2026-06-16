@@ -245,96 +245,81 @@ function BadgesTab({ api, user }) {
 
 function AITab() {
   const D = {
-    cyan: 'var(--cyan)',
-    orange: 'var(--orange)',
-    green: 'var(--green)',
-    muted: 'var(--text-muted)',
-    label: 'var(--text-label)',
-    mono: 'var(--font-mono)',
-    display: 'var(--font-display)',
-    panel: 'var(--bg-panel)',
-    border: 'var(--border)',
+    cyan: 'var(--cyan)', orange: 'var(--orange)', green: 'var(--green)',
+    muted: 'var(--text-muted)', label: 'var(--text-label)',
+    mono: 'var(--font-mono)', display: 'var(--font-display)',
   };
-
-  const features = [
-    {
-      icon: '◈',
-      color: D.orange,
-      title: 'ASK EBENEZER',
-      where: 'Floating button — available on every show',
-      what: 'A conversational agent with deep knowledge of Phish history, eras, setlists, and key jams. Ask him about a show, a tour, a song, or what to listen to next. He has access to your attended shows and ratings and will reference them when relevant.',
-      loop: 'You ask. He responds. You decide what to do with it. He never rates shows on your behalf, never modifies your data, and never has access to any other user\'s information.',
-    },
-    {
-      icon: '✦',
-      color: D.cyan,
-      title: 'VIBE CHECK',
-      where: 'Show masthead — loads automatically when you open a show',
-      what: 'Reads publicly available Phish.net community reviews for a show and generates a structured summary: what the community said, what stood out, what the consensus was. Results are cached so the same show doesn\'t regenerate on every visit.',
-      loop: 'The source is public community reviews — not your ratings, not our data. You see the summary. You form your own opinion. Then you rate.',
-    },
-  ];
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-
-      {/* Header */}
       <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
-        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>◈ AI IN THE PHREEZER</div>
-        <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 10px' }}>
-          Two AI features. Both have a clear job. Neither makes decisions for you.
-        </p>
+        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ AI IN THE PHREEZER'}</div>
+        <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>Two features. Both earned their place.</p>
         <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: 0 }}>
-          The principle is simple: your ratings are yours. AI can inform, contextualize, and add personality — but it does not touch your data, influence your scores, or operate without you in the loop.
+          Phreezer is a rating app. Your scores are yours — built from memory, opinion, and however many times you have heard Tweezer go somewhere unexpected. AI does not generate them, suggest them, or nudge them in any direction. What it does is help you think.
         </p>
       </div>
 
-      {/* Feature cards */}
-      {features.map((f, i) => (
-        <div key={i} style={{ borderLeft: `3px solid ${f.color}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: `${f.color}05` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: f.color, textShadow: `0 0 16px ${f.color}66` }}>{f.icon}</span>
-            <div>
-              <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: f.color, letterSpacing: '2.5px' }}>{f.title}</div>
-              <div style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.muted, marginTop: 2 }}>{f.where}</div>
-            </div>
-          </div>
-          <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>{f.what}</p>
-          <div style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${f.color}22`, borderLeft: `2px solid ${f.color}66`, padding: '10px 12px' }}>
-            <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: f.color, letterSpacing: '2px', marginBottom: 5, opacity: 0.7 }}>HUMAN IN THE LOOP</div>
-            <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, margin: 0 }}>{f.loop}</p>
+      <div style={{ borderLeft: `3px solid ${D.orange}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(255,102,0,0.03)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.orange, textShadow: '0 0 16px rgba(255,102,0,0.5)' }}>{'◈'}</span>
+          <div>
+            <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: D.orange, letterSpacing: '2.5px' }}>ASK EBENEZER</div>
+            <div style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.muted, marginTop: 2 }}>Floating button — available on every show page</div>
           </div>
         </div>
-      ))}
+        <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
+          Ebenezer is a conversational agent who knows Phish — the eras, the tours, the jams worth seeking out, the shows that looked unremarkable on paper and turned into something else. He has access to your attended shows and ratings. Ask him what to listen to next. Ask him about a specific night. Ask him why 1997 sounds like that.
+        </p>
+        <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
+          He will recommend shows if you ask. That is a conversation — not a system making decisions about your taste without your input.
+        </p>
+        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: 0 }}>
+          He never touches your ratings, never acts without you asking, and never sees another user{'\''}s data.
+        </p>
+      </div>
 
-      {/* Principles */}
-      <div style={{ borderLeft: '3px solid rgba(51,255,51,0.4)', padding: '20px 16px', background: 'rgba(51,255,51,0.02)' }}>
-        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>◈ WHAT WE DON'T DO</div>
+      <div style={{ borderLeft: `3px solid ${D.cyan}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(0,224,208,0.02)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.cyan, textShadow: '0 0 16px rgba(0,224,208,0.5)' }}>{'✦'}</span>
+          <div>
+            <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: D.cyan, letterSpacing: '2.5px' }}>VIBE CHECK</div>
+            <div style={{ fontFamily: D.mono, fontSize: '0.62rem', color: D.muted, marginTop: 2 }}>On-demand — tap to generate on any show page</div>
+          </div>
+        </div>
+        <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
+          Pulls publicly available Phish.net community reviews for a show and summarizes what the community said — what stood out, what the consensus was, what the room felt like. You request it. First time generates and caches. Every visit after that uses the cached version.
+        </p>
+        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: 0 }}>
+          The source is public community reviews — not your ratings, not our data. You see it. You form your own opinion. Then you rate.
+        </p>
+      </div>
+
+      <div style={{ borderLeft: '3px solid rgba(51,255,51,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(51,255,51,0.02)' }}>
+        <div style={{ fontFamily: D.display, fontSize: '0.52rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ ON RESPONSIBILITY'}</div>
         {[
-          'No AI-generated ratings. Every score in this app came from a human.',
-          'No algorithmic recommendation engine. Ebenezer will suggest shows when you ask — that's a conversation, not a system working on you in the background.',
-          'No user data shared between sessions or used to train models.',
+          'Every rating in this app came from a human. AI commentary is available when you want it and stays out of the way when you do not.',
+          'No algorithm decides what shows surface for you.',
+          'No data from your session trains a model or gets shared with anyone else.',
+          'No AI operates without you explicitly asking it to.',
           'No black box. Both features have a defined scope and stay in it.',
-          'No AI that operates without you explicitly asking it to.',
         ].map((line, i) => (
           <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
-            <span style={{ color: 'var(--green)', fontFamily: D.mono, fontSize: '0.75rem', flexShrink: 0, marginTop: 1 }}>—</span>
+            <span style={{ color: D.green, fontFamily: D.mono, fontSize: '0.75rem', flexShrink: 0, marginTop: 2 }}>—</span>
             <span style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.7 }}>{line}</span>
           </div>
         ))}
       </div>
 
-      {/* Model disclosure */}
-      <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.38rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>MODEL</div>
-        <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7 }}>
-          Powered by Claude (Anthropic). Prompts are designed to keep responses grounded in Phish-specific knowledge and user context. Ebenezer does not have access to the internet, other users, or anything outside what you and the show record provide.
+        <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.75 }}>
+          Powered by Claude (Anthropic). No internet access — knowledge comes from training, not live search. Scoped to Phish history and your personal show data. No access to other users. No live data outside what you and the show record provide.
         </div>
       </div>
-
     </div>
   );
 }
+
 
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
   const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
