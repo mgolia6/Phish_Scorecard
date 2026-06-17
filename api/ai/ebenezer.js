@@ -355,7 +355,7 @@ async function queryTopLongestJams(pool, era = null, limit = 20) {
 async function queryShowFacts(pool, showDate) {
   try {
     const r = await pool.query(`
-      SELECT show_date, venue, city, state, country, tour_name, era
+      SELECT show_date, venue, city, state, country, tour_name, era, pn_rating, pn_num_ratings
       FROM pn_shows WHERE show_date = $1
     `, [showDate]);
     return r.rows[0] || null;
@@ -428,6 +428,11 @@ function formatRichShowContext(showDate, showFacts, teases, guests, reviews) {
     ctx += `\n== SHOW FACTS: ${showDate} ==\n`;
     ctx += `Venue: ${showFacts.venue}, ${showFacts.city}${showFacts.state ? ', ' + showFacts.state : ''}\n`;
     ctx += `Tour: ${showFacts.tour_name || 'unknown'} | Era: ${showFacts.era}\n`;
+    if (showFacts.pn_rating) {
+      ctx += `Phish.net community rating: ${showFacts.pn_rating}/5`;
+      if (showFacts.pn_num_ratings) ctx += ` (${showFacts.pn_num_ratings} votes)`;
+      ctx += `\n`;
+    }
   }
   if (teases.length) {
     ctx += `\nTEASES IN THIS SHOW:\n`;
