@@ -53,7 +53,7 @@ async function ensureSchema(pool) {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-  -- Add rating columns if seeded before this migration
+  // Add rating columns if table was created before this migration was added
   await pool.query(`ALTER TABLE pn_shows ADD COLUMN IF NOT EXISTS pn_rating NUMERIC(4,3)`).catch(() => {});
   await pool.query(`ALTER TABLE pn_shows ADD COLUMN IF NOT EXISTS pn_num_ratings INTEGER DEFAULT 0`).catch(() => {});
 
