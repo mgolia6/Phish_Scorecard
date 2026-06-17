@@ -289,57 +289,6 @@ function ErrorLogTab() {
   );
 }
 
-// ── Tooltip component ──────────────────────────────────────
-function Tooltip({ text, children }) {
-  const [visible, setVisible] = useState(false);
-  return (
-    <div style={{ position: 'relative', display: 'inline-block' }}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-      onTouchStart={() => setVisible(v => !v)}
-    >
-      {children}
-      {visible && (
-        <div style={{
-          position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)',
-          background: '#111', border: '1px solid rgba(0,224,208,0.3)', padding: '8px 12px',
-          fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(0,224,208,0.85)',
-          lineHeight: 1.5, whiteSpace: 'nowrap', zIndex: 999, pointerEvents: 'none',
-          boxShadow: '0 0 12px rgba(0,224,208,0.15)',
-        }}>
-          {text}
-          <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-            width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-            borderTop: '5px solid rgba(0,224,208,0.3)' }} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── ActionButton with tooltip ───────────────────────────────
-function ActionBtn({ label, tooltip, color, working, workingKey, onClick, disabled }) {
-  const isWorking = working === workingKey;
-  return (
-    <Tooltip text={tooltip}>
-      <button
-        onClick={onClick}
-        disabled={isWorking || disabled}
-        style={{
-          fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '2px',
-          padding: '12px 14px', border: `1px solid ${color}`,
-          background: isWorking ? `${color}18` : 'transparent',
-          color, cursor: isWorking || disabled ? 'default' : 'pointer',
-          opacity: isWorking || disabled ? 0.5 : 1, width: '100%', textAlign: 'left',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}
-      >
-        <span>{isWorking ? '◈ WORKING...' : label}</span>
-        <span style={{ fontSize: '0.5rem', color: `${color}66`, fontFamily: 'var(--font-mono)' }}>?</span>
-      </button>
-    </Tooltip>
-  );
-}
 
 // ── System Stats ───────────────────────────────────────────
 function SystemTab({ api, showMessage }) {
@@ -387,7 +336,7 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'migrate',
           label: '⚙ RUN MIGRATIONS',
-          tooltip: 'Run pending DB schema migrations. Safe to run multiple times — skips already-applied ones.',
+          desc: 'Runs any pending database schema changes -- new tables, columns, indexes. Safe to run multiple times; already-applied migrations are skipped. Run this after any deployment that adds new features or if the DB schema seems out of sync.',
           action: async () => {
             setWorking('migrate');
             try {
@@ -402,26 +351,26 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'cache',
           label: '✕ CLEAR SHOW CACHE',
-          tooltip: 'Clears the cached show/setlist data. Shows will re-fetch from Phish.net on next load.',
+          desc: 'Wipes cached setlist and show data from the database. The next time any user loads a show it will be re-fetched fresh from Phish.net. Use this if setlist data looks stale or incorrect.',
           action: () => runAction('cache', '/api/admin/clear-cache'),
         },
       ],
     },
     {
-      group: 'UNCLE EBENEZER',
+      group: 'UNCLE EBENEZER -- KNOWLEDGE BASE',
       color: D.orange,
       items: [
         {
           key: 'seed-phishnet',
           label: '◈ SEED PHISH.NET FULL CATALOG',
-          tooltip: 'Seeds ALL Phish.net data: songs, shows, longest jams, debuts, teases, guests, and fan reviews. Run once — takes 3-5 min. This is what makes Ebenezer a phishphile.',
+          desc: "The big one. Fetches and stores the complete Phish.net dataset: every song with play count, debut date, and current gap; every show with venue, tour, and community rating; longest jams by duration; song debut records; song teases by show; special guests; and thousands of fan-written reviews in their own words. This is what gives Ebenezer real knowledge of the catalog. Run once -- takes 3-5 min. Safe to re-run; all records upsert.",
           action: () => runAction('seed-phishnet', '/api/admin/seed-phishnet', 'GET', (d) => {
             setActionResult({
               title: 'PHISH.NET CATALOG SEEDED',
               lines: [
                 ...(d.results || []).map(r =>
                   r.skipped ? `${r.type}: skipped` :
-                  r.status === 'error' ? `${r.type}: ERROR — ${r.error}` :
+                  r.status === 'error' ? `${r.type}: ERROR - ${r.error}` :
                   `${r.type}: ${r.count} records`
                 ),
                 '',
@@ -433,7 +382,7 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'seed-jamcharts',
           label: '❄ SEED JAMCHART CATALOG',
-          tooltip: 'Fetches ALL Phish.net jamchart entries (~2500) into the DB. Run once. Takes ~30s. Already included in FULL CATALOG seed above.',
+          desc: "Fetches all Phish.net jamchart entries -- community-flagged exceptional jam versions with descriptions written by phans (e.g. 'deep cow funk', 'went fully Type II'). Ebenezer searches these when users ask about specific jam styles. Already included in the full catalog seed above. Run standalone only to refresh jamcharts without re-seeding everything else.",
           action: () => runAction('seed-jamcharts', '/api/admin/seed-jamcharts', 'GET', (d) => {
             setActionResult({ title: 'JAMCHART SEED COMPLETE', lines: [
               `Inserted: ${d.inserted}`,
@@ -445,15 +394,15 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'refresh-jamcharts',
           label: '↺ REFRESH JAMCHARTS',
-          tooltip: 'Fetches the 200 most recent Phish.net jamchart entries and upserts them. Also runs automatically every Monday.',
+          desc: 'Fetches the 200 most recent jamchart entries from Phish.net and upserts them. Picks up newly flagged versions from recent tours. Also runs automatically every Monday at 6am UTC via cron. Tap this to force a manual refresh between scheduled runs.',
           action: () => runAction('refresh-jamcharts', '/api/admin/refresh-jamcharts', 'GET', (d) => {
-            showMessage(`Refreshed — ${d.inserted} new, ${d.updated} updated, ${d.total} total`);
+            showMessage(`Refreshed -- ${d.inserted} new, ${d.updated} updated, ${d.total} total`);
           }),
         },
         {
           key: 'seed-ebenezer',
           label: '◈ SEED EBENEZER POST',
-          tooltip: 'Creates or refreshes the pinned Uncle Ebenezer introduction post in the community feed.',
+          desc: 'Creates or refreshes the pinned Uncle Ebenezer intro post at the top of the community feed. Run this if the pinned post is missing or needs to be recreated after a feed reset.',
           action: () => runAction('seed-ebenezer', '/api/admin/seed-ebenezer'),
         },
       ],
@@ -465,9 +414,9 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'seed-badges',
           label: '⬡ SEED FOUNDER BADGES',
-          tooltip: 'Assigns PHAB PHIVE (users #1-5) and EARLY PHREEZE (users #6-20) badges by signup date. Safe to re-run — picks up newly verified users.',
+          desc: 'Assigns founder badges to the first 20 verified users by signup date. Users #1-5 get PHAB PHIVE. Users #6-20 get EARLY PHREEZE. Safe to re-run -- existing assignments are not duplicated, and newly verified users who qualify will be picked up.',
           action: () => runAction('seed-badges', '/api/admin/seed-founder-badges', 'GET', (d) => {
-            if (d.ok) setActionResult({ title: 'BADGES ASSIGNED', lines: d.assigned.map(u => `#${u.rank} ${u.username} → ${u.badge}`) });
+            if (d.ok) setActionResult({ title: 'BADGES ASSIGNED', lines: d.assigned.map(u => `#${u.rank} ${u.username} -> ${u.badge}`) });
           }),
         },
       ],
@@ -536,30 +485,48 @@ function SystemTab({ api, showMessage }) {
       )}
 
       {ACTIONS.map(group => (
-        <div key={group.group} style={{ marginBottom: 20 }}>
-          <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: group.color, letterSpacing: '3px', marginBottom: 8, opacity: 0.7 }}>
+        <div key={group.group} style={{ marginBottom: 28 }}>
+          <div style={{
+            fontFamily: D.disp, fontSize: '0.52rem', color: group.color,
+            letterSpacing: '3px', marginBottom: 12, opacity: 0.85,
+            borderBottom: `1px solid ${group.color}22`, paddingBottom: 8,
+          }}>
             ◈ {group.group}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {group.items.map(item => (
-              <Tooltip key={item.key} text={item.tooltip}>
+              <div key={item.key} style={{
+                border: `1px solid ${group.color}28`,
+                borderLeft: `3px solid ${group.color}`,
+                background: working === item.key ? `${group.color}08` : 'rgba(0,0,0,0.25)',
+              }}>
+                <div style={{
+                  padding: '12px 14px 10px',
+                  fontFamily: D.mono,
+                  fontSize: '0.72rem',
+                  color: 'rgba(255,255,255,0.48)',
+                  lineHeight: 1.65,
+                  borderBottom: `1px solid ${group.color}15`,
+                }}>
+                  {item.desc}
+                </div>
                 <button
                   onClick={item.action}
                   disabled={!!working}
                   style={{
-                    fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px',
-                    padding: '13px 16px', border: `1px solid ${group.color}`,
-                    background: working === item.key ? `${group.color}18` : 'transparent',
-                    color: group.color, cursor: !!working ? 'default' : 'pointer',
-                    opacity: !!working && working !== item.key ? 0.4 : 1,
+                    fontFamily: D.disp, fontSize: '0.6rem', letterSpacing: '2px',
+                    padding: '12px 16px',
+                    background: 'transparent', border: 'none',
+                    color: !!working && working !== item.key ? `${group.color}33` : group.color,
+                    cursor: !!working ? 'not-allowed' : 'pointer',
                     width: '100%', textAlign: 'left',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    display: 'flex', alignItems: 'center', gap: 10,
                   }}
                 >
-                  <span>{working === item.key ? '◈ WORKING...' : item.label}</span>
-                  <span style={{ fontSize: '0.55rem', color: `${group.color}55`, fontFamily: D.mono }}>HOLD FOR INFO</span>
+                  <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>{working === item.key ? '◌' : '▶'}</span>
+                  {working === item.key ? '◈ WORKING...' : item.label}
                 </button>
-              </Tooltip>
+              </div>
             ))}
           </div>
         </div>
