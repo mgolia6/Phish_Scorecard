@@ -243,6 +243,14 @@
       "destination": "/api/admin/seed-phishnet"
     },
     {
+      "source": "/api/ai/ebenezer-moderate",
+      "destination": "/api/ai/ebenezer-moderate"
+    },
+    {
+      "source": "/api/ai/ebenezer-log",
+      "destination": "/api/ai/ebenezer-log"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
