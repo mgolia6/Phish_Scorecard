@@ -122,7 +122,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           </button>
         </div>
         {history.length > 0 && (
-          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(0,224,208,0.08)', border: '1px solid rgba(0,224,208,0.35)', padding: '4px 10px', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10 }}>↓ EXPORT</button>
+          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.6)', padding: '5px 12px', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10, fontWeight: 700 }}>↓ EXPORT</button>
         )}
       </div>
 
