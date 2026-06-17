@@ -261,35 +261,24 @@ async function fetchPhreezeerAggregates(pool) {
 }
 
 function formatPhreezeerContext({ topShows, topSongs, stats }) {
-  let ctx = '
-== PHREEZER COMMUNITY DATA ==
-';
-  ctx += '(Aggregated ratings from Phreezer users — never attributed to individuals)
-';
+  let ctx = `\n== PHREEZER COMMUNITY DATA ==\n`;
+  ctx += `(Aggregated ratings from Phreezer users — never attributed to individuals)\n`;
 
   if (stats) {
-    ctx += `
-OVERALL: ${stats.total_raters} raters, ${stats.shows_covered} shows covered, ${stats.total_ratings} song ratings, community avg ${stats.overall_avg}/5
-`;
+    ctx += `\nOVERALL: ${stats.total_raters} raters, ${stats.shows_covered} shows covered, ${stats.total_ratings} song ratings, community avg ${stats.overall_avg}/5\n`;
   }
 
   if (topShows.length) {
-    ctx += '
-TOP RATED SHOWS BY PHREEZER COMMUNITY:
-';
+    ctx += `\nTOP RATED SHOWS BY PHREEZER COMMUNITY:\n`;
     topShows.forEach((s, i) => {
-      ctx += `${i + 1}. ${s.show_date} — ${s.venue}, ${s.city}${s.state ? `, ${s.state}` : ''} — ${s.avg_score}/5 (${s.rater_count} raters)
-`;
+      ctx += `${i + 1}. ${s.show_date} — ${s.venue}, ${s.city}${s.state ? `, ${s.state}` : ''} — ${s.avg_score}/5 (${s.rater_count} raters)\n`;
     });
   }
 
   if (topSongs.length) {
-    ctx += '
-TOP RATED SONGS BY PHREEZER COMMUNITY:
-';
+    ctx += `\nTOP RATED SONGS BY PHREEZER COMMUNITY:\n`;
     topSongs.forEach((s, i) => {
-      ctx += `${i + 1}. ${s.song_name} — ${s.avg_score}/5 (${s.total_ratings} ratings from ${s.unique_raters} raters)
-`;
+      ctx += `${i + 1}. ${s.song_name} — ${s.avg_score}/5 (${s.total_ratings} ratings from ${s.unique_raters} raters)\n`;
     });
   }
 
@@ -318,12 +307,16 @@ export default async function handler(req, res) {
     const pool = getPool();
     const showsResult = await pool.query(`
       SELECT
-        a.show_date, a.venue, a.city, a.state,
-        r.overall_rating, r.notes
-      FROM user_attendance a
-      LEFT JOIN user_ratings r ON r.user_id = a.user_id AND r.show_date = a.show_date
-      WHERE a.user_id = $1
-      ORDER BY a.show_date DESC
+        TO_CHAR(s.show_date, 'YYYY-MM-DD') as show_date,
+        s.venue, s.city, s.state,
+        ROUND(AVG(r.rating)::numeric, 2) as overall_rating,
+        COUNT(r.id) as song_count,
+        COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as rated_count
+      FROM ratings r
+      JOIN shows s ON r.show_date = s.show_date
+      WHERE r.user_id = $1
+      GROUP BY s.show_date, s.venue, s.city, s.state
+      ORDER BY s.show_date DESC
       LIMIT 200
     `, [user.id]);
 
@@ -334,16 +327,7 @@ export default async function handler(req, res) {
       .sort((a, b) => parseFloat(b.overall_rating) - parseFloat(a.overall_rating))
       .slice(0, 10);
 
-    userContext = `
-USER HISTORY (${shows.length} shows attended):
-RECENTLY ATTENDED (last 20):
-${shows.slice(0, 20).map(s => `${s.show_date} — ${s.venue}, ${s.city}${s.state ? `, ${s.state}` : ''}${s.overall_rating ? ` [rated: ${s.overall_rating}/5]` : ' [unrated]'}`).join('\n')}
-
-TOP RATED:
-${topRated.length ? topRated.map(s => `${s.show_date} — ${s.venue} — ${s.overall_rating}/5${s.notes ? ` ("${s.notes.substring(0, 80)}")` : ''}`).join('\n') : 'No rated shows yet.'}
-
-STATS: ${shows.length} attended, ${rated.length} rated, ${unrated.length} unrated${rated.length > 0 ? `, avg ${(rated.reduce((s,r) => s + parseFloat(r.overall_rating), 0) / rated.length).toFixed(2)}/5` : ''}
-`;
+    userContext = `\nUSER HISTORY (${shows.length} shows rated):\nRECENTLY RATED (last 20):\n${shows.slice(0, 20).map(s => `${s.show_date} — ${s.venue}, ${s.city}${s.state ? `, ${s.state}` : ''} [${s.overall_rating ? `avg: ${s.overall_rating}/5` : 'rated'}]`).join('\n')}\n\nTOP RATED:\n${topRated.length ? topRated.map(s => `${s.show_date} — ${s.venue} — ${s.overall_rating}/5`).join('\n') : 'No rated shows yet.'}\n\nSTATS: ${shows.length} shows rated${rated.length > 0 ? `, avg ${(rated.reduce((s,r) => s + parseFloat(r.overall_rating), 0) / rated.length).toFixed(2)}/5` : ''}\n`;
   } catch (e) {
     userContext = 'Could not load user history.';
   }
