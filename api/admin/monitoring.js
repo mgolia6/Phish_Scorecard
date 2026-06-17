@@ -86,6 +86,21 @@ export default async function handler(req, res) {
       FROM feedback
     `).catch(() => ({ rows: [{ total: 0, last_7d: 0, unread: 0 }] }));
 
+    // Knowledge base catalog status
+    const kbStats = await Promise.all([
+      db.query(`SELECT COUNT(*) as count, MAX(updated_at) as last_updated FROM pn_songs`).catch(() => ({ rows: [{ count: 0, last_updated: null }] })),
+      db.query(`SELECT COUNT(*) as count, MAX(updated_at) as last_updated, COUNT(*) FILTER (WHERE pn_rating IS NOT NULL) as with_rating FROM pn_shows`).catch(() => ({ rows: [{ count: 0, last_updated: null, with_rating: 0 }] })),
+      db.query(`SELECT COUNT(*) as count, MAX(updated_at) as last_updated FROM pn_reviews`).catch(() => ({ rows: [{ count: 0, last_updated: null }] })),
+      db.query(`SELECT COUNT(*) as count, MAX(updated_at) as last_updated FROM jamchart_entries`).catch(() => ({ rows: [{ count: 0, last_updated: null }] })),
+    ]);
+
+    const knowledge_base = {
+      songs:     { count: parseInt(kbStats[0].rows[0]?.count || 0), last_updated: kbStats[0].rows[0]?.last_updated, label: 'Song catalog', desc: 'Play counts, debut dates, gaps. Refresh monthly.' },
+      shows:     { count: parseInt(kbStats[1].rows[0]?.count || 0), with_rating: parseInt(kbStats[1].rows[0]?.with_rating || 0), last_updated: kbStats[1].rows[0]?.last_updated, label: 'Show catalog', desc: 'Venues, tours, community ratings. Refresh monthly.' },
+      reviews:   { count: parseInt(kbStats[2].rows[0]?.count || 0), last_updated: kbStats[2].rows[0]?.last_updated, label: 'Fan reviews', desc: 'Phan-written show reviews. Refresh after major tours.' },
+      jamcharts: { count: parseInt(kbStats[3].rows[0]?.count || 0), last_updated: kbStats[3].rows[0]?.last_updated, label: 'Jamchart entries', desc: 'Auto-refreshes every Monday via cron.' },
+    };
+
     res.json({
       activation,
       email: { by_type: emailLog.rows, recent: lastEmail.rows },
@@ -94,6 +109,7 @@ export default async function handler(req, res) {
       ratings: ratingStats.rows[0],
       donations: donations.rows[0] || { items_sold: 0, donation_total: 0 },
       feedback: feedbackStats.rows[0],
+      knowledge_base,
     });
   } finally {
     db.release();
