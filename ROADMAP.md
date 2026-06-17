@@ -8,61 +8,72 @@
 
 ---
 
-## ✅ COMPLETED THIS SESSION (2026-06-16 Part 3)
+## ✅ COMPLETED THIS SESSION (2026-06-17)
 
-- Feed: body truncation, compact new post box, bottom padding
-- Boot sequence: typewriter effect, glitch exit, snowflake sizing, DON'T SUCK split, z-index fix
-- Email cron: onboarding pass added, rate limiting, copy rewritten
-- Welcome emails sent to existing users confirmed
-- Founder badges: PHAB PHIVE (#1-5), EARLY PHREEZE (#6-20), admin seed button
-- AI tab: full copy, responsible AI opener, three data layers, accurate feature descriptions
-- Ebenezer: Phish.net live data injection (setlists, reviews, jamcharts, song histories)
-- Ebenezer: Phreezer community aggregates in every session context
-- Ebenezer: intent detection for show, song, recommendation queries
-- FullPageLoader: restored everywhere, z-index fixed
+- Ebenezer: syntax error fixed (formatPhreezeerContext broken multiline strings)
+- Ebenezer: jamchart hallucination fix — never claims missing data when it's in context
+- Ebenezer: hard ban on "see live" / future show recommendations
+- Ebenezer: intent detection expanded (cow funk, funk, nasty, type ii, find me, etc.)
+- Ebenezer: full Phish.net knowledge base — songs (3,171), shows (4,082), reviews (1,847), jamcharts (2,500+)
+- Ebenezer: DB search for vibe queries — pulls jamcharts + reviews by keyword + era
+- Ebenezer: song facts (play count, debut, gap), show context (venue, tour, teases, guests)
+- Admin SYSTEM tab: reorganized with groups, always-visible descriptions, no tooltips
+- Admin SYSTEM tab: SEED PHISH.NET FULL CATALOG button
+- Admin MONITORING tab: Ebenezer knowledge base panel with counts + refresh status
+- Admin MONITORING tab: fixed email_verified column, added shows_rated + raters
+- Toast notification: z-index 9500, bottom-center, clears header and tab bar
+- Seed result modal: full diagnostic output (shows_processed, errors, field names)
+- pn_rating display: hidden pending Phish.net API inquiry (not in v5 API)
+- Rate limiting on auth endpoints: confirmed complete
+- Phish.net forum post: confirmed published
 
 ---
 
-## ✅ COMPLETED PRIOR (2026-06-16 Parts 1 & 2)
+## ✅ COMPLETED PRIOR (2026-06-16)
+
 - All crashes, filter rewrite, DesktopLanding, SlotMachine, scorecard browse without login
 - Companion system, Phriend Overlap gate, Ebenezer pinned post
-- Mike Says No, boot sequence initial, desktop card stats
-- 4 community APIs upgraded, CommunityTab rewrite, profile modal desktop, feed desktop
+- Boot sequence, desktop card stats, community APIs, CommunityTab rewrite
+- Founder badges: PHAB PHIVE (#1-5), EARLY PHREEZE (#6-20), admin seed button
+- Email cron: onboarding pass, rate limiting, copy rewritten, welcome emails confirmed
+- AI tab: full copy, responsible AI opener, three data layers
 
 ---
 
 ## 🔴 OPEN — NEXT SESSION
 
 ### P0
-- **Seed founder badges** — one tap in admin SYSTEM tab
-- **Confirm desktop layout** — unconfirmed, Matthew was on mobile all day
+- **Confirm desktop layout** — unconfirmed, Matthew has been on mobile
 
 ### P1 — Pre-beta checklist
-- **GoDaddy DNS** — phreezer.mpgink.com subdomain in Resend
 - **iOS Safari UAT** — not yet confirmed complete
-- **Publish Phish.net forum post** — drafted, held pending readiness
+- **GoDaddy DNS** — phreezer.mpgink.com subdomain in Resend (polish, not blocking)
 
 ### P2 — Ebenezer improvements
-- **Song intent detection expansion** — currently ~40 songs hardcoded, switch to fuzzy match against shows DB or expand list
-- **Show-specific Phreezer ratings in context** — when user asks about a show they rated, include their song-level scores
+- **pn_rating** — reach out to Phish.net about show rating API access; re-add to scorecard when available
+- **Song intent detection** — fuzzy match against songs DB vs hardcoded ~40 names
+- **Show-specific Phreezer ratings in context** — include user's song scores when asking about a show they rated
+- **Expand review seed** — currently top 600 shows; consider broader pass after confirmed working
 
 ### P3 — Analytics
-- **duration_seconds on ratings** — add column, populate from Phish.in at setlist load time
-- **Avg song length in top-songs API** — foundation for jam detection (above/below median)
-- **Median song length across catalog** — compare avg vs median to flag outlier jams
+- **duration_seconds on ratings** — add column, populate from Phish.in at setlist load
+- **Avg song length in top-songs API** — foundation for jam detection
+- **Median song length across catalog** — flag outlier jams
 
 ### P4 — Email
-- **Show rating reminder** — cron: if user attended a show 7+ days ago and hasn't rated it, nudge
-- **Milestone emails** — 25 and 50 shows rated (5 already wired)
+- **Show rating reminder** — cron: user attended 7+ days ago, hasn't rated, send nudge
+- **Milestone emails** — 25 and 50 shows rated
 
 ---
 
 ## Architecture Notes
-- Boot sequence: celebrate-overlay z-index 2000, fullpage-loader z-index 1000 — boot always wins
+- Boot sequence: celebrate-overlay z-index 2000, fullpage-loader z-index 1000
+- Toast: z-index 9500, bottom: 100px, bottom-center
 - Ebenezer context: [USER DATA] + [PHREEZER AGGREGATES] + [PHISH.NET LIVE DATA] every call
-- Intent detection in ebenezer.js — date regex, ~40 song names, recommendation keywords
+- Ebenezer DB: pn_songs, pn_shows, pn_reviews, jamchart_entries — seeded via admin
+- Ebenezer intent: date regex, song names, recommendation keywords, vibe keywords
 - Founder badges: user_badges table, idempotent seed, door closes at signup #20
 - email_log table: deduplication key (user_id, email_type), 300ms between sends
-- Song duration: NOT stored in DB — deferred analytics surface
-- PHISH_NET_API_KEY env var used for all Phish.net API calls
-- PHREEZER_RESEND_API_KEY env var for all email sends
+- Phish.net v5 API: songs, shows, setlists, jamcharts, reviews — NO show ratings endpoint
+- PHISH_NET_API_KEY + PHREEZER_RESEND_API_KEY env vars
+- Jamchart refresh: Monday 6am UTC cron via /api/admin/refresh-jamcharts
