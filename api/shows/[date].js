@@ -79,26 +79,8 @@ export default async function handler(req, res) {
       ? (scoredReviews.reduce((s, r) => s + parseFloat(r.score), 0) / scoredReviews.length).toFixed(2)
       : null;
 
-    // Try to get aggregate show rating from pn_shows table
-    // This is the Phish.net community consensus rating (1-5 scale, min 3 votes)
-    // Falls back gracefully if table doesn't exist yet (pre-seed)
-    let pnRating = null;
-    let pnNumRatings = null;
-    try {
-      const { getPool } = await import('../_db.js');
-      const pool = getPool();
-      const ratingRes = await pool.query(
-        `SELECT pn_rating, pn_num_ratings FROM pn_shows WHERE show_date = $1`,
-        [date]
-      );
-      if (ratingRes.rows[0]?.pn_rating) {
-        pnRating = parseFloat(ratingRes.rows[0].pn_rating);
-        pnNumRatings = parseInt(ratingRes.rows[0].pn_num_ratings) || null;
-      }
-    } catch (_) {
-      // pn_shows not seeded yet — that's fine
-    }
-
+    // pn_rating removed — not available via Phish.net v5 API
+    // Will re-add when phish.net confirms API access for show ratings
     res.json({
       showid:        first.showid,
       showdate:      first.showdate,
@@ -113,8 +95,6 @@ export default async function handler(req, res) {
       setlist_notes: first.setlistnotes || '',
       soundcheck:    (first.soundcheck || '').replace(/<[^>]*>/g, '').trim(),
       songs,
-      pn_rating:      pnRating,
-      pn_num_ratings: pnNumRatings,
       reviews: {
         count:     reviews.length,
         avg_score: avgReviewScore,
