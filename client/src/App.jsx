@@ -405,11 +405,11 @@ export default function App() {
           {user && ['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'my-shows'  ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
+              <button className={`sub-tab-btn ${tab === 'my-deep-phreeze' ? 'active' : ''}`} onClick={() => setTab('my-deep-phreeze')}>DEEP PHREEZE</button>
               <button className={`sub-tab-btn ${tab === 'my-songs'  ? 'active' : ''}`} onClick={() => setTab('my-songs')}>MY SONGS</button>
               <button className={`sub-tab-btn ${tab === 'my-venues' ? 'active' : ''}`} onClick={() => setTab('my-venues')}>MY VENUES</button>
               <button className={`sub-tab-btn ${tab === 'my-states' ? 'active' : ''}`} onClick={() => setTab('my-states')}>MY STATES</button>
               <button className={`sub-tab-btn ${tab === 'my-phriends' ? 'active' : ''}`} onClick={() => setTab('my-phriends')}>MY PHRIENDS</button>
-              <button className={`sub-tab-btn ${tab === 'my-deep-phreeze' ? 'active' : ''}`} onClick={() => setTab('my-deep-phreeze')}>DEEP PHREEZE</button>
             </div>
           )}
           {['feed','community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) && (
