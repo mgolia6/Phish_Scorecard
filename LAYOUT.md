@@ -225,7 +225,7 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ---
 
 ## What's Explicitly NOT There Yet
-- Desktop layout visual confirmation (unconfirmed — Matthew on mobile all session)
+- Desktop UAT pass — full walkthrough not done. Known issues: font sizes too small in places (causes squinting), visual polish needed. Scorecard overlay fixed (keeps sidebar/rail on desktop) but broader desktop pass pending Matthew's recorded UAT session.
 - Feed reply notifications
 - Feed moderation in admin panel
 - Phish Phreeze community subtab (band-level stats)
