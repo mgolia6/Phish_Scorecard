@@ -339,7 +339,7 @@ async function seedReviews(pool) {
   }
 
   if (!shows.length) {
-    return { type: 'reviews', count: 0, error: 'pn_shows is empty — run the full catalog seed first' };
+    return { type: 'reviews', count: 0, status: 'error', error: 'pn_shows is empty or has no shows — run songs/shows seed first, then retry reviews' };
   }
 
   let firstError = null;
