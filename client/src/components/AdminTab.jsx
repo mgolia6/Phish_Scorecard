@@ -412,16 +412,33 @@ function SystemTab({ api, showMessage }) {
       color: D.orange,
       items: [
         {
+          key: 'seed-phishnet',
+          label: '◈ SEED PHISH.NET FULL CATALOG',
+          tooltip: 'Seeds ALL Phish.net data: songs, shows, longest jams, debuts, teases, guests, and fan reviews. Run once — takes 3-5 min. This is what makes Ebenezer a phishphile.',
+          action: () => runAction('seed-phishnet', '/api/admin/seed-phishnet', 'GET', (d) => {
+            setActionResult({
+              title: 'PHISH.NET CATALOG SEEDED',
+              lines: [
+                ...(d.results || []).map(r =>
+                  r.skipped ? `${r.type}: skipped` :
+                  r.status === 'error' ? `${r.type}: ERROR — ${r.error}` :
+                  `${r.type}: ${r.count} records`
+                ),
+                '',
+                ...Object.entries(d.db_counts || {}).map(([k,v]) => `${k}: ${v} rows`),
+              ]
+            });
+          }),
+        },
+        {
           key: 'seed-jamcharts',
           label: '❄ SEED JAMCHART CATALOG',
-          tooltip: 'Fetches ALL Phish.net jamchart entries (~2500) into the DB. Run once. Takes ~30s. Ebenezer uses this for vibe/style queries.',
+          tooltip: 'Fetches ALL Phish.net jamchart entries (~2500) into the DB. Run once. Takes ~30s. Already included in FULL CATALOG seed above.',
           action: () => runAction('seed-jamcharts', '/api/admin/seed-jamcharts', 'GET', (d) => {
             setActionResult({ title: 'JAMCHART SEED COMPLETE', lines: [
               `Inserted: ${d.inserted}`,
               `Updated: ${d.updated}`,
-              `Errors: ${d.errors}`,
               `Total in DB: ${d.total}`,
-              `Pages fetched: ${d.pages}`,
             ]});
           }),
         },
