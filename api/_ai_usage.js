@@ -37,17 +37,26 @@ async function ensureTable(pool) {
  * Log an AI API call. Fire and forget — catch errors silently.
  * @param {{ userId?: number, feature: string, model: string, inputTokens: number, outputTokens: number }} opts
  */
+let _tableEnsured = false;
+
 export async function logAiUsage({ userId = null, feature, model, inputTokens, outputTokens }) {
-  try {
-    const pool = getPool();
-    await ensureTable(pool);
-    const cost = estimateCost(model, inputTokens, outputTokens);
-    await pool.query(
-      `INSERT INTO ai_usage_log (user_id, feature, model, input_tokens, output_tokens, cost_usd)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [userId || null, feature, model, inputTokens, outputTokens, cost]
-    );
-  } catch (err) {
-    console.error('AI usage log failed (non-fatal):', err.message);
-  }
+  // Non-blocking — runs after response is sent, never delays user
+  Promise.resolve().then(async () => {
+    try {
+      const pool = getPool();
+      if (!_tableEnsured) {
+        await ensureTable(pool);
+        _tableEnsured = true;
+      }
+      const cost = estimateCost(model, inputTokens, outputTokens);
+      await pool.query(
+        `INSERT INTO ai_usage_log (user_id, feature, model, input_tokens, output_tokens, cost_usd)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [userId || null, feature, model, inputTokens, outputTokens, cost]
+      );
+    } catch (err) {
+      // Truly fire and forget — log but never surface
+      console.error('AI usage log failed (non-fatal):', err.message);
+    }
+  });
 }
