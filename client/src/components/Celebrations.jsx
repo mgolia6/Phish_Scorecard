@@ -43,10 +43,6 @@ const JOKE_LINES = [
   'NOTIFYING WILSON.................',
   'CONSULTING ICCULUS...............',
   'CALCULATING TUBE TIME............',
-  'DEFRAGMENTING THE GUELAH.........',
-  'RELEASING THE HARPOON............',
-  'HERBING THE MEATSTICK............',
-  'SYNCING WITH THE MOTHERSHIP......',
 ];
 
 function pickJokeLine() {
