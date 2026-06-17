@@ -329,17 +329,31 @@ async function seedReviews(pool) {
     return { type: 'reviews', count: 0, error: 'No shows in pn_shows yet — run songs/shows seed first' };
   }
 
+  let firstError = null;
+  let firstShowDateTried = null;
+  let sampleReviewKeys = null;
+
   for (const showDate of shows) {
     try {
+      firstShowDateTried = firstShowDateTried || showDate;
       const url = `${PNET}/reviews/showdate/${showDate}.json?apikey=${PHISH_NET_KEY}`;
       const res = await fetch(url);
-      if (!res.ok) { errors++; continue; }
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        if (!firstError) firstError = `HTTP ${res.status} for ${showDate}: ${body.slice(0,80)}`;
+        errors++;
+        continue;
+      }
       const data = await res.json();
       const reviews = data?.data || [];
 
+      // Capture field shape from first review we see
+      if (!sampleReviewKeys && reviews[0]) {
+        sampleReviewKeys = Object.keys(reviews[0]).join(', ');
+      }
+
       for (const r of reviews) {
         try {
-          // Per-show endpoint uses: review (text), score (1-5), author, tstamp
           const text = (r.review || r.review_text || r.body || '').trim();
           if (!text || text.length < 30) continue;
           const score = r.score != null ? parseFloat(r.score) : null;
@@ -354,18 +368,29 @@ async function seedReviews(pool) {
             getEra(showDate),
           ]);
           upserted++;
-        } catch (_) {}
+        } catch (insertErr) {
+          if (!firstError) firstError = `Insert error: ${insertErr.message}`;
+          errors++;
+        }
       }
 
       showsProcessed++;
-      // 150ms between shows — polite, stays well under rate limit
       await new Promise(resolve => setTimeout(resolve, 150));
     } catch (e) {
+      if (!firstError) firstError = `Fetch error for ${showDate}: ${e.message}`;
       errors++;
     }
   }
 
-  return { type: 'reviews', count: upserted, shows_processed: showsProcessed, errors, total_shows: shows.length };
+  return {
+    type: 'reviews',
+    count: upserted,
+    shows_processed: showsProcessed,
+    errors,
+    total_shows: shows.length,
+    first_error: firstError,
+    sample_review_fields: sampleReviewKeys,
+  };
 }
 
 // ── Main handler ─────────────────────────────────────────────
