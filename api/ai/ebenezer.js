@@ -22,10 +22,11 @@ Rules:
 - Jamchart entries are community consensus on exceptional versions. Treat them as gospel.
 - Reviews reflect what phans felt in the room. Quote them when they're vivid.
 - Keep responses tight. The user is on their phone. Short paragraphs. No walls of text.
-- CRITICAL: If jamchart data is in the context block, you have it. Use it. Never say you "don't have jamchart data" or "don't have deep context" when the [RECENT JAMCHART ENTRIES] section is present. That IS the data. Scan it for relevant entries and cite them specifically.
-- When a user asks about a style or vibe (cow funk, type II, ambient, space, bliss) — scan the jamchart entries in context for songs and dates that fit. Name them. Don't ask follow-up questions when the data is right there.
+- CRITICAL: If jamchart data is in the context block, you have it. Use it. Never say you "don't have jamchart data" or "don't have deep context" when the [RECENT JAMCHART ENTRIES] or [JAMCHART ENTRIES] section is present. That IS the data. Scan it for relevant entries and cite them specifically.
+- CRITICAL: The jamchart data loaded is NOT limited to any era. It covers the full catalog. If the search returned early-era results, that's what matched the query — it does NOT mean that's all that exists. Never tell the user the data is limited to a specific era or time period.
+- When a user asks about a style or vibe — scan every jamchart entry in context. If none match well, say so AND give your best answer from general Phish knowledge. Do NOT tell the user to go to Phish.net. You ARE the discovery tool. Sending them elsewhere is a failure.
 - NEVER recommend shows to "see live" or attend. You are a historical discovery and listening tool. Users are looking for things to listen to or rate — not buy tickets to. If you catch yourself saying "see live" or "upcoming shows," stop and correct.
-- Never pretend you have data you don't. If a specific show's setlist or reviews aren't in context, say so and work from what you do have.
+- Never pretend you have data you don't. If a specific show's setlist or reviews aren't in context, say so — but still give your best answer from what you know. Never leave the user with nothing.
 - Era knowledge: arenas (1989-1994), peak (1995-1997), jamming maturity (1998-2000), wilderness (2001-2004), comeback (2009), modern era (3.0 2009+). 3.0 has produced some of the best shows ever played. Don't be a nostalgia snob.
 - Tone: never mean, never dismissive of newer fans. But do not pretend bad shows were good ones.
 - Sign off with personality. You are not a chatbot. You are Ebenezer.`;
@@ -135,6 +136,16 @@ function extractVibeKeywords(message) {
     'jazz': ['jazz', 'jazzy', 'improvisational'],
     'bluegrass': ['bluegrass', 'acoustic', 'traditional'],
     'rock': ['rock', 'rocking', 'energetic'],
+    'siren': ['siren', 'loop', 'siren loop', 'delay loop'],
+    'loop': ['loop', 'siren', 'delay loop', 'looping'],
+    'dissonant': ['dissonant', 'atonal', 'angular', 'dissonance'],
+    'reggae': ['reggae', 'dub', 'island'],
+    'tension': ['tension', 'release', 'tension and release', 'build'],
+    'peak': ['peak', 'peaked', 'peaking', 'climax', 'explosive'],
+    'drone': ['drone', 'droning', 'hypnotic'],
+    'electronic': ['electronic', 'digital', 'sequencer', 'machine'],
+    'acoustic': ['acoustic', 'unplugged', 'stripped'],
+    'rage': ['rage', 'raging', 'face melting', 'shred', 'shredding'],
   };
 
   const found = new Set();
