@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     )
   `);
 
-  // Get users ordered by signup — first 20 verified users
+  // Get first 20 verified users by signup date
   const usersRes = await pool.query(`
     SELECT id, username, created_at
     FROM users
@@ -31,21 +31,30 @@ export default async function handler(req, res) {
     LIMIT 20
   `);
 
+  const users = usersRes.rows;
+  if (!users.length) return res.json({ ok: true, assigned: [] });
+
+  // Build bulk insert values — one query, no loop, no timeout risk
+  const values = [];
+  const params = [];
   const results = [];
-  for (let i = 0; i < usersRes.rows.length; i++) {
-    const user = usersRes.rows[i];
+
+  users.forEach((u, i) => {
     const rank = i + 1;
-    const badgeKey = rank <= 5 ? 'phab_phive' : 'early_phreeze';
-    const badgeLabel = rank <= 5 ? 'PHAB PHIVE' : 'EARLY PHREEZE';
+    const badgeKey   = rank <= 5 ? 'phab_phive'    : 'early_phreeze';
+    const badgeLabel = rank <= 5 ? 'PHAB PHIVE'    : 'EARLY PHREEZE';
+    const base = i * 3;
+    values.push(`($${base + 1}, $${base + 2}, $${base + 3})`);
+    params.push(u.id, badgeKey, badgeLabel);
+    results.push({ rank, username: u.username, badge: badgeLabel });
+  });
 
-    await pool.query(`
-      INSERT INTO user_badges (user_id, badge_key, badge_label)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (user_id, badge_key) DO NOTHING
-    `, [user.id, badgeKey, badgeLabel]);
-
-    results.push({ rank, username: user.username, badge: badgeLabel });
-  }
+  await pool.query(
+    `INSERT INTO user_badges (user_id, badge_key, badge_label)
+     VALUES ${values.join(', ')}
+     ON CONFLICT (user_id, badge_key) DO NOTHING`,
+    params
+  );
 
   res.json({ ok: true, assigned: results });
 }
