@@ -48,9 +48,14 @@ async function ensureSchema(pool) {
       tour_name VARCHAR(255),
       era VARCHAR(32),
       song_count INTEGER DEFAULT 0,
+      pn_rating NUMERIC(4,3),
+      pn_num_ratings INTEGER DEFAULT 0,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  -- Add rating columns if seeded before this migration
+  await pool.query(`ALTER TABLE pn_shows ADD COLUMN IF NOT EXISTS pn_rating NUMERIC(4,3)`).catch(() => {});
+  await pool.query(`ALTER TABLE pn_shows ADD COLUMN IF NOT EXISTS pn_num_ratings INTEGER DEFAULT 0`).catch(() => {});
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS pn_longest_jams (
@@ -153,17 +158,23 @@ async function seedShows(pool) {
   let upserted = 0;
   for (const s of shows) {
     try {
+      // Phish.net /shows endpoint returns: rating (1-5 aggregate), num_ratings (vote count)
+      const pnRating = s.rating ? parseFloat(s.rating) : null;
+      const pnNumRatings = s.num_ratings ? parseInt(s.num_ratings) : 0;
       await pool.query(`
-        INSERT INTO pn_shows (show_date, venue, city, state, country, tour_name, era)
-        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        INSERT INTO pn_shows (show_date, venue, city, state, country, tour_name, era, pn_rating, pn_num_ratings)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
         ON CONFLICT (show_date) DO UPDATE SET
           venue=EXCLUDED.venue, city=EXCLUDED.city, state=EXCLUDED.state,
-          country=EXCLUDED.country, tour_name=EXCLUDED.tour_name, era=EXCLUDED.era, updated_at=NOW()
+          country=EXCLUDED.country, tour_name=EXCLUDED.tour_name, era=EXCLUDED.era,
+          pn_rating=EXCLUDED.pn_rating, pn_num_ratings=EXCLUDED.pn_num_ratings, updated_at=NOW()
       `, [
         s.showdate,
         s.venue, s.city, s.state, s.country,
         s.tour_name || s.tourname || null,
         getEra(s.showdate),
+        pnRating,
+        pnNumRatings,
       ]);
       upserted++;
     } catch (_) {}
