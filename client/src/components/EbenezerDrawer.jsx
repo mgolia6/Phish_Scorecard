@@ -114,15 +114,15 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         <div ref={bottomRef} />
       </div>
 
-      <div style={{ padding: '6px 14px 4px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
+      <div style={{ padding: '8px 14px', borderTop: '1px solid rgba(255,102,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(255,102,0,0.04)' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
           Conversations logged anonymously.{' '}
-          <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'rgba(51,255,51,0.5)' : 'rgba(255,102,0,0.4)', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', cursor: 'pointer', textDecoration: 'underline' }}>
-            {optOut ? 'Opted out' : 'Opt out'}
+          <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'var(--green)' : 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline', fontWeight: optOut ? 700 : 400 }}>
+            {optOut ? '✓ Opted out' : 'Opt out'}
           </button>
         </div>
         {history.length > 0 && (
-          <button onClick={() => exportConversation(history)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '3px 8px', color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1px', cursor: 'pointer', marginLeft: 8 }}>EXPORT</button>
+          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(0,224,208,0.08)', border: '1px solid rgba(0,224,208,0.35)', padding: '4px 10px', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10 }}>↓ EXPORT</button>
         )}
       </div>
 
