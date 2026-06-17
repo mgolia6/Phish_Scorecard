@@ -1276,6 +1276,53 @@ function MonitoringTab({ api }) {
         )}
       </Panel>
 
+      {/* Knowledge Base Status */}
+      {data.knowledge_base && (
+        <Panel title="◈ EBENEZER KNOWLEDGE BASE" color={D.orange}>
+          {Object.entries(data.knowledge_base).map(([key, kb]) => {
+            const count = parseInt(kb.count) || 0;
+            const seeded = count > 0;
+            const lastUpdated = kb.last_updated ? new Date(kb.last_updated) : null;
+            const daysSince = lastUpdated ? Math.floor((Date.now() - lastUpdated) / 86400000) : null;
+            const needsRefresh = daysSince !== null && daysSince > 30;
+
+            return (
+              <div key={key} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)',
+              }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.48rem', color: seeded ? D.orange : D.muted, letterSpacing: '1.5px' }}>
+                    {kb.label?.toUpperCase() || key.toUpperCase()}
+                  </div>
+                  <div style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted, marginTop: 3, lineHeight: 1.4 }}>
+                    {kb.desc}
+                  </div>
+                  {lastUpdated && (
+                    <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: needsRefresh ? D.red : 'rgba(255,255,255,0.2)', marginTop: 3 }}>
+                      Last seeded: {lastUpdated.toLocaleDateString()}{needsRefresh ? ' — REFRESH RECOMMENDED' : ''}
+                    </div>
+                  )}
+                  {kb.with_rating !== undefined && (
+                    <div style={{ fontFamily: D.mono, fontSize: '0.6rem', color: 'rgba(255,102,0,0.4)', marginTop: 2 }}>
+                      {kb.with_rating} shows have Phish.net community rating
+                    </div>
+                  )}
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '1.1rem', color: seeded ? D.orange : D.muted, lineHeight: 1 }}>
+                    {count > 0 ? count.toLocaleString() : '—'}
+                  </div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.36rem', color: D.muted, letterSpacing: '1px', marginTop: 3 }}>
+                    {seeded ? 'RECORDS' : 'NOT SEEDED'}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </Panel>
+      )}
+
       {/* Feedback + Donations */}
       <Panel title="◈ FEEDBACK + DONATIONS" color={D.green}>
         <Row label="FEEDBACK TOTAL"   val={fmtNum(feedback?.total)} />
