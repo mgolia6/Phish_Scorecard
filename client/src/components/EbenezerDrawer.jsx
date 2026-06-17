@@ -166,7 +166,23 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
 export function EbenezerDrawer({ history, setHistory, loading, setLoading, error, setError, input, setInput, open, setOpen }) {
   const inputRef = useRef(null);
   const [optOut, setOptOut] = useState(() => { try { return localStorage.getItem('ebenezer_opt_out') === 'true'; } catch { return false; } });
-  useEffect(() => { if (open) setTimeout(() => inputRef.current?.focus(), 300); }, [open]);
+
+  // Sync opt-out from profile on first open -- ensures cross-device consistency
+  const optOutSynced = useRef(false);
+  useEffect(() => {
+    if (open && !optOutSynced.current) {
+      optOutSynced.current = true;
+      fetch('/api/user/profile', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('phish_token') } })
+        .then(r => r.json())
+        .then(d => {
+          const serverVal = d.ebenezer_opt_out === true;
+          setOptOut(serverVal);
+          try { localStorage.setItem('ebenezer_opt_out', String(serverVal)); } catch {}
+        }).catch(() => {});
+    }
+    if (open) setTimeout(() => inputRef.current?.focus(), 300);
+  }, [open]);
+
   const handleToggleOptOut = useCallback(async () => {
     const next = !optOut; setOptOut(next);
     try { localStorage.setItem('ebenezer_opt_out', String(next)); } catch {}
@@ -214,7 +230,21 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
   const inputRef = useRef(null);
   const [optOut, setOptOut] = useState(() => { try { return localStorage.getItem('ebenezer_opt_out') === 'true'; } catch { return false; } });
 
-  useEffect(() => { if (railOpen) setTimeout(() => inputRef.current?.focus(), 300); }, [railOpen]);
+  // Sync opt-out from profile on first open
+  const optOutSynced = useRef(false);
+  useEffect(() => {
+    if (railOpen && !optOutSynced.current) {
+      optOutSynced.current = true;
+      fetch('/api/user/profile', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('phish_token') } })
+        .then(r => r.json())
+        .then(d => {
+          const serverVal = d.ebenezer_opt_out === true;
+          setOptOut(serverVal);
+          try { localStorage.setItem('ebenezer_opt_out', String(serverVal)); } catch {}
+        }).catch(() => {});
+    }
+    if (railOpen) setTimeout(() => inputRef.current?.focus(), 300);
+  }, [railOpen]);
 
   const handleToggleOptOut = useCallback(async () => {
     const next = !optOut; setOptOut(next);
