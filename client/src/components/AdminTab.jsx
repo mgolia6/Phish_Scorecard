@@ -363,7 +363,7 @@ function SystemTab({ api, showMessage }) {
         {
           key: 'seed-phishnet',
           label: '◈ SEED PHISH.NET FULL CATALOG',
-          desc: "The big one. Fetches and stores the complete Phish.net dataset: every song with play count, debut date, and current gap; every show with venue, tour, and community rating; longest jams by duration; song debut records; song teases by show; special guests; and thousands of fan-written reviews in their own words. This is what gives Ebenezer real knowledge of the catalog. Run once -- takes 3-5 min. Safe to re-run; all records upsert.",
+          desc: "Seeds three Phish.net datasets into the local DB: (1) SONGS -- every song in the catalog with total play count, debut date, last played, and current gap in shows. (2) SHOWS -- every show with venue, city, tour name, era, and the Phish.net community rating (1-5 scale). (3) REVIEWS -- fan-written show reviews in their own words, which is what gives Ebenezer his vocabulary for cow funk, bliss jams, Type II, etc. Run once, takes 3-5 min. Safe to re-run anytime.",
           action: () => runAction('seed-phishnet', '/api/admin/seed-phishnet', 'GET', (d) => {
             setActionResult({
               title: 'PHISH.NET CATALOG SEEDED',
