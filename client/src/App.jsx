@@ -24,6 +24,7 @@ import { ProfileModal, PhreezerAvatar } from './components/ProfileModal';
 import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
 import { TourGuide } from './components/TourGuide';
 import { DesktopLanding } from './components/DesktopLanding';
+import { ChangelogModal, shouldShowChangelog } from './components/ChangelogModal';
 import { Analytics, identifyUser, resetIdentity } from './analytics';
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState('login');
   const [messages, setMessages] = useState([]);
   const [mikeError, setMikeError] = useState(null);
+  const [showChangelog, setShowChangelog] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showTandC, setShowTandC] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -61,6 +63,15 @@ export default function App() {
   const [profileTapped, setProfileTapped] = useState(false);
   const stickyHeaderRef = useRef(null);
   const api = useApi();
+
+  // Show changelog once per version for returning users
+  useEffect(() => {
+    if (shouldShowChangelog()) {
+      // Small delay so it doesn't fight with boot sequence
+      const t = setTimeout(() => setShowChangelog(true), 800);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   // Track tab views
   useEffect(() => {
@@ -450,6 +461,7 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
+      {showChangelog && <ChangelogModal onDismiss={() => setShowChangelog(false)} />}
       {/* Scorecard overlay — full screen, preserves tab context */}
       {scorecardOverlay && (
         <div style={{
