@@ -17,6 +17,7 @@ async function ensureColumns(pool) {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS era_preference VARCHAR(20)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stage_side VARCHAR(20)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_vibe VARCHAR(20)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ebenezer_opt_out BOOLEAN DEFAULT FALSE`);
     migrated = true;
   } catch (err) {
     console.error('Profile migration error (non-fatal):', err.message);
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const result = await pool.query(
       `SELECT phishnet_username, favorite_song, favorite_venue, favorite_show_date,
-              avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe
+              avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe, ebenezer_opt_out
        FROM users WHERE id = $1`,
       [user.id]
     );
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const { phishnet_username, favorite_song, favorite_venue, favorite_show_date,
-            avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe } = req.body;
+            avatar_icon, vantage_point, show_style, era_preference, stage_side, show_vibe, ebenezer_opt_out } = req.body;
 
     if (avatar_icon && !ALLOWED_ICONS.includes(avatar_icon)) {
       return res.status(400).json({ error: 'Invalid icon' });
@@ -77,8 +78,9 @@ export default async function handler(req, res) {
          show_style         = $7,
          era_preference     = $8,
          stage_side         = $9,
-         show_vibe          = $10
-       WHERE id = $11`,
+         show_vibe          = $10,
+         ebenezer_opt_out   = $11
+       WHERE id = $12`,
       [
         phishnet_username  || null,
         favorite_song      || null,
@@ -90,6 +92,7 @@ export default async function handler(req, res) {
         era_preference     || null,
         stage_side         || null,
         show_vibe          || null,
+        ebenezer_opt_out === true ? true : false,
         user.id,
       ]
     );
