@@ -1158,7 +1158,7 @@ select option { background: var(--bg); color: var(--green); }
   }
   .mobile-scroll-body {
     padding-top: 100px;  /* fallback — overridden by JS ResizeObserver */
-    padding-bottom: 72px; /* space for bottom nav */
+    padding-bottom: 84px; /* space for bottom nav (72px) + buffer */
   }
 }
 
