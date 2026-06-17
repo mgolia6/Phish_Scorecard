@@ -2,6 +2,8 @@ import { getPool } from '../_db.js';
 import { verifyToken, cors } from '../_auth.js';
 import { logAiUsage } from '../_ai_usage.js';
 import { captureException } from '../_sentry.js';
+import { moderateMessage } from './ebenezer-moderate.js';
+import { logEbenezerConversation } from './ebenezer-log.js';
 
 const SYSTEM_PROMPT = `You are Uncle Ebenezer — a jaded veteran of the Phish community embedded in Phreezer, a show rating app for phans. You have been to hundreds of shows across every era. You've seen the peaks, survived the wilderness years, and kept showing up anyway. That says something about you, and you know it.
 
@@ -604,6 +606,21 @@ export default async function handler(req, res) {
 
   const { message, history = [] } = req.body;
   if (!message?.trim()) return res.status(400).json({ error: 'Message required' });
+
+  // Content moderation pre-flight
+  const modResult = await moderateMessage(message);
+  if (!modResult.allowed) {
+    logEbenezerConversation({ intent: 'blocked', messageLength: message.length, responseLength: 0, flagged: true });
+    return res.json({ reply: "That's not the kind of conversation I'm having. Ask me about music." });
+  }
+
+  // Check user opt-out for anonymous logging
+  let ebenezerOptOut = false;
+  try {
+    const pool = getPool();
+    const prefRes = await pool.query('SELECT ebenezer_opt_out FROM users WHERE id = $1', [user.id]);
+    ebenezerOptOut = prefRes.rows[0]?.ebenezer_opt_out === true;
+  } catch (_) {}
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'AI not configured' });
