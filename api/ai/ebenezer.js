@@ -309,6 +309,196 @@ function formatDBJamchartContext(entries, keywords, era) {
   return ctx;
 }
 
+// ── Rich Phish.net DB queries ──────────────────────────────
+
+async function querySongFacts(pool, songName) {
+  // Song stats from pn_songs
+  try {
+    const r = await pool.query(`
+      SELECT slug, song_name, times_played, debut_date, last_played, gap
+      FROM pn_songs
+      WHERE song_name ILIKE $1 OR slug ILIKE $2
+      LIMIT 1
+    `, [songName, songName.toLowerCase().replace(/[^a-z0-9]+/g,'-')]);
+    return r.rows[0] || null;
+  } catch (_) { return null; }
+}
+
+async function queryLongestVersions(pool, songName, limit = 10) {
+  try {
+    const r = await pool.query(`
+      SELECT show_date, song_name, duration_label, duration_seconds, era
+      FROM pn_longest_jams
+      WHERE song_name ILIKE $1
+      ORDER BY duration_seconds DESC NULLS LAST
+      LIMIT $2
+    `, [`%${songName}%`, limit]);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+async function queryTopLongestJams(pool, era = null, limit = 20) {
+  try {
+    let q, params;
+    if (era) {
+      q = `SELECT show_date, song_name, duration_label, duration_seconds, era FROM pn_longest_jams WHERE era = $1 ORDER BY duration_seconds DESC NULLS LAST LIMIT $2`;
+      params = [era, limit];
+    } else {
+      q = `SELECT show_date, song_name, duration_label, duration_seconds, era FROM pn_longest_jams ORDER BY duration_seconds DESC NULLS LAST LIMIT $1`;
+      params = [limit];
+    }
+    const r = await pool.query(q, params);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+async function queryShowFacts(pool, showDate) {
+  try {
+    const r = await pool.query(`
+      SELECT show_date, venue, city, state, country, tour_name, era
+      FROM pn_shows WHERE show_date = $1
+    `, [showDate]);
+    return r.rows[0] || null;
+  } catch (_) { return null; }
+}
+
+async function queryDebut(pool, songName) {
+  try {
+    const r = await pool.query(`
+      SELECT song_name, debut_date, debut_venue, debut_city, debut_state
+      FROM pn_debuts WHERE song_name ILIKE $1 LIMIT 1
+    `, [songName]);
+    return r.rows[0] || null;
+  } catch (_) { return null; }
+}
+
+async function queryTeases(pool, showDate) {
+  try {
+    const r = await pool.query(`
+      SELECT teased_song, in_song FROM pn_teases WHERE show_date = $1
+    `, [showDate]);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+async function queryGuests(pool, showDate) {
+  try {
+    const r = await pool.query(`
+      SELECT guest_name, instrument, song_name FROM pn_guests WHERE show_date = $1
+    `, [showDate]);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+async function queryReviews(pool, showDate, limit = 5) {
+  // Fetch top-scored reviews for a show — real phan language
+  try {
+    const r = await pool.query(`
+      SELECT score, review_text FROM pn_reviews
+      WHERE show_date = $1 AND review_text IS NOT NULL AND length(review_text) > 100
+      ORDER BY score DESC NULLS LAST
+      LIMIT $2
+    `, [showDate, limit]);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+async function searchReviewsByVibe(pool, keywords, era = null, limit = 8) {
+  // Full-text search reviews for vibe language — "cow funk", "bliss", "type ii", etc.
+  // This is the gold: real phan language describing what they heard
+  try {
+    const likeTerms = keywords.map((_, i) => `review_text ILIKE $${i + 1}`).join(' OR ');
+    const likeParams = keywords.map(k => `%${k}%`);
+    let q, params;
+    if (era) {
+      q = `SELECT show_date, score, review_text FROM pn_reviews WHERE (${likeTerms}) AND era = $${keywords.length + 1} AND length(review_text) > 150 ORDER BY score DESC NULLS LAST LIMIT $${keywords.length + 2}`;
+      params = [...likeParams, era, limit];
+    } else {
+      q = `SELECT show_date, score, review_text FROM pn_reviews WHERE (${likeTerms}) AND length(review_text) > 150 ORDER BY score DESC NULLS LAST LIMIT $${keywords.length + 1}`;
+      params = [...likeParams, limit];
+    }
+    const r = await pool.query(q, params);
+    return r.rows;
+  } catch (_) { return []; }
+}
+
+function formatRichShowContext(showDate, showFacts, teases, guests, reviews) {
+  let ctx = '';
+  if (showFacts) {
+    ctx += `\n== SHOW FACTS: ${showDate} ==\n`;
+    ctx += `Venue: ${showFacts.venue}, ${showFacts.city}${showFacts.state ? ', ' + showFacts.state : ''}\n`;
+    ctx += `Tour: ${showFacts.tour_name || 'unknown'} | Era: ${showFacts.era}\n`;
+  }
+  if (teases.length) {
+    ctx += `\nTEASES IN THIS SHOW:\n`;
+    teases.forEach(t => { ctx += `- ${t.teased_song}${t.in_song ? ` (teased in ${t.in_song})` : ''}\n`; });
+  }
+  if (guests.length) {
+    ctx += `\nSPECIAL GUESTS:\n`;
+    guests.forEach(g => { ctx += `- ${g.guest_name}${g.instrument ? ` (${g.instrument})` : ''}${g.song_name ? ` on ${g.song_name}` : ''}\n`; });
+  }
+  if (reviews.length) {
+    ctx += `\nFAN REVIEWS (what phans said in their own words):\n`;
+    reviews.forEach(r => {
+      const snippet = (r.review_text || '').slice(0, 400);
+      ctx += `[${r.score}/5] "${snippet}${r.review_text?.length > 400 ? '...' : ''}"\n`;
+    });
+  }
+  return ctx;
+}
+
+function formatRichSongContext(songName, songFacts, longestVersions, debut) {
+  let ctx = `\n== SONG FACTS: ${songName.toUpperCase()} ==\n`;
+  if (songFacts) {
+    ctx += `Times played: ${songFacts.times_played}\n`;
+    ctx += `Debut: ${songFacts.debut_date || 'unknown'}\n`;
+    ctx += `Last played: ${songFacts.last_played || 'unknown'}\n`;
+    ctx += `Current gap: ${songFacts.gap} shows\n`;
+  }
+  if (debut) {
+    ctx += `Debut venue: ${debut.debut_venue}, ${debut.debut_city}${debut.debut_state ? ', ' + debut.debut_state : ''}\n`;
+  }
+  if (longestVersions.length) {
+    ctx += `\nLONGEST VERSIONS ON RECORD:\n`;
+    longestVersions.slice(0, 8).forEach((v, i) => {
+      ctx += `${i+1}. ${v.show_date} — ${v.duration_label || 'duration unknown'} (${v.era})\n`;
+    });
+  }
+  return ctx;
+}
+
+function formatVibeContext(jamEntries, reviews, longestJams, keywords, era) {
+  const vibeLabel = keywords?.length > 0 ? keywords.slice(0,3).join('/').toUpperCase() : 'REQUESTED VIBE';
+  const eraLabel = era ? ` · ${era.toUpperCase()} ERA` : '';
+  let ctx = `\n== COMMUNITY DATA: ${vibeLabel}${eraLabel} ==\n`;
+  ctx += `This is what phans actually said and documented about this style of playing:\n\n`;
+
+  if (reviews.length) {
+    ctx += `FAN REVIEWS MENTIONING THIS VIBE (in their own words):\n`;
+    reviews.forEach(r => {
+      const snippet = (r.review_text || '').slice(0, 350);
+      ctx += `[${r.show_date}] [${r.score}/5] "${snippet}${r.review_text?.length > 350 ? '...' : ''}"\n\n`;
+    });
+  }
+
+  if (jamEntries.length) {
+    ctx += `\nJAMCHART ENTRIES MATCHING THIS VIBE:\n`;
+    jamEntries.forEach(j => {
+      ctx += `- ${j.show_date} ${j.song_name}: ${j.description || 'community flagged'}\n`;
+    });
+  }
+
+  if (longestJams.length) {
+    ctx += `\nLONGEST JAMS IN THIS ERA/CONTEXT:\n`;
+    longestJams.slice(0, 8).forEach(j => {
+      ctx += `- ${j.show_date} ${j.song_name}: ${j.duration_label || 'long'}\n`;
+    });
+  }
+
+  ctx += `\nUse the specific dates and shows above. Quote what phans said. Give the user something concrete to listen to RIGHT NOW.\n`;
+  return ctx;
+}
+
 // ── Phreezer aggregate data ────────────────────────────────
 
 async function fetchPhreezeerAggregates(pool) {
@@ -446,23 +636,46 @@ export default async function handler(req, res) {
   let phishNetContext = '';
 
   try {
-    if (intent.type === 'show' && PHISH_NET_KEY) {
-      const data = await fetchShowData(intent.date);
-      phishNetContext = formatShowContext(intent.date, data);
-    } else if (intent.type === 'song' && PHISH_NET_KEY) {
-      const data = await fetchSongData(intent.slug);
-      phishNetContext = formatSongContext(intent.name, data);
+    if (intent.type === 'show') {
+      const pool = getPool();
+      const [pnetData, showFacts, teases, guests, dbReviews] = await Promise.all([
+        PHISH_NET_KEY ? fetchShowData(intent.date) : Promise.resolve({ setlist: [], reviews: [], jamcharts: [] }),
+        queryShowFacts(pool, intent.date),
+        queryTeases(pool, intent.date),
+        queryGuests(pool, intent.date),
+        queryReviews(pool, intent.date, 5),
+      ]);
+      // Combine live Phish.net setlist/jamchart data with rich DB facts + reviews
+      phishNetContext = formatShowContext(intent.date, pnetData);
+      phishNetContext += formatRichShowContext(intent.date, showFacts, teases, guests, dbReviews);
+
+    } else if (intent.type === 'song') {
+      const pool = getPool();
+      const [pnetData, songFacts, longestVersions, debut] = await Promise.all([
+        PHISH_NET_KEY ? fetchSongData(intent.slug) : Promise.resolve({ history: [], jamcharts: [] }),
+        querySongFacts(pool, intent.name),
+        queryLongestVersions(pool, intent.name, 10),
+        queryDebut(pool, intent.name),
+      ]);
+      phishNetContext = formatSongContext(intent.name, pnetData);
+      phishNetContext += formatRichSongContext(intent.name, songFacts, longestVersions, debut);
+
     } else if (intent.type === 'recommend' || intent.type === 'general') {
-      // Try DB jamchart search first (rich, keyword-searchable catalog)
       const vibeKeywords = extractVibeKeywords(message);
       const era = extractEraFromMessage(message);
       const pool = getPool();
-      const dbJams = await searchJamchartsDB(pool, vibeKeywords, era);
 
-      if (dbJams.length > 0) {
-        phishNetContext = formatDBJamchartContext(dbJams, vibeKeywords, era);
+      // Pull from all three sources in parallel
+      const [dbJams, vibeReviews, longestJams] = await Promise.all([
+        searchJamchartsDB(pool, vibeKeywords, era),
+        vibeKeywords.length > 0 ? searchReviewsByVibe(pool, vibeKeywords, era, 6) : Promise.resolve([]),
+        era ? queryTopLongestJams(pool, era, 10) : Promise.resolve([]),
+      ]);
+
+      if (dbJams.length > 0 || vibeReviews.length > 0 || longestJams.length > 0) {
+        phishNetContext = formatVibeContext(dbJams, vibeReviews, longestJams, vibeKeywords, era);
       } else if (PHISH_NET_KEY) {
-        // Fallback to recent from Phish.net API
+        // Fallback to recent jamcharts from API
         const jams = await fetchRecentJamcharts();
         phishNetContext = formatJamchartContext(jams);
       }
