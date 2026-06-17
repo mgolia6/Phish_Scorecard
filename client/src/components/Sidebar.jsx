@@ -4,11 +4,11 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
 
   const myPhreezerItems = [
     { id: 'my-shows',        label: 'MY SHOWS',     glyph: '◉', authRequired: true },
+    { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
     { id: 'my-songs',        label: 'MY SONGS',     glyph: '♪', authRequired: true },
     { id: 'my-venues',       label: 'MY VENUES',    glyph: '⌖', authRequired: true },
     { id: 'my-states',       label: 'MY STATES',    glyph: '⬡', authRequired: true },
     { id: 'my-phriends',     label: 'MY PHRIENDS',  glyph: '⚇', authRequired: true },
-    { id: 'my-deep-phreeze', label: 'DEEP PHREEZE', glyph: '❄', authRequired: true },
   ];
 
   const communityItems = [
