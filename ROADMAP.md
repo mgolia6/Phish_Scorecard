@@ -11,7 +11,7 @@
 ## 🔴 OPEN — NEXT SESSION
 
 ### P0
-- **Desktop UAT pass** — Matthew to do full recorded walkthrough with screenshots. Known issues: font sizes cause squinting, visual polish needed across multiple surfaces. Scorecard overlay fix shipped (no longer hides sidebar) but full desktop pass has not been done. This is blocking beta.
+- **Desktop UAT pass** — Matthew to do full recorded walkthrough with screenshots. Known issues: font sizes cause squinting in places, visual polish needed across multiple surfaces, scorecard overlay goes full-screen hiding sidebar/rail (reverted fix — needs proper solution as part of UAT pass, not a quick patch). This is blocking beta.
 
 ### P1 — Pre-beta
 - **iOS Safari UAT** — not yet confirmed complete
