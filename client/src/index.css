@@ -1173,8 +1173,8 @@ select option { background: var(--bg); color: var(--green); }
     bottom: 0; left: 0; right: 0;
     z-index: 200;
     background: var(--bg);
-    border-top: 1px solid rgba(51,255,51,0.18);
-    height: 60px;
+    border-top: 1px solid rgba(51,255,51,0.25);
+    height: 72px;
     align-items: stretch;
     /* safe area for iPhone home indicator */
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -1185,12 +1185,12 @@ select option { background: var(--bg); color: var(--green); }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 5px;
     background: transparent;
     border: none;
-    color: rgba(51,255,51,0.4);
+    color: rgba(51,255,51,0.35);
     cursor: pointer;
-    padding: 8px 4px;
+    padding: 10px 4px;
     transition: color 0.15s;
     -webkit-tap-highlight-color: transparent;
   }
@@ -1198,19 +1198,19 @@ select option { background: var(--bg); color: var(--green); }
     color: var(--cyan);
   }
   .bottom-nav-btn.active .bottom-nav-icon {
-    text-shadow: 0 0 12px rgba(0,224,208,0.7);
+    text-shadow: 0 0 14px rgba(0,224,208,0.8);
   }
   .bottom-nav-btn:active {
     background: rgba(51,255,51,0.04);
   }
   .bottom-nav-icon {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     line-height: 1;
   }
   .bottom-nav-label {
     font-family: var(--font-display);
-    font-size: 0.38rem;
-    letter-spacing: 1.5px;
+    font-size: 0.5rem;
+    letter-spacing: 2px;
     text-transform: uppercase;
     white-space: nowrap;
   }
