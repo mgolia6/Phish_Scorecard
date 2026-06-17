@@ -298,59 +298,74 @@ async function seedGuests(pool) {
 }
 
 async function seedReviews(pool) {
-  // Strategy: fetch reviews via the bulk endpoint
-  // Phish.net v5 /reviews.json returns all reviews paginated
-  let page = 1;
-  let total = 0;
+  // Bulk /reviews.json doesn't return review text — only metadata.
+  // Working pattern (same as Vibe Check + show detail): /reviews/showdate/{date}.json
+  // Strategy: fetch top-rated shows from pn_shows, pull reviews per show.
+  // Prioritize shows with highest pn_rating and most votes — richest content first.
   let upserted = 0;
-  let sampleRecord = null; // capture first record for diagnostics
-  const BATCH = 500;
-  const MAX_PAGES = 60;
+  let showsProcessed = 0;
+  let errors = 0;
 
-  while (page <= MAX_PAGES) {
+  // Pull top 600 shows by rating from what we've already seeded
+  // Covers the canonical "must-know" shows — Big Cypress, Nassau 4/3/98, etc.
+  let shows = [];
+  try {
+    const res = await pool.query(`
+      SELECT show_date
+      FROM pn_shows
+      WHERE pn_rating IS NOT NULL
+      ORDER BY pn_rating DESC, pn_num_ratings DESC NULLS LAST
+      LIMIT 600
+    `);
+    shows = res.rows.map(r => r.show_date instanceof Date
+      ? r.show_date.toISOString().slice(0, 10)
+      : String(r.show_date).slice(0, 10)
+    );
+  } catch (e) {
+    return { type: 'reviews', count: 0, error: 'Could not query pn_shows: ' + e.message };
+  }
+
+  if (!shows.length) {
+    return { type: 'reviews', count: 0, error: 'No shows in pn_shows yet — run songs/shows seed first' };
+  }
+
+  for (const showDate of shows) {
     try {
-      const reviews = await pnetFetch('reviews', { limit: BATCH, page });
-      if (!reviews.length) break;
-      total += reviews.length;
-
-      // Capture first record shape for diagnostics
-      if (!sampleRecord && reviews[0]) {
-        sampleRecord = Object.keys(reviews[0]).join(',');
-      }
+      const url = `${PNET}/reviews/showdate/${showDate}.json?apikey=${PHISH_NET_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) { errors++; continue; }
+      const data = await res.json();
+      const reviews = data?.data || [];
 
       for (const r of reviews) {
         try {
-          // Try every known field name variant for review text
-          const text = (
-            r.review || r.review_text || r.body || r.text ||
-            r.reviewtext || r.content || r.comment || ''
-          ).trim();
-          const showdate = r.showdate || r.show_date || r.date;
-          if (!showdate) continue;
-          // Store even short reviews — 0 char minimum, we'll filter on read
+          // Per-show endpoint uses: review (text), score (1-5), author, tstamp
+          const text = (r.review || r.review_text || r.body || '').trim();
+          if (!text || text.length < 30) continue;
           const score = r.score != null ? parseFloat(r.score) : null;
           await pool.query(`
             INSERT INTO pn_reviews (show_date, score, review_text, era)
-            VALUES ($1,$2,$3,$4)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT DO NOTHING
           `, [
-            showdate,
-            (!isNaN(score) && score >= 0) ? score : null,
-            text || null,
-            getEra(showdate),
+            showDate,
+            (!isNaN(score) && score > 0) ? score : null,
+            text,
+            getEra(showDate),
           ]);
           upserted++;
         } catch (_) {}
       }
 
-      if (reviews.length < BATCH) break;
-      page++;
-      await new Promise(resolve => setTimeout(resolve, 200));
+      showsProcessed++;
+      // 150ms between shows — polite, stays well under rate limit
+      await new Promise(resolve => setTimeout(resolve, 150));
     } catch (e) {
-      return { type: 'reviews', count: upserted, total, pages: page, error: e.message, sample: sampleRecord };
+      errors++;
     }
   }
-  return { type: 'reviews', count: upserted, total, pages: page, sample: sampleRecord };
+
+  return { type: 'reviews', count: upserted, shows_processed: showsProcessed, errors, total_shows: shows.length };
 }
 
 // ── Main handler ─────────────────────────────────────────────
