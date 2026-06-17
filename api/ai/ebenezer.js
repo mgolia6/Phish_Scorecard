@@ -80,6 +80,84 @@ async function fetchRecentJamcharts() {
   } catch (e) { return []; }
 }
 
+// ── DB jamchart search (uses cached jamchart_entries table) ──
+async function searchJamchartsDB(pool, keywords, era) {
+  try {
+    // Check if table exists first
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables WHERE table_name = 'jamchart_entries'
+      ) as exists
+    `);
+    if (!tableCheck.rows[0]?.exists) return [];
+
+    let query, params;
+    if (keywords && keywords.length > 0) {
+      // Full-text + ILIKE search on description + song name
+      const likeTerms = keywords.map((_, i) => `(description ILIKE $${i + 1} OR song_name ILIKE $${i + 1})`).join(' OR ');
+      const likeParams = keywords.map(k => `%${k}%`);
+      if (era) {
+        query = `SELECT show_date, song_name, description, era FROM jamchart_entries WHERE (${likeTerms}) AND era = $${keywords.length + 1} ORDER BY show_date DESC LIMIT 25`;
+        params = [...likeParams, era];
+      } else {
+        query = `SELECT show_date, song_name, description, era FROM jamchart_entries WHERE (${likeTerms}) ORDER BY show_date DESC LIMIT 25`;
+        params = likeParams;
+      }
+    } else if (era) {
+      query = `SELECT show_date, song_name, description, era FROM jamchart_entries WHERE era = $1 ORDER BY RANDOM() LIMIT 20`;
+      params = [era];
+    } else {
+      // Fallback: recent notable entries
+      query = `SELECT show_date, song_name, description, era FROM jamchart_entries ORDER BY show_date DESC LIMIT 30`;
+      params = [];
+    }
+    const result = await pool.query(query, params);
+    return result.rows;
+  } catch (e) {
+    return [];
+  }
+}
+
+function extractVibeKeywords(message) {
+  const msg = message.toLowerCase();
+  const vibeMap = {
+    'cow funk': ['funk', 'cow funk', 'funky', 'groove'],
+    'funk': ['funk', 'funky', 'groove'],
+    'type ii': ['type ii', 'type 2', 'abstract', 'ambient', 'exploratory', 'spacey'],
+    'type 2': ['type ii', 'type 2', 'abstract', 'ambient'],
+    'ambient': ['ambient', 'spacey', 'atmospheric', 'floating'],
+    'space': ['space', 'spacey', 'ambient', 'atmospheric'],
+    'bliss': ['bliss', 'euphoric', 'uplifting', 'soaring'],
+    'dark': ['dark', 'sinister', 'ominous', 'brooding'],
+    'nasty': ['nasty', 'heavy', 'aggressive', 'intense'],
+    'heavy': ['heavy', 'intense', 'aggressive'],
+    'psychedelic': ['psychedelic', 'trippy', 'mind-bending'],
+    'jazz': ['jazz', 'jazzy', 'improvisational'],
+    'bluegrass': ['bluegrass', 'acoustic', 'traditional'],
+    'rock': ['rock', 'rocking', 'energetic'],
+  };
+
+  const found = new Set();
+  for (const [trigger, keywords] of Object.entries(vibeMap)) {
+    if (msg.includes(trigger)) {
+      keywords.forEach(k => found.add(k));
+    }
+  }
+  return [...found];
+}
+
+function extractEraFromMessage(message) {
+  const msg = message.toLowerCase();
+  if (msg.includes('1997') || msg.includes("'97") || msg.includes('97')) return 'peak';
+  if (msg.includes('1995') || msg.includes('1996') || msg.includes("'95") || msg.includes("'96")) return 'peak';
+  if (msg.includes('1998') || msg.includes('1999') || msg.includes('2000') || msg.includes("'98") || msg.includes("'99")) return 'jamming-maturity';
+  if (msg.includes('2001') || msg.includes('2002') || msg.includes('2003') || msg.includes('2004')) return 'wilderness';
+  if (msg.includes('modern') || msg.includes('3.0') || msg.includes('recent') || msg.includes('2019') || msg.includes('2021') || msg.includes('2022') || msg.includes('2023') || msg.includes('2024') || msg.includes('2025')) return 'modern';
+  if (msg.includes('comeback') || msg.includes('2009') || msg.includes('2010') || msg.includes('2011') || msg.includes('2012')) return 'comeback';
+  if (msg.includes('peak') || msg.includes('best era') || msg.includes('golden era')) return 'peak';
+  return null;
+}
+
 // ── Intent detection ────────────────────────────────────────
 
 function detectIntent(message) {
@@ -209,11 +287,25 @@ function formatSongContext(name, { history, jamcharts }) {
 
 function formatJamchartContext(jamcharts) {
   if (!jamcharts.length) return '';
-  let ctx = '\n== RECENT JAMCHART ENTRIES ==\n';
-  ctx += 'These are versions the community has flagged as exceptional recently:\n';
+  let ctx = `\n== RECENT JAMCHART ENTRIES ==\n`;
+  ctx += `These are versions the community has flagged as exceptional recently:\n`;
   jamcharts.slice(0, 20).forEach(j => {
     ctx += `- ${j.showdate} ${j.song || j.songname}: ${j.jamchart_description || j.note || 'notable'}\n`;
   });
+  return ctx;
+}
+
+function formatDBJamchartContext(entries, keywords, era) {
+  if (!entries.length) return '';
+  const vibeLabel = keywords?.length > 0 ? keywords.slice(0, 3).join('/') : 'requested vibe';
+  const eraLabel = era ? ` · ${era} era` : '';
+  let ctx = `\n== JAMCHART ENTRIES — MATCHED: ${vibeLabel.toUpperCase()}${eraLabel.toUpperCase()} ==\n`;
+  ctx += `These are community-flagged exceptional versions matching what the user asked for:\n`;
+  entries.forEach(j => {
+    ctx += `- ${j.show_date} ${j.song_name}: ${j.description || 'community flagged as exceptional'}\n`;
+  });
+  ctx += `\nTotal matched: ${entries.length} entries from the Phreezer jamchart catalog.\n`;
+  ctx += `Use these specific dates and songs in your response. Name them. Give the user something to go listen to RIGHT NOW.\n`;
   return ctx;
 }
 
@@ -360,9 +452,20 @@ export default async function handler(req, res) {
     } else if (intent.type === 'song' && PHISH_NET_KEY) {
       const data = await fetchSongData(intent.slug);
       phishNetContext = formatSongContext(intent.name, data);
-    } else if ((intent.type === 'recommend' || intent.type === 'general') && PHISH_NET_KEY) {
-      const jams = await fetchRecentJamcharts();
-      phishNetContext = formatJamchartContext(jams);
+    } else if (intent.type === 'recommend' || intent.type === 'general') {
+      // Try DB jamchart search first (rich, keyword-searchable catalog)
+      const vibeKeywords = extractVibeKeywords(message);
+      const era = extractEraFromMessage(message);
+      const pool = getPool();
+      const dbJams = await searchJamchartsDB(pool, vibeKeywords, era);
+
+      if (dbJams.length > 0) {
+        phishNetContext = formatDBJamchartContext(dbJams, vibeKeywords, era);
+      } else if (PHISH_NET_KEY) {
+        // Fallback to recent from Phish.net API
+        const jams = await fetchRecentJamcharts();
+        phishNetContext = formatJamchartContext(jams);
+      }
     }
   } catch (e) {
     captureException(e);
