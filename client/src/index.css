@@ -1041,7 +1041,20 @@ select option { background: var(--bg); color: var(--green); }
 .instr-num  { color: var(--orange); font-family: var(--font-display); font-size: 0.7rem; min-width: 24px; padding-top: 2px; }
 
 /* Messages */
-.messages-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+.messages-container {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
 .message         { padding: 12px 20px; border: 1px solid; font-size: 0.8rem; letter-spacing: 1px; animation: slideIn 0.2s ease; max-width: 320px; }
 .message.success { border-color: var(--green); color: var(--green); background: rgba(51,255,51,0.08); box-shadow: var(--glow-green); }
 .message.error   { border-color: var(--red);   color: var(--red);   background: rgba(255,51,51,0.08); }
