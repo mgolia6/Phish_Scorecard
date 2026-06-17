@@ -32,7 +32,7 @@ At the start of every session, before anything else:
 - Provider: Neon Postgres (connected to Vercel project)
 - POSTGRES_URL: stored in Claude project instructions
 - Use psycopg2 to run schema or queries directly from session
-- Schema is in `init-db.sql` — tables: users, shows, ratings, vibe_checks
+- Schema is in `init-db.sql` — tables: users, shows, ratings, vibe_checks, posts, post_replies, post_reactions, user_show_attendance, show_companions, user_badges, email_log
 
 ## Vercel
 - Project: phish-scorecard under Matthew's Pro account
@@ -63,11 +63,15 @@ At the start of every session, before anything else:
 │   ├── ai/ebenezer.js       Uncle Ebenezer AI agent (Sonnet)
 │   ├── analytics/songs.js + venues.js
 │   ├── admin/health.js       server-side external API health probe
-│   └── admin/seed-ebenezer.js  seeds pinned Uncle Ebenezer post (admin only)
+│   ├── admin/seed-ebenezer.js  seeds pinned Uncle Ebenezer post (admin only)
+│   ├── admin/seed-founder-badges.js  assigns PHAB PHIVE / EARLY PHREEZE badges
+│   ├── users/badges.js         get badges for a user
+│   ├── emails/cron.js          daily email cron (onboarding, day3/7/30, milestones)
+│   └── emails/onboarding.js    onboarding email trigger (also fires from verify-email)
 ├── client/src/
 │   ├── App.jsx
 │   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
-│   ├── components/          31 component files (incl. PhreezeFeed, PhriendOverlap,
+│   ├── components/          33 component files (incl. PhreezeFeed, PhriendOverlap,
 │   │                            DesktopLanding, ShowSlotMachine)
 │   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
@@ -85,7 +89,7 @@ At the start of every session, before anything else:
 - `ANTHROPIC_API_KEY`
 - `NODE_ENV`
 - `PHREEZER_RESEND_API_KEY` — email delivery (Resend)
-- `CRON_SECRET` — protects email and etsy cron endpoints
+- `CRON_SECRET` — protects email and etsy cron endpoints (reset via Vercel if lost — not recoverable after set)
 - `VITE_SENTRY_DSN` — Sentry error monitoring (client-side, Matthew to add)
 - `VITE_POSTHOG_KEY` — Posthog analytics (client-side, Matthew to add)
 
