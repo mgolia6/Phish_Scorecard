@@ -432,9 +432,9 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
-      {/* Scorecard overlay — full screen, preserves tab context */}
+      {/* Scorecard overlay — full screen on mobile, inline on desktop */}
       {scorecardOverlay && (
-        <div style={{
+        <div className="scorecard-overlay-wrap" style={{
           position: 'fixed', inset: 0, zIndex: 400,
           background: 'var(--bg)', overflowY: 'auto',
           display: 'flex', flexDirection: 'column',
