@@ -1233,15 +1233,26 @@ function MonitoringTab({ api }) {
 
       {/* Rating Activity */}
       <Panel title="◈ RATING ACTIVITY" color={D.green}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
           {[
-            { val: fmtNum(ratings?.total),    label: 'TOTAL RATED' },
-            { val: fmtNum(ratings?.last_7d),  label: 'LAST 7D' },
-            { val: fmtNum(ratings?.last_24h), label: 'TODAY' },
+            { val: fmtNum(ratings?.total),       label: 'SONG RATINGS' },
+            { val: fmtNum(ratings?.shows_rated),  label: 'SHOWS RATED' },
+            { val: fmtNum(ratings?.raters),       label: 'RATERS' },
           ].map(s => (
             <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(51,255,51,0.1)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
               <div style={{ fontFamily: D.disp, fontSize: '0.38rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[
+            { val: fmtNum(ratings?.last_7d),  label: 'LAST 7 DAYS' },
+            { val: fmtNum(ratings?.last_24h), label: 'TODAY' },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: 'center', padding: '8px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(51,255,51,0.08)' }}>
+              <div style={{ fontFamily: D.disp, fontSize: '1rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.36rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
