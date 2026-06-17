@@ -60,13 +60,12 @@ export default async function handler(req, res) {
       const author = r.author || r.username || r.uid || 'Anonymous';
       const text = r.review_text || r.review || r.body || r.text || '';
       const rawScore = r.score;
-      // phish.net scores 0-10 scale; normalize to 0-5
+      // phish.net review scores are on a 1-5 scale
       let score = null;
       if (rawScore != null && rawScore !== '') {
         const n = parseFloat(rawScore);
-        if (!isNaN(n)) {
-          // phish.net scores are 0-100 scale
-          score = Math.round(n);
+        if (!isNaN(n) && n >= 0) {
+          score = Math.round(n * 10) / 10; // keep one decimal
         }
       }
       // Strip ISO timestamp suffix — keep only YYYY-MM-DD
@@ -79,6 +78,26 @@ export default async function handler(req, res) {
     const avgReviewScore = scoredReviews.length
       ? (scoredReviews.reduce((s, r) => s + parseFloat(r.score), 0) / scoredReviews.length).toFixed(2)
       : null;
+
+    // Try to get aggregate show rating from pn_shows table
+    // This is the Phish.net community consensus rating (1-5 scale, min 3 votes)
+    // Falls back gracefully if table doesn't exist yet (pre-seed)
+    let pnRating = null;
+    let pnNumRatings = null;
+    try {
+      const { getPool } = await import('../_db.js');
+      const pool = getPool();
+      const ratingRes = await pool.query(
+        `SELECT pn_rating, pn_num_ratings FROM pn_shows WHERE show_date = $1`,
+        [date]
+      );
+      if (ratingRes.rows[0]?.pn_rating) {
+        pnRating = parseFloat(ratingRes.rows[0].pn_rating);
+        pnNumRatings = parseInt(ratingRes.rows[0].pn_num_ratings) || null;
+      }
+    } catch (_) {
+      // pn_shows not seeded yet — that's fine
+    }
 
     res.json({
       showid:        first.showid,
@@ -94,6 +113,8 @@ export default async function handler(req, res) {
       setlist_notes: first.setlistnotes || '',
       soundcheck:    (first.soundcheck || '').replace(/<[^>]*>/g, '').trim(),
       songs,
+      pn_rating:      pnRating,
+      pn_num_ratings: pnNumRatings,
       reviews: {
         count:     reviews.length,
         avg_score: avgReviewScore,
