@@ -189,6 +189,8 @@ async function seedShows(pool) {
 }
 
 async function seedLongestJams(pool) {
+  // Note: longestjams endpoint requires elevated Phish.net API access
+  // Request at: https://phish.net/api
   const jams = await pnetFetch('longestjams');
   let upserted = 0;
   for (const j of jams) {
@@ -296,15 +298,14 @@ async function seedGuests(pool) {
 }
 
 async function seedReviews(pool) {
-  // Strategy: fetch ALL reviews, store them all
-  // Reviews are the voice of the community — the richer the better
-  // Phish.net has ~20k+ reviews; we fetch in batches and store all of them
-  // review_text is the gold — phan language, feels, cow funk, bliss, etc.
+  // Strategy: fetch reviews via the bulk endpoint
+  // Phish.net v5 /reviews.json returns all reviews paginated
   let page = 1;
   let total = 0;
   let upserted = 0;
+  let sampleRecord = null; // capture first record for diagnostics
   const BATCH = 500;
-  const MAX_PAGES = 60; // safety cap ~30k reviews
+  const MAX_PAGES = 60;
 
   while (page <= MAX_PAGES) {
     try {
@@ -312,14 +313,21 @@ async function seedReviews(pool) {
       if (!reviews.length) break;
       total += reviews.length;
 
+      // Capture first record shape for diagnostics
+      if (!sampleRecord && reviews[0]) {
+        sampleRecord = Object.keys(reviews[0]).join(',');
+      }
+
       for (const r of reviews) {
         try {
-          // Phish.net v5 bulk reviews use 'review' field (not review_text)
-          // Try all known variants
-          const text = (r.review || r.review_text || r.body || r.text || '').trim();
-          const showdate = r.showdate || r.show_date;
-          if (!text || text.length < 20 || !showdate) continue;
-          // Score on bulk reviews: 0-5 scale directly
+          // Try every known field name variant for review text
+          const text = (
+            r.review || r.review_text || r.body || r.text ||
+            r.reviewtext || r.content || r.comment || ''
+          ).trim();
+          const showdate = r.showdate || r.show_date || r.date;
+          if (!showdate) continue;
+          // Store even short reviews — 0 char minimum, we'll filter on read
           const score = r.score != null ? parseFloat(r.score) : null;
           await pool.query(`
             INSERT INTO pn_reviews (show_date, score, review_text, era)
@@ -327,8 +335,8 @@ async function seedReviews(pool) {
             ON CONFLICT DO NOTHING
           `, [
             showdate,
-            (!isNaN(score) && score > 0) ? score : null,
-            text,
+            (!isNaN(score) && score >= 0) ? score : null,
+            text || null,
             getEra(showdate),
           ]);
           upserted++;
@@ -337,14 +345,12 @@ async function seedReviews(pool) {
 
       if (reviews.length < BATCH) break;
       page++;
-
-      // Small delay to be nice to Phish.net
       await new Promise(resolve => setTimeout(resolve, 200));
     } catch (e) {
-      break;
+      return { type: 'reviews', count: upserted, total, pages: page, error: e.message, sample: sampleRecord };
     }
   }
-  return { type: 'reviews', count: upserted, total, pages: page };
+  return { type: 'reviews', count: upserted, total, pages: page, sample: sampleRecord };
 }
 
 // ── Main handler ─────────────────────────────────────────────
