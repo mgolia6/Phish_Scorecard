@@ -368,11 +368,19 @@ function SystemTab({ api, showMessage }) {
             setActionResult({
               title: 'PHISH.NET CATALOG SEEDED',
               lines: [
-                ...(d.results || []).map(r =>
-                  r.skipped ? `${r.type}: skipped` :
-                  r.status === 'error' ? `${r.type}: ERROR - ${r.error}` :
-                  `${r.type}: ${r.count} records`
-                ),
+                ...(d.results || []).map(r => {
+                  if (r.skipped) return `${r.type}: skipped`;
+                  if (r.status === 'error' || r.error) return `${r.type}: ERROR - ${r.error || 'unknown'}`;
+                  // Base line
+                  const base = `${r.type}: ${r.count ?? 0} records`;
+                  // Extra diagnostic lines for reviews
+                  const extras = [];
+                  if (r.shows_processed !== undefined) extras.push(`  shows processed: ${r.shows_processed} of ${r.total_shows}`);
+                  if (r.errors > 0) extras.push(`  fetch errors: ${r.errors}`);
+                  if (r.first_error) extras.push(`  first error: ${r.first_error}`);
+                  if (r.sample_review_fields) extras.push(`  review fields: ${r.sample_review_fields}`);
+                  return [base, ...extras].join('\n');
+                }),
                 '',
                 ...Object.entries(d.db_counts || {}).map(([k,v]) => `${k}: ${v} rows`),
               ]
