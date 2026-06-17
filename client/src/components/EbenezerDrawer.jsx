@@ -194,7 +194,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
       {/* Floating button */}
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ position: 'fixed', bottom: 20, right: 16, height: 52, width: open ? 52 : 'auto', borderRadius: open ? '50%' : 26, paddingLeft: open ? 0 : 16, paddingRight: open ? 0 : 16, display: open ? 'none' : 'flex', background: 'rgba(255,102,0,0.92)', border: `2px solid ${open ? 'rgba(51,255,51,0.3)' : 'var(--orange)'}`, color: '#000', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 0 24px rgba(255,102,0,0.6), 0 2px 8px rgba(0,0,0,0.4)', zIndex: 1000, transition: 'all 0.2s', fontFamily: 'var(--font-display)' }}
+        style={{ position: 'fixed', bottom: 88, right: 16, height: 52, width: open ? 52 : 'auto', borderRadius: open ? '50%' : 26, paddingLeft: open ? 0 : 16, paddingRight: open ? 0 : 16, display: open ? 'none' : 'flex', background: 'rgba(255,102,0,0.92)', border: `2px solid ${open ? 'rgba(51,255,51,0.3)' : 'var(--orange)'}`, color: '#000', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 0 24px rgba(255,102,0,0.6), 0 2px 8px rgba(0,0,0,0.4)', zIndex: 1000, transition: 'all 0.2s', fontFamily: 'var(--font-display)' }}
         title="Uncle Ebenezer · Jaded Vet"
         className="ebenezer-float-btn"
       >
@@ -203,7 +203,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
       </button>
 
       {/* Drawer */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: open ? '72vh' : 0, background: 'var(--bg-panel)', borderTop: open ? '2px solid rgba(255,102,0,0.4)' : 'none', zIndex: 999, transition: 'height 0.3s cubic-bezier(0.4,0,0.2,1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'fixed', bottom: 72, left: 0, right: 0, height: open ? 'calc(72vh - 72px)' : 0, background: 'var(--bg-panel)', borderTop: open ? '2px solid rgba(255,102,0,0.4)' : 'none', zIndex: 999, transition: 'height 0.3s cubic-bezier(0.4,0,0.2,1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <div style={{ padding: '12px 18px 10px', borderBottom: '1px solid rgba(255,102,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(255,102,0,0.05)' }}>
           <div>
@@ -220,7 +220,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
         <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
       </div>
 
-      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: '72vh', zIndex: 998, background: 'rgba(0,0,0,0.4)' }} />}
+      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'calc(72vh - 72px + 72px)', zIndex: 998, background: 'rgba(0,0,0,0.4)' }} />}
     </>
   );
 }
