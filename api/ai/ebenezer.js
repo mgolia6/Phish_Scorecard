@@ -745,6 +745,17 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!ebenezerOptOut) {
+      logEbenezerConversation({
+        intent: intent?.type || 'general',
+        era: extractEraFromMessage(message),
+        vibeKeywords: extractVibeKeywords(message),
+        messageLength: message.length,
+        responseLength: reply.length,
+        flagged: false,
+      });
+    }
+
     return res.status(200).json({ reply, intent: intent.type });
   } catch (e) {
     captureException(e);
