@@ -60,7 +60,7 @@ export default async function handler(req, res) {
     const userStats = await db.query(`
       SELECT
         COUNT(*) as total,
-        COUNT(*) FILTER (WHERE is_verified) as verified,
+        COUNT(*) FILTER (WHERE email_verified = true) as verified,
         COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') as last_7d,
         COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours') as last_24h
       FROM users
@@ -69,10 +69,12 @@ export default async function handler(req, res) {
     const ratingStats = await db.query(`
       SELECT
         COUNT(*) as total,
+        COUNT(DISTINCT show_date) as shows_rated,
+        COUNT(DISTINCT user_id) as raters,
         COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours') as last_24h,
         COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') as last_7d
       FROM ratings
-    `).catch(() => ({ rows: [{ total: 0, last_24h: 0, last_7d: 0 }] }));
+    `).catch(() => ({ rows: [{ total: 0, shows_rated: 0, raters: 0, last_24h: 0, last_7d: 0 }] }));
 
     const donations = await db.query(`
       SELECT items_sold, donation_total FROM donation_tracker WHERE id = 1
