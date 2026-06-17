@@ -33,28 +33,28 @@ export function SaveCelebration({ onDone }) {
   );
 }
 
-// Pool of rotating Phish inside-joke boot lines
+// Pool of rotating Phish inside-joke boot lines (one picked per session)
 const JOKE_LINES = [
-  'INITIATING SIREN LOOPS...........OK',
-  'CHILLING THE PHREEZER............OK',
-  'EXTRACTING THE JAMS..............OK',
-  'READING THE BOOK.................OK',
-  'LOCATING THE LIZARDS.............OK',
-  'NOTIFYING WILSON.................OK',
-  'CONSULTING ICCULUS...............OK',
-  'CALCULATING TUBE TIME............OK',
+  'INITIATING SIREN LOOPS...........',
+  'CHILLING THE PHREEZER............',
+  'EXTRACTING THE JAMS..............',
+  'READING THE BOOK.................',
+  'LOCATING THE LIZARDS.............',
+  'NOTIFYING WILSON.................',
+  'CONSULTING ICCULUS...............',
+  'CALCULATING TUBE TIME............',
+  'DEFRAGMENTING THE GUELAH.........',
+  'RELEASING THE HARPOON............',
+  'HERBING THE MEATSTICK............',
+  'SYNCING WITH THE MOTHERSHIP......',
 ];
 
-function pickJokeLines(count = 2) {
-  const shuffled = [...JOKE_LINES].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+function pickJokeLine() {
+  return JOKE_LINES[Math.floor(Math.random() * JOKE_LINES.length)];
 }
 
 // Typewriter hook — types out text char by char at given speed
 function useTypewriter(lines, charDelay = 38, lineGap = 320) {
-  // completedLines: array of fully typed strings
-  // currentLine: index of line being typed
-  // currentChars: how many chars of current line are visible
   const [completedLines, setCompletedLines] = useState([]);
   const [currentLine, setCurrentLine] = useState(0);
   const [currentChars, setCurrentChars] = useState(0);
@@ -69,7 +69,6 @@ function useTypewriter(lines, charDelay = 38, lineGap = 320) {
     const totalChars = line.text.length;
 
     if (currentChars < totalChars) {
-      // Type next character
       const tick = () => {
         const now = Date.now();
         if (!lastTickRef.current) lastTickRef.current = now;
@@ -83,7 +82,6 @@ function useTypewriter(lines, charDelay = 38, lineGap = 320) {
       rafRef.current = requestAnimationFrame(tick);
       return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
     } else {
-      // Line complete — pause then move to next
       const t = setTimeout(() => {
         setCompletedLines(prev => [...prev, line]);
         setCurrentLine(l => l + 1);
@@ -103,23 +101,28 @@ function useTypewriter(lines, charDelay = 38, lineGap = 320) {
 
 export function WelcomeCelebration({ username, onDone }) {
   const onDoneRef = useRef(onDone);
-  const jokeLines = useRef(pickJokeLines(2)).current;
+  const jokeLine = useRef(pickJokeLine()).current;
 
+  // Boot sequence:
+  // 1. INITIALIZING — cursor sits 900ms before next line starts
+  // 2. One joke line — cursor sits 700ms after completion
+  // 3. OK — just two chars, then pause 600ms
+  // 4. IDENTITY CONFIRMED
+  // 5. DON'T SUCK
+  // 6. AT PHISH.
   const lines = [
-    { text: 'PHREEZER v2.0 — INITIALIZING...', pauseAfter: 200 },
-    { text: 'LOADING SHOW DATABASE............OK', pauseAfter: 120 },
-    { text: jokeLines[0], pauseAfter: 120 },
-    { text: jokeLines[1], pauseAfter: 300 },
+    { text: 'PHREEZER v2.0 — INITIALIZING...', pauseAfter: 900 },
+    { text: jokeLine,                          pauseAfter: 700 },
+    { text: 'OK',                              pauseAfter: 600, ok: true },
     { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, pauseAfter: 500, accent: true },
-    { text: "DON'T SUCK", pauseAfter: 180, big: true },
-    { text: 'AT PHISH.', pauseAfter: 9999, big: true },
+    { text: "DON'T SUCK",                      pauseAfter: 180, big: true },
+    { text: 'AT PHISH.',                       pauseAfter: 9999, big: true },
   ];
 
-  const { completedLines, currentLine, currentText, done } = useTypewriter(lines, 36, 300);
+  const { completedLines, currentLine, currentText } = useTypewriter(lines, 36, 300);
 
   const [glitching, setGlitching] = useState(false);
 
-  // Auto-dismiss after last line finishes — glitch then exit
   useEffect(() => {
     if (currentLine >= lines.length - 1 && currentText === lines[lines.length - 1]?.text) {
       const t1 = setTimeout(() => setGlitching(true), 600);
@@ -131,6 +134,7 @@ export function WelcomeCelebration({ username, onDone }) {
   const renderLine = (text, meta, key, isTyping = false) => {
     const isBig = meta?.big;
     const isAccent = meta?.accent;
+    const isOk = meta?.ok;
     return (
       <div key={key} style={{
         fontFamily: isBig ? 'var(--font-display)' : 'var(--font-mono)',
@@ -139,12 +143,14 @@ export function WelcomeCelebration({ username, onDone }) {
           : isAccent
           ? 'clamp(0.82rem, 2.8vw, 1.15rem)'
           : 'clamp(0.7rem, 2.4vw, 1rem)',
-        color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
+        color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : isOk ? 'var(--green)' : 'rgba(51,255,51,0.85)',
         letterSpacing: isBig ? '8px' : isAccent ? '5px' : '3px',
         textShadow: isBig
           ? '0 0 40px rgba(255,102,0,0.7)'
           : isAccent
           ? '0 0 24px rgba(0,224,208,0.7)'
+          : isOk
+          ? '0 0 16px rgba(51,255,51,0.9)'
           : '0 0 10px rgba(51,255,51,0.3)',
         textAlign: 'center',
         lineHeight: 1.5,
@@ -207,10 +213,7 @@ export function WelcomeCelebration({ username, onDone }) {
           alignItems: 'center',
           gap: 'clamp(10px, 3vw, 20px)',
         }}>
-          {/* Completed lines */}
           {completedLines.map((line, i) => renderLine(line.text, line, `done-${i}`, false))}
-
-          {/* Currently typing line */}
           {currentLine < lines.length && currentText !== null && (
             renderLine(currentText, lines[currentLine], 'current', true)
           )}
