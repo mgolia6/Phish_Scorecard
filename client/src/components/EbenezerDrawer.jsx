@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 const MAX_HISTORY = 10;
 
@@ -10,7 +10,19 @@ const suggestions = [
 ];
 
 // ── Shared chat UI (used by both mobile drawer and desktop rail) ──────────────
-export function EbenezerChat({ history, setHistory, loading, setLoading, error, setError, input, setInput, inputRef, compact }) {
+
+function exportConversation(history) {
+  const lines = history.map(m =>
+    m.role === 'user' ? 'YOU: ' + m.content : 'UNCLE EBENEZER:\n' + m.content
+  ).join('\n\n---\n\n');
+  const blob = new Blob(['PHREEZER -- UNCLE EBENEZER CONVERSATION\n' + '='.repeat(40) + '\n\n' + lines], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ebenezer-' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+export function EbenezerChat({ history, setHistory, loading, setLoading, error, setError, input, setInput, inputRef, compact, optOut, onToggleOptOut }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -102,6 +114,18 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         <div ref={bottomRef} />
       </div>
 
+      <div style={{ padding: '6px 14px 4px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
+          Conversations logged anonymously.{' '}
+          <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'rgba(51,255,51,0.5)' : 'rgba(255,102,0,0.4)', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', cursor: 'pointer', textDecoration: 'underline' }}>
+            {optOut ? 'Opted out' : 'Opt out'}
+          </button>
+        </div>
+        {history.length > 0 && (
+          <button onClick={() => exportConversation(history)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '3px 8px', color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1px', cursor: 'pointer', marginLeft: 8 }}>EXPORT</button>
+        )}
+      </div>
+
       {/* Input */}
       <div style={{ padding: '10px 14px 16px', borderTop: '1px solid rgba(255,102,0,0.15)', display: 'flex', gap: 8, flexShrink: 0, background: 'var(--bg)' }}>
         <textarea
@@ -141,7 +165,13 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
 // ── MOBILE: bottom drawer ─────────────────────────────────────────────────────
 export function EbenezerDrawer({ history, setHistory, loading, setLoading, error, setError, input, setInput, open, setOpen }) {
   const inputRef = useRef(null);
+  const [optOut, setOptOut] = useState(() => { try { return localStorage.getItem('ebenezer_opt_out') === 'true'; } catch { return false; } });
   useEffect(() => { if (open) setTimeout(() => inputRef.current?.focus(), 300); }, [open]);
+  const handleToggleOptOut = useCallback(async () => {
+    const next = !optOut; setOptOut(next);
+    try { localStorage.setItem('ebenezer_opt_out', String(next)); } catch {}
+    try { await fetch('/api/user/profile', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('phish_token') }, body: JSON.stringify({ ebenezer_opt_out: next }) }); } catch {}
+  }, [optOut]);
 
   return (
     <>
@@ -171,7 +201,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
             <button onClick={() => setOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
           </div>
         </div>
-        <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} />
+        <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
       </div>
 
       {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: '72vh', zIndex: 998, background: 'rgba(0,0,0,0.4)' }} />}
@@ -209,7 +239,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
               <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0, marginLeft: 8 }}>CLEAR</button>
             )}
           </div>
-          <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} compact />
+          <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} compact optOut={false} onToggleOptOut={() => {}} />
         </div>
       )}
     </div>
