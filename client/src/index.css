@@ -1157,7 +1157,62 @@ select option { background: var(--bg); color: var(--green); }
     background: var(--bg);
   }
   .mobile-scroll-body {
-    padding-top: 132px; /* fallback — overridden by JS ResizeObserver */
+    padding-top: 100px;  /* fallback — overridden by JS ResizeObserver */
+    padding-bottom: 72px; /* space for bottom nav */
+  }
+}
+
+/* ── MOBILE BOTTOM NAV ───────────────────────────────── */
+.mobile-bottom-nav {
+  display: none; /* hidden on desktop */
+}
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 200;
+    background: var(--bg);
+    border-top: 1px solid rgba(51,255,51,0.18);
+    height: 60px;
+    align-items: stretch;
+    /* safe area for iPhone home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    color: rgba(51,255,51,0.4);
+    cursor: pointer;
+    padding: 8px 4px;
+    transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-btn.active {
+    color: var(--cyan);
+  }
+  .bottom-nav-btn.active .bottom-nav-icon {
+    text-shadow: 0 0 12px rgba(0,224,208,0.7);
+  }
+  .bottom-nav-btn:active {
+    background: rgba(51,255,51,0.04);
+  }
+  .bottom-nav-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .bottom-nav-label {
+    font-family: var(--font-display);
+    font-size: 0.38rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 }
 
