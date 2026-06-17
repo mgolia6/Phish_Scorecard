@@ -162,11 +162,17 @@ async function seedSongs(pool) {
 async function seedShows(pool) {
   const shows = await pnetFetch('shows');
   let upserted = 0;
+  let sampleFields = null;
+  let ratingsFound = 0;
   for (const s of shows) {
+    // Capture field names from first record
+    if (!sampleFields) sampleFields = Object.keys(s).join(', ');
     try {
-      // Phish.net /shows endpoint returns: rating (1-5 aggregate), num_ratings (vote count)
-      const pnRating = s.rating ? parseFloat(s.rating) : null;
-      const pnNumRatings = s.num_ratings ? parseInt(s.num_ratings) : 0;
+      // Try all known rating field names — Phish.net may use different names
+      const pnRating = s.rating || s.avg_rating || s.artistrating || s.show_rating || null;
+      const pnRatingVal = pnRating ? parseFloat(pnRating) : null;
+      const pnNumRatings = s.num_ratings || s.rating_count || s.votes || 0;
+      if (pnRatingVal) ratingsFound++;
       await pool.query(`
         INSERT INTO pn_shows (show_date, venue, city, state, country, tour_name, era, pn_rating, pn_num_ratings)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -185,7 +191,7 @@ async function seedShows(pool) {
       upserted++;
     } catch (_) {}
   }
-  return { type: 'shows', count: upserted, total: shows.length };
+  return { type: 'shows', count: upserted, total: shows.length, ratings_found: ratingsFound, sample_fields: sampleFields };
 }
 
 async function seedLongestJams(pool) {
