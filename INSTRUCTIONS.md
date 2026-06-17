@@ -32,7 +32,8 @@ At the start of every session, before anything else:
 - Provider: Neon Postgres (connected to Vercel project)
 - POSTGRES_URL: stored in Claude project instructions
 - Use psycopg2 to run schema or queries directly from session
-- Schema is in `init-db.sql` — tables: users, shows, ratings, vibe_checks, posts, post_replies, post_reactions, user_show_attendance, show_companions, user_badges, email_log
+- Schema is in `init-db.sql` — tables: users, shows, ratings, vibe_checks, posts, post_replies, post_reactions, user_show_attendance, show_companions, user_badges, email_log, ai_usage_log, ebenezer_log
+- Phish.net knowledge base tables (created at seed time): pn_songs, pn_shows, pn_reviews, jamchart_entries
 
 ## Vercel
 - Project: phish-scorecard under Matthew's Pro account
@@ -59,12 +60,18 @@ At the start of every session, before anything else:
 │   ├── ratings/[showDate].js
 │   ├── user/shows.js
 │   ├── user/kpi.js
-│   ├── ai/summarize.js      Vibe Check (Haiku, cached in vibe_checks table)
-│   ├── ai/ebenezer.js       Uncle Ebenezer AI agent (Sonnet)
+│   ├── ai/summarize.js        Vibe Check (Haiku, cached in vibe_checks table)
+│   ├── ai/ebenezer.js         Uncle Ebenezer AI agent (Sonnet)
+│   ├── ai/ebenezer-moderate.js  Pre-flight content moderation (hard blocklist + Haiku)
+│   ├── ai/ebenezer-log.js     Anonymous conversation metadata logger
 │   ├── analytics/songs.js + venues.js
-│   ├── admin/health.js       server-side external API health probe
-│   ├── admin/seed-ebenezer.js  seeds pinned Uncle Ebenezer post (admin only)
-│   ├── admin/seed-founder-badges.js  assigns PHAB PHIVE / EARLY PHREEZE badges
+│   ├── admin/health.js              server-side external API health probe
+│   ├── admin/seed-ebenezer.js       seeds pinned Uncle Ebenezer post (admin only)
+│   ├── admin/seed-founder-badges.js assigns PHAB PHIVE / EARLY PHREEZE badges
+│   ├── admin/seed-phishnet.js       seeds pn_songs, pn_shows, pn_reviews from Phish.net API
+│   ├── admin/seed-jamcharts.js      seeds jamchart_entries table (all ~2500 entries)
+│   ├── admin/refresh-jamcharts.js   upserts recent 200 jamcharts (also Monday 6am cron)
+│   ├── admin/monitoring.js          system health + Ebenezer knowledge base status
 │   ├── users/badges.js         get badges for a user
 │   ├── emails/cron.js          daily email cron (onboarding, day3/7/30, milestones)
 │   └── emails/onboarding.js    onboarding email trigger (also fires from verify-email)
