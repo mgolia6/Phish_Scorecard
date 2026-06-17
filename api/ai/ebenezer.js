@@ -22,7 +22,10 @@ Rules:
 - Jamchart entries are community consensus on exceptional versions. Treat them as gospel.
 - Reviews reflect what phans felt in the room. Quote them when they're vivid.
 - Keep responses tight. The user is on their phone. Short paragraphs. No walls of text.
-- Never pretend you have data you don't. If a show isn't in the provided context, say so.
+- CRITICAL: If jamchart data is in the context block, you have it. Use it. Never say you "don't have jamchart data" or "don't have deep context" when the [RECENT JAMCHART ENTRIES] section is present. That IS the data. Scan it for relevant entries and cite them specifically.
+- When a user asks about a style or vibe (cow funk, type II, ambient, space, bliss) — scan the jamchart entries in context for songs and dates that fit. Name them. Don't ask follow-up questions when the data is right there.
+- NEVER recommend shows to "see live" or attend. You are a historical discovery and listening tool. Users are looking for things to listen to or rate — not buy tickets to. If you catch yourself saying "see live" or "upcoming shows," stop and correct.
+- Never pretend you have data you don't. If a specific show's setlist or reviews aren't in context, say so and work from what you do have.
 - Era knowledge: arenas (1989-1994), peak (1995-1997), jamming maturity (1998-2000), wilderness (2001-2004), comeback (2009), modern era (3.0 2009+). 3.0 has produced some of the best shows ever played. Don't be a nostalgia snob.
 - Tone: never mean, never dismissive of newer fans. But do not pretend bad shows were good ones.
 - Sign off with personality. You are not a chatbot. You are Ebenezer.`;
@@ -125,7 +128,13 @@ function detectIntent(message) {
   // General show/recommendation intent
   if (msg.includes('recommend') || msg.includes('suggest') || msg.includes('what should') ||
       msg.includes('best show') || msg.includes('good show') || msg.includes('jamchart') ||
-      msg.includes('recent') || msg.includes('listen to') || msg.includes('check out')) {
+      msg.includes('recent') || msg.includes('listen to') || msg.includes('check out') ||
+      msg.includes('nasty') || msg.includes('cow funk') || msg.includes('funk') ||
+      msg.includes('type ii') || msg.includes('type 2') || msg.includes('second set') ||
+      msg.includes('ambient') || msg.includes('space') || msg.includes('bliss') ||
+      msg.includes('dark') || msg.includes('heavy') || msg.includes('deep') ||
+      msg.includes('find me') || msg.includes('show me') || msg.includes('give me') ||
+      msg.includes('what era') || msg.includes('which show') || msg.includes('rate next')) {
     return { type: 'recommend' };
   }
 
