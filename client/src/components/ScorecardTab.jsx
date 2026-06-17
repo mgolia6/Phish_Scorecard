@@ -784,21 +784,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 ))}
               </div>
 
-              {/* Phish.net community rating — separate signal from Phreezer */}
-              {currentShow.pn_rating && (
-                <div style={{
-                  background: 'rgba(255,102,0,0.04)', border: '1px solid rgba(255,102,0,0.18)',
-                  padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                }}>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px' }}>PHISH.NET</div>
-                    {currentShow.pn_num_ratings && (
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,102,0,0.35)', marginTop: 2 }}>{currentShow.pn_num_ratings} votes</div>
-                    )}
-                  </div>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--orange)', textShadow: '0 0 16px rgba(255,102,0,0.4)' }}>{parseFloat(currentShow.pn_rating).toFixed(3)}</span>
-                </div>
-              )}
+              {/* Phish.net community rating — hidden pending API access
+                   pn_rating not available via Phish.net v5 API; pending inquiry with phish.net */}
 
               {/* Your score if rated */}
               {overallAvg && (
