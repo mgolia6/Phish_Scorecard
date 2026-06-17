@@ -289,12 +289,65 @@ function ErrorLogTab() {
   );
 }
 
+// ── Tooltip component ──────────────────────────────────────
+function Tooltip({ text, children }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+      onTouchStart={() => setVisible(v => !v)}
+    >
+      {children}
+      {visible && (
+        <div style={{
+          position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)',
+          background: '#111', border: '1px solid rgba(0,224,208,0.3)', padding: '8px 12px',
+          fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(0,224,208,0.85)',
+          lineHeight: 1.5, whiteSpace: 'nowrap', zIndex: 999, pointerEvents: 'none',
+          boxShadow: '0 0 12px rgba(0,224,208,0.15)',
+        }}>
+          {text}
+          <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
+            width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+            borderTop: '5px solid rgba(0,224,208,0.3)' }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── ActionButton with tooltip ───────────────────────────────
+function ActionBtn({ label, tooltip, color, working, workingKey, onClick, disabled }) {
+  const isWorking = working === workingKey;
+  return (
+    <Tooltip text={tooltip}>
+      <button
+        onClick={onClick}
+        disabled={isWorking || disabled}
+        style={{
+          fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '2px',
+          padding: '12px 14px', border: `1px solid ${color}`,
+          background: isWorking ? `${color}18` : 'transparent',
+          color, cursor: isWorking || disabled ? 'default' : 'pointer',
+          opacity: isWorking || disabled ? 0.5 : 1, width: '100%', textAlign: 'left',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}
+      >
+        <span>{isWorking ? '◈ WORKING...' : label}</span>
+        <span style={{ fontSize: '0.5rem', color: `${color}66`, fontFamily: 'var(--font-mono)' }}>?</span>
+      </button>
+    </Tooltip>
+  );
+}
+
 // ── System Stats ───────────────────────────────────────────
 function SystemTab({ api, showMessage }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(null);
   const [migrationResult, setMigrationResult] = useState(null);
+  const [actionResult, setActionResult] = useState(null);
 
   const loadStats = () => {
     setLoading(true);
@@ -306,29 +359,18 @@ function SystemTab({ api, showMessage }) {
 
   useEffect(() => { loadStats(); }, []);
 
-  const runMigrations = async () => {
-    setWorking('migrate');
-    try {
-      const token = localStorage.getItem('phish_token');
-      const res = await fetch('/api/admin/migrate', {
-        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      setMigrationResult(data);
-      loadStats();
-    } catch (err) {
-      setMigrationResult({ error: err.message });
-    } finally { setWorking(null); }
+  const adminFetch = (path, method = 'GET') => {
+    const token = localStorage.getItem('phish_token');
+    return fetch(path, { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } });
   };
 
-  const clearCache = async () => {
-    setWorking('cache');
+  const runAction = async (key, path, method = 'POST', successFn) => {
+    setWorking(key);
     try {
-      const token = localStorage.getItem('phish_token');
-      await fetch('/api/admin/clear-cache', {
-        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-      });
-      showMessage('Cache cleared');
+      const res = await adminFetch(path, method);
+      const data = await res.json();
+      if (successFn) successFn(data);
+      else showMessage(data.ok ? 'Done.' : ('Error: ' + (data.error || JSON.stringify(data))));
       loadStats();
     } catch (err) {
       showMessage('Failed: ' + err.message);
@@ -336,6 +378,84 @@ function SystemTab({ api, showMessage }) {
   };
 
   if (loading) return <FullPageLoader text="LOADING STATS..." />;
+
+  const ACTIONS = [
+    {
+      group: 'DATABASE',
+      color: D.cyan,
+      items: [
+        {
+          key: 'migrate',
+          label: '⚙ RUN MIGRATIONS',
+          tooltip: 'Run pending DB schema migrations. Safe to run multiple times — skips already-applied ones.',
+          action: async () => {
+            setWorking('migrate');
+            try {
+              const res = await adminFetch('/api/admin/migrate', 'POST');
+              const data = await res.json();
+              setMigrationResult(data);
+              loadStats();
+            } catch (err) { setMigrationResult({ error: err.message }); }
+            finally { setWorking(null); }
+          },
+        },
+        {
+          key: 'cache',
+          label: '✕ CLEAR SHOW CACHE',
+          tooltip: 'Clears the cached show/setlist data. Shows will re-fetch from Phish.net on next load.',
+          action: () => runAction('cache', '/api/admin/clear-cache'),
+        },
+      ],
+    },
+    {
+      group: 'UNCLE EBENEZER',
+      color: D.orange,
+      items: [
+        {
+          key: 'seed-jamcharts',
+          label: '❄ SEED JAMCHART CATALOG',
+          tooltip: 'Fetches ALL Phish.net jamchart entries (~2500) into the DB. Run once. Takes ~30s. Ebenezer uses this for vibe/style queries.',
+          action: () => runAction('seed-jamcharts', '/api/admin/seed-jamcharts', 'GET', (d) => {
+            setActionResult({ title: 'JAMCHART SEED COMPLETE', lines: [
+              `Inserted: ${d.inserted}`,
+              `Updated: ${d.updated}`,
+              `Errors: ${d.errors}`,
+              `Total in DB: ${d.total}`,
+              `Pages fetched: ${d.pages}`,
+            ]});
+          }),
+        },
+        {
+          key: 'refresh-jamcharts',
+          label: '↺ REFRESH JAMCHARTS',
+          tooltip: 'Fetches the 200 most recent Phish.net jamchart entries and upserts them. Also runs automatically every Monday.',
+          action: () => runAction('refresh-jamcharts', '/api/admin/refresh-jamcharts', 'GET', (d) => {
+            showMessage(`Refreshed — ${d.inserted} new, ${d.updated} updated, ${d.total} total`);
+          }),
+        },
+        {
+          key: 'seed-ebenezer',
+          label: '◈ SEED EBENEZER POST',
+          tooltip: 'Creates or refreshes the pinned Uncle Ebenezer introduction post in the community feed.',
+          action: () => runAction('seed-ebenezer', '/api/admin/seed-ebenezer'),
+        },
+      ],
+    },
+    {
+      group: 'USERS + BADGES',
+      color: D.green,
+      items: [
+        {
+          key: 'seed-badges',
+          label: '⬡ SEED FOUNDER BADGES',
+          tooltip: 'Assigns PHAB PHIVE (users #1-5) and EARLY PHREEZE (users #6-20) badges by signup date. Safe to re-run — picks up newly verified users.',
+          action: () => runAction('seed-badges', '/api/admin/seed-founder-badges', 'GET', (d) => {
+            if (d.ok) setActionResult({ title: 'BADGES ASSIGNED', lines: d.assigned.map(u => `#${u.rank} ${u.username} → ${u.badge}`) });
+          }),
+        },
+      ],
+    },
+  ];
 
   return (
     <div style={{ padding: '0 10px 20px' }}>
@@ -363,6 +483,20 @@ function SystemTab({ api, showMessage }) {
         </div>
       )}
 
+      {actionResult && (
+        <div className="modal-overlay" style={{ zIndex: 700 }}>
+          <div className="modal" style={{ maxWidth: 420 }}>
+            <div className="modal-title" style={{ color: D.green }}>{actionResult.title}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: '50vh', overflowY: 'auto', marginBottom: 20 }}>
+              {actionResult.lines.map((line, i) => (
+                <div key={i} style={{ fontFamily: D.mono, fontSize: '0.75rem', color: 'rgba(51,255,51,0.8)', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>{line}</div>
+              ))}
+            </div>
+            <button className="btn-primary" style={{ width: '100%', padding: '13px' }} onClick={() => setActionResult(null)}>CLOSE</button>
+          </div>
+        </div>
+      )}
+
       <SectionLabel color={D.cyan}>◈ SYSTEM STATS</SectionLabel>
 
       {stats && (
@@ -384,35 +518,35 @@ function SystemTab({ api, showMessage }) {
         </>
       )}
 
-      <SectionLabel color={D.orange}>◈ ACTIONS</SectionLabel>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <button onClick={runMigrations} disabled={!!working} style={{
-          fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '15px',
-          border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer',
-        }}>{working === 'migrate' ? 'RUNNING...' : '⚙ RUN MIGRATIONS'}</button>
-
-        <button
-          onClick={async () => {
-            setWorking('seed-badges');
-            try {
-              const res = await fetch('/api/admin/seed-founder-badges', {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('phish_token')}` }
-              });
-              const d = await res.json();
-              if (d.ok) alert(`Badges assigned:\n${d.assigned.map(u => `#${u.rank} ${u.username} → ${u.badge}`).join('\n')}`);
-              else alert('Error: ' + JSON.stringify(d));
-            } catch (e) { alert('Failed: ' + e.message); }
-            finally { setWorking(null); }
-          }}
-          disabled={working === 'seed-badges'}
-          style={{ fontFamily: D.fontDisplay, fontSize: '0.48rem', letterSpacing: '2px', padding: '10px 18px', background: 'transparent', border: `1px solid ${D.orange}`, color: D.orange, cursor: 'pointer', opacity: working === 'seed-badges' ? 0.4 : 1, marginTop: 8 }}
-        >{working === 'seed-badges' ? 'SEEDING...' : '⬡ SEED FOUNDER BADGES'}</button>
-        <button onClick={clearCache} disabled={!!working} style={{
-          fontFamily: D.disp, fontSize: '0.5rem', letterSpacing: '2px', padding: '13px',
-          border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer',
-        }}>{working === 'cache' ? 'CLEARING...' : '✕ CLEAR SHOW CACHE'}</button>
-      </div>
+      {ACTIONS.map(group => (
+        <div key={group.group} style={{ marginBottom: 20 }}>
+          <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: group.color, letterSpacing: '3px', marginBottom: 8, opacity: 0.7 }}>
+            ◈ {group.group}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {group.items.map(item => (
+              <Tooltip key={item.key} text={item.tooltip}>
+                <button
+                  onClick={item.action}
+                  disabled={!!working}
+                  style={{
+                    fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px',
+                    padding: '13px 16px', border: `1px solid ${group.color}`,
+                    background: working === item.key ? `${group.color}18` : 'transparent',
+                    color: group.color, cursor: !!working ? 'default' : 'pointer',
+                    opacity: !!working && working !== item.key ? 0.4 : 1,
+                    width: '100%', textAlign: 'left',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  }}
+                >
+                  <span>{working === item.key ? '◈ WORKING...' : item.label}</span>
+                  <span style={{ fontSize: '0.55rem', color: `${group.color}55`, fontFamily: D.mono }}>HOLD FOR INFO</span>
+                </button>
+              </Tooltip>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
