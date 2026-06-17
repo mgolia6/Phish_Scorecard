@@ -395,13 +395,6 @@ export default function App() {
               </div>
             </div>
           </header>
-          <nav className="tab-nav">
-            {user && <>
-              <button className={`tab-btn ${['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY PHREEZER</button>
-              <button className={`tab-btn ${['feed','community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('feed')}>COMMUNITY</button>
-            </>}
-            <button className={`tab-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>SCORECARD</button>
-          </nav>
           {user && ['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) && (
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'my-shows'  ? 'active' : ''}`} onClick={() => setTab('my-shows')}>MY SHOWS</button>
@@ -429,6 +422,31 @@ export default function App() {
             {renderMain(true)}
           </div>
         </div>
+        {/* MOBILE BOTTOM NAV */}
+        <nav className="mobile-bottom-nav">
+          {user && (
+            <button className={`bottom-nav-btn ${['my-shows','my-songs','my-venues','my-states','my-phriends','my-deep-phreeze','analytics'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('my-shows')}>
+              <span className="bottom-nav-icon">◉</span>
+              <span className="bottom-nav-label">MY PHREEZER</span>
+            </button>
+          )}
+          {user && (
+            <button className={`bottom-nav-btn ${['feed','community','leaderboard','top-shows','top-songs','top-venues','top-states','phriend-overlap'].includes(tab) ? 'active' : ''}`} onClick={() => setTab('feed')}>
+              <span className="bottom-nav-icon">⬡</span>
+              <span className="bottom-nav-label">COMMUNITY</span>
+            </button>
+          )}
+          <button className={`bottom-nav-btn ${tab === 'scorecard' ? 'active' : ''}`} onClick={() => setTab('scorecard')}>
+            <span className="bottom-nav-icon">★</span>
+            <span className="bottom-nav-label">SCORECARD</span>
+          </button>
+          {!user && (
+            <button className="bottom-nav-btn" onClick={() => openAuth('login')}>
+              <span className="bottom-nav-icon">→</span>
+              <span className="bottom-nav-label">LOGIN</span>
+            </button>
+          )}
+        </nav>
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
