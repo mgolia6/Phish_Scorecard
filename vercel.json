@@ -239,6 +239,10 @@
       "destination": "/api/admin/seed-jamcharts"
     },
     {
+      "source": "/api/admin/seed-phishnet",
+      "destination": "/api/admin/seed-phishnet"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
