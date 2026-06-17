@@ -364,7 +364,8 @@ export default async function handler(req, res) {
 
   // Which data types to seed — default all, or pass ?types=songs,shows etc
   const requested = req.query?.types ? req.query.types.split(',') : null;
-  const shouldRun = (type) => !requested || requested.includes(type);
+  const VALID_TYPES = ['songs', 'shows', 'reviews'];
+  const shouldRun = (type) => VALID_TYPES.includes(type) && (!requested || requested.includes(type));
 
   const pool = getPool();
   const results = [];
@@ -378,14 +379,12 @@ export default async function handler(req, res) {
   }
 
   // Run each seeder — continue even if one fails
+  // Phish.net v5 API exposes: shows, songs, songdata, setlists, jamcharts, reviews, venues, attendance
+  // longestjams, debuts, teases, guests are web-only chart pages — no API endpoint exists
   const seeders = [
-    { key: 'songs',        fn: () => seedSongs(pool) },
-    { key: 'shows',        fn: () => seedShows(pool) },
-    { key: 'longest_jams', fn: () => seedLongestJams(pool) },
-    { key: 'debuts',       fn: () => seedDebuts(pool) },
-    { key: 'teases',       fn: () => seedTeases(pool) },
-    { key: 'guests',       fn: () => seedGuests(pool) },
-    { key: 'reviews',      fn: () => seedReviews(pool) },
+    { key: 'songs',   fn: () => seedSongs(pool) },
+    { key: 'shows',   fn: () => seedShows(pool) },
+    { key: 'reviews', fn: () => seedReviews(pool) },
   ];
 
   for (const seeder of seeders) {
@@ -403,7 +402,7 @@ export default async function handler(req, res) {
 
   // Row counts for summary
   const counts = {};
-  for (const tbl of ['pn_songs','pn_shows','pn_longest_jams','pn_debuts','pn_teases','pn_reviews','pn_guests']) {
+  for (const tbl of ['pn_songs','pn_shows','pn_reviews']) {
     try {
       const r = await pool.query(`SELECT COUNT(*) FROM ${tbl}`);
       counts[tbl] = parseInt(r.rows[0].count);
