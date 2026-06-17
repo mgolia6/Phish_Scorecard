@@ -1,5 +1,5 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-16
+**Last updated:** 2026-06-17
 
 ---
 
@@ -7,7 +7,7 @@
 - **Live at:** phreezer.mpgink.com
 - **Stage:** Beta prep — Phish.net community post drafted, not yet published
 - **Primary surface:** Mobile (iOS Safari) — all layout decisions mobile-first
-- **Desktop:** Supported, three-column layout active
+- **Desktop:** Supported, three-column layout active — unconfirmed visually this session (Matthew was on mobile)
 
 ---
 
@@ -88,9 +88,20 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 
 ### Desktop Card Stats
 `.desktop-card-stats` class: hidden on mobile, flex on ≥769px
-- Top Shows: RATERS · TOTAL RATINGS · VENUE inline
-- Top Venues: SHOWS RATED · RATERS · TOTAL RATINGS inline
-- Top Songs: RATERS · TIMES RATED inline
+- !important removed — was silently blocking display
+- Top Shows: RATERS · SONGS · DAY · S1·S2·E breakdown
+- Top Songs: RATERS · VERSIONS · HOME SET · FIRST RATED
+- Top Venues: SHOWS · RATERS · RATINGS · DOW
+- Top States: RATED · VENUES · RATERS · COVERAGE%
+
+### Desktop Profile Modal
+- Width: 820px (bumped from 560px)
+- Tabs font: 0.62rem, padding 14px (bumped from 0.49rem / 10px)
+- Header, username, email, stat fonts all bumped
+
+### Desktop Feedback Modal
+- maxWidth: 520px (bumped from 480px)
+- Textarea font: 0.82rem, minHeight: 80px
 
 ---
 
@@ -105,8 +116,11 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ### Feed
 - Pinned posts sort first, orange left border, ❄ PINNED · UNCLE EBENEZER badge
 - `pinned` BOOLEAN + `author_label` VARCHAR(50) columns on posts table
-- KNOWN ISSUE: author_label not overriding username display — fix pending
-- Built for mobile currently — desktop layout pass pending
+- author_label display FIXED — displayName() helper checks author_label first
+- Body truncation at 220 chars with READ MORE / SHOW LESS toggle
+- New post box: collapsed single-row prompt, expands on tap
+- 80px bottom padding on feed container
+- Action buttons (▲ react, ◈ replies, + reply) always visible
 
 ### Phriend Overlap
 - Logged-out gate: ⚇ icon + description + CREATE ACCOUNT/LOGIN CTAs
@@ -115,8 +129,10 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ---
 
 ## ProfileModal
-4 tabs: **MY PHISH · BADGES · ABOUT · SHOP**
-- Currently built for mobile — desktop pass pending (target: 700–900px wide panel)
+5 tabs: **MY PHISH · BADGES · ABOUT · AI · SHOP**
+- AI tab added this session — between ABOUT and SHOP
+- BADGES tab: shows founder badges (PHAB PHIVE, EARLY PHREEZE) and milestone badges
+- Desktop width: 820px
 
 ---
 
@@ -144,17 +160,22 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 
 ### Show Masthead (Desktop)
 - Left: date, venue, location, tour, audio badge
-- Right panel: PHAN REVIEWS / PHREEZERS RATED / PHRIENDS HERE stat boxes + YOUR SCORE
+- Right panel (.show-masthead-right): PHAN REVIEWS / PHREEZERS RATED / PHRIENDS HERE + YOUR SCORE
+- Right panel hidden on mobile via CSS class — single column on mobile
 
 ---
 
-## Entry Animation (WelcomeCelebration)
-- Centered, max-width 720px, dark overlay
-- Snowflake at top (90px, cyan glow)
-- Lines: 1rem / 1.15rem / 1.8rem, 20px gap between, centered
-- Big final line "DON'T SUCK AT PHISH" in orange at 1.8rem
-- TAP TO SKIP at bottom
-- Do NOT revert to left-aligned or particle animation
+## Entry Animation (WelcomeCelebration / Boot Sequence)
+- Full typewriter effect — char-by-char at 36ms/char with blinking block cursor
+- Rotating inside-joke lines (NOTIFYING WILSON, CONSULTING ICCULUS, etc.)
+- Snowflake: clamp(100px, 28vw, 160px) — large, centered, cyan glow
+- Lines: clamp values for responsive sizing
+- DON'T SUCK split across two lines to prevent mobile overflow
+- Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app
+- TAP TO SKIP visible after 2nd line
+- Boot sequence z-index: 2000 — always above FullPageLoader (z-index: 1000)
+- FullPageLoader: restored spinner for all other loading states (admin, community tabs, etc.)
+- Do NOT revert to left-aligned, instant-pop, or particle animation
 
 ---
 
@@ -175,6 +196,7 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - Desktop: persistent right rail (auth-gated)
 - Mobile: floating ❄ button — label is "❄ ASK EBENEZER"
 - Logged-out users on desktop: no rail (eliminates dead space)
+- Now pulls live Phish.net data (setlists, reviews, jamcharts) + Phreezer community aggregates
 
 ---
 
@@ -187,24 +209,23 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - **FEED:** default COMMUNITY landing, first in sidebar — do not revert
 - **PHRIEND OVERLAP:** second in sidebar — do not revert
 - **Attendance type:** mandatory gate on first star tap — do not remove
-- **Entry animation:** terminal boot sequence, centered, no particles — do not revert
+- **Entry animation:** terminal boot sequence, typewriter, glitch exit, centered — do not revert
 - **Scorecard keying:** always posKey, never song name
 - **Error boundary:** Mike Says No for ALL errors — do not revert to Ebenezer
 - **Default show list:** hidden on scorecard — arrow shows immediately
 - **Logged-out desktop:** home tab with DesktopLanding — not scorecard
+- **New post box:** collapsed single row — do not revert to always-expanded
+- **ProfileModal tabs:** MY PHISH · BADGES · ABOUT · AI · SHOP — do not reorder
 
 ---
 
 ## What's Explicitly NOT There Yet
-- Ebenezer post author_label display fix (shows as mpgink username)
-- Feed desktop layout (reply/upvote buttons not visible on desktop)
-- Profile modal desktop layout (too narrow, mobile-sized)
-- Feedback modal desktop sizing
-- Global desktop font pass (everything too small on desktop)
-- Community card data expansion (Top Songs: times played, set breakdown; Top Venues: attendance data)
-- Feed moderation in admin panel
+- Desktop layout visual confirmation (unconfirmed — Matthew on mobile all session)
 - Feed reply notifications
+- Feed moderation in admin panel
 - Phish Phreeze community subtab (band-level stats)
 - Etsy OAuth activation (pending Etsy app review)
-- Rate limiting on auth endpoints
-- Sentry DSN fix (malformed org ID in Vercel env var)
+- Sentry DSN fix (malformed org ID — Matthew to update in Vercel)
+- GoDaddy DNS for phreezer.mpgink.com in Resend
+- Song duration storage (duration_seconds column not yet added)
+- Ebenezer song intent detection — only ~40 songs hardcoded, needs expansion
