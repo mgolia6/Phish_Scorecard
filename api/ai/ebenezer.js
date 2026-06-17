@@ -26,6 +26,7 @@ Rules:
 - Keep responses tight. The user is on their phone. Short paragraphs. No walls of text.
 - CRITICAL: If jamchart data is in the context block, you have it. Use it. Never say you "don't have jamchart data" or "don't have deep context" when the [RECENT JAMCHART ENTRIES] or [JAMCHART ENTRIES] section is present. That IS the data. Scan it for relevant entries and cite them specifically.
 - CRITICAL: The jamchart data loaded is NOT limited to any era. It covers the full catalog. If the search returned early-era results, that's what matched the query — it does NOT mean that's all that exists. Never tell the user the data is limited to a specific era or time period.
+- CRITICAL: When a user asks about a specific era (e.g. "best 1997 shows"), the context block WILL contain jamchart entries from that era. Use them. List specific dates. Do NOT say you don't have data for that era — the data is in the context. If for some reason the context block is empty, use your general knowledge of that era instead of claiming ignorance.
 - When a user asks about a style or vibe — scan every jamchart entry in context. If none match well, say so AND give your best answer from general Phish knowledge. Do NOT tell the user to go to Phish.net. You ARE the discovery tool. Sending them elsewhere is a failure.
 - NEVER recommend shows to "see live" or attend. You are a historical discovery and listening tool. Users are looking for things to listen to or rate — not buy tickets to. If you catch yourself saying "see live" or "upcoming shows," stop and correct.
 - Never pretend you have data you don't. If a specific show's setlist or reviews aren't in context, say so — but still give your best answer from what you know. Never leave the user with nothing.
@@ -107,7 +108,8 @@ async function searchJamchartsDB(pool, keywords, era) {
         params = likeParams;
       }
     } else if (era) {
-      query = `SELECT show_date, song_name, description, era FROM jamchart_entries WHERE era = $1 ORDER BY RANDOM() LIMIT 20`;
+      // Era-only query — sample notable entries from that era
+      query = `SELECT show_date, song_name, description, era FROM jamchart_entries WHERE era = $1 ORDER BY show_date DESC LIMIT 30`;
       params = [era];
     } else {
       // Fallback: recent notable entries
@@ -699,9 +701,11 @@ export default async function handler(req, res) {
       const pool = getPool();
 
       // Pull from all three sources in parallel
+      // When no vibe keywords but era is specified (e.g. "best 1997 shows"), search reviews by era
+      const eraReviewKeywords = era && vibeKeywords.length === 0 ? ['show', 'second set', 'incredible', 'must hear', 'best'] : vibeKeywords;
       const [dbJams, vibeReviews, longestJams] = await Promise.all([
         searchJamchartsDB(pool, vibeKeywords, era),
-        vibeKeywords.length > 0 ? searchReviewsByVibe(pool, vibeKeywords, era, 6) : Promise.resolve([]),
+        searchReviewsByVibe(pool, eraReviewKeywords, era, 6),
         era ? queryTopLongestJams(pool, era, 10) : Promise.resolve([]),
       ]);
 
