@@ -198,12 +198,12 @@ Font: `var(--font-mono)`, `0.5rem`, colored at 60% opacity.
 ```css
 .desktop-filter-block { display: block; }
 .mobile-filter-block  { display: none; }
-.desktop-card-stats   { display: none !important; }
+.desktop-card-stats   { display: none; }  /* hidden on mobile */
 
 @media (min-width: 769px) {
   .desktop-filter-block { display: block; }  /* already default */
   .mobile-filter-block  { display: none; }   /* already default */
-  .desktop-card-stats   { display: flex !important; }
+  .desktop-card-stats   { display: flex; align-items: center; gap: 0; }  /* visible on desktop */
 }
 @media (max-width: 768px) {
   .desktop-filter-block { display: none; }
@@ -221,3 +221,75 @@ Use these classes to gate desktop vs mobile UI — never rely on JS window width
 - Retry: `0.5rem` Orbitron, border `rgba(255,51,51,0.2)`, padding `8px 20px`
 - Entire overlay is clickable (onClick=resetError)
 
+
+
+---
+
+## New Patterns — 2026-06-17
+
+### Boot Sequence Animations
+```css
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+/* Blinking block cursor on typewriter lines */
+/* Used in WelcomeCelebration during boot sequence */
+
+@keyframes bootGlitch {
+  /* RGB split + hue rotation + clip-path tears */
+  /* Applied via .boot-glitch class on celebrate-overlay */
+  /* Fires after last boot line finishes typing */
+}
+.boot-glitch { animation: bootGlitch 0.5s steps(1) forwards !important; }
+```
+
+### CommExpandCard extraStats
+Extra metric columns shown between card name and score on desktop only:
+```jsx
+extraStats={[
+  { value: '42', label: 'RATERS', color: 'var(--cyan)' },
+  { value: 'SAT', label: 'DAY', color: 'var(--text-muted)' },
+]}
+```
+- Rendered in `.desktop-card-stats` div — hidden on mobile, flex on desktop
+- No !important — rely on media query specificity
+
+### UserDelta component
+Shows logged-in user's score vs community avg:
+- Orange if user is above avg by >0.2
+- Red if below by >0.2
+- Green if within ±0.2
+- Label: "YOUR SCORE" or "YOUR AVG FOR THIS SONG"
+
+### SetBreakdown pills
+```jsx
+<SetBreakdown s1={12} s2={9} enc={2} />
+```
+- SET 1: cyan, SET 2: orange, ENCORE: green
+- Only renders if any count > 0
+
+### Feed post body truncation
+- 220 char threshold
+- READ MORE / SHOW LESS in post's accent color
+- 0.36rem Orbitron, no border
+
+### New post box (collapsed state)
+- Single row: avatar initials + placeholder text + "+ POST" label right-aligned
+- Expands to full composer on tap
+- Never show expanded by default
+
+### show-masthead-right
+```css
+.show-masthead-right { display: none; }
+@media (min-width: 769px) {
+  .show-masthead-right { display: flex; }
+}
+```
+Desktop-only right panel on show masthead.
+
+### Badge card pattern (BadgesTab)
+- Left: icon (1.6rem, color-matched glow) in 48×48 bordered box
+- Right: label (0.62rem Orbitron, color) + description (0.72rem mono, dimmed)
+- Border-left: 3px solid badge color
+- Background: badge color at 8% opacity
