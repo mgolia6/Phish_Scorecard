@@ -16,9 +16,15 @@ function getEra(showDate) {
 }
 
 async function pnetFetch(endpoint, params = {}) {
+  if (!PHISH_NET_KEY) throw new Error(`PHISH_NET_API_KEY not set — cannot fetch ${endpoint}`);
   const qs = new URLSearchParams({ apikey: PHISH_NET_KEY, ...params }).toString();
-  const res = await fetch(`${PNET}/${endpoint}.json?${qs}`);
-  if (!res.ok) throw new Error(`Phish.net ${endpoint} returned ${res.status}`);
+  const url = `${PNET}/${endpoint}.json?${qs}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    // Try to get error body for better diagnostics
+    const body = await res.text().catch(() => '');
+    throw new Error(`Phish.net ${endpoint} returned ${res.status}: ${body.slice(0, 100)}`);
+  }
   const data = await res.json();
   return data?.data || [];
 }
@@ -187,9 +193,11 @@ async function seedLongestJams(pool) {
   let upserted = 0;
   for (const j of jams) {
     try {
-      const durationSec = j.duration ? Math.round(parseFloat(j.duration) * 60) : null;
-      const mins = j.duration ? Math.floor(parseFloat(j.duration)) : null;
-      const secs = j.duration ? Math.round((parseFloat(j.duration) % 1) * 60) : null;
+      // Phish.net longestjams: duration may be in 'minutes', 'duration', or 'length'
+      const rawDur = j.minutes || j.duration || j.length || j.duration_seconds / 60 || null;
+      const durationSec = rawDur ? Math.round(parseFloat(rawDur) * 60) : null;
+      const mins = rawDur ? Math.floor(parseFloat(rawDur)) : null;
+      const secs = rawDur ? Math.round((parseFloat(rawDur) % 1) * 60) : null;
       const label = mins != null ? `${mins}:${String(secs).padStart(2,'0')}` : null;
       await pool.query(`
         INSERT INTO pn_longest_jams (show_date, song_name, slug, duration_seconds, duration_label, era)
@@ -216,6 +224,8 @@ async function seedDebuts(pool) {
   let upserted = 0;
   for (const d of debuts) {
     try {
+      const slug = d.slug || (d.song || d.songname || '').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      if (!slug) continue;
       await pool.query(`
         INSERT INTO pn_debuts (slug, song_name, debut_date, debut_venue, debut_city, debut_state)
         VALUES ($1,$2,$3,$4,$5,$6)
@@ -224,9 +234,9 @@ async function seedDebuts(pool) {
           debut_venue=EXCLUDED.debut_venue, debut_city=EXCLUDED.debut_city,
           debut_state=EXCLUDED.debut_state, updated_at=NOW()
       `, [
-        d.slug,
-        d.song || d.songname,
-        d.showdate || null,
+        slug,
+        d.song || d.songname || d.song_name || '',
+        d.showdate || d.show_date || null,
         d.venue || null,
         d.city || null,
         d.state || null,
@@ -242,15 +252,15 @@ async function seedTeases(pool) {
   let upserted = 0;
   for (const t of teases) {
     try {
+      const teaseShow = t.showdate || t.show_date;
+      const teaseSong = t.tease || t.teased_song || t.song || t.songname;
+      const inSong = t.in_song || t.insong || t.song_performed_in || null;
+      if (!teaseShow || !teaseSong) continue;
       await pool.query(`
         INSERT INTO pn_teases (show_date, teased_song, in_song)
         VALUES ($1,$2,$3)
         ON CONFLICT (show_date, teased_song, in_song) DO NOTHING
-      `, [
-        t.showdate,
-        t.tease || t.teased_song || t.song,
-        t.in_song || t.insong || null,
-      ]);
+      `, [teaseShow, teaseSong, inSong]);
       upserted++;
     } catch (_) {}
   }
@@ -263,15 +273,18 @@ async function seedGuests(pool) {
     let upserted = 0;
     for (const g of guests) {
       try {
+        const guestShow = g.showdate || g.show_date;
+        const guestName = g.guest || g.guest_name || g.name || g.artistname;
+        if (!guestShow || !guestName) continue;
         await pool.query(`
           INSERT INTO pn_guests (show_date, guest_name, instrument, song_name)
           VALUES ($1,$2,$3,$4)
           ON CONFLICT (show_date, guest_name, song_name) DO NOTHING
         `, [
-          g.showdate,
-          g.guest || g.guest_name || null,
-          g.instrument || null,
-          g.song || g.songname || null,
+          guestShow,
+          guestName,
+          g.instrument || g.instruments || null,
+          g.song || g.songname || g.song_name || null,
         ]);
         upserted++;
       } catch (_) {}
@@ -301,17 +314,22 @@ async function seedReviews(pool) {
 
       for (const r of reviews) {
         try {
-          const text = (r.review_text || r.body || r.review || '').trim();
-          if (!text || text.length < 50) continue; // skip empty/very short
+          // Phish.net v5 bulk reviews use 'review' field (not review_text)
+          // Try all known variants
+          const text = (r.review || r.review_text || r.body || r.text || '').trim();
+          const showdate = r.showdate || r.show_date;
+          if (!text || text.length < 20 || !showdate) continue;
+          // Score on bulk reviews: 0-5 scale directly
+          const score = r.score != null ? parseFloat(r.score) : null;
           await pool.query(`
             INSERT INTO pn_reviews (show_date, score, review_text, era)
             VALUES ($1,$2,$3,$4)
             ON CONFLICT DO NOTHING
           `, [
-            r.showdate,
-            parseFloat(r.score) || null,
+            showdate,
+            (!isNaN(score) && score > 0) ? score : null,
             text,
-            getEra(r.showdate),
+            getEra(showdate),
           ]);
           upserted++;
         } catch (_) {}
