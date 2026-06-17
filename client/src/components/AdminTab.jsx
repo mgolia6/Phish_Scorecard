@@ -373,8 +373,11 @@ function SystemTab({ api, showMessage }) {
                   if (r.status === 'error' || r.error) return `${r.type}: ERROR - ${r.error || 'unknown'}`;
                   // Base line
                   const base = `${r.type}: ${r.count ?? 0} records`;
-                  // Extra diagnostic lines for reviews
                   const extras = [];
+                  // Shows diagnostic
+                  if (r.ratings_found !== undefined) extras.push(`  ratings found: ${r.ratings_found}`);
+                  if (r.sample_fields && r.type === 'shows') extras.push(`  fields: ${r.sample_fields}`);
+                  // Reviews diagnostic
                   if (r.shows_processed !== undefined) extras.push(`  shows processed: ${r.shows_processed} of ${r.total_shows}`);
                   if (r.errors > 0) extras.push(`  fetch errors: ${r.errors}`);
                   if (r.first_error) extras.push(`  first error: ${r.first_error}`);
