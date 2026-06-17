@@ -168,11 +168,10 @@ async function seedShows(pool) {
     // Capture field names from first record
     if (!sampleFields) sampleFields = Object.keys(s).join(', ');
     try {
-      // Try all known rating field names — Phish.net may use different names
-      const pnRating = s.rating || s.avg_rating || s.artistrating || s.show_rating || null;
-      const pnRatingVal = pnRating ? parseFloat(pnRating) : null;
-      const pnNumRatings = s.num_ratings || s.rating_count || s.votes || 0;
-      if (pnRatingVal) ratingsFound++;
+      // Phish.net /shows endpoint does NOT include rating fields
+      // Ratings are computed after reviews are seeded (see seedRatingsFromReviews below)
+      const pnRatingVal = null;
+      const pnNumRatings = 0;
       await pool.query(`
         INSERT INTO pn_shows (show_date, venue, city, state, country, tour_name, era, pn_rating, pn_num_ratings)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -412,6 +411,34 @@ async function seedReviews(pool) {
   };
 }
 
+async function seedRatingsFromReviews(pool) {
+  // Phish.net /shows has no rating field — compute aggregate from pn_reviews
+  // UPDATE pn_shows with avg score + vote count calculated from seeded reviews
+  try {
+    const result = await pool.query(`
+      UPDATE pn_shows s
+      SET
+        pn_rating = sub.avg_score,
+        pn_num_ratings = sub.vote_count,
+        updated_at = NOW()
+      FROM (
+        SELECT
+          show_date,
+          ROUND(AVG(score)::numeric, 3) as avg_score,
+          COUNT(*) as vote_count
+        FROM pn_reviews
+        WHERE score IS NOT NULL AND score > 0
+        GROUP BY show_date
+        HAVING COUNT(*) >= 1
+      ) sub
+      WHERE s.show_date = sub.show_date
+    `);
+    return { type: 'ratings_computed', count: result.rowCount, status: 'ok' };
+  } catch (e) {
+    return { type: 'ratings_computed', count: 0, status: 'error', error: e.message };
+  }
+}
+
 // ── Main handler ─────────────────────────────────────────────
 export default async function handler(req, res) {
   cors(res, req);
@@ -423,7 +450,7 @@ export default async function handler(req, res) {
 
   // Which data types to seed — default all, or pass ?types=songs,shows etc
   const requested = req.query?.types ? req.query.types.split(',') : null;
-  const VALID_TYPES = ['songs', 'shows', 'reviews'];
+  const VALID_TYPES = ['songs', 'shows', 'reviews', 'ratings_computed'];
   const shouldRun = (type) => VALID_TYPES.includes(type) && (!requested || requested.includes(type));
 
   const pool = getPool();
@@ -441,9 +468,10 @@ export default async function handler(req, res) {
   // Phish.net v5 API exposes: shows, songs, songdata, setlists, jamcharts, reviews, venues, attendance
   // longestjams, debuts, teases, guests are web-only chart pages — no API endpoint exists
   const seeders = [
-    { key: 'songs',   fn: () => seedSongs(pool) },
-    { key: 'shows',   fn: () => seedShows(pool) },
-    { key: 'reviews', fn: () => seedReviews(pool) },
+    { key: 'songs',            fn: () => seedSongs(pool) },
+    { key: 'shows',            fn: () => seedShows(pool) },
+    { key: 'reviews',          fn: () => seedReviews(pool) },
+    { key: 'ratings_computed', fn: () => seedRatingsFromReviews(pool) },
   ];
 
   for (const seeder of seeders) {
@@ -461,6 +489,11 @@ export default async function handler(req, res) {
 
   // Row counts for summary
   const counts = {};
+  // Also count how many shows have computed ratings
+  try {
+    const ratedShows = await pool.query(`SELECT COUNT(*) FROM pn_shows WHERE pn_rating IS NOT NULL`);
+    counts['pn_shows_with_rating'] = parseInt(ratedShows.rows[0].count);
+  } catch (_) {}
   for (const tbl of ['pn_songs','pn_shows','pn_reviews']) {
     try {
       const r = await pool.query(`SELECT COUNT(*) FROM ${tbl}`);
