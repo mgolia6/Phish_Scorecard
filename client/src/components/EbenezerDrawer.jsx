@@ -212,8 +212,15 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
 // ── DESKTOP: right rail ───────────────────────────────────────────────────────
 export function EbenezerRail({ history, setHistory, loading, setLoading, error, setError, input, setInput, railOpen, setRailOpen }) {
   const inputRef = useRef(null);
+  const [optOut, setOptOut] = useState(() => { try { return localStorage.getItem('ebenezer_opt_out') === 'true'; } catch { return false; } });
 
   useEffect(() => { if (railOpen) setTimeout(() => inputRef.current?.focus(), 300); }, [railOpen]);
+
+  const handleToggleOptOut = useCallback(async () => {
+    const next = !optOut; setOptOut(next);
+    try { localStorage.setItem('ebenezer_opt_out', String(next)); } catch {}
+    try { await fetch('/api/user/profile', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('phish_token') }, body: JSON.stringify({ ebenezer_opt_out: next }) }); } catch {}
+  }, [optOut]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', flexShrink: 0 }}>
@@ -239,7 +246,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
               <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0, marginLeft: 8 }}>CLEAR</button>
             )}
           </div>
-          <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} compact optOut={false} onToggleOptOut={() => {}} />
+          <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} compact optOut={optOut} onToggleOptOut={handleToggleOptOut} />
         </div>
       )}
     </div>
