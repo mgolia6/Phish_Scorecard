@@ -5,9 +5,9 @@
 
 ## App Status
 - **Live at:** phreezer.mpgink.com
-- **Stage:** Beta prep — Phish.net community post drafted, not yet published
+- **Stage:** Beta — Phish.net community post published, 14 users
 - **Primary surface:** Mobile (iOS Safari) — all layout decisions mobile-first
-- **Desktop:** Supported, three-column layout active — unconfirmed visually this session (Matthew was on mobile)
+- **Desktop:** Supported, three-column layout active — unconfirmed visually (Matthew on mobile)
 
 ---
 
@@ -196,7 +196,12 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - Desktop: persistent right rail (auth-gated)
 - Mobile: floating ❄ button — label is "❄ ASK EBENEZER"
 - Logged-out users on desktop: no rail (eliminates dead space)
-- Now pulls live Phish.net data (setlists, reviews, jamcharts) + Phreezer community aggregates
+- Pulls live Phish.net data (setlists, reviews, jamcharts) + Phreezer community aggregates
+- Expand button (⛶) in rail header → opens full modal overlay (860px × 700px, z-index 8000, backdrop blur)
+- Clicking outside modal or ✕ closes it — conversation state persists
+- Disclosure footer: "Conversations logged anonymously. Opt out." — always visible, orange opt-out link
+- Export button (orange): appears after first message, downloads .txt conversation
+- Opt-out preference stored on users.ebenezer_opt_out, syncs cross-device via profile API
 
 ---
 
@@ -229,3 +234,6 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - GoDaddy DNS for phreezer.mpgink.com in Resend
 - Song duration storage (duration_seconds column not yet added)
 - Ebenezer song intent detection — only ~40 songs hardcoded, needs expansion
+- Ebenezer show date links — dates in responses not yet tappable (design decided, not built)
+- Phish.net show ratings — not in v5 API, hidden pending inquiry with phish.net
+- Ebenezer conversation persistence across navigation (sessionStorage approach designed, not built)
