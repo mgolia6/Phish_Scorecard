@@ -310,23 +310,36 @@ async function seedReviews(pool) {
   // Covers the canonical "must-know" shows — Big Cypress, Nassau 4/3/98, etc.
   let shows = [];
   try {
-    const res = await pool.query(`
-      SELECT show_date
-      FROM pn_shows
+    // Try top-rated shows first; fall back to all shows if ratings not populated yet
+    const ratedRes = await pool.query(`
+      SELECT show_date FROM pn_shows
       WHERE pn_rating IS NOT NULL
       ORDER BY pn_rating DESC, pn_num_ratings DESC NULLS LAST
       LIMIT 600
-    `);
-    shows = res.rows.map(r => r.show_date instanceof Date
-      ? r.show_date.toISOString().slice(0, 10)
-      : String(r.show_date).slice(0, 10)
-    );
+    `).catch(() => ({ rows: [] }));
+
+    if (ratedRes.rows.length > 0) {
+      shows = ratedRes.rows.map(r => r.show_date instanceof Date
+        ? r.show_date.toISOString().slice(0, 10)
+        : String(r.show_date).slice(0, 10)
+      );
+    } else {
+      // pn_rating not populated yet — fall back to all shows ordered by date desc
+      // (recent shows have more reviews and more phan activity)
+      const allRes = await pool.query(`
+        SELECT TO_CHAR(show_date, 'YYYY-MM-DD') as show_date
+        FROM pn_shows
+        ORDER BY show_date DESC
+        LIMIT 600
+      `).catch(() => ({ rows: [] }));
+      shows = allRes.rows.map(r => r.show_date);
+    }
   } catch (e) {
     return { type: 'reviews', count: 0, error: 'Could not query pn_shows: ' + e.message };
   }
 
   if (!shows.length) {
-    return { type: 'reviews', count: 0, error: 'No shows in pn_shows yet — run songs/shows seed first' };
+    return { type: 'reviews', count: 0, error: 'pn_shows is empty — run the full catalog seed first' };
   }
 
   let firstError = null;
