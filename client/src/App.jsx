@@ -25,6 +25,7 @@ import { EbenezerDrawer, EbenezerRail } from './components/EbenezerDrawer';
 import { TourGuide } from './components/TourGuide';
 import { DesktopLanding } from './components/DesktopLanding';
 import { ChangelogModal, shouldShowChangelog } from './components/ChangelogModal';
+import { BadgeQueue } from './components/BadgeCelebration';
 import { Analytics, identifyUser, resetIdentity } from './analytics';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [mikeError, setMikeError] = useState(null);
   const [showChangelog, setShowChangelog] = useState(false);
+  const [pendingBadges, setPendingBadges] = useState([]);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showTandC, setShowTandC] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -102,6 +104,12 @@ export default function App() {
       setUser(u);
       identifyUser(u);
       setProfileTapped(false); // reset pulse on every session load
+      // Fetch unseen badges awarded while away (login catch-up)
+      fetch(`${API}/user/badges`, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      }).then(r => r.ok ? r.json() : null).then(d => {
+        if (d?.badges?.length) setPendingBadges(d.badges);
+      }).catch(() => {});
       setTab(!u.tandc_accepted ? 'scorecard' : 'my-shows'); if (tab === 'home') setTab('my-shows');
       if (!u.tandc_accepted) {
         setShowTandC(true);
@@ -462,6 +470,17 @@ export default function App() {
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
       {showChangelog && <ChangelogModal onDismiss={() => setShowChangelog(false)} />}
+      {pendingBadges.length > 0 && (
+        <BadgeQueue
+          badges={pendingBadges}
+          onAllDone={() => {
+            // Mark all seen
+            const keys = pendingBadges.map(b => b.badge_key);
+            setPendingBadges([]);
+            api.post('/user/badges', { badge_keys: keys }).catch(() => {});
+          }}
+        />
+      )}
       {/* Scorecard overlay — full screen, preserves tab context */}
       {scorecardOverlay && (
         <div style={{
