@@ -6,7 +6,7 @@ import { SongRating, SetScore } from './ScorecardHelpers';
 import { InlineAudioPlayer } from './AudioPlayer';
 import { ShowSlotMachine } from './ShowSlotMachine';
 
-export function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShowDate, onShowLoaded, onFeedbackTrigger }) {
+export function ScorecardTab({ api, showMessage, showError, onAuthRequired, initialShowDate, onShowLoaded, onFeedbackTrigger, onBadgeEarned }) {
   const [query, setQuery] = useState('');
   const [allShows, setAllShows] = useState([]);
   const [results, setResults] = useState([]);
@@ -319,13 +319,17 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         notes: ratings[s.posKey || s.song]?.notes || '',
       }));
       if (!ratingsList.length) { showMessage('Rate at least one song first', 'info'); setSubmitting(false); return; }
-      await api.post(`/ratings/${currentShow.showdate}`, {
+      const saveRes = await api.post(`/ratings/${currentShow.showdate}`, {
         ratings: ratingsList,
         attendance_type: attendanceType,
         showDetails: { venue: currentShow.venue, city: currentShow.city, state: currentShow.state, country: currentShow.country },
       });
       setSaved(true);
       setCelebrating(true);
+      // Fire badge celebrations for real-time earned badges
+      if (saveRes?.new_badges?.length && onBadgeEarned) {
+        setTimeout(() => onBadgeEarned(saveRes.new_badges), 2800); // after save celebration
+      }
       // Track rating count for post-rating feedback trigger
       const newCount = parseInt(localStorage.getItem('phreezer_rating_count') || '0') + 1;
       localStorage.setItem('phreezer_rating_count', String(newCount));
