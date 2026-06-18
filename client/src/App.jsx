@@ -37,6 +37,9 @@ export default function App() {
   const [mikeError, setMikeError] = useState(null);
   const [showChangelog, setShowChangelog] = useState(false);
   const [pendingBadges, setPendingBadges] = useState([]);
+  const handleBadgeEarned = useCallback((badges) => {
+    if (badges?.length) setPendingBadges(prev => [...prev, ...badges]);
+  }, []);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showTandC, setShowTandC] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -248,6 +251,7 @@ export default function App() {
           initialShowDate={rateShowDate}
           onShowLoaded={() => setRateShowDate(null)}
           onFeedbackTrigger={setFeedbackModal}
+          onBadgeEarned={handleBadgeEarned}
         />
       )}
       {tab === 'my-shows' && user && (
@@ -513,6 +517,7 @@ export default function App() {
               onAuthRequired={() => openAuth('login')}
               initialShowDate={scorecardOverlayDate}
               onFeedbackTrigger={setFeedbackModal}
+              onBadgeEarned={handleBadgeEarned}
             />
           </div>
         </div>
