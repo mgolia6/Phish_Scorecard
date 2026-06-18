@@ -124,7 +124,41 @@ export default async function handler(req, res) {
         }
       }
 
-      return res.json({ success: true });
+      // Check for newly earned badges
+      const newBadges = [];
+
+      // Count total rated shows for this user
+      const ratedCount = await pool.query(
+        `SELECT COUNT(DISTINCT show_date) as cnt FROM ratings WHERE user_id = $1`,
+        [user.id]
+      );
+      const totalRated = parseInt(ratedCount.rows[0]?.cnt || 0);
+
+      const ratingMilestones = [
+        { count: 1,   key: 'rated_1',   label: '1ST FREEZE' },
+        { count: 10,  key: 'rated_10',  label: 'SCHOOLED' },
+        { count: 25,  key: 'rated_25',  label: 'SCHOLAR' },
+        { count: 50,  key: 'rated_50',  label: 'DEEP CUTS' },
+        { count: 100, key: 'rated_100', label: 'HALL OF PHAME' },
+      ];
+
+      for (const m of ratingMilestones) {
+        if (totalRated >= m.count) {
+          const existing = await pool.query(
+            `SELECT id FROM user_badges WHERE user_id = $1 AND badge_key = $2`,
+            [user.id, m.key]
+          );
+          if (!existing.rows.length) {
+            await pool.query(
+              `INSERT INTO user_badges (user_id, badge_key, badge_label) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+              [user.id, m.key, m.label]
+            );
+            newBadges.push({ badge_key: m.key, badge_label: m.label });
+          }
+        }
+      }
+
+      return res.json({ success: true, new_badges: newBadges });
     } catch (err) {
       console.error('Ratings error:', err);
       return res.status(500).json({ error: err.message });
