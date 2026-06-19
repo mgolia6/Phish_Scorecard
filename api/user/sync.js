@@ -185,11 +185,16 @@ function computeStats(attendedDates, cachedShows, userRatings) {
     }
   });
 
-  // Song frequency — how many times you've heard each song
+  // Song frequency — how many SHOWS you've heard each song at (deduped per show)
+  // This prevents Tweezerfest-style inflation where a song played 5x in one night
+  // counted as 5 separate "times heard" instead of 1 show.
   const songFreq = {};
   showsWithCache.forEach(d => {
     const c = cache[d];
+    const seenThisShow = new Set();
     (c.setlist || []).forEach(s => {
+      if (!s.song || seenThisShow.has(s.song)) return;
+      seenThisShow.add(s.song);
       if (!songFreq[s.song]) songFreq[s.song] = 0;
       songFreq[s.song]++;
     });
