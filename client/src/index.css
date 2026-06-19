@@ -1539,17 +1539,32 @@ select option { background: var(--bg); color: var(--green); }
   50% { opacity: 0; }
 }
 
-/* ── BOOT SEQUENCE SNOWFLAKE MELT ── */
-/* Snowflake droops, drips, and spreads into a puddle right before the glitch */
-@keyframes snowflakeMelt {
-  0%   { transform: scaleY(1) scaleX(1) translateY(0);
-         filter: drop-shadow(0 0 24px rgba(0,224,208,0.65)); opacity: 1; }
-  30%  { transform: scaleY(0.94) scaleX(1.04) translateY(2%);
-         filter: drop-shadow(0 10px 18px rgba(0,224,208,0.6)) blur(0.4px); opacity: 1; }
-  65%  { transform: scaleY(0.5) scaleX(1.28) translateY(16%);
-         filter: drop-shadow(0 20px 26px rgba(0,224,208,0.5)) blur(1.6px); opacity: 0.85; }
-  100% { transform: scaleY(0.1) scaleX(1.55) translateY(42%);
-         filter: drop-shadow(0 30px 30px rgba(0,224,208,0.35)) blur(3px); opacity: 0.5; }
+/* ── BOOT SEQUENCE SNOWFLAKE DRIP → PUDDLE → WAKE ── */
+/* Snowflake dissolves downward, droplets fall, a puddle forms, ripples cascade out */
+@keyframes snowflakeDrip {
+  0%   { transform: translateY(0) scale(1);     opacity: 1;    filter: drop-shadow(0 0 24px rgba(0,224,208,0.65)); }
+  45%  { transform: translateY(3%) scale(0.99); opacity: 0.85; filter: drop-shadow(0 10px 18px rgba(0,224,208,0.6)) blur(0.6px); }
+  100% { transform: translateY(12%) scale(0.9); opacity: 0;    filter: drop-shadow(0 20px 22px rgba(0,224,208,0.4)) blur(2.5px); }
+}
+
+@keyframes dripFall {
+  0%   { transform: translateY(0) scaleY(0.6); opacity: 0; }
+  18%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { transform: translateY(var(--drip-dist, 56px)) scaleY(1.35); opacity: 0; }
+}
+
+@keyframes puddleForm {
+  0%   { transform: scale(0.2); opacity: 0; }
+  55%  { opacity: 0.85; }
+  100% { transform: scale(1);   opacity: 0.7; }
+}
+
+/* Concentric wake rings spreading out from the puddle */
+@keyframes rippleWake {
+  0%   { transform: scale(0.25); opacity: 0; }
+  22%  { opacity: 0.65; }
+  100% { transform: scale(2.6);  opacity: 0; }
 }
 
 /* ── BOOT SEQUENCE GLITCH EXIT ── */

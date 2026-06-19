@@ -122,10 +122,10 @@ export function WelcomeCelebration({ username, onDone }) {
 
   useEffect(() => {
     if (currentLine >= lines.length - 1 && currentText === lines[lines.length - 1]?.text) {
-      // Snowflake melts/drips first, then the screen glitches out.
+      // Snowflake drips into a puddle with a cascading wake, then the screen glitches out.
       const tMelt = setTimeout(() => setMelting(true), 80);
-      const t1 = setTimeout(() => setGlitching(true), 760);
-      const t2 = setTimeout(() => onDoneRef.current?.(), 2160);
+      const t1 = setTimeout(() => setGlitching(true), 1700);
+      const t2 = setTimeout(() => onDoneRef.current?.(), 2900);
       return () => { clearTimeout(tMelt); clearTimeout(t1); clearTimeout(t2); };
     }
   }, [currentLine, currentText]);
@@ -171,6 +171,15 @@ export function WelcomeCelebration({ username, onDone }) {
     );
   };
 
+  // Falling droplets (staggered) + cascading wake rings for the melt
+  const drips = [
+    { left: '40%', size: 7, dist: '52px', delay: 0 },
+    { left: '52%', size: 9, dist: '60px', delay: 0.14 },
+    { left: '46%', size: 6, dist: '56px', delay: 0.3 },
+    { left: '58%', size: 8, dist: '50px', delay: 0.44 },
+  ];
+  const ripples = [0, 0.2, 0.4, 0.6];
+
   return (
     <div
       className={`celebrate-overlay${glitching ? ' boot-glitch' : ''}`}
@@ -193,19 +202,73 @@ export function WelcomeCelebration({ username, onDone }) {
         maxWidth: 720,
         width: '100%',
       }}>
-        <img
-          src="/assets/phreezer-snowflake.png"
-          alt=""
-          style={{
-            width: 'clamp(150px, 40vw, 240px)',
-            height: 'clamp(150px, 40vw, 240px)',
-            objectFit: 'contain',
-            marginBottom: 'clamp(28px, 6vw, 52px)',
-            transformOrigin: 'bottom center',
-            filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
-            animation: melting ? 'snowflakeMelt 0.7s ease-in forwards' : 'none',
-          }}
-        />
+        {/* Melt stage: snowflake dissolves, droplets fall into a puddle, wake ripples cascade out */}
+        <div style={{
+          position: 'relative',
+          width: 'clamp(150px, 40vw, 240px)',
+          height: 'clamp(150px, 40vw, 240px)',
+          marginBottom: 'clamp(28px, 6vw, 52px)',
+        }}>
+          <img
+            src="/assets/phreezer-snowflake.png"
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              transformOrigin: 'bottom center',
+              filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
+              animation: melting ? 'snowflakeDrip 0.9s ease-in forwards' : 'none',
+            }}
+          />
+
+          {melting && drips.map((d, i) => (
+            <span key={`drip-${i}`} style={{
+              position: 'absolute',
+              top: '60%',
+              left: d.left,
+              width: d.size,
+              height: Math.round(d.size * 1.5),
+              borderRadius: '50% 50% 50% 50% / 60% 60% 42% 42%',
+              background: 'radial-gradient(circle at 50% 32%, rgba(120,245,235,0.95), rgba(0,224,208,0.5))',
+              boxShadow: '0 0 8px rgba(0,224,208,0.7)',
+              '--drip-dist': d.dist,
+              animation: `dripFall 0.75s ${d.delay}s ease-in forwards`,
+              opacity: 0,
+            }} />
+          ))}
+
+          {melting && (
+            <span style={{
+              position: 'absolute',
+              bottom: '2%',
+              left: '14%',
+              width: '72%',
+              height: '15%',
+              borderRadius: '50%',
+              background: 'radial-gradient(ellipse at center, rgba(0,224,208,0.55), rgba(0,224,208,0.12) 68%, transparent)',
+              boxShadow: '0 0 24px rgba(0,224,208,0.5)',
+              transformOrigin: 'center',
+              animation: 'puddleForm 0.55s 0.4s ease-out forwards',
+              opacity: 0,
+            }} />
+          )}
+
+          {melting && ripples.map((delay, i) => (
+            <span key={`ripple-${i}`} style={{
+              position: 'absolute',
+              bottom: '2%',
+              left: '18%',
+              width: '64%',
+              height: '13%',
+              borderRadius: '50%',
+              border: '2px solid rgba(0,224,208,0.5)',
+              transformOrigin: 'center',
+              animation: `rippleWake 1.15s ${(0.55 + delay).toFixed(2)}s ease-out forwards`,
+              opacity: 0,
+            }} />
+          ))}
+        </div>
 
         <div style={{
           width: '100%',
