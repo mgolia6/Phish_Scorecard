@@ -117,13 +117,16 @@ export function WelcomeCelebration({ username, onDone }) {
 
   const { completedLines, currentLine, currentText } = useTypewriter(lines, 36, 300);
 
+  const [melting, setMelting] = useState(false);
   const [glitching, setGlitching] = useState(false);
 
   useEffect(() => {
     if (currentLine >= lines.length - 1 && currentText === lines[lines.length - 1]?.text) {
-      const t1 = setTimeout(() => setGlitching(true), 600);
-      const t2 = setTimeout(() => onDoneRef.current?.(), 2000);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      // Snowflake melts/drips first, then the screen glitches out.
+      const tMelt = setTimeout(() => setMelting(true), 80);
+      const t1 = setTimeout(() => setGlitching(true), 760);
+      const t2 = setTimeout(() => onDoneRef.current?.(), 2160);
+      return () => { clearTimeout(tMelt); clearTimeout(t1); clearTimeout(t2); };
     }
   }, [currentLine, currentText]);
 
@@ -194,11 +197,13 @@ export function WelcomeCelebration({ username, onDone }) {
           src="/assets/phreezer-snowflake.png"
           alt=""
           style={{
-            width: 'clamp(100px, 28vw, 160px)',
-            height: 'clamp(100px, 28vw, 160px)',
+            width: 'clamp(150px, 40vw, 240px)',
+            height: 'clamp(150px, 40vw, 240px)',
             objectFit: 'contain',
             marginBottom: 'clamp(28px, 6vw, 52px)',
+            transformOrigin: 'bottom center',
             filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
+            animation: melting ? 'snowflakeMelt 0.7s ease-in forwards' : 'none',
           }}
         />
 
