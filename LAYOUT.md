@@ -171,8 +171,8 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - Snowflake: clamp(150px, 40vw, 240px) — large, centered, cyan glow
 - Lines: clamp values for responsive sizing
 - DON'T SUCK split across two lines to prevent mobile overflow
-- Snowflake melt: after final line, snowflake droops/drips/spreads into a puddle (snowflakeMelt keyframe, transform-origin bottom) right before the glitch fires
-- Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app (melt at +80ms, glitch at +760ms, done at +2160ms)
+- Snowflake melt: after final line, snowflake dissolves downward (snowflakeDrip), droplets fall (dripFall), a puddle forms (puddleForm), and wake rings cascade outward (rippleWake) — layered "melt stage" in WelcomeCelebration, not a single scaled image (avoid the old "smooshed" look)
+- Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app (melt at +80ms, glitch at +1700ms, done at +2900ms)
 - TAP TO SKIP visible after 2nd line
 - Boot sequence z-index: 2000 — always above FullPageLoader (z-index: 1000)
 - FullPageLoader: restored spinner for all other loading states (admin, community tabs, etc.)
