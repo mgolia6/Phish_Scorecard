@@ -16,9 +16,10 @@
 ### P1 — Pre-beta
 - **iOS Safari UAT** — not yet confirmed complete
 - **GoDaddy DNS** — phreezer.mpgink.com subdomain in Resend (polish, not blocking)
+- **Sentry DSN fix** — malformed org ID in Vercel env var, Matthew to correct
 
 ### P2 — Engagement / Retention
-- **Show rating reminder email** — cron: user attended 7+ days ago, hasn't rated, send nudge. 12/16 users have zero ratings — highest leverage item.
+- **Show rating reminder email** ✅ 2026-06-18 — ships on tomorrow's cron
 - **Phriend activity feed** — what your phriends rated this week. Low lift, high engagement for tight beta community.
 - **Show of the week** — admin-pinned show, everyone rates it, creates shared moment.
 - **Milestone emails** — 25 and 50 shows rated
@@ -50,6 +51,12 @@
 ---
 
 ## ✅ COMPLETED
+
+### 2026-06-18
+- Tweezerfest dedupe fix — Deep Phreeze MOST HEARD now counts shows, not raw setlist rows
+- 1ST BUG badge (🐛 IT DOES MATTER) — added to BadgeCelebration, awarded to lbag420
+- Rating reminder email — template + cron pass, fires tomorrow to attended-but-unrated users
+- CLAUDE.md — Claude Code handoff doc added to repo root
 
 ### 2026-06-17 (Part 2)
 - Deep Phreeze promoted to second in mobile + desktop nav
