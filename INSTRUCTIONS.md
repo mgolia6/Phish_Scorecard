@@ -50,7 +50,7 @@ At the start of every session, before anything else:
 │   ├── _auth.js             JWT verify + CORS helpers (CORS locked to phreezer.mpgink.com)
 │   ├── _disposable.js       disposable email domain blocklist
 │   ├── _ratelimit.js        in-memory rate limiter (login/register)
-│   ├── _email.js            Resend email sender + all 5 HTML templates
+│   ├── _email.js            Resend email sender + all 6 HTML templates (incl. ratingReminderEmail)
 │   ├── _ai_usage.js         AI token usage logger
 │   ├── auth/register.js
 │   ├── auth/login.js
@@ -74,7 +74,8 @@ At the start of every session, before anything else:
 │   ├── admin/monitoring.js          system health + Ebenezer knowledge base status
 │   ├── users/badges.js         get badges for a user
 │   ├── emails/cron.js          daily email cron (onboarding, day3/7/30, milestones)
-│   └── emails/onboarding.js    onboarding email trigger (also fires from verify-email)
+│   ├── emails/onboarding.js    onboarding email trigger (also fires from verify-email)
+│   └── emails/cron.js          daily email cron (onboarding, day3/7/30, milestones, rating_reminder)
 ├── client/src/
 │   ├── App.jsx
 │   ├── analytics.js         Posthog + Sentry instrumentation, named Analytics events
@@ -82,6 +83,7 @@ At the start of every session, before anything else:
 │   │                            DesktopLanding, ShowSlotMachine)
 │   ├── index.css            design system — see STYLE_GUIDE.md
 │   └── App.css
+├── CLAUDE.md                Claude Code handoff doc — stack, patterns, conventions, what NOT to do
 ├── init-db.sql
 ├── STYLE_GUIDE.md           design tokens, font system, component patterns
 ├── package.json             backend deps (bcryptjs, jsonwebtoken, pg)
