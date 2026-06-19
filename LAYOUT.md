@@ -168,10 +168,11 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ## Entry Animation (WelcomeCelebration / Boot Sequence)
 - Full typewriter effect — char-by-char at 36ms/char with blinking block cursor
 - Rotating inside-joke lines (NOTIFYING WILSON, CONSULTING ICCULUS, etc.)
-- Snowflake: clamp(100px, 28vw, 160px) — large, centered, cyan glow
+- Snowflake: clamp(150px, 40vw, 240px) — large, centered, cyan glow
 - Lines: clamp values for responsive sizing
 - DON'T SUCK split across two lines to prevent mobile overflow
-- Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app
+- Snowflake melt: after final line, snowflake droops/drips/spreads into a puddle (snowflakeMelt keyframe, transform-origin bottom) right before the glitch fires
+- Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app (melt at +80ms, glitch at +760ms, done at +2160ms)
 - TAP TO SKIP visible after 2nd line
 - Boot sequence z-index: 2000 — always above FullPageLoader (z-index: 1000)
 - FullPageLoader: restored spinner for all other loading states (admin, community tabs, etc.)
