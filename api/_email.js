@@ -227,3 +227,42 @@ export function milestoneEmail(username, showsRated) {
   `);
   return { subject: `${showsRated} shows phrozen. ◈`, html };
 }
+
+// ─────────────────────────────────────────────────────────────
+// 6. RATING REMINDER — attended shows but never rated anything
+// ─────────────────────────────────────────────────────────────
+export function ratingReminderEmail(username, showsAttended) {
+  const name = username || 'phan';
+  const html = layout(`
+    ${heading('YOU\'VE BEEN THERE. NOW TELL US HOW IT WAS.', '#ff6600')}
+    <tr><td style="padding-bottom:24px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        ${stat('SHOWS ATTENDED', showsAttended, '#ff6600')}
+      </tr></table>
+    </td></tr>
+    ${body(`Hey ${name},<br><br>
+You\'ve got ${showsAttended} show${showsAttended === 1 ? '' : 's'} logged in your Phreezer — but you haven\'t rated any of them yet.<br><br>
+Pick one you remember well. Pull it up, score each song 1–5. It takes about two minutes. You get a Vibe Check from Uncle Ebenezer, a full set breakdown, and your score lives in the community record permanently.<br><br>
+Summer tour starts July 7. Good time to get your rating legs under you before the new shows hit.`)}
+    <!-- HOW TO RATE -->
+    <tr><td style="padding-bottom:28px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${[
+          ['1. OPEN MY SHOWS', 'Go to the MY PHREEZER tab and tap any show in your attendance history.', '#00e0d0'],
+          ['2. SCORECARD', 'Hit the scorecard for that show. Every song in the setlist is right there.', '#33ff33'],
+          ['3. RATE 1–5', 'Tap the stars. Add notes if you want. Hit SAVE RATINGS when you\'re done.', '#ff6600'],
+        ].map(([label, desc, color]) => `
+        <tr>
+          <td style="padding:12px 14px;background:rgba(0,0,0,0.35);border-left:2px solid ${color};margin-bottom:8px;display:block;">
+            <div style="font-family:monospace;font-size:10px;font-weight:bold;letter-spacing:3px;color:${color};margin-bottom:5px;">${label}</div>
+            <div style="font-family:monospace;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;">${desc}</div>
+          </td>
+        </tr>
+        <tr><td style="padding-bottom:6px;"></td></tr>`).join('')}
+      </table>
+    </td></tr>
+    ${button('RATE A SHOW', APP_URL)}
+    ${body(`— mpgink`)}
+  `);
+  return { subject: `You\'ve been to ${showsAttended} show${showsAttended === 1 ? '' : 's'}. How were they?`, html };
+}
