@@ -1,3 +1,35 @@
+## Session: 2026-06-18
+
+### Shipped
+
+**Tweezerfest dedupe fix**
+- `api/user/sync.js` — `songFreq` now counts unique shows per song, not raw setlist rows
+- Added `seenThisShow` Set per show in `computeStats` — prevents multi-play nights (e.g. Tweezerfest) from inflating "times heard" count in Deep Phreeze MOST HEARD section
+- Fix only applies after user re-syncs; existing cached stats unaffected until sync
+
+**1ST BUG badge**
+- `client/src/components/BadgeCelebration.jsx` — added `first_bug` entry: 🐛 emoji, orange, pulse, sub-label "IT DOES MATTER"
+- Awarded manually to lbag420 (user ID 9) via Neon SQL — will show on next login via badge catch-up flow
+- SQL: `INSERT INTO user_badges (user_id, badge_key, badge_label) VALUES (9, 'first_bug', '1ST BUG') ON CONFLICT DO NOTHING`
+
+**Rating reminder email**
+- `api/_email.js` — new `ratingReminderEmail` template: subject "You've been to X shows. How were they?", attended count stat tile, 3-step rate guide, summer tour July 7 callout
+- `api/emails/cron.js` — new rating reminder pass: targets verified users with attendance but zero ratings, most recent attended show ≥7 days ago. One-time send, logged as `rating_reminder`. Runs on daily cron schedule.
+
+**CLAUDE.md**
+- New file added to repo root — handoff doc for Claude Code sessions
+- Covers stack, file map, patterns, conventions, what NOT to do, and how this repo uses claude.ai vs Claude Code
+
+### Decisions Made
+- Rating reminder fires on schedule (not manually triggered) — goes out tomorrow morning
+- claude.ai = mocking, design discussion, session wrap; Claude Code = actual builds going forward
+- lbag420 reported Tweezerfest inflation bug — first community bug report, earned the 1ST BUG badge
+
+### Open / Next Session
+See ROADMAP.md
+
+---
+
 # SESSION LOG
 
 ## Session: 2026-06-17 (Full Day — Part 2)
