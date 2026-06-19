@@ -17,6 +17,7 @@ const BADGE_CONFIG = {
   critic:      { icon: 'glyph',     glyph: '✍',   color: 'var(--orange)', shadow: 'rgba(255,102,0,0.8)',  sub: 'PHISH.NET REVIEWER',       pulse: false },
   streak_7:    { icon: 'glyph',     glyph: '⚡',   color: 'var(--green)',  shadow: 'rgba(51,255,51,0.8)',  sub: '7 DAY LOGIN STREAK',       pulse: false },
   streak_30:   { icon: 'glyph',     glyph: '⚡',   color: 'var(--orange)', shadow: 'rgba(255,102,0,1)',    sub: '30 DAY LOGIN STREAK',      pulse: true  },
+  first_bug:   { icon: 'emoji',     glyph: '🐛',   color: 'var(--orange)', shadow: 'rgba(255,102,0,0.9)',  sub: 'IT DOES MATTER',           pulse: true  },
 };
 
 function Particles({ color }) {
