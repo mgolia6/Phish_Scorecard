@@ -11,6 +11,7 @@ import {
   day7EngageEmail,
   day30ReengageEmail,
   milestoneEmail,
+  ratingReminderEmail,
 } from '../_email.js';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -129,6 +130,31 @@ export default async function handler(req, res) {
           results.push(r);
         }
       }
+    }
+
+    // ── RATING REMINDER PASS ──────────────────────────────────
+    // Users who have attended shows (via attendance table) but zero ratings,
+    // and their most recent attended show was at least 7 days ago.
+    const reminderRes = await pool.query(`
+      SELECT
+        u.id, u.email, u.username,
+        COUNT(DISTINCT a.show_date) AS shows_attended
+      FROM users u
+      JOIN attendance a ON a.user_id = u.id
+      WHERE u.email_verified = TRUE
+        AND NOT EXISTS (
+          SELECT 1 FROM ratings r WHERE r.user_id = u.id
+        )
+        AND (
+          SELECT MAX(a2.show_date) FROM attendance a2 WHERE a2.user_id = u.id
+        ) <= NOW() - INTERVAL '7 days'
+      GROUP BY u.id
+    `);
+
+    for (const user of reminderRes.rows) {
+      const showsAttended = parseInt(user.shows_attended, 10);
+      const r = await fire(pool, user, 'rating_reminder', ratingReminderEmail, showsAttended);
+      results.push(r);
     }
 
     const sent = results.filter(r => r.sent).length;
