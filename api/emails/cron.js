@@ -12,9 +12,29 @@ import {
   day30ReengageEmail,
   milestoneEmail,
   ratingReminderEmail,
+  weeklyReminderEmail,
 } from '../_email.js';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const APP_URL = 'https://phreezer.mpgink.com';
+
+function genToken() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let t = '';
+  for (let i = 0; i < 48; i++) t += chars[Math.floor(Math.random() * chars.length)];
+  return t;
+}
+
+// ISO week stamp like "2026-W26" — used as a per-week email_type so the
+// weekly reminder dedupes to once per user per week via the email_log constraint.
+function isoWeekStamp(d) {
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
+}
 
 async function ensureEmailLog(pool) {
   await pool.query(`
@@ -26,6 +46,11 @@ async function ensureEmailLog(pool) {
       UNIQUE(user_id, email_type)
     )
   `);
+}
+
+async function ensureEmailPrefs(pool) {
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_opt_out BOOLEAN DEFAULT FALSE');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS unsubscribe_token VARCHAR(64)');
 }
 
 async function alreadySent(pool, userId, emailType) {
@@ -68,6 +93,7 @@ export default async function handler(req, res) {
 
   const pool = getPool();
   await ensureEmailLog(pool);
+  await ensureEmailPrefs(pool);
 
   const results = [];
 
@@ -75,14 +101,18 @@ export default async function handler(req, res) {
     const usersRes = await pool.query(`
       SELECT
         u.id, u.email, u.username, u.created_at, u.last_login_date,
+        u.unsubscribe_token,
         COUNT(DISTINCT r.show_date) AS shows_rated
       FROM users u
       LEFT JOIN ratings r ON r.user_id = u.id
       WHERE u.email_verified = TRUE
+        AND NOT COALESCE(u.email_opt_out, FALSE)
       GROUP BY u.id
     `);
 
     const now = new Date();
+    const isTuesday = now.getUTCDay() === 2;
+    const weekStamp = isoWeekStamp(now);
 
     for (const user of usersRes.rows) {
       const daysSinceSignup = (now - new Date(user.created_at)) / 86400000;
@@ -134,6 +164,25 @@ export default async function handler(req, res) {
           results.push(r);
         }
       }
+
+      // Weekly reminder — Tuesdays, every opted-in verified user.
+      // Deduped per ISO week via the week-stamped email_type.
+      if (isTuesday) {
+        const weekType = `weekly_${weekStamp}`;
+        if (!(await alreadySent(pool, user.id, weekType))) {
+          let token = user.unsubscribe_token;
+          if (!token) {
+            token = genToken();
+            await pool.query('UPDATE users SET unsubscribe_token = $1 WHERE id = $2', [token, user.id]);
+          }
+          const unsubUrl = `${APP_URL}/api/emails/unsubscribe?token=${token}`;
+          await sleep(300);
+          const { subject, html } = weeklyReminderEmail(user.username, unsubUrl);
+          await sendEmail({ to: user.email, subject, html, unsubscribeUrl: unsubUrl });
+          await logSent(pool, user.id, weekType);
+          results.push({ sent: true, to: user.email, type: weekType });
+        }
+      }
     }
 
     // ── RATING REMINDER PASS ──────────────────────────────────
@@ -146,6 +195,7 @@ export default async function handler(req, res) {
       FROM users u
       JOIN attendance a ON a.user_id = u.id
       WHERE u.email_verified = TRUE
+        AND NOT COALESCE(u.email_opt_out, FALSE)
         AND NOT EXISTS (
           SELECT 1 FROM ratings r WHERE r.user_id = u.id
         )
