@@ -4,6 +4,10 @@ import App from './App';
 import './index.css';
 import * as Sentry from '@sentry/react';
 import { initPosthog } from './analytics';
+import { applyTheme, getTheme } from './theme';
+
+// Apply saved theme before first paint to avoid a flash of the wrong theme.
+applyTheme(getTheme());
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 

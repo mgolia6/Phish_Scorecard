@@ -36,6 +36,37 @@
   --font-serif:    'Playfair Display', Georgia, serif; /* show dates only */
 }
 
+/* ── LIGHT THEME (Phase 1) ──────────────────────────────
+   Opt-in via <html data-theme="light">. Overrides the design tokens only;
+   neon accents become readable dark-ink variants, glows are dropped.
+   Hardcoded (non-variable) colors in components are a later phase. */
+[data-theme="light"] {
+  --green:         #0f8a1e;   /* readable green ink on light */
+  --cyan:          #0a8a82;   /* deep teal */
+  --orange:        #cf5500;   /* deep orange for CTAs/warnings */
+  --red:           #cc2b2b;
+  --white:         #14211a;   /* "bright text" token → near-black on light */
+  --bg:            #eef1ea;   /* soft paper, faint green tint */
+  --bg-panel:      #ffffff;
+  --bg-elevated:   #e6ebe2;
+  --border:        rgba(15,90,25,0.18);
+  --border-mid:    rgba(15,90,25,0.30);
+
+  --text-label:    rgba(16,70,24,0.82);
+  --text-muted:    rgba(16,70,24,0.58);
+  --text-dim:      rgba(0,0,0,0.55);
+
+  /* Neon glows read as blur on light — drop them for Phase 1 */
+  --glow-green:    none;
+  --glow-cyan:     none;
+  --glow-orange:   none;
+}
+
+/* Lighter, subtler scanlines on light */
+[data-theme="light"] body::before {
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.035) 2px, rgba(0,0,0,0.035) 4px);
+}
+
 /* ── BASE ───────────────────────────────────────────── */
 html, body {
   background: var(--bg);

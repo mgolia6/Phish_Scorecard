@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PrivacyModal } from './PrivacyModal';
 import { DonationCard } from './DonationCard';
 import { formatDate } from '../utils';
+import { getTheme, setTheme } from '../theme';
 
 // ============================================================
 // PHREEZER AVATAR — geometric SVG, seeded by avatar id
@@ -339,6 +340,7 @@ function AITab() {
 
 export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, initialSection = 'info' }) {
   const [sec, setSec] = React.useState(initialSection === 'info' ? 'phish' : initialSection);
+  const [theme, setThemeState] = React.useState(getTheme());
   const [showPrivacy, setShowPrivacy] = React.useState(false);
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
@@ -423,6 +425,25 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           {/* ── MY PHISH TAB ── */}
           {sec === 'phish' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+              {/* Appearance / theme */}
+              <div style={{ background: 'rgba(0,224,208,0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ APPEARANCE</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {[['dark', '◑ DARK'], ['light', '◐ LIGHT']].map(([val, label]) => (
+                    <button key={val} onClick={() => { setTheme(val); setThemeState(val); }} style={{
+                      flex: 1, padding: '11px 8px', cursor: 'pointer',
+                      fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '2px',
+                      border: `1px solid ${theme === val ? 'var(--cyan)' : 'var(--border)'}`,
+                      background: theme === val ? 'rgba(0,224,208,0.1)' : 'transparent',
+                      color: theme === val ? 'var(--cyan)' : 'var(--text-muted)',
+                    }}>{label}</button>
+                  ))}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                  Light mode is in beta — some screens still have dark accents.
+                </div>
+              </div>
 
               {/* Identity block */}
               <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.15)', padding: '16px 14px' }}>
