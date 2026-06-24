@@ -55,7 +55,7 @@ export function MyStatesTab({ api, showMessage, showError }) {
 
       <Heatmap data={stateMap} title="MY RATINGS BY STATE" />
 
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>
         ◈ MY STATES — TAP FOR DETAILS
       </div>
 
@@ -72,7 +72,7 @@ export function MyStatesTab({ api, showMessage, showError }) {
             accent={accent}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 5 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 5 }}>
                   TOP VENUE IN {s.state}
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.92rem', color: 'var(--white)' }}>{s.topVenue}</div>
@@ -80,7 +80,7 @@ export function MyStatesTab({ api, showMessage, showError }) {
               </div>
               {s.avg && (
                 <div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 5 }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 5 }}>
                     YOUR AVG SCORE IN {s.state}
                   </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 900, color: scoreCol, textShadow: `0 0 12px ${scoreCol}66` }}>{s.avg}</div>

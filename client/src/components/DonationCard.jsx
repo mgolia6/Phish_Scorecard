@@ -20,7 +20,7 @@ export function DonationCard() {
       borderLeft: '3px solid var(--green)',
       padding: '14px 16px',
     }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '3px', color: 'rgba(51,255,51,0.6)', marginBottom: 10 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', color: 'rgba(51,255,51,0.6)', marginBottom: 10 }}>
         ◈ MOCKINGBIRD FOUNDATION
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -28,11 +28,11 @@ export function DonationCard() {
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--green)', letterSpacing: '1px', lineHeight: 1 }}>
             {total}
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
             donated · {items} item{items !== 1 ? 's' : ''} sold
           </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(51,255,51,0.4)', textAlign: 'right', lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(51,255,51,0.4)', textAlign: 'right', lineHeight: 1.6 }}>
           $1.00 per item<br />
           supports music education
         </div>

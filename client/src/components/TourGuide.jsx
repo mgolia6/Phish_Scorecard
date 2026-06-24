@@ -120,7 +120,7 @@ export function TourGuide({ onComplete }) {
           </div>
           <div style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '0.42rem',
+            fontSize: '0.56rem',
             letterSpacing: '3px',
             color: `${step.glyphColor}88`,
             marginBottom: 8,
@@ -175,7 +175,7 @@ export function TourGuide({ onComplete }) {
             <button
               onClick={handleSkip}
               style={{
-                fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px',
+                fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px',
                 color: 'rgba(255,255,255,0.18)', background: 'transparent',
                 border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
                 padding: '11px 14px', whiteSpace: 'nowrap',
@@ -188,7 +188,7 @@ export function TourGuide({ onComplete }) {
             onClick={handleNext}
             style={{
               flex: 1, padding: '13px',
-              fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '3px',
+              fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '3px',
               background: step.glyphColor, color: '#000',
               border: 'none', cursor: 'pointer', fontWeight: 700,
             }}

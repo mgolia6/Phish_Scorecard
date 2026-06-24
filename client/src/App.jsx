@@ -500,11 +500,11 @@ export default function App() {
           }}>
             <button onClick={closeScorecardOverlay} style={{
               background: 'transparent', border: '1px solid rgba(51,255,51,0.25)',
-              color: 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.48rem',
+              color: 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.6rem',
               letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
             }}>◀ BACK</button>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>
               SCORECARD
             </span>
           </div>
@@ -561,7 +561,7 @@ export default function App() {
               >
                 ◈ RATE MY FIRST SHOW
               </button>
-              <button style={{ width: '100%', padding: '11px', fontSize: '0.6rem' }} onClick={() => setShowFirstShowPrompt(false)}>
+              <button style={{ width: '100%', padding: '11px', fontSize: '0.66rem' }} onClick={() => setShowFirstShowPrompt(false)}>
                 MAYBE LATER
               </button>
             </div>

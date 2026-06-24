@@ -41,7 +41,7 @@ export function MyVenuesTab({ api, showMessage, showError }) {
       </div>
 
 
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>
         ◈ MY VENUES — TAP FOR TOP SHOWS
       </div>
 
@@ -56,7 +56,7 @@ export function MyVenuesTab({ api, showMessage, showError }) {
             avg={v.average_rating || '—'} count={v.total_shows} countLabel="SHOWS"
             accent={accent}>
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>
                 TOP SHOWS HERE
               </div>
               {(v.top_shows || []).map((s, si) => {
@@ -64,7 +64,7 @@ export function MyVenuesTab({ api, showMessage, showError }) {
                 return (
                   <div key={si} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: si < v.top_shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
                     <a href={`https://phish.in/${s.show_date}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', flex: 1 }}>{formatDate(s.show_date)}</span>
                     <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: col, letterSpacing: 1 }}>{s.avg_score}</span>
                   </div>

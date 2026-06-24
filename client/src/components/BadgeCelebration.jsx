@@ -118,7 +118,7 @@ export function BadgeCelebration({ badge, onDone }) {
         }}>
           {/* ACHIEVEMENT UNLOCKED tag */}
           <div style={{
-            fontFamily: 'var(--font-display)', fontSize: '0.35rem',
+            fontFamily: 'var(--font-display)', fontSize: '0.56rem',
             letterSpacing: '5px', color: 'rgba(255,255,255,0.18)',
             animation: 'badgeFadeUp 0.3s 0.1s ease forwards', opacity: 0,
           }}>ACHIEVEMENT UNLOCKED</div>
@@ -160,7 +160,7 @@ export function BadgeCelebration({ badge, onDone }) {
 
           {/* Sub label */}
           <div style={{
-            fontFamily: 'var(--font-display)', fontSize: '0.38rem',
+            fontFamily: 'var(--font-display)', fontSize: '0.56rem',
             letterSpacing: '4px', color: cfg.color.replace(')', ', 0.45)').replace('var(', 'rgba(').replace('--cyan', '0,224,208').replace('--green', '51,255,51').replace('--orange', '255,102,0'),
             animation: 'badgeFadeUp 0.4s 0.55s ease forwards', opacity: 0,
             marginTop: -8,
@@ -170,7 +170,7 @@ export function BadgeCelebration({ badge, onDone }) {
         {/* Tap hint */}
         <div style={{
           position: 'absolute', bottom: 32,
-          fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
+          fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
           letterSpacing: '2px', color: 'rgba(51,255,51,0.15)',
           animation: 'badgeFadeUp 0.4s 1.2s ease forwards', opacity: 0,
         }}>TAP TO CONTINUE</div>

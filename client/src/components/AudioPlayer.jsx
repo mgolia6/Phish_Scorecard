@@ -84,14 +84,14 @@ export function InlineAudioPlayer({ track, onClose }) {
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {error ? (
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', letterSpacing: '2px', color: 'rgba(255,80,80,0.7)', textAlign: 'center' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(255,80,80,0.7)', textAlign: 'center' }}>
           STREAM UNAVAILABLE
         </div>
       ) : (
         <>
           {/* Track label */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', color: 'rgba(0,224,208,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(0,224,208,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
               {loading ? 'LOADING...' : `◉ ${track.title?.toUpperCase()}`}
             </div>
             <button onClick={onClose} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 0 0 12px', flexShrink: 0 }}>
@@ -118,7 +118,7 @@ export function InlineAudioPlayer({ track, onClose }) {
             </button>
 
             {/* Time */}
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', flexShrink: 0, minWidth: 32 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.35)', flexShrink: 0, minWidth: 32 }}>
               {fmt(current)}
             </span>
 
@@ -142,13 +142,13 @@ export function InlineAudioPlayer({ track, onClose }) {
             </div>
 
             {/* Duration */}
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', flexShrink: 0, minWidth: 32, textAlign: 'right' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)', flexShrink: 0, minWidth: 32, textAlign: 'right' }}>
               {fmt(duration)}
             </span>
           </div>
 
           {/* Phish.in attribution */}
-          <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.48rem', color: 'rgba(255,255,255,0.15)', textAlign: 'right' }}>
+          <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.15)', textAlign: 'right' }}>
             via phish.in
           </div>
         </>

@@ -76,9 +76,9 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
 
         {/* Date */}
         <div style={{ flexShrink: 0, minWidth: 44, textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactMonth}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactMonth}</div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '2px 0' }}>{compactDay}</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactYear}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactYear}</div>
         </div>
 
         {/* Venue + city */}
@@ -95,7 +95,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                 <span key={c.user_id} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cyan)', padding: '1px 5px', border: '1px solid rgba(0,224,208,0.25)' }}>{c.username}</span>
               ))}
               {show.companions.length > 3 && (
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--text-muted)' }}>+{show.companions.length - 3}</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)' }}>+{show.companions.length - 3}</span>
               )}
             </div>
           )}
@@ -125,7 +125,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           {phreezerScore == null ? (
             /* ── Placeholder for unrated shows ── */
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(51,255,51,0.3)', letterSpacing: '2px', marginBottom: 8 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(51,255,51,0.3)', letterSpacing: '2px', marginBottom: 8 }}>
                 NOT RATED YET
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -133,7 +133,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
               </div>
             </div>
           ) : loadingCard ? (
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '12px 0' }}>LOADING...</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '12px 0' }}>LOADING...</div>
           ) : cardData ? (
             <>
               {/* Set scores */}
@@ -147,7 +147,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                       return (
                         <div key={k} style={{ textAlign: 'center' }}>
                           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: col, letterSpacing: 1, lineHeight: 1, textShadow: `0 0 10px ${col}66` }}>{v || '—'}</div>
-                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: col, opacity: 0.7, letterSpacing: '2px', marginTop: 5 }}>{setLabel(k)}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: col, opacity: 0.7, letterSpacing: '2px', marginTop: 5 }}>{setLabel(k)}</div>
                         </div>
                       );
                     })}
@@ -156,11 +156,11 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
               {/* Top songs */}
               {cardData.topSongs.length > 0 && (
                 <>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>TOP RATED SONGS</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>TOP RATED SONGS</div>
                   {cardData.topSongs.map((s, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < cardData.topSongs.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
                       <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.55rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.song_name}</span>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: 'var(--orange)', letterSpacing: '1px', flexShrink: 0 }}>{parseFloat(s.rating).toFixed(1)}</span>
                     </div>
@@ -187,7 +187,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                 });
                 return unique.length > 0 ? (
                   <div style={{ marginTop: 12, padding: '10px 12px', background: 'rgba(255,102,0,0.04)', border: '1px solid rgba(255,102,0,0.2)', borderLeft: '2px solid var(--orange)' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 8 }}>MY REVIEW</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 8 }}>MY REVIEW</div>
                     {unique.map((rev, i) => (
                       <div key={rev.review_id || i} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7, marginBottom: i < unique.length - 1 ? 10 : 0 }}>
                         "{stripBBCode(rev.review_text)}"
@@ -208,16 +208,16 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           {show.favorited ? '★' : '☆'}
         </button>
         <button onClick={() => onRateShow(show.show_date)}
-          style={{ flex: 1, padding: '11px 8px', background: 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: phreezerScore != null ? 'var(--cyan)' : 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer' }}>
+          style={{ flex: 1, padding: '11px 8px', background: 'transparent', border: 'none', borderRight: '1px solid rgba(51,255,51,0.08)', color: phreezerScore != null ? 'var(--cyan)' : 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}>
           {phreezerScore != null ? '◈ RE-RATE' : '◈ RATE'}
         </button>
 
         <a href={`https://phish.net/setlists/?d=${show.show_date}`} target="_blank" rel="noopener noreferrer"
-          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
+          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(51,255,51,0.08)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', textDecoration: 'none' }}>
           PHISH.NET
         </a>
         <a href={`${RELISTEN}/${show.show_date?.replace(/-/g,'/')}`} target="_blank" rel="noopener noreferrer"
-          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', textDecoration: 'none' }}>
+          style={{ flex: 1, padding: '11px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', textDecoration: 'none' }}>
           RELISTEN
         </a>
       </div>

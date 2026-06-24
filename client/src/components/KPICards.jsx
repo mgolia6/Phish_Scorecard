@@ -73,19 +73,19 @@ function KPICard({ val, lbl, col, tip, tipTitle, source, isLast, flipped, onFlip
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: col, lineHeight: 1, textShadow: '0 0 16px currentColor' }}>
             {val}
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 8 }}>
             {lbl}
           </div>
         </div>
         {/* BACK */}
         <div className="kpi-face kpi-face-back" style={{ background: 'var(--bg-elevated)', padding: '10px 8px', gap: 6 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', fontWeight: 700, color: col, letterSpacing: '1.5px', textShadow: '0 0 10px currentColor', textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', fontWeight: 700, color: col, letterSpacing: '1.5px', textShadow: '0 0 10px currentColor', textAlign: 'center' }}>
             {tipTitle}
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', color: 'var(--white)', lineHeight: 1.5, textAlign: 'center', letterSpacing: '0.5px' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--white)', lineHeight: 1.5, textAlign: 'center', letterSpacing: '0.5px' }}>
             {tip}
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: col, opacity: 0.65, textAlign: 'center', marginTop: 2 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: col, opacity: 0.65, textAlign: 'center', marginTop: 2 }}>
             {source}
           </div>
         </div>
@@ -153,7 +153,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
         borderTop: 'none',
         marginBottom: 10,
       }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.75)', letterSpacing: '2.5px', fontWeight: 700 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(0,224,208,0.75)', letterSpacing: '2.5px', fontWeight: 700 }}>
           ↕ TAP ANY STAT TO FLIP
         </span>
       </div>
@@ -168,11 +168,11 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           borderBottom: '1px solid rgba(255,102,0,0.2)',
           background: 'rgba(255,102,0,0.04)',
         }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', fontWeight: 700, color: 'var(--orange)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '3px', fontWeight: 700, color: 'var(--orange)' }}>
             ◈ QUICK PHREEZE
           </span>
           <button onClick={onImport} style={{
-            padding: '7px 14px', fontFamily: 'var(--font-display)', fontSize: '0.5rem',
+            padding: '7px 14px', fontFamily: 'var(--font-display)', fontSize: '0.6rem',
             letterSpacing: '2px', border: '1px solid rgba(255,140,0,0.5)',
             cursor: 'pointer',
             color: 'var(--orange)',
@@ -206,11 +206,11 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
               }
               return (
                 <div key={lbl} style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '1.5px', color: 'var(--text-label)', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px', color: 'var(--text-label)', marginBottom: 6 }}>
                     <span>{lbl}</span>
                     <span style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       <span style={{ color: col, fontSize: '0.7rem' }}>{display}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.46rem' }}>{sub}</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.6rem' }}>{sub}</span>
                     </span>
                   </div>
                   <div style={{ height: 4, background: 'rgba(51,255,51,0.08)' }}>
@@ -231,7 +231,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
                   border: '1px solid rgba(51,255,51,0.25)',
                   background: 'rgba(51,255,51,0.04)',
                   fontFamily: 'var(--font-display)',
-                  fontSize: '0.52rem',
+                  fontSize: '0.62rem',
                   color: 'var(--green)',
                   letterSpacing: '1.5px',
                   whiteSpace: 'nowrap',
@@ -252,7 +252,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
                 kpi.first_show ? ['FIRST SHOW',      formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
               ].filter(Boolean).map(([l, v, s, col], i, arr) => (
                 <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-label)', letterSpacing: '1.5px', flexShrink: 0 }}>{l}</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-label)', letterSpacing: '1.5px', flexShrink: 0 }}>{l}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {v} <span style={{ color: col, fontSize: '0.76rem' }}>{s}</span>
                   </span>
@@ -264,7 +264,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           {/* Deep Phreeze */}
           <div
             onClick={() => onDeepPhreeze && onDeepPhreeze()}
-            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2.5px', fontWeight: 700, color: 'rgba(0,224,208,0.75)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
+            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2.5px', fontWeight: 700, color: 'rgba(0,224,208,0.75)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
           >
             ❄ DIVE INTO DEEP PHREEZE ▶
           </div>

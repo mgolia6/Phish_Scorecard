@@ -50,7 +50,7 @@ function Reel({ values, spinning, locked, lockedValue, direction = 1, color = 'v
       </div>
 
       {locked && (
-        <div style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.3rem', color: color, letterSpacing: '3px', zIndex: 3, opacity: 0.8 }}>LOCKED</div>
+        <div style={{ position: 'absolute', bottom: 6, left: 0, right: 0, textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: color, letterSpacing: '3px', zIndex: 3, opacity: 0.8 }}>LOCKED</div>
       )}
     </div>
   );
@@ -122,7 +122,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 28, animation: 'bounce 1.8s ease-in-out infinite' }}>
             <style>{`@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', color: 'var(--orange)', lineHeight: 1, textShadow: '0 0 30px rgba(255,102,0,0.7)', animation: 'none' }}>↑</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'var(--orange)', letterSpacing: '3px', textShadow: '0 0 15px rgba(255,102,0,0.5)' }}>HIT THAT BUTTON</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', letterSpacing: '3px', textShadow: '0 0 15px rgba(255,102,0,0.5)' }}>HIT THAT BUTTON</div>
           </div>
 
           {/* Dare copy */}
@@ -134,7 +134,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
       ) : (
         <>
           {/* Slot machine label */}
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--text-muted)', letterSpacing: '4px', marginBottom: 16 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '4px', marginBottom: 16 }}>
             {phase === 'done' ? 'FOUND ONE' : 'SEARCHING THE VAULT...'}
           </div>
 
@@ -177,7 +177,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
           </div>
 
           {phase === 'done' && (
-            <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--green)', letterSpacing: '4px', animation: 'fadeIn 0.4s ease' }}>
+            <div style={{ marginTop: 14, fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--green)', letterSpacing: '4px', animation: 'fadeIn 0.4s ease' }}>
               <style>{`@keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
               LOADING...
             </div>

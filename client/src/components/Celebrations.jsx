@@ -287,7 +287,7 @@ export function WelcomeCelebration({ username, onDone }) {
           <div style={{
             marginTop: 'clamp(24px, 6vw, 56px)',
             fontFamily: 'var(--font-display)',
-            fontSize: '0.42rem',
+            fontSize: '0.56rem',
             color: 'rgba(255,255,255,0.18)',
             letterSpacing: '4px',
           }}>
