@@ -58,31 +58,31 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
     const isRated = !!show.phreezer_avg;
     const isAttended = show.attended;
     const tint = i % 2 === 0
-      ? 'rgba(0,224,208,0.09)'
-      : 'rgba(255,140,0,0.13)';
+      ? 'rgba(var(--cyan-rgb),0.09)'
+      : 'rgba(var(--orange-bright-rgb),0.13)';
     return {
       background: isRated
-        ? 'linear-gradient(135deg, rgba(255,140,0,0.08) 0%, rgba(5,18,5,0.98) 100%)'
+        ? 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.08) 0%, rgba(5,18,5,0.98) 100%)'
         : isAttended
-          ? 'linear-gradient(135deg, rgba(51,255,51,0.07) 0%, rgba(5,18,5,0.98) 100%)'
+          ? 'linear-gradient(135deg, rgba(var(--green-rgb),0.07) 0%, rgba(5,18,5,0.98) 100%)'
           : `linear-gradient(135deg, ${tint} 0%, rgba(5,18,5,0.98) 100%)`,
-      border: isRated ? '1px solid rgba(255,140,0,0.5)' : isAttended ? '1px solid rgba(51,255,51,0.5)' : '1px solid rgba(0,224,208,0.3)',
+      border: isRated ? '1px solid rgba(var(--orange-bright-rgb),0.5)' : isAttended ? '1px solid rgba(var(--green-rgb),0.5)' : '1px solid rgba(var(--cyan-rgb),0.3)',
       borderLeft: isRated ? '3px solid var(--orange)' : isAttended ? '3px solid var(--green)' : '3px solid var(--cyan)',
-      boxShadow: isRated ? '0 0 18px rgba(255,140,0,0.12)' : isAttended ? '0 0 18px rgba(51,255,51,0.12)' : 'none',
+      boxShadow: isRated ? '0 0 18px rgba(var(--orange-bright-rgb),0.12)' : isAttended ? '0 0 18px rgba(var(--green-rgb),0.12)' : 'none',
     };
   };
 
   if (loading) return (
-    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
+    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(var(--cyan-rgb),0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(var(--cyan-rgb),0.03)' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
     </div>
   );
 
   if (!otdShows.length) return (
-    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
+    <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(var(--cyan-rgb),0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(var(--cyan-rgb),0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--cyan)', opacity: 0.4 }} />
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
       </div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phish didn't play today's date in any year.</div>
     </div>
@@ -94,7 +94,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
   const [sy, sm, sd] = show.show_date.split('-');
   const fullDate = `${months[parseInt(sm)-1]} ${parseInt(sd)}, ${sy}`;
   const yearsAgo = new Date().getFullYear() - parseInt(sy);
-  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+  const scoreColor = show.phreezer_avg >= 4.7 ? 'var(--orange)' : show.phreezer_avg ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.4)';
   const cStyle = getCardStyle(show, idx);
 
   // Slide-out direction while animating, then snap new card in from opposite side
@@ -108,7 +108,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
           {otdShows.map((s, i) => {
             const activeDotColor = s.phreezer_avg ? 'var(--orange)' : s.attended ? 'var(--green)' : 'var(--cyan)';
-            const inactiveDotColor = s.phreezer_avg ? 'rgba(255,140,0,0.3)' : s.attended ? 'rgba(51,255,51,0.3)' : 'rgba(0,224,208,0.2)';
+            const inactiveDotColor = s.phreezer_avg ? 'rgba(var(--orange-bright-rgb),0.3)' : s.attended ? 'rgba(var(--green-rgb),0.3)' : 'rgba(var(--cyan-rgb),0.2)';
             return (
               <div key={i} onClick={() => go(i - idx)} style={{
                 width: i === idx ? 18 : 6, height: 6,
@@ -123,8 +123,8 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       {/* Badge row */}
       {(isAttended || isRated) && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 6, paddingLeft: 2 }}>
-          {isRated && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>}
-          {isAttended && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>}
+          {isRated && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(var(--orange-bright-rgb),0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>}
+          {isAttended && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(var(--green-rgb),0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>}
         </div>
       )}
 
@@ -316,7 +316,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       {/* ── SECTION C: MY SHOWS ── */}
       <div style={{ padding: '10px' }}>
         {/* ◈ MY SHOWS label */}
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(51,255,51,0.3)', marginBottom: 10 }}>◈ MY SHOWS</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(var(--green-rgb),0.3)', marginBottom: 10 }}>◈ MY SHOWS</div>
 
         {/* Filter + Sort — combined, scrollable row */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
@@ -324,11 +324,11 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
             <button key={k} onClick={() => setFilterBy(k)} style={{
               flexShrink: 0,
               padding: '9px 14px',
-              border: `1px solid ${filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.3)'}`,
-              background: filterBy === k ? 'rgba(255,102,0,0.1)' : 'transparent',
-              color: filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.65)',
+              border: `1px solid ${filterBy === k ? 'var(--orange)' : 'rgba(var(--cyan-rgb),0.3)'}`,
+              background: filterBy === k ? 'rgba(var(--orange-rgb),0.1)' : 'transparent',
+              color: filterBy === k ? 'var(--orange)' : 'rgba(var(--cyan-rgb),0.65)',
               fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '1.5px', cursor: 'pointer',
-              boxShadow: filterBy === k ? '0 0 8px rgba(255,102,0,0.25)' : 'none',
+              boxShadow: filterBy === k ? '0 0 8px rgba(var(--orange-rgb),0.25)' : 'none',
               whiteSpace: 'nowrap',
             }}>{l}</button>
           ))}
@@ -341,9 +341,9 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
             <button key={k} onClick={() => setSortBy(k)} style={{
               flexShrink: 0,
               padding: '7px 12px',
-              border: `1px solid ${sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.3)'}`,
-              background: sortBy === k ? 'rgba(0,224,208,0.08)' : 'transparent',
-              color: sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.65)',
+              border: `1px solid ${sortBy === k ? 'var(--cyan)' : 'rgba(var(--cyan-rgb),0.3)'}`,
+              background: sortBy === k ? 'rgba(var(--cyan-rgb),0.08)' : 'transparent',
+              color: sortBy === k ? 'var(--cyan)' : 'rgba(var(--cyan-rgb),0.65)',
               fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px', cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}>{l}</button>
@@ -359,7 +359,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
           const hasReview = reviews.length > 0;
           const phreezerScore = show.phreezer_avg ?? show.overall_rating ?? null;
           const scoreColor = phreezerScore >= 4.7 ? 'var(--orange)' : phreezerScore != null ? 'var(--cyan)' : 'var(--text-muted)';
-          const cardAccent = phreezerScore >= 4.7 ? 'var(--orange)' : phreezerScore != null ? 'var(--cyan)' : 'rgba(51,255,51,0.25)';
+          const cardAccent = phreezerScore >= 4.7 ? 'var(--orange)' : phreezerScore != null ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.25)';
 
           return (
             <ShowCard

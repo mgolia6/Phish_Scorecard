@@ -74,7 +74,7 @@ export function InlineAudioPlayer({ track, onClose }) {
   return (
     <div style={{
       background: 'rgba(0,0,0,0.5)',
-      borderTop: '1px solid rgba(0,224,208,0.15)',
+      borderTop: '1px solid rgba(var(--cyan-rgb),0.15)',
       padding: '10px 12px',
       animation: 'fadeIn 0.18s ease',
       width: '100%',
@@ -91,7 +91,7 @@ export function InlineAudioPlayer({ track, onClose }) {
         <>
           {/* Track label */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(0,224,208,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(var(--cyan-rgb),0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
               {loading ? 'LOADING...' : `◉ ${track.title?.toUpperCase()}`}
             </div>
             <button onClick={onClose} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 0 0 12px', flexShrink: 0 }}>
@@ -107,7 +107,7 @@ export function InlineAudioPlayer({ track, onClose }) {
               disabled={loading}
               style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: loading ? 'rgba(0,224,208,0.15)' : 'var(--cyan)',
+                background: loading ? 'rgba(var(--cyan-rgb),0.15)' : 'var(--cyan)',
                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, color: '#000', fontSize: '0.75rem',
@@ -137,7 +137,7 @@ export function InlineAudioPlayer({ track, onClose }) {
                 transform: 'translate(-50%, -50%)',
                 width: 10, height: 10, borderRadius: '50%',
                 background: 'var(--cyan)',
-                boxShadow: '0 0 6px rgba(0,224,208,0.8)',
+                boxShadow: '0 0 6px rgba(var(--cyan-rgb),0.8)',
               }} />
             </div>
 

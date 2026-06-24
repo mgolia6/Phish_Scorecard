@@ -46,7 +46,7 @@ export function ProfileTab({ api, user }) {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--cyan)', letterSpacing: '2px' }}>
           {user.username}
         </div>
-        <div style={{ fontSize: '0.65rem', color: 'rgba(51,255,51,0.35)', marginTop: 4, letterSpacing: '1px' }}>
+        <div style={{ fontSize: '0.65rem', color: 'rgba(var(--green-rgb),0.35)', marginTop: 4, letterSpacing: '1px' }}>
           {user.email}
         </div>
       </div>
@@ -99,7 +99,7 @@ export function ProfileTab({ api, user }) {
 
       <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
         <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-          style={{ display: 'block', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', letterSpacing: '2px', textDecoration: 'none', padding: '12px', border: '1px solid rgba(255,102,0,0.3)' }}>
+          style={{ display: 'block', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', letterSpacing: '2px', textDecoration: 'none', padding: '12px', border: '1px solid rgba(var(--orange-rgb),0.3)' }}>
           ☕ BUY A COFFEE — KEEP PHREEZER RUNNING
         </a>
       </div>

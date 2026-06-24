@@ -131,7 +131,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
         gridTemplateColumns: '1fr 1fr 1fr 1fr',
         background: 'var(--bg-panel)',
         border: '1px solid var(--border)',
-        borderTop: '2px solid rgba(0,224,208,0.3)',
+        borderTop: '2px solid rgba(var(--cyan-rgb),0.3)',
       }}>
         {cardData.map(({ val, lbl, col, tip, tipTitle, source }, i) => (
           <KPICard
@@ -153,30 +153,30 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
         borderTop: 'none',
         marginBottom: 10,
       }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(0,224,208,0.75)', letterSpacing: '2.5px', fontWeight: 700 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--cyan-rgb),0.75)', letterSpacing: '2.5px', fontWeight: 700 }}>
           ↕ TAP ANY STAT TO FLIP
         </span>
       </div>
 
       {/* ── QUICK PHREEZE ── */}
-      <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderBottom: '2px solid rgba(255,102,0,0.25)' }}>
+      <div style={{ background: 'var(--bg-panel)', border: '1px solid var(--border)', borderBottom: '2px solid rgba(var(--orange-rgb),0.25)' }}>
 
         {/* Section header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '10px 14px',
-          borderBottom: '1px solid rgba(255,102,0,0.2)',
-          background: 'rgba(255,102,0,0.04)',
+          borderBottom: '1px solid rgba(var(--orange-rgb),0.2)',
+          background: 'rgba(var(--orange-rgb),0.04)',
         }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '3px', fontWeight: 700, color: 'var(--orange)' }}>
             ◈ QUICK PHREEZE
           </span>
           <button onClick={onImport} style={{
             padding: '7px 14px', fontFamily: 'var(--font-display)', fontSize: '0.6rem',
-            letterSpacing: '2px', border: '1px solid rgba(255,140,0,0.5)',
+            letterSpacing: '2px', border: '1px solid rgba(var(--orange-bright-rgb),0.5)',
             cursor: 'pointer',
             color: 'var(--orange)',
-            filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
+            filter: 'drop-shadow(0 0 5px rgba(var(--orange-bright-rgb),0.5))',
           }}>↓ IMPORT</button>
         </div>
 
@@ -213,7 +213,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.6rem' }}>{sub}</span>
                     </span>
                   </div>
-                  <div style={{ height: 4, background: 'rgba(51,255,51,0.08)' }}>
+                  <div style={{ height: 4, background: 'rgba(var(--green-rgb),0.08)' }}>
                     <div style={{ width: `${fillPct}%`, height: '100%', background: col, boxShadow: `0 0 6px ${col}`, transition: 'width 0.6s' }} />
                   </div>
                 </div>
@@ -223,13 +223,13 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
 
           {/* Badges */}
           {kpi.badges && kpi.badges.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 4, paddingTop: 12, borderTop: '1px solid rgba(51,255,51,0.08)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 4, paddingTop: 12, borderTop: '1px solid rgba(var(--green-rgb),0.08)' }}>
               {kpi.badges.map(b => (
                 <div key={b.id} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5,
                   padding: '5px 10px',
-                  border: '1px solid rgba(51,255,51,0.25)',
-                  background: 'rgba(51,255,51,0.04)',
+                  border: '1px solid rgba(var(--green-rgb),0.25)',
+                  background: 'rgba(var(--green-rgb),0.04)',
                   fontFamily: 'var(--font-display)',
                   fontSize: '0.62rem',
                   color: 'var(--green)',
@@ -245,13 +245,13 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
 
           {/* Top stats */}
           {(kpi.top_song || kpi.top_venue || kpi.first_show) && (
-            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(51,255,51,0.08)', borderLeft: '3px solid var(--orange)', paddingLeft: 12 }}>
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(var(--green-rgb),0.08)', borderLeft: '3px solid var(--orange)', paddingLeft: 12 }}>
               {[
                 kpi.top_song   ? ['TOP RATED SONG', kpi.top_song.song_name,     `(${kpi.top_song.avg})`,     'var(--orange)'] : null,
                 kpi.top_venue  ? ['TOP VENUE',       kpi.top_venue.venue,        `(${kpi.top_venue.shows}x)`, 'var(--cyan)']   : null,
                 kpi.first_show ? ['FIRST SHOW',      formatDate(kpi.first_show), '',                          'var(--cyan)']   : null,
               ].filter(Boolean).map(([l, v, s, col], i, arr) => (
-                <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-label)', letterSpacing: '1.5px', flexShrink: 0 }}>{l}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)', textAlign: 'right', marginLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {v} <span style={{ color: col, fontSize: '0.76rem' }}>{s}</span>
@@ -264,7 +264,7 @@ export function KPICards({ api, onDeepPhreeze, onImport, refreshKey }) {
           {/* Deep Phreeze */}
           <div
             onClick={() => onDeepPhreeze && onDeepPhreeze()}
-            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(0,224,208,0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2.5px', fontWeight: 700, color: 'rgba(0,224,208,0.75)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(0,224,208,0.3)' }}
+            style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(var(--cyan-rgb),0.1)', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2.5px', fontWeight: 700, color: 'rgba(var(--cyan-rgb),0.75)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'rgba(var(--cyan-rgb),0.3)' }}
           >
             ❄ DIVE INTO DEEP PHREEZE ▶
           </div>

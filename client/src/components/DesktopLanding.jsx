@@ -13,7 +13,7 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
         alt="PHREEZER"
         style={{
           height: 110, objectFit: 'contain', marginBottom: 52,
-          filter: 'drop-shadow(0 0 20px rgba(0,224,208,0.4))',
+          filter: 'drop-shadow(0 0 20px rgba(var(--cyan-rgb),0.4))',
         }}
       />
 
@@ -29,7 +29,7 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
         ].map(({ glyph, label, sub, color, action, cta }) => (
           <div key={label} onClick={action} style={{
             padding: '28px 20px 22px', cursor: 'pointer',
-            border: `1px solid ${color === 'var(--orange)' ? 'rgba(255,102,0,0.2)' : color === 'var(--cyan)' ? 'rgba(0,224,208,0.2)' : 'rgba(51,255,51,0.2)'}`,
+            border: `1px solid ${color === 'var(--orange)' ? 'rgba(var(--orange-rgb),0.2)' : color === 'var(--cyan)' ? 'rgba(var(--cyan-rgb),0.2)' : 'rgba(var(--green-rgb),0.2)'}`,
             background: 'rgba(255,255,255,0.02)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
             transition: 'all 0.2s',
@@ -56,25 +56,25 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
         <button onClick={() => onLogin('signup')} style={{
           fontFamily: 'var(--font-display)', fontSize: '0.85rem', letterSpacing: '3px',
           padding: '18px 52px', background: 'transparent', border: '1px solid var(--orange)',
-          color: 'var(--orange)', cursor: 'pointer', boxShadow: '0 0 24px rgba(255,102,0,0.3)',
+          color: 'var(--orange)', cursor: 'pointer', boxShadow: '0 0 24px rgba(var(--orange-rgb),0.3)',
           transition: 'all 0.2s',
         }}
-        onMouseEnter={e => { e.target.style.background = 'rgba(255,102,0,0.1)'; e.target.style.boxShadow = '0 0 40px rgba(255,102,0,0.5)'; }}
-        onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.boxShadow = '0 0 24px rgba(255,102,0,0.3)'; }}
+        onMouseEnter={e => { e.target.style.background = 'rgba(var(--orange-rgb),0.1)'; e.target.style.boxShadow = '0 0 40px rgba(var(--orange-rgb),0.5)'; }}
+        onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.boxShadow = '0 0 24px rgba(var(--orange-rgb),0.3)'; }}
         >+ CREATE ACCOUNT</button>
         <button onClick={() => onLogin('login')} style={{
           fontFamily: 'var(--font-display)', fontSize: '0.78rem', letterSpacing: '2px',
           padding: '16px 36px', background: 'transparent',
-          border: '1px solid rgba(51,255,51,0.25)', color: 'rgba(51,255,51,0.6)', cursor: 'pointer', transition: 'all 0.2s',
+          border: '1px solid rgba(var(--green-rgb),0.25)', color: 'rgba(var(--green-rgb),0.6)', cursor: 'pointer', transition: 'all 0.2s',
         }}
-        onMouseEnter={e => { e.target.style.color = 'var(--green)'; e.target.style.borderColor = 'rgba(51,255,51,0.5)'; }}
-        onMouseLeave={e => { e.target.style.color = 'rgba(51,255,51,0.6)'; e.target.style.borderColor = 'rgba(51,255,51,0.25)'; }}
+        onMouseEnter={e => { e.target.style.color = 'var(--green)'; e.target.style.borderColor = 'rgba(var(--green-rgb),0.5)'; }}
+        onMouseLeave={e => { e.target.style.color = 'rgba(var(--green-rgb),0.6)'; e.target.style.borderColor = 'rgba(var(--green-rgb),0.25)'; }}
         >→ LOGIN</button>
       </div>
 
       <div onClick={onGoToScorecard} style={{
         fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-        color: 'rgba(51,255,51,0.28)', letterSpacing: '2px', cursor: 'pointer',
+        color: 'rgba(var(--green-rgb),0.28)', letterSpacing: '2px', cursor: 'pointer',
       }}>OR BROWSE SETLISTS + COMMUNITY WITHOUT AN ACCOUNT →</div>
     </div>
   );

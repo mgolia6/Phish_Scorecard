@@ -62,7 +62,7 @@ export function MyStatesTab({ api, showMessage, showError }) {
       {!states.length ? (
         <div className="empty-state">RATE SOME SHOWS FIRST</div>
       ) : states.map((s, i) => {
-        const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+        const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.4)';
         const scoreCol = s.avg && parseFloat(s.avg) >= 4.5 ? 'var(--orange)' : 'var(--cyan)';
         return (
           <CommExpandCard key={s.state}

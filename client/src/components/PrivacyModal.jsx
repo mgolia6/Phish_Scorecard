@@ -7,13 +7,13 @@ const S = {
     justifyContent: 'center', overflowY: 'auto', padding: '24px 16px',
   },
   modal: {
-    background: '#0f0f0f', border: '1px solid rgba(0,224,208,0.15)',
+    background: '#0f0f0f', border: '1px solid rgba(var(--cyan-rgb),0.15)',
     borderRadius: 2, width: '100%', maxWidth: 680,
-    boxShadow: '0 0 40px rgba(0,224,208,0.08)',
+    boxShadow: '0 0 40px rgba(var(--cyan-rgb),0.08)',
     position: 'relative', marginBottom: 24,
   },
   header: {
-    borderBottom: '1px solid rgba(0,224,208,0.12)',
+    borderBottom: '1px solid rgba(var(--cyan-rgb),0.12)',
     padding: '20px 20px 16px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
@@ -31,7 +31,7 @@ const S = {
   section: {
     borderLeft: '3px solid var(--cyan)', padding: '16px 20px',
     borderBottom: '1px solid rgba(255,255,255,0.04)',
-    background: 'rgba(0,224,208,0.02)',
+    background: 'rgba(var(--cyan-rgb),0.02)',
   },
   sectionAlt: {
     borderLeft: '3px solid var(--green)', padding: '16px 20px',
@@ -40,7 +40,7 @@ const S = {
   sectionWarn: {
     borderLeft: '3px solid var(--orange)', padding: '16px 20px',
     borderBottom: '1px solid rgba(255,255,255,0.04)',
-    background: 'rgba(255,102,0,0.02)',
+    background: 'rgba(var(--orange-rgb),0.02)',
   },
   label: {
     fontFamily: 'var(--font-display)', fontSize: '0.6rem',

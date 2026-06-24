@@ -34,7 +34,7 @@ export function AnalyticsTab({ api, showMessage, showError }) {
             <span className="stat-rank">#{i+1}</span>
             <div className="stat-name">
               <div>{v.venue}</div>
-              <div style={{ color: 'rgba(51,255,51,0.4)', fontSize: '0.7rem' }}>{v.city}{v.state ? `, ${v.state}` : ''} · {v.total_shows} shows</div>
+              <div style={{ color: 'rgba(var(--green-rgb),0.4)', fontSize: '0.7rem' }}>{v.city}{v.state ? `, ${v.state}` : ''} · {v.total_shows} shows</div>
             </div>
             <span className="stat-score">{v.average_rating}</span>
           </div>

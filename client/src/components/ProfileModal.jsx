@@ -124,7 +124,7 @@ export function BadgesSection({ api }) {
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 8 }}>LOCKED</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {locked.map((b, i) => (
-              <div key={i} style={{ background: 'var(--bg-panel)', border: '1px solid rgba(51,255,51,0.08)', padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, opacity: 0.4 }}>
+              <div key={i} style={{ background: 'var(--bg-panel)', border: '1px solid rgba(var(--green-rgb),0.08)', padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, opacity: 0.4 }}>
                 <span style={{ fontSize: '1.4rem', filter: 'grayscale(1)' }}>{b.glyph}</span>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-label)', letterSpacing: '1.5px', textAlign: 'center' }}>{b.label}</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.4 }}>{b.desc}</div>
@@ -252,7 +252,7 @@ function AITab() {
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
+      <div style={{ background: 'rgba(var(--cyan-rgb),0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '20px 16px' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ AI IN THE PHREEZER'}</div>
         <p style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
           We believe AI should inform, not decide. Every feature here is built around that principle — you stay in the loop, you make the calls, and the AI earns its place by making your judgment better, not by replacing it.
@@ -263,9 +263,9 @@ function AITab() {
         </p>
       </div>
 
-      <div style={{ borderLeft: `3px solid ${D.orange}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(255,102,0,0.03)' }}>
+      <div style={{ borderLeft: `3px solid ${D.orange}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--orange-rgb),0.03)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.orange, textShadow: '0 0 16px rgba(255,102,0,0.5)' }}>{'◈'}</span>
+          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.orange, textShadow: '0 0 16px rgba(var(--orange-rgb),0.5)' }}>{'◈'}</span>
           <div>
             <div style={{ fontFamily: D.display, fontSize: '0.66rem', color: D.orange, letterSpacing: '2.5px' }}>ASK EBENEZER</div>
             <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, marginTop: 2 }}>Floating button — available on every show page</div>
@@ -282,9 +282,9 @@ function AITab() {
         </p>
       </div>
 
-      <div style={{ borderLeft: `3px solid ${D.cyan}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(0,224,208,0.02)' }}>
+      <div style={{ borderLeft: `3px solid ${D.cyan}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--cyan-rgb),0.02)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.cyan, textShadow: '0 0 16px rgba(0,224,208,0.5)' }}>{'✦'}</span>
+          <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.cyan, textShadow: '0 0 16px rgba(var(--cyan-rgb),0.5)' }}>{'✦'}</span>
           <div>
             <div style={{ fontFamily: D.display, fontSize: '0.66rem', color: D.cyan, letterSpacing: '2.5px' }}>VIBE CHECK</div>
             <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, marginTop: 2 }}>On-demand — tap to generate on any show page</div>
@@ -298,7 +298,7 @@ function AITab() {
         </p>
       </div>
 
-      <div style={{ borderLeft: '3px solid rgba(51,255,51,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(51,255,51,0.02)' }}>
+      <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--green-rgb),0.02)' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ ON RESPONSIBILITY'}</div>
         {[
           'Every rating in this app came from a human. AI commentary is available when you want it and stays out of the way when you do not.',
@@ -325,7 +325,7 @@ function AITab() {
           ['PHISH.NET PUBLIC DATA', 'Setlists, community reviews, jamchart entries, and song histories pulled in real time when you ask about a specific show or song. This is what the broader Phish community has documented and chosen to make public.'],
         ].map(([label, desc]) => (
           <div key={label} style={{ marginBottom: 10 }}>
-            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(0,224,208,0.5)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
+            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.5)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
             <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', lineHeight: 1.7 }}>{desc}</div>
           </div>
         ))}
@@ -389,7 +389,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         {/* Header */}
         <div className="profile-modal-header">
           <div style={{ fontFamily:'var(--font-display)', fontSize:'0.66rem', color:'var(--cyan)', letterSpacing:'3px' }}>◈ PROFILE</div>
-          <button onClick={onClose} style={{ background:'transparent', border:'1px solid rgba(51,255,51,0.25)', color:'var(--text-label)', fontFamily:'var(--font-display)', fontSize:'0.62rem', letterSpacing:'2px', padding:'5px 10px', cursor:'pointer' }}>
+          <button onClick={onClose} style={{ background:'transparent', border:'1px solid rgba(var(--green-rgb),0.25)', color:'var(--text-label)', fontFamily:'var(--font-display)', fontSize:'0.62rem', letterSpacing:'2px', padding:'5px 10px', cursor:'pointer' }}>
             ✕ CLOSE
           </button>
         </div>
@@ -407,7 +407,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
               color: '#000',
               textDecoration: 'none', display: 'block',
               background: 'var(--orange)',
-              boxShadow: '0 0 20px rgba(255,140,0,0.5)',
+              boxShadow: '0 0 20px rgba(var(--orange-bright-rgb),0.5)',
               fontWeight: 700,
             }}>◈ SUPPORT</a>
           </div>
@@ -428,7 +428,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
 
               {/* Appearance / theme — ADMIN-ONLY while light mode is in beta (sandboxed) */}
               {user?.is_admin && (
-              <div style={{ background: 'rgba(0,224,208,0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px' }}>
+              <div style={{ background: 'rgba(var(--cyan-rgb),0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ APPEARANCE <span style={{ color: 'var(--orange)', fontSize: '0.5rem', marginLeft: 6 }}>ADMIN BETA</span></div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   {[['dark', '◑ DARK'], ['light', '◐ LIGHT']].map(([val, label]) => (
@@ -436,7 +436,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                       flex: 1, padding: '11px 8px', cursor: 'pointer',
                       fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '2px',
                       border: `1px solid ${theme === val ? 'var(--cyan)' : 'var(--border)'}`,
-                      background: theme === val ? 'rgba(0,224,208,0.1)' : 'transparent',
+                      background: theme === val ? 'rgba(var(--cyan-rgb),0.1)' : 'transparent',
                       color: theme === val ? 'var(--cyan)' : 'var(--text-muted)',
                     }}>{label}</button>
                   ))}
@@ -448,7 +448,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
               )}
 
               {/* Identity block */}
-              <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.15)', padding: '16px 14px' }}>
+              <div style={{ background: 'rgba(var(--cyan-rgb),0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.15)', padding: '16px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ YOUR PHISH IDENTITY</div>
                 {[
                   ['PHISH.NET HANDLE', profile?.phishnet_username],
@@ -458,18 +458,18 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 ].map(([label, val]) => (
                   <div key={label} style={{ marginBottom: 12 }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>{label}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: val ? 'var(--white)' : 'rgba(51,255,51,0.2)' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: val ? 'var(--white)' : 'rgba(var(--green-rgb),0.2)' }}>
                       {val || '—'}
                     </div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(51,255,51,0.25)', marginTop: 8 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.25)', marginTop: 8 }}>
                   Edit via phish.net import ↗
                 </div>
               </div>
 
               {/* Avatar */}
-              <div style={{ background: 'rgba(0,224,208,0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px' }}>
+              <div style={{ background: 'rgba(var(--cyan-rgb),0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>
                   ◈ CHOOSE YOUR AVATAR{savingIcon && <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: '0.6rem' }}>SAVING...</span>}
                 </div>
@@ -477,13 +477,13 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   {AVATAR_OPTIONS.map(opt => (
                     <button key={opt.id} onClick={() => handleSaveIcon(opt.id)} style={{
                       aspectRatio: '1',
-                      border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(51,255,51,0.12)'}`,
-                      background: selectedIcon === opt.id ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.3)',
+                      border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.12)'}`,
+                      background: selectedIcon === opt.id ? 'rgba(var(--cyan-rgb),0.1)' : 'rgba(0,0,0,0.3)',
                       cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: 8,
-                      boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(0,224,208,0.3)' : 'none',
+                      boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(var(--cyan-rgb),0.3)' : 'none',
                       transition: 'all 0.15s',
                     }}>
-                      <PhreezerAvatar seed={opt.id} size={40} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(0,224,208,0.4)'} />
+                      <PhreezerAvatar seed={opt.id} size={40} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(var(--cyan-rgb),0.4)'} />
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: selectedIcon === opt.id ? 'var(--cyan)' : 'var(--text-muted)', letterSpacing: '1px' }}>{opt.label}</span>
                     </button>
                   ))}
@@ -532,7 +532,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   ]
                 },
               ].map(({ label, field, options }) => (
-                <div key={field} style={{ borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '16px 14px', background: 'rgba(0,0,0,0.2)' }}>
+                <div key={field} style={{ borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px', background: 'rgba(0,0,0,0.2)' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 12 }}>◈ {label}</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {options.map(opt => {
@@ -543,12 +543,12 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                           fontFamily: 'var(--font-display)',
                           fontSize: '0.66rem',
                           letterSpacing: '2px',
-                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(51,255,51,0.2)'}`,
-                          background: active ? 'rgba(0,224,208,0.12)' : 'transparent',
+                          border: `1px solid ${active ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.2)'}`,
+                          background: active ? 'rgba(var(--cyan-rgb),0.12)' : 'transparent',
                           color: active ? 'var(--cyan)' : 'var(--text-label)',
                           cursor: 'pointer',
-                          boxShadow: active ? '0 0 16px rgba(0,224,208,0.3)' : 'none',
-                          textShadow: active ? '0 0 10px rgba(0,224,208,0.6)' : 'none',
+                          boxShadow: active ? '0 0 16px rgba(var(--cyan-rgb),0.3)' : 'none',
+                          textShadow: active ? '0 0 10px rgba(var(--cyan-rgb),0.6)' : 'none',
                           transition: 'all 0.15s',
                         }}>
                           {active ? '◈ ' : ''}{opt.label}
@@ -579,7 +579,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           {sec === 'about' && (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-              <div style={{ background: 'rgba(0,224,208,0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(0,224,208,0.1)', padding: '20px 16px' }}>
+              <div style={{ background: 'rgba(var(--cyan-rgb),0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '20px 16px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 14 }}>◈ ORIGIN STORY</div>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', lineHeight: 1.8, margin: '0 0 14px' }}>
                   I’ve been blessed to be a part of the Phish community for over three decades. I remember immediately feeling embraced by the community even at my first few shows. There is a comfort I have found being in a crowd of thousands at a Phish show that evades me in other large crowd situations. It’s that felt sense of joy and also critical analysis of the music that keeps the experience fresh and perpetuates the scene.
@@ -604,7 +604,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 </p>
               </div>
 
-              <div style={{ borderLeft: '3px solid var(--orange)', borderBottom: '1px solid rgba(255,140,0,0.1)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ borderLeft: '3px solid var(--orange)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ WHAT THIS IS</div>
                 {[
                   ['RATE', 'Score every song 1–5. Build a record of how you actually hear the music.'],
@@ -616,14 +616,14 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                       fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '2px', flexShrink: 0, paddingTop: 2,
                       background: 'linear-gradient(90deg, #FF8C00 0%, #FFD700 40%, #FF6600 70%, #FF8C00 100%)',
                       WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                      filter: 'drop-shadow(0 0 5px rgba(255,140,0,0.5))',
+                      filter: 'drop-shadow(0 0 5px rgba(var(--orange-bright-rgb),0.5))',
                     }}>{verb}.</span>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.6 }}>{desc}</span>
                   </div>
                 ))}
               </div>
 
-              <div style={{ borderLeft: '3px solid var(--green)', borderBottom: '1px solid rgba(51,255,51,0.1)', padding: '20px 16px' }}>
+              <div style={{ borderLeft: '3px solid var(--green)', borderBottom: '1px solid rgba(var(--green-rgb),0.1)', padding: '20px 16px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ BUILT BY</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', color: 'var(--white)', marginBottom: 4 }}>mpgink</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 16 }}>
@@ -635,14 +635,14 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 </a>
               </div>
 
-              <div style={{ borderLeft: '3px solid rgba(51,255,51,0.3)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.3)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ STANDING ON SHOULDERS</div>
                 {[
                   ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
                   ['PHISH.IN', 'Live audio archives. Stream what you\'re rating.', 'https://phish.in'],
                   ['ANTHROPIC', 'AI powering Vibe Check and Uncle Ebenezer.', 'https://anthropic.com'],
                 ].map(([name, desc, href]) => (
-                  <div key={name} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(51,255,51,0.06)' }}>
+                  <div key={name} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(var(--green-rgb),0.06)' }}>
                     <a href={href} target="_blank" rel="noopener noreferrer"
                       style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--cyan)', letterSpacing: '2px', textDecoration: 'none' }}>
                       {name} ↗
@@ -650,7 +650,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(51,255,51,0.2)', marginTop: 4 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(var(--green-rgb),0.2)', marginTop: 4 }}>
                   Independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
                 </div>
               </div>

@@ -54,8 +54,8 @@ export function ChangelogModal({ onDismiss }) {
         onClick={e => e.stopPropagation()}
         style={{
           background: 'var(--bg-panel)',
-          border: '1px solid rgba(0,224,208,0.4)',
-          boxShadow: '0 0 40px rgba(0,224,208,0.12), 0 0 80px rgba(0,0,0,0.6)',
+          border: '1px solid rgba(var(--cyan-rgb),0.4)',
+          boxShadow: '0 0 40px rgba(var(--cyan-rgb),0.12), 0 0 80px rgba(0,0,0,0.6)',
           width: '100%', maxWidth: 420,
           padding: '28px 24px 24px',
           position: 'relative',
@@ -79,16 +79,16 @@ export function ChangelogModal({ onDismiss }) {
         <div style={{
           fontFamily: 'var(--font-display)', fontSize: '1rem',
           color: 'var(--cyan)', letterSpacing: '4px',
-          textShadow: '0 0 20px rgba(0,224,208,0.5)',
+          textShadow: '0 0 20px rgba(var(--cyan-rgb),0.5)',
           marginBottom: 4,
         }}>
           PHREEZER UPDATE
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-          color: 'rgba(51,255,51,0.4)', letterSpacing: '2px',
+          color: 'rgba(var(--green-rgb),0.4)', letterSpacing: '2px',
           marginBottom: 24, paddingBottom: 16,
-          borderBottom: '1px solid rgba(51,255,51,0.12)',
+          borderBottom: '1px solid rgba(var(--green-rgb),0.12)',
         }}>
           v{CHANGELOG_VERSION} — Jun 17, 2026
         </div>
@@ -111,12 +111,12 @@ export function ChangelogModal({ onDismiss }) {
                   }}>{c.title}</div>
                   <div style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
-                    color: 'rgba(51,255,51,0.72)', lineHeight: 1.6,
+                    color: 'rgba(var(--green-rgb),0.72)', lineHeight: 1.6,
                   }}>{c.desc}</div>
                 </div>
               </div>
               {i < CHANGES.length - 1 && (
-                <div style={{ height: 1, background: 'rgba(51,255,51,0.1)' }} />
+                <div style={{ height: 1, background: 'rgba(var(--green-rgb),0.1)' }} />
               )}
             </React.Fragment>
           ))}
@@ -126,7 +126,7 @@ export function ChangelogModal({ onDismiss }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{
             fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
-            color: 'rgba(51,255,51,0.25)', letterSpacing: '1px',
+            color: 'rgba(var(--green-rgb),0.25)', letterSpacing: '1px',
           }}>TAP OUTSIDE TO DISMISS</span>
           <button
             onClick={handleDismiss}

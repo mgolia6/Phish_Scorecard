@@ -31,7 +31,7 @@ const StatBox = ({ val, label, color = D.cyan }) => (
 const TabBtn = ({ active, color, onClick, children }) => (
   <button onClick={onClick} style={{
     fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px',
-    padding: '10px 14px', border: `1px solid ${active ? color : 'rgba(51,255,51,0.15)'}`,
+    padding: '10px 14px', border: `1px solid ${active ? color : 'rgba(var(--green-rgb),0.15)'}`,
     background: active ? `${color}18` : 'transparent',
     color: active ? color : D.muted, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
   }}>{children}</button>
@@ -259,7 +259,7 @@ function ErrorLogTab() {
                 <span style={{ color: D.muted, fontSize: '0.7rem', flexShrink: 0 }}>{expanded === e.id ? '▲' : '▼'}</span>
               </div>
               {expanded === e.id && (
-                <div style={{ padding: '0 12px 12px', borderTop: '1px solid rgba(51,255,51,0.06)' }}>
+                <div style={{ padding: '0 12px 12px', borderTop: '1px solid rgba(var(--green-rgb),0.06)' }}>
                   <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.label, lineHeight: 1.5, wordBreak: 'break-all', marginTop: 10 }}>
                     {e.message}
                   </div>
@@ -449,7 +449,7 @@ function SystemTab({ api, showMessage }) {
                 {migrationResult.results?.map((r, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
                     <span style={{ color: r.status === 'ok' ? D.green : D.red, fontFamily: D.disp, fontSize: '0.7rem' }}>{r.status === 'ok' ? '✓' : '✗'}</span>
-                    <span style={{ fontFamily: D.mono, fontSize: '0.7rem', color: r.status === 'ok' ? 'rgba(51,255,51,0.7)' : D.red }}>{r.migration}</span>
+                    <span style={{ fontFamily: D.mono, fontSize: '0.7rem', color: r.status === 'ok' ? 'rgba(var(--green-rgb),0.7)' : D.red }}>{r.migration}</span>
                     {r.error && <span style={{ fontSize: '0.66rem', color: D.red, opacity: 0.7 }}>{r.error}</span>}
                   </div>
                 ))}
@@ -466,7 +466,7 @@ function SystemTab({ api, showMessage }) {
             <div className="modal-title" style={{ color: D.green }}>{actionResult.title}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: '50vh', overflowY: 'auto', marginBottom: 20 }}>
               {actionResult.lines.map((line, i) => (
-                <div key={i} style={{ fontFamily: D.mono, fontSize: '0.75rem', color: 'rgba(51,255,51,0.8)', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>{line}</div>
+                <div key={i} style={{ fontFamily: D.mono, fontSize: '0.75rem', color: 'rgba(var(--green-rgb),0.8)', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>{line}</div>
               ))}
             </div>
             <button className="btn-primary" style={{ width: '100%', padding: '13px' }} onClick={() => setActionResult(null)}>CLOSE</button>
@@ -601,19 +601,19 @@ function FeedbackTab({ api }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {filtered.map(r => (
-          <div key={r.id} style={{ padding: '12px 14px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,140,0,0.15)', borderLeft: '3px solid var(--orange)' }}>
+          <div key={r.id} style={{ padding: '12px 14px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(var(--orange-bright-rgb),0.15)', borderLeft: '3px solid var(--orange)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span style={{ fontFamily: D.mono, fontSize: '0.84rem', color: D.label }}>{r.phishnet_username || r.email}</span>
-                <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(255,140,0,0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
-                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(0,224,208,0.35)', padding: '1px 6px' }}>{r.section}</span>}
+                <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(var(--orange-bright-rgb),0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
+                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.35)', padding: '1px 6px' }}>{r.section}</span>}
               </div>
               <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, flexShrink: 0 }}>
                 {new Date(r.created_at).toLocaleDateString()}
               </span>
             </div>
             {r.free_text && (
-              <div style={{ fontFamily: D.mono, fontSize: '0.75rem', color: 'var(--white)', lineHeight: 1.6, borderLeft: '2px solid rgba(255,140,0,0.3)', paddingLeft: 10 }}>
+              <div style={{ fontFamily: D.mono, fontSize: '0.75rem', color: 'var(--white)', lineHeight: 1.6, borderLeft: '2px solid rgba(var(--orange-bright-rgb),0.3)', paddingLeft: 10 }}>
                 "{r.free_text}"
               </div>
             )}
@@ -658,7 +658,7 @@ function UserEmailNudge({ userId, username }) {
 
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-      <select value={type} onChange={e => setType(e.target.value)} style={{ flex: 1, minWidth: 150, background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.74rem', padding: '8px 10px', outline: 'none' }}>
+      <select value={type} onChange={e => setType(e.target.value)} style={{ flex: 1, minWidth: 150, background: 'var(--bg-elevated)', border: '1px solid rgba(var(--green-rgb),0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.74rem', padding: '8px 10px', outline: 'none' }}>
         {EMAIL_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>
       <button onClick={send} disabled={busy}
@@ -731,7 +731,7 @@ function UsersTab({ api, showError }) {
         <div className="modal-overlay" style={{ zIndex: 600 }}>
           <div className="modal" style={{ maxWidth: 360 }}>
             <div className="modal-title" style={{ color: D.red }}>CONFIRM</div>
-            <p style={{ fontSize: '0.85rem', color: 'rgba(51,255,51,0.8)', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.85rem', color: 'rgba(var(--green-rgb),0.8)', marginBottom: 24, lineHeight: 1.6 }}>
               {confirming.action === 'delete' && <>Delete <strong style={{ color: D.red }}>{confirming.username}</strong>? Permanent. Cannot be undone.</>}
               {confirming.action === 'clear-data' && <>Clear all show data for <strong style={{ color: D.orange }}>{confirming.username}</strong>? Ratings, attendance, and reviews will be removed. Account preserved.</>}
               {confirming.action === 'reset-onboarding' && <>Reset onboarding for <strong style={{ color: D.cyan }}>{confirming.username}</strong>? They'll go through setup again on next login.</>}
@@ -774,8 +774,8 @@ function UsersTab({ api, showError }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {users.map(u => (
           <div key={u.id} style={{
-            border: `1px solid ${u.is_admin ? 'rgba(0,224,208,0.35)' : D.border}`,
-            borderLeft: `3px solid ${u.is_admin ? D.cyan : 'rgba(51,255,51,0.3)'}`,
+            border: `1px solid ${u.is_admin ? 'rgba(var(--cyan-rgb),0.35)' : D.border}`,
+            borderLeft: `3px solid ${u.is_admin ? D.cyan : 'rgba(var(--green-rgb),0.3)'}`,
             background: D.panel,
           }}>
             {/* Collapsed header — always visible, tap to expand */}
@@ -786,7 +786,7 @@ function UsersTab({ api, showError }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontFamily: D.mono, fontSize: '1.05rem', color: 'var(--white)' }}>{u.username}</span>
-                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(0,224,208,0.4)', padding: '2px 6px' }}>ADMIN</span>}
+                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.4)', padding: '2px 6px' }}>ADMIN</span>}
                 </div>
                 <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.muted, marginTop: 3 }}>{u.email}</div>
                 {/* Mini stat pills — collapsed only (full grid shows when expanded) */}
@@ -813,30 +813,30 @@ function UsersTab({ api, showError }) {
 
             {/* Expanded — stats + actions */}
             {expanded === u.id && (
-              <div style={{ borderTop: '1px solid rgba(51,255,51,0.1)' }}>
+              <div style={{ borderTop: '1px solid rgba(var(--green-rgb),0.1)' }}>
                 {/* Full stat grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', borderBottom: '1px solid rgba(var(--green-rgb),0.08)' }}>
                   {[
                     { val: u.shows_attended, lbl: 'ATTENDED', col: D.cyan },
                     { val: u.shows_rated,    lbl: 'RATED',    col: D.orange },
                     { val: u.reviews,        lbl: 'REVIEWS',  col: D.green },
-                    { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? D.green : 'rgba(51,255,51,0.2)' },
-                    { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? D.green : 'rgba(51,255,51,0.2)' },
+                    { val: u.tandc_accepted ? '✓' : '✗', lbl: 'T&C', col: u.tandc_accepted ? D.green : 'rgba(var(--green-rgb),0.2)' },
+                    { val: u.onboarding_complete ? '✓' : '✗', lbl: 'ONBOARD', col: u.onboarding_complete ? D.green : 'rgba(var(--green-rgb),0.2)' },
                     { val: u.email_verified ? '✓' : '✗', lbl: 'VERIFIED', col: u.email_verified ? D.green : D.orange },
                   ].map(({ val, lbl, col }) => (
-                    <div key={lbl} style={{ padding: '12px 4px', textAlign: 'center', borderRight: '1px solid rgba(51,255,51,0.06)' }}>
+                    <div key={lbl} style={{ padding: '12px 4px', textAlign: 'center', borderRight: '1px solid rgba(var(--green-rgb),0.06)' }}>
                       <div style={{ fontFamily: D.disp, fontSize: '1.3rem', color: col, lineHeight: 1 }}>{val}</div>
                       <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
                     </div>
                   ))}
                 </div>
                 {/* AI cost */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderBottom: '1px solid rgba(var(--green-rgb),0.08)' }}>
                   <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.muted }}>CLAUDE AI COST</span>
                   <span style={{ fontFamily: D.mono, fontSize: '0.85rem', color: D.orange }}>${Number(u.ai_cost_usd || 0).toFixed(4)}</span>
                 </div>
                 {/* Email nudge */}
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(var(--green-rgb),0.08)' }}>
                   <div style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SEND EMAIL</div>
                   <UserEmailNudge userId={u.id} username={u.username} />
                 </div>
@@ -1289,7 +1289,7 @@ function MonitoringTab({ api }) {
             { val: fmtNum(users?.last_7d),  label: 'LAST 7D' },
             { val: fmtNum(users?.last_24h), label: 'TODAY' },
           ].map(s => (
-            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(0,224,208,0.1)' }}>
+            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(var(--cyan-rgb),0.1)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.cyan, lineHeight: 1 }}>{s.val}</div>
               <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
@@ -1305,7 +1305,7 @@ function MonitoringTab({ api }) {
             { val: fmtNum(ratings?.shows_rated),  label: 'SHOWS RATED' },
             { val: fmtNum(ratings?.raters),       label: 'RATERS' },
           ].map(s => (
-            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(51,255,51,0.1)' }}>
+            <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(var(--green-rgb),0.1)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
               <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
@@ -1316,7 +1316,7 @@ function MonitoringTab({ api }) {
             { val: fmtNum(ratings?.last_7d),  label: 'LAST 7 DAYS' },
             { val: fmtNum(ratings?.last_24h), label: 'TODAY' },
           ].map(s => (
-            <div key={s.label} style={{ textAlign: 'center', padding: '8px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(51,255,51,0.08)' }}>
+            <div key={s.label} style={{ textAlign: 'center', padding: '8px 4px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(var(--green-rgb),0.08)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
               <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
@@ -1381,7 +1381,7 @@ function MonitoringTab({ api }) {
                     </div>
                   )}
                   {kb.with_rating !== undefined && (
-                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: 'rgba(255,102,0,0.4)', marginTop: 2 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: 'rgba(var(--orange-rgb),0.4)', marginTop: 2 }}>
                       {kb.with_rating} shows have Phish.net community rating
                     </div>
                   )}
@@ -1445,7 +1445,7 @@ function EmailsTab({ api, showMessage, showError }) {
       .catch(() => {});
   }, []);
 
-  const selStyle = { background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.8rem', padding: '10px 12px', outline: 'none', width: '100%' };
+  const selStyle = { background: 'var(--bg-elevated)', border: '1px solid rgba(var(--green-rgb),0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.8rem', padding: '10px 12px', outline: 'none', width: '100%' };
   const btn = (c) => ({ background: 'transparent', border: `1px solid ${c}`, color: c, fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '12px 16px', cursor: busy ? 'default' : 'pointer', width: '100%', opacity: busy ? 0.5 : 1 });
 
   const runAll = async () => {

@@ -379,7 +379,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
         }}>
           <div style={{
             background: '#0d0d0d',
-            border: '1px solid rgba(255,140,0,0.4)',
+            border: '1px solid rgba(var(--orange-bright-rgb),0.4)',
             maxWidth: 360, width: '100%',
             padding: '28px 24px',
           }}>
@@ -399,8 +399,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   key={opt.value}
                   onClick={() => handleAttendancePick(opt.value)}
                   style={{
-                    background: 'rgba(255,140,0,0.04)',
-                    border: '1px solid rgba(255,140,0,0.3)',
+                    background: 'rgba(var(--orange-bright-rgb),0.04)',
+                    border: '1px solid rgba(var(--orange-bright-rgb),0.3)',
                     color: 'var(--white)',
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.82rem',
@@ -411,8 +411,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     flexDirection: 'column',
                     gap: 3,
                   }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.7)'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.3)'}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(var(--orange-bright-rgb),0.7)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(var(--orange-bright-rgb),0.3)'}
                 >
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--orange)' }}>{opt.label}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{opt.sub}</span>
@@ -522,18 +522,18 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
                 {/* ERA — 2×2 grid */}
                 <div style={{ flexShrink:0 }}>
-                  {colLabel('rgba(255,102,0,0.55)','ERA')}
+                  {colLabel('rgba(var(--orange-rgb),0.55)','ERA')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:3 }}>
                     {[{l:'1.0',s:'1983–2000',v:'1.0'},{l:'2.0',s:'2002–2004',v:'2.0'},{l:'3.0',s:'2009–2020',v:'3.0'},{l:'4.0',s:'2021–NOW',v:'4.0'}].map(era => {
                       const active = selectedEra===era.v;
                       return (
                         <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null);setSongs([]); }} style={{
-                          background: active?'rgba(255,102,0,0.14)':'rgba(255,255,255,0.03)',
+                          background: active?'rgba(var(--orange-rgb),0.14)':'rgba(255,255,255,0.03)',
                           border:`2px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
                           color: active?'#ff6600':'rgba(255,255,255,0.65)',
                           fontFamily:'var(--font-display)', cursor:'pointer',
                           padding:'12px 14px', textAlign:'center',
-                          boxShadow:active?'0 0 16px rgba(255,102,0,0.3)':'none',
+                          boxShadow:active?'0 0 16px rgba(var(--orange-rgb),0.3)':'none',
                           display:'flex', flexDirection:'column', alignItems:'center', gap:3,
                           transition:'all 0.15s',
                         }}>
@@ -549,7 +549,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
                 {/* YEAR — 10×4 */}
                 <div style={{ flexShrink:0 }}>
-                  {colLabel('rgba(0,224,208,0.55)','YEAR')}
+                  {colLabel('rgba(var(--cyan-rgb),0.55)','YEAR')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(10,38px)', gap:3 }}>
                     {eraYearsFiltered.map(yr => {
                       const active=selectedYear===yr, avail=availYrs.has(yr);
@@ -562,7 +562,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
                 {/* MONTH — 6×2 */}
                 <div style={{ flexShrink:0 }}>
-                  {colLabel('rgba(51,255,51,0.55)','MONTH')}
+                  {colLabel('rgba(var(--green-rgb),0.55)','MONTH')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(6,38px)', gap:3 }}>
                     {['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'].map((mn,i) => {
                       const p=String(i+1).padStart(2,'0'), active=selectedMonth===p, avail=availMos.has(p);
@@ -575,7 +575,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
                 {/* DAY — 8×4 */}
                 <div style={{ flexShrink:0 }}>
-                  {colLabel('rgba(255,102,0,0.55)','DAY')}
+                  {colLabel('rgba(var(--orange-rgb),0.55)','DAY')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(8,28px)', gap:3 }}>
                     {Array.from({length:31},(_,i)=>String(i+1)).map(d => {
                       const p=d.padStart(2,'0'), active=selectedDay===d, avail=availDays.has(p);
@@ -589,7 +589,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
                 {/* DOW — 4×2 */}
                 <div style={{ flexShrink:0 }}>
-                  {colLabel('rgba(0,224,208,0.55)','DAY OF WEEK')}
+                  {colLabel('rgba(var(--cyan-rgb),0.55)','DAY OF WEEK')}
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(4,38px)', gap:3 }}>
                     {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((dow,i) => {
                       const active=selectedDow===String(i), avail=availDows.has(String(i));
@@ -603,12 +603,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 {hasFilters && (
                   <div style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8, alignSelf:'stretch', paddingTop:18 }}>
                     <div style={{
-                      background:'rgba(255,102,0,0.08)', border:'1px solid rgba(255,102,0,0.4)',
+                      background:'rgba(var(--orange-rgb),0.08)', border:'1px solid rgba(var(--orange-rgb),0.4)',
                       padding:'14px 10px', textAlign:'center', minWidth:68,
-                      boxShadow:'0 0 16px rgba(255,102,0,0.15)',
+                      boxShadow:'0 0 16px rgba(var(--orange-rgb),0.15)',
                     }}>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1.6rem', color:'var(--orange)', lineHeight:1, textShadow:'0 0 16px rgba(255,102,0,0.6)', fontWeight:900 }}>{pool.length}</div>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', color:'rgba(255,102,0,0.55)', letterSpacing:'2px', marginTop:5 }}>SHOWS</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'1.6rem', color:'var(--orange)', lineHeight:1, textShadow:'0 0 16px rgba(var(--orange-rgb),0.6)', fontWeight:900 }}>{pool.length}</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', color:'rgba(var(--orange-rgb),0.55)', letterSpacing:'2px', marginTop:5 }}>SHOWS</div>
                     </div>
                     <button onClick={clearAll} style={{
                       background:'transparent', border:'1px solid rgba(255,80,80,0.45)',
@@ -630,10 +630,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {/* YEAR */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>YEAR</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.55)', letterSpacing: '2px', marginBottom: 3 }}>YEAR</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedYear} onChange={e => { setSelectedYear(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedYear ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedYear ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedYear ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedYear ? 'rgba(var(--cyan-rgb),0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedYear ? 'rgba(var(--cyan-rgb),0.6)' : 'rgba(var(--cyan-rgb),0.25)'}`, color: selectedYear ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">YEAR</option>
                   {['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'].map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
@@ -642,10 +642,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
             {/* MONTH */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(51,255,51,0.55)', letterSpacing: '2px', marginBottom: 3 }}>MONTH</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--green-rgb),0.55)', letterSpacing: '2px', marginBottom: 3 }}>MONTH</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedMonth ? 'rgba(51,255,51,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedMonth ? 'rgba(51,255,51,0.6)' : 'rgba(51,255,51,0.25)'}`, color: selectedMonth ? 'var(--green)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedMonth ? 'rgba(var(--green-rgb),0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedMonth ? 'rgba(var(--green-rgb),0.6)' : 'rgba(var(--green-rgb),0.25)'}`, color: selectedMonth ? 'var(--green)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">MONTH</option>
                   {[['01','JAN'],['02','FEB'],['03','MAR'],['04','APR'],['05','MAY'],['06','JUN'],['07','JUL'],['08','AUG'],['09','SEP'],['10','OCT'],['11','NOV'],['12','DEC']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
@@ -654,10 +654,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
             {/* DAY */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DAY</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-rgb),0.55)', letterSpacing: '2px', marginBottom: 3 }}>DAY</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedDay} onChange={e => { setSelectedDay(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDay ? 'rgba(255,102,0,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDay ? 'rgba(255,102,0,0.6)' : 'rgba(255,102,0,0.25)'}`, color: selectedDay ? 'var(--orange)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDay ? 'rgba(var(--orange-rgb),0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDay ? 'rgba(var(--orange-rgb),0.6)' : 'rgba(var(--orange-rgb),0.25)'}`, color: selectedDay ? 'var(--orange)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">DAY</option>
                   {Array.from({length:31},(_,i)=>String(i+1).padStart(2,'0')).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
@@ -666,10 +666,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
             {/* DAY OF WEEK */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DOW</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.55)', letterSpacing: '2px', marginBottom: 3 }}>DOW</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedDow} onChange={e => { setSelectedDow(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDow !== '' ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDow !== '' ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedDow !== '' ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDow !== '' ? 'rgba(var(--cyan-rgb),0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDow !== '' ? 'rgba(var(--cyan-rgb),0.6)' : 'rgba(var(--cyan-rgb),0.25)'}`, color: selectedDow !== '' ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">DOW</option>
                   {[['0','SUN'],['1','MON'],['2','TUE'],['3','WED'],['4','THU'],['5','FRI'],['6','SAT']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
@@ -680,7 +680,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           {/* Mobile match count + clear */}
           {(selectedYear || selectedMonth || selectedDay || selectedDow !== '') && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-              <div style={{ background: 'rgba(255,102,0,0.08)', border: '1px solid rgba(255,102,0,0.4)', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ background: 'rgba(var(--orange-rgb),0.08)', border: '1px solid rgba(var(--orange-rgb),0.4)', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--orange)', fontWeight: 900, lineHeight: 1 }}>
                   {(() => {
                     const ERAS_MAP = {'1.0':['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000'],'2.0':['2002','2003','2004'],'3.0':['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020'],'4.0':['2021','2022','2023','2024','2025']};
@@ -697,7 +697,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     }).length;
                   })()}
                 </span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px' }}>SHOWS</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-rgb),0.55)', letterSpacing: '2px' }}>SHOWS</span>
               </div>
               <button onClick={() => { setSelectedEra(''); setSelectedYear(''); setSelectedMonth(''); setSelectedDay(''); setSelectedDow(''); setQuery(''); setCurrentShow(null); setSongs([]); setResults(allShows.slice(0, 20)); }}
                 style={{ background: 'transparent', border: '1px solid rgba(255,80,80,0.45)', color: 'rgba(255,100,100,0.85)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '6px 10px', cursor: 'pointer' }}>
@@ -794,11 +794,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               {/* Your score if rated */}
               {overallAvg && (
                 <div style={{
-                  background: 'rgba(0,224,208,0.05)', border: '1px solid rgba(0,224,208,0.2)',
+                  background: 'rgba(var(--cyan-rgb),0.05)', border: '1px solid rgba(var(--cyan-rgb),0.2)',
                   padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(0,224,208,0.6)', letterSpacing: '2px' }}>YOUR SCORE</span>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--cyan)', textShadow: '0 0 16px rgba(0,224,208,0.5)' }}>{overallAvg}</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.6)', letterSpacing: '2px' }}>YOUR SCORE</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--cyan)', textShadow: '0 0 16px rgba(var(--cyan-rgb),0.5)' }}>{overallAvg}</span>
                 </div>
               )}
 
@@ -830,13 +830,13 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           {/* ── PHRIENDS AT THIS SHOW — when attended, or when phriends already tagged ── */}
           {(attendanceType === 'attended' || phriends.tagged.length > 0) && (
             <div style={{
-              border: '1px solid rgba(0,224,208,0.28)',
-              background: 'linear-gradient(135deg, rgba(0,224,208,0.04), rgba(5,18,5,0.98))',
+              border: '1px solid rgba(var(--cyan-rgb),0.28)',
+              background: 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.04), rgba(5,18,5,0.98))',
               marginBottom: 12, padding: 14,
             }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                 ◈ PHRIENDS AT THIS SHOW
-                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(0,224,208,0.25), transparent)' }} />
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(var(--cyan-rgb),0.25), transparent)' }} />
               </div>
 
               {/* Tag input */}
@@ -846,10 +846,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   onChange={e => setPhriendInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleTagPhriend()}
                   placeholder="search phreezer username..."
-                  style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
+                  style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
                 />
                 <button onClick={handleTagPhriend} disabled={phriendLoading || !phriendInput.trim()}
-                  style={{ background: 'rgba(0,224,208,0.07)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
+                  style={{ background: 'rgba(var(--cyan-rgb),0.07)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
                   {phriendLoading ? '...' : '+ TAG'}
                 </button>
               </div>
@@ -858,8 +858,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               {phriends.tagged.length > 0 && (
                 <div style={{ marginBottom: phriends.also_attended.length ? 10 : 0 }}>
                   {phriends.tagged.map(c => (
-                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(0,224,208,0.28)', background: 'rgba(0,224,208,0.04)', marginBottom: 6 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', flexShrink: 0 }}>
+                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(var(--cyan-rgb),0.28)', background: 'rgba(var(--cyan-rgb),0.04)', marginBottom: 6 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(var(--cyan-rgb),0.4)', background: 'rgba(var(--cyan-rgb),0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', flexShrink: 0 }}>
                         {c.username.slice(0,2).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -868,7 +868,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '1px', marginTop: 2 }}>★ {c.their_score}</div>
                         )}
                       </div>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '2px 5px', border: '1px solid rgba(0,224,208,0.4)', color: 'var(--cyan)', flexShrink: 0 }}>TAGGED</span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '2px 5px', border: '1px solid rgba(var(--cyan-rgb),0.4)', color: 'var(--cyan)', flexShrink: 0 }}>TAGGED</span>
                       <button onClick={() => handleUntagPhriend(c.user_id)} style={{ background: 'none', border: 'none', color: 'rgba(255,51,51,0.45)', cursor: 'pointer', fontSize: '0.7rem', padding: '0 2px', flexShrink: 0 }} title="Remove tag">✕</button>
                     </div>
                   ))}
@@ -884,8 +884,8 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                   </div>
                   {phriends.also_attended.map(c => (
-                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(51,255,51,0.15)', background: 'rgba(51,255,51,0.02)', marginBottom: 6 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(51,255,51,0.2)', background: 'rgba(51,255,51,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+                    <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(var(--green-rgb),0.15)', background: 'rgba(var(--green-rgb),0.02)', marginBottom: 6 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(var(--green-rgb),0.2)', background: 'rgba(var(--green-rgb),0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', flexShrink: 0 }}>
                         {c.username.slice(0,2).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -893,7 +893,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 2 }}>attended · not yet tagged</div>
                       </div>
                       <button onClick={() => handleTagPhriendById(c)}
-                        style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 8px', cursor: 'pointer', flexShrink: 0 }}>
+                        style={{ background: 'rgba(var(--green-rgb),0.04)', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 8px', cursor: 'pointer', flexShrink: 0 }}>
                         + TAG
                       </button>
                     </div>
@@ -1047,7 +1047,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
               {/* ── VIBE CHECK ── */}
               {(vibeCheck?.structured || loadingVibe || vibeError) && (
-                <div style={{ marginBottom: 16, border: '1px solid rgba(255,140,0,0.25)', background: 'rgba(0,0,0,0.3)' }}>
+                <div style={{ marginBottom: 16, border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'rgba(0,0,0,0.3)' }}>
                   <button onClick={() => setVibeExpanded(v => !v)} style={{
                     width: '100%', padding: '10px 14px', background: 'transparent', border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -1056,7 +1056,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>◈ VIBE CHECK</span>
                       {vibeCheck?.structured?.sentiment && (
-                        <span style={{ fontSize: '0.56rem', padding: '2px 7px', border: `1px solid ${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--border)'}`, color: `${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--text-muted)'}` }}>
+                        <span style={{ fontSize: '0.56rem', padding: '2px 7px', border: `1px solid ${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(var(--green-rgb),0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--border)'}`, color: `${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(var(--green-rgb),0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--text-muted)'}` }}>
                           {vibeCheck.structured.sentiment}
                         </span>
                       )}
@@ -1067,23 +1067,23 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     </span>
                   </button>
                   {vibeExpanded && vibeError && (
-                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,102,0,0.15)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
+                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(var(--orange-rgb),0.15)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
                       Could not synthesize reviews for this show.<br/>
-                      <span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.6rem' }}>Reviews are still available below ↓</span>
+                      <span style={{ color: 'rgba(var(--cyan-rgb),0.5)', fontSize: '0.6rem' }}>Reviews are still available below ↓</span>
                     </div>
                   )}
                   {vibeExpanded && !vibeError && vibeCheck?.structured && (
-                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,140,0,0.15)' }}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 12, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
+                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(var(--orange-bright-rgb),0.15)' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 12, borderLeft: '2px solid rgba(var(--orange-bright-rgb),0.4)', paddingLeft: 10 }}>
                         {vibeCheck.structured.overall}
                       </div>
                       {vibeCheck.structured.themes?.map((t, i) => (
-                        <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < vibeCheck.structured.themes.length - 1 ? '1px solid rgba(51,255,51,0.07)' : 'none' }}>
+                        <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < vibeCheck.structured.themes.length - 1 ? '1px solid rgba(var(--green-rgb),0.07)' : 'none' }}>
                           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>{t.label}</div>
                           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.65 }}>{t.text}</div>
                         </div>
                       ))}
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 10, borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 8 }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 10, borderTop: '1px solid rgba(var(--green-rgb),0.06)', paddingTop: 8 }}>
                         AI SYNTHESIS OF {vibeCheck.structured.reviewCount} PHISH.NET REVIEWS · {vibeCheck.cached ? 'CACHED' : 'JUST GENERATED'}
                       </div>
                     </div>

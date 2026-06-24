@@ -136,7 +136,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
                 className="sidebar-nav-btn sidebar-nav-sub-item"
                 onClick={onFeedback}
                 title="Send Feedback"
-                style={{ color: 'rgba(51,255,51,0.4)' }}
+                style={{ color: 'rgba(var(--green-rgb),0.4)' }}
               >
                 <span className="sidebar-nav-glyph">◈</span>
                 {expanded && <span className="sidebar-nav-label">FEEDBACK</span>}
@@ -162,7 +162,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
               {expanded && (
                 <div style={{ overflow: 'hidden' }}>
                   <div className="sidebar-username">{user.username}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '1.5px', marginTop: 3 }}>VIEW PROFILE</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '1.5px', marginTop: 3 }}>VIEW PROFILE</div>
                 </div>
               )}
             </div>
@@ -170,7 +170,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
             /* Logged-out CTA — prominent, not buried */
             expanded ? (
               <div style={{ padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(51,255,51,0.45)', letterSpacing: '2px', marginBottom: 4, textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--green-rgb),0.45)', letterSpacing: '2px', marginBottom: 4, textAlign: 'center' }}>
                   RATE. TRACK. RELIVE.
                 </div>
                 <button
@@ -182,7 +182,7 @@ export function Sidebar({ tab, setTab, user, onLogin, onLogout, onOpenProfile, o
                 </button>
                 <button
                   onClick={() => onLogin('login')}
-                  style={{ width: '100%', padding: '10px', fontSize: '0.66rem', letterSpacing: '2px', fontFamily: 'var(--font-display)', border: '1px solid rgba(51,255,51,0.25)', color: 'rgba(51,255,51,0.6)', background: 'transparent' }}
+                  style={{ width: '100%', padding: '10px', fontSize: '0.66rem', letterSpacing: '2px', fontFamily: 'var(--font-display)', border: '1px solid rgba(var(--green-rgb),0.25)', color: 'rgba(var(--green-rgb),0.6)', background: 'transparent' }}
                 >
                   → LOGIN
                 </button>

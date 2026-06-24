@@ -63,7 +63,7 @@ export function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecar
               LET'S GO
             </button>
             <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-              style={{ width: '100%', padding: '12px', display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px' }}>
+              style={{ width: '100%', padding: '12px', display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', border: '1px solid rgba(var(--orange-rgb),0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px' }}>
               ☕ KEEP THE PHREEZER STOCKED
             </a>
           </div>
@@ -163,7 +163,7 @@ export function ProfileSetupModal({ api, onComplete }) {
       <div className="modal-overlay" style={{ zIndex: 850 }}>
         <div className="modal" style={{ maxWidth: 480 }}>
           <div className="modal-title">SET UP YOUR PROFILE</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(51,255,51,0.5)', marginBottom: 24, lineHeight: 1.6 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--green-rgb),0.5)', marginBottom: 24, lineHeight: 1.6 }}>
             Import your history from phish.net to unlock your stats and Deep Phreeze.
           </div>
 
@@ -186,7 +186,7 @@ export function ProfileSetupModal({ api, onComplete }) {
               onClick={() => setConfirmedHandle(v => !v)}>
               <input type="checkbox" checked={confirmedHandle} onChange={e => setConfirmedHandle(e.target.checked)}
                 style={{ flexShrink: 0, marginTop: 3, accentColor: 'var(--orange)', width: 16, height: 16 }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(51,255,51,0.75)', lineHeight: 1.5 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--green-rgb),0.75)', lineHeight: 1.5 }}>
                 I confirm this is my phish.net account
               </span>
             </div>
@@ -212,14 +212,14 @@ export function ProfileSetupModal({ api, onComplete }) {
 
           {/* OR divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0 12px' }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(var(--green-rgb),0.08)' }} />
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--green-rgb),0.25)', letterSpacing: '2px' }}>OR</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(var(--green-rgb),0.08)' }} />
           </div>
 
           {/* skip */}
           <button
-            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'rgba(var(--green-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}
             onClick={handleSkip}
           >
             I DON'T HAVE A PHISH.NET ACCOUNT
@@ -237,8 +237,8 @@ export function ProfileSetupModal({ api, onComplete }) {
 
           {/* import success banner */}
           {importCount && (
-            <div style={{ textAlign: 'center', marginBottom: 24, padding: '16px', border: '1px solid rgba(0,224,208,0.2)', background: 'rgba(0,224,208,0.04)' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 900, color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 6, textShadow: '0 0 20px rgba(0,224,208,0.4)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24, padding: '16px', border: '1px solid rgba(var(--cyan-rgb),0.2)', background: 'rgba(var(--cyan-rgb),0.04)' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 900, color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 6, textShadow: '0 0 20px rgba(var(--cyan-rgb),0.4)' }}>
                 PHROZEN IN.
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--green)', letterSpacing: '2px' }}>
@@ -281,7 +281,7 @@ export function ProfileSetupModal({ api, onComplete }) {
           {favoriteShowDate && (
             <div style={S.field}>
               <label style={S.label}>FIRST SHOW ◈ AUTO-SET</label>
-              <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', background: 'rgba(0,224,208,0.04)' }}>
+              <div style={{ padding: '10px 12px', border: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', background: 'rgba(var(--cyan-rgb),0.04)' }}>
                 {favoriteShowLabel}
               </div>
               <div style={S.hint}>Your earliest attended show</div>
