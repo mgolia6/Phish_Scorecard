@@ -35,14 +35,14 @@ export function SaveCelebration({ onDone }) {
 
 // Pool of rotating Phish inside-joke boot lines (one picked per session)
 const JOKE_LINES = [
-  'INITIATING SIREN LOOPS...........',
-  'CHILLING THE PHREEZER............',
-  'EXTRACTING THE JAMS..............',
-  'READING THE BOOK.................',
-  'LOCATING THE LIZARDS.............',
-  'NOTIFYING WILSON.................',
-  'CONSULTING ICCULUS...............',
-  'CALCULATING TUBE TIME............',
+  'INITIATING SIREN LOOPS...',
+  'CHILLING THE PHREEZER...',
+  'EXTRACTING THE JAMS...',
+  'READING THE BOOK...',
+  'LOCATING THE LIZARDS...',
+  'NOTIFYING WILSON...',
+  'CONSULTING ICCULUS...',
+  'CALCULATING TUBE TIME...',
 ];
 
 function pickJokeLine() {
@@ -143,7 +143,7 @@ export function WelcomeCelebration({ username, onDone }) {
           ? 'clamp(0.82rem, 2.8vw, 1.15rem)'
           : 'clamp(0.7rem, 2.4vw, 1rem)',
         color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : isOk ? 'var(--green)' : 'rgba(51,255,51,0.85)',
-        letterSpacing: isBig ? '8px' : isAccent ? '5px' : '3px',
+        letterSpacing: isBig ? '8px' : isAccent ? '4px' : '2px',
         textShadow: isBig
           ? '0 0 40px rgba(255,102,0,0.7)'
           : isAccent
@@ -205,8 +205,8 @@ export function WelcomeCelebration({ username, onDone }) {
         {/* Melt stage: snowflake dissolves, droplets fall into a puddle, wake ripples cascade out */}
         <div style={{
           position: 'relative',
-          width: 'clamp(150px, 40vw, 240px)',
-          height: 'clamp(150px, 40vw, 240px)',
+          width: 'clamp(175px, 46vw, 280px)',
+          height: 'clamp(175px, 46vw, 280px)',
           marginBottom: 'clamp(28px, 6vw, 52px)',
         }}>
           <img

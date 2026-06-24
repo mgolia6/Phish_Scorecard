@@ -73,19 +73,19 @@ function KPICard({ val, lbl, col, tip, tipTitle, source, isLast, flipped, onFlip
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: col, lineHeight: 1, textShadow: '0 0 16px currentColor' }}>
             {val}
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '2px', marginTop: 8 }}>
             {lbl}
           </div>
         </div>
         {/* BACK */}
         <div className="kpi-face kpi-face-back" style={{ background: 'var(--bg-elevated)', padding: '10px 8px', gap: 6 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', fontWeight: 700, color: col, letterSpacing: '1.5px', textShadow: '0 0 10px currentColor', textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', fontWeight: 700, color: col, letterSpacing: '1.5px', textShadow: '0 0 10px currentColor', textAlign: 'center' }}>
             {tipTitle}
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--white)', lineHeight: 1.5, textAlign: 'center', letterSpacing: '0.5px' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', color: 'var(--white)', lineHeight: 1.5, textAlign: 'center', letterSpacing: '0.5px' }}>
             {tip}
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: col, opacity: 0.65, textAlign: 'center', marginTop: 2 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: col, opacity: 0.65, textAlign: 'center', marginTop: 2 }}>
             {source}
           </div>
         </div>
