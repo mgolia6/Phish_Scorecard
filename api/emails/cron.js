@@ -57,7 +57,11 @@ export default async function handler(req, res) {
   cors(res, req);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const secret = req.headers['x-cron-secret'] || req.query.secret;
+  // Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`.
+  // Also accept the legacy x-cron-secret header and ?secret= for manual runs.
+  const authHeader = req.headers['authorization'] || '';
+  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const secret = req.headers['x-cron-secret'] || req.query.secret || bearer;
   if (!secret || secret !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
