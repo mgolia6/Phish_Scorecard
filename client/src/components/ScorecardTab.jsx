@@ -745,7 +745,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
       {currentShow && !loadingShow && (
         <div className="panel">
-          <div className="show-masthead" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'start' }}>
+          <div className="show-masthead">
             {/* Left: date + venue + meta */}
             <div className="show-masthead-main">
               <div className="show-date-display">{formatDate(currentShow.showdate)}</div>
@@ -946,6 +946,15 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                                 className={`song-name-link ${song.isjam ? 'jam-chart' : ''}`}
                                 onClick={e => e.stopPropagation()}
                               >{song.song}</a>
+                              {(() => {
+                                const t = (song.transition || '').trim();
+                                if (!t || t === ',') return null;
+                                return t.includes('->')
+                                  ? <span className="song-transition segue-hard">--&gt;</span>
+                                  : t.includes('>')
+                                  ? <span className="song-transition segue-soft">&gt;</span>
+                                  : null;
+                              })()}
                             </div>
                             <div className="song-meta">
                               {duration && <span className="song-duration">{duration}</span>}
@@ -954,17 +963,6 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                               {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
                             </div>
                           </div>
-                          {(() => {
-                            const t = (song.transition || '').trim();
-                            if (!t || t === ',') return null;
-                            return (
-                              <span className="song-transition">
-                                {t.includes('->') ? <span className="segue-hard">--&gt;</span>
-                                  : t.includes('>') ? <span className="segue-soft">&gt;</span>
-                                  : null}
-                              </span>
-                            );
-                          })()}
                           <div className="song-row-controls">
                             {audio?.mp3_url ? (
                               <button

@@ -887,7 +887,7 @@ select option { background: var(--bg); color: var(--green); }
 .jam-badge        { border-color: var(--cyan);   color: var(--cyan);   }
 .reprise-badge    { border-color: var(--orange);  color: var(--orange); }
 .footnote-badge   { border-color: rgba(51,255,51,0.45); color: rgba(51,255,51,0.65); cursor: help; }
-.song-transition  { font-size: 0.9rem; text-align: center; }
+.song-transition  { font-size: 0.9rem; margin-left: 4px; flex-shrink: 0; align-self: baseline; }
 .segue-soft       { color: var(--orange); font-weight: bold; }
 .segue-hard       { color: var(--red);    font-weight: bold; }
 .song-duration    { font-size: 0.78rem; color: rgba(51,255,51,0.55); letter-spacing: 1px; white-space: nowrap; font-family: var(--font-mono); }
@@ -1245,7 +1245,7 @@ select option { background: var(--bg); color: var(--green); }
   .song-name-with-num { display: flex; align-items: baseline; gap: 6px; width: 100%; margin-bottom: 6px; }
   .song-name-link   { font-size: 0.96rem; word-break: break-word; text-align: left; }
   .song-meta        { display: none; }
-  .song-transition  { display: block; text-align: center; font-size: 1rem; margin: 0 0 6px; }
+  .song-transition  { display: inline-block; font-size: 0.95rem; }
   .song-row-controls{ display: flex; flex-direction: row; align-items: center; gap: 8px; width: 100%; }
   .song-row-controls .song-duration-inline { font-family: var(--font-mono); font-size: 0.72rem; color: rgba(51,255,51,0.5); letter-spacing: 1px; flex-shrink: 0; }
   .song-row-controls .song-badges-inline   { display: flex; gap: 4px; flex-shrink: 0; }
@@ -1526,12 +1526,13 @@ select option { background: var(--bg); color: var(--green); }
   .leaderboard-row .leaderboard-user { font-size: 0.92rem !important; }
 }
 
-/* ── SHOW MASTHEAD RIGHT PANEL — desktop only ── */
-.show-masthead-right { display: none; }
+/* ── SHOW MASTHEAD ── */
+/* Mobile: single column (date/venue, then the data panel stacked below).
+   Desktop: date/venue left, data panel fills the dead space on the right. */
+.show-masthead { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+.show-masthead-right { display: flex; }
 @media (min-width: 769px) {
-  .show-masthead-right { display: flex; }
-  /* On mobile, masthead goes single column */
-  .show-masthead { grid-template-columns: 1fr !important; }
+  .show-masthead { grid-template-columns: 1fr auto; gap: 24px; }
 }
 
 @keyframes cursorBlink {
