@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       )
     `);
 
-    const [totals, byFeature, byDay, byModel, recent] = await Promise.all([
+    const [totals, byFeature, byDay, byModel, byUser, recent] = await Promise.all([
       // Overall totals
       pool.query(`
         SELECT
@@ -81,6 +81,22 @@ export default async function handler(req, res) {
         ORDER BY calls DESC
       `),
 
+      // By user — cost attributed per user (null user_id rolls up as system)
+      pool.query(`
+        SELECT
+          l.user_id,
+          COALESCE(u.username, '(system)')     AS username,
+          COUNT(*)::int                        AS calls,
+          COALESCE(SUM(l.input_tokens), 0)::int  AS input_tokens,
+          COALESCE(SUM(l.output_tokens), 0)::int AS output_tokens,
+          COALESCE(SUM(l.cost_usd), 0)::numeric  AS cost_usd
+        FROM ai_usage_log l
+        LEFT JOIN users u ON u.id = l.user_id
+        GROUP BY l.user_id, u.username
+        ORDER BY cost_usd DESC
+        LIMIT 50
+      `),
+
       // Most recent 20 calls
       pool.query(`
         SELECT
@@ -104,6 +120,7 @@ export default async function handler(req, res) {
       byFeature: byFeature.rows,
       byDay: byDay.rows,
       byModel: byModel.rows,
+      byUser: byUser.rows,
       recent: recent.rows,
     });
   } catch (err) {

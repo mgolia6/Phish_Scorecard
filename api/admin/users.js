@@ -12,6 +12,20 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
+      // ai_usage_log is lazily created elsewhere — ensure it exists so the
+      // per-user cost subquery below never errors on a fresh database.
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS ai_usage_log (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+          feature VARCHAR(64) NOT NULL,
+          model VARCHAR(64) NOT NULL,
+          input_tokens INTEGER NOT NULL DEFAULT 0,
+          output_tokens INTEGER NOT NULL DEFAULT 0,
+          cost_usd NUMERIC(10, 6) NOT NULL DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
       const result = await pool.query(
         `SELECT
           u.id, u.username, u.email, u.first_name, u.is_admin,
@@ -19,7 +33,8 @@ export default async function handler(req, res) {
           TO_CHAR(u.created_at, 'YYYY-MM-DD') as joined,
           COUNT(DISTINCT a.show_date) as shows_attended,
           COUNT(DISTINCT r.show_date) as shows_rated,
-          COUNT(DISTINCT ur.id) as reviews
+          COUNT(DISTINCT ur.id) as reviews,
+          (SELECT COALESCE(SUM(cost_usd), 0) FROM ai_usage_log WHERE user_id = u.id) as ai_cost_usd
          FROM users u
          LEFT JOIN attendance a ON a.user_id = u.id
          LEFT JOIN ratings r ON r.user_id = u.id

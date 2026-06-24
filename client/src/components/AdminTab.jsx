@@ -791,6 +791,11 @@ function UsersTab({ api, showError }) {
                     </div>
                   ))}
                 </div>
+                {/* AI cost */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                  <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.muted }}>CLAUDE AI COST</span>
+                  <span style={{ fontFamily: D.mono, fontSize: '0.85rem', color: D.orange }}>${Number(u.ai_cost_usd || 0).toFixed(4)}</span>
+                </div>
                 {/* Actions */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '12px 16px' }}>
                   {[
@@ -957,7 +962,7 @@ function AiUsageTab({ api }) {
   if (error)   return <div style={{ padding: 20, fontFamily: D.mono, color: D.red, fontSize: '0.75rem' }}>{error}</div>;
   if (!data)   return null;
 
-  const { totals, byFeature, byDay, byModel, recent } = data;
+  const { totals, byFeature, byDay, byModel, byUser = [], recent } = data;
 
   const fmt = n => Number(n).toLocaleString();
   const fmtCost = n => `$${Number(n).toFixed(4)}`;
@@ -1009,6 +1014,22 @@ function AiUsageTab({ api }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* By User — cost per user */}
+      <SectionLabel color={D.orange}>◈ COST BY USER</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+        {byUser.map(u => (
+          <div key={u.user_id ?? 'system'} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderLeft: `3px solid ${D.orange}` }}>
+            <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.label }}>{u.username}</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{fmt(u.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{fmt(parseInt(u.input_tokens) + parseInt(u.output_tokens))} tok</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(u.cost_usd)}</span>
+            </div>
+          </div>
+        ))}
+        {byUser.length === 0 && <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: D.muted, padding: '10px 0' }}>No data yet.</div>}
       </div>
 
       {/* Last 30 days */}
@@ -1358,6 +1379,84 @@ function MonitoringTab({ api }) {
   );
 }
 
+// ── Emails Tab ─────────────────────────────────────────────
+const EMAIL_TYPES = [
+  ['onboarding',     'Welcome / Onboarding'],
+  ['day3_nudge',     'Day 3 — empty Phreezer'],
+  ['day7_engage',    'Day 7 — warming up'],
+  ['day30_reengage', 'Day 30 — miss you'],
+  ['rating_reminder','Rating reminder'],
+  ['milestone',      'Milestone (5 shows)'],
+  ['weekly',         'Weekly reminder'],
+];
+
+function EmailsTab({ api, showMessage, showError }) {
+  const [users, setUsers] = useState([]);
+  const [selUser, setSelUser] = useState('');
+  const [emailType, setEmailType] = useState('onboarding');
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const token = localStorage.getItem('phish_token');
+  const post = (body) => fetch('/api/admin/send-email', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Send failed'); return d; });
+
+  useEffect(() => {
+    fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { const list = Array.isArray(d) ? d : (d.users || []); setUsers(list); if (list[0]) setSelUser(String(list[0].id)); })
+      .catch(() => {});
+  }, []);
+
+  const selStyle = { background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.8rem', padding: '10px 12px', outline: 'none', width: '100%' };
+  const btn = (c) => ({ background: 'transparent', border: `1px solid ${c}`, color: c, fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '12px 16px', cursor: busy ? 'default' : 'pointer', width: '100%', opacity: busy ? 0.5 : 1 });
+
+  const runAll = async () => {
+    if (!window.confirm('Run the full lifecycle email pass for ALL users now? This sends real emails.')) return;
+    setBusy(true); setResult(null);
+    try { const d = await post({ mode: 'all' }); setResult(`Lifecycle run: sent ${d.sent ?? 0}, skipped ${d.skipped ?? 0}.`); showMessage?.('Lifecycle emails fired.'); }
+    catch (e) { showError?.(e.message); }
+    finally { setBusy(false); }
+  };
+
+  const sendOne = async () => {
+    if (!selUser) return;
+    setBusy(true); setResult(null);
+    try { const d = await post({ mode: 'one', userId: Number(selUser), type: emailType }); setResult(`Sent ${emailType} to ${d.to}.`); showMessage?.(`Sent to ${d.to}.`); }
+    catch (e) { showError?.(e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div style={{ padding: '0 10px 40px' }}>
+      <SectionLabel color={D.orange}>◈ SEND TO ALL (LIFECYCLE)</SectionLabel>
+      <div style={{ marginBottom: 10, fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, lineHeight: 1.7 }}>
+        Runs the daily cron pass on demand — welcome, day-3/7/30, milestones, rating reminders, and (on Tuesdays) the weekly reminder. Respects opt-outs and the once-per-type dedupe.
+      </div>
+      <button onClick={runAll} disabled={busy} style={btn(D.orange)}>{busy ? 'WORKING…' : '▶ RUN LIFECYCLE EMAILS (ALL USERS)'}</button>
+
+      <div style={{ height: 28 }} />
+
+      <SectionLabel color={D.cyan}>◈ SEND ONE EMAIL TO ONE USER</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 440 }}>
+        <select value={selUser} onChange={e => setSelUser(e.target.value)} style={selStyle}>
+          {users.map(u => <option key={u.id} value={u.id}>{u.username} — {u.email}</option>)}
+        </select>
+        <select value={emailType} onChange={e => setEmailType(e.target.value)} style={selStyle}>
+          {EMAIL_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+        </select>
+        <button onClick={sendOne} disabled={busy || !selUser} style={btn(D.cyan)}>{busy ? 'SENDING…' : '✉ SEND EMAIL'}</button>
+      </div>
+      <div style={{ marginTop: 10, fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>Manual sends bypass the dedupe — you can resend the same email.</div>
+
+      {result && <div style={{ marginTop: 16, fontFamily: D.mono, fontSize: '0.74rem', color: D.green }}>✓ {result}</div>}
+    </div>
+  );
+}
+
 const TABS = [
   { id: 'users',     label: 'USERS',     color: 'var(--cyan)' },
   { id: 'system',    label: 'SYSTEM',    color: 'var(--cyan)' },
@@ -1367,6 +1466,7 @@ const TABS = [
   { id: 'errors',    label: 'ERRORS',    color: 'var(--red, #ff3333)' },
   { id: 'feedback',   label: 'FEEDBACK',   color: 'var(--orange)' },
   { id: 'donations',  label: 'DONATIONS',  color: 'var(--green)'  },
+  { id: 'emails',     label: 'EMAILS',     color: 'var(--orange)' },
   { id: 'monitoring', label: 'MONITORING', color: 'var(--cyan)'  },
 ];
 
@@ -1397,6 +1497,7 @@ export function AdminTab({ api, showMessage, showError }) {
       {activeTab === 'errors'   && <ErrorLogTab />}
       {activeTab === 'feedback'  && <FeedbackTab          api={api} />}
       {activeTab === 'donations'  && <DonationsTab  api={api} showMessage={showMessage} showError={showError} />}
+      {activeTab === 'emails'     && <EmailsTab     api={api} showMessage={showMessage} showError={showError} />}
       {activeTab === 'monitoring' && <MonitoringTab api={api} />}
     </div>
   );
