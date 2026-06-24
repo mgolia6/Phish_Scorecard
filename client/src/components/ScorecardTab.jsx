@@ -383,7 +383,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             maxWidth: 360, width: '100%',
             padding: '28px 24px',
           }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '3px', color: 'var(--orange)', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '3px', color: 'var(--orange)', marginBottom: 8 }}>
               BEFORE YOU RATE
             </div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 22 }}>
@@ -414,7 +414,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.7)'}
                   onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,140,0,0.3)'}
                 >
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', color: 'var(--orange)' }}>{opt.label}</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--orange)' }}>{opt.label}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>{opt.sub}</span>
                 </button>
               ))}
@@ -506,12 +506,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.25)` : 'rgba(255,255,255,0.08)'}`,
             color: active ? C[type] : avail||!loaded ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)',
             fontFamily: 'var(--font-display)', cursor: 'pointer', textAlign: 'center',
-            fontSize: '0.6rem', letterSpacing: '0.5px', padding: '5px 2px',
+            fontSize: '0.66rem', letterSpacing: '0.5px', padding: '5px 2px',
             boxShadow: active ? `0 0 5px ${C[type]}44` : 'none', transition: 'all 0.1s',
           });
 
           const colLabel = (color, text) => (
-            <div style={{ fontFamily:'var(--font-display)', fontSize:'0.38rem', color, letterSpacing:'3px', marginBottom:3 }}>{text}</div>
+            <div style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', color, letterSpacing:'3px', marginBottom:3 }}>{text}</div>
           );
 
           const sep = <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0, margin:'0 4px' }} />;
@@ -538,7 +538,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                           transition:'all 0.15s',
                         }}>
                           <span style={{ fontSize:'1.6rem', fontWeight:900, letterSpacing:'2px', lineHeight:1 }}>{era.l}</span>
-                          <span style={{ fontSize:'0.42rem', opacity:0.6, letterSpacing:'1px', whiteSpace:'nowrap' }}>{era.s}</span>
+                          <span style={{ fontSize:'0.56rem', opacity:0.6, letterSpacing:'1px', whiteSpace:'nowrap' }}>{era.s}</span>
                         </button>
                       );
                     })}
@@ -608,12 +608,12 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       boxShadow:'0 0 16px rgba(255,102,0,0.15)',
                     }}>
                       <div style={{ fontFamily:'var(--font-display)', fontSize:'1.6rem', color:'var(--orange)', lineHeight:1, textShadow:'0 0 16px rgba(255,102,0,0.6)', fontWeight:900 }}>{pool.length}</div>
-                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.34rem', color:'rgba(255,102,0,0.55)', letterSpacing:'2px', marginTop:5 }}>SHOWS</div>
+                      <div style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', color:'rgba(255,102,0,0.55)', letterSpacing:'2px', marginTop:5 }}>SHOWS</div>
                     </div>
                     <button onClick={clearAll} style={{
                       background:'transparent', border:'1px solid rgba(255,80,80,0.45)',
                       color:'rgba(255,100,100,0.85)', fontFamily:'var(--font-display)',
-                      fontSize:'0.44rem', letterSpacing:'1.5px', padding:'6px 8px',
+                      fontSize:'0.6rem', letterSpacing:'1.5px', padding:'6px 8px',
                       cursor:'pointer', whiteSpace:'nowrap', width:'100%',
                     }}>✕ CLEAR</button>
                   </div>
@@ -630,50 +630,50 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {/* YEAR */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>YEAR</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>YEAR</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedYear} onChange={e => { setSelectedYear(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedYear ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedYear ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedYear ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedYear ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedYear ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedYear ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">YEAR</option>
                   {['1983','1984','1985','1986','1987','1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'].map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
-                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.62rem', pointerEvents: 'none' }}>▼</span>
               </div>
             </div>
             {/* MONTH */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(51,255,51,0.55)', letterSpacing: '2px', marginBottom: 3 }}>MONTH</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(51,255,51,0.55)', letterSpacing: '2px', marginBottom: 3 }}>MONTH</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedMonth} onChange={e => { setSelectedMonth(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedMonth ? 'rgba(51,255,51,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedMonth ? 'rgba(51,255,51,0.6)' : 'rgba(51,255,51,0.25)'}`, color: selectedMonth ? 'var(--green)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedMonth ? 'rgba(51,255,51,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedMonth ? 'rgba(51,255,51,0.6)' : 'rgba(51,255,51,0.25)'}`, color: selectedMonth ? 'var(--green)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">MONTH</option>
                   {[['01','JAN'],['02','FEB'],['03','MAR'],['04','APR'],['05','MAY'],['06','JUN'],['07','JUL'],['08','AUG'],['09','SEP'],['10','OCT'],['11','NOV'],['12','DEC']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
-                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--green)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--green)', fontSize: '0.62rem', pointerEvents: 'none' }}>▼</span>
               </div>
             </div>
             {/* DAY */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DAY</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DAY</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedDay} onChange={e => { setSelectedDay(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDay ? 'rgba(255,102,0,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDay ? 'rgba(255,102,0,0.6)' : 'rgba(255,102,0,0.25)'}`, color: selectedDay ? 'var(--orange)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDay ? 'rgba(255,102,0,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDay ? 'rgba(255,102,0,0.6)' : 'rgba(255,102,0,0.25)'}`, color: selectedDay ? 'var(--orange)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">DAY</option>
                   {Array.from({length:31},(_,i)=>String(i+1).padStart(2,'0')).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
-                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--orange)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--orange)', fontSize: '0.62rem', pointerEvents: 'none' }}>▼</span>
               </div>
             </div>
             {/* DAY OF WEEK */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DOW</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.55)', letterSpacing: '2px', marginBottom: 3 }}>DOW</div>
               <div style={{ position: 'relative' }}>
                 <select value={selectedDow} onChange={e => { setSelectedDow(e.target.value); setCurrentShow(null); setSongs([]); }}
-                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDow !== '' ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDow !== '' ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedDow !== '' ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', background: selectedDow !== '' ? 'rgba(0,224,208,0.1)' : 'rgba(0,0,0,0.4)', border: `1px solid ${selectedDow !== '' ? 'rgba(0,224,208,0.6)' : 'rgba(0,224,208,0.25)'}`, color: selectedDow !== '' ? 'var(--cyan)' : 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1px', padding: '8px 28px 8px 10px', outline: 'none', cursor: 'pointer' }}>
                   <option value="">DOW</option>
                   {[['0','SUN'],['1','MON'],['2','TUE'],['3','WED'],['4','THU'],['5','FRI'],['6','SAT']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
-                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.55rem', pointerEvents: 'none' }}>▼</span>
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)', fontSize: '0.62rem', pointerEvents: 'none' }}>▼</span>
               </div>
             </div>
           </div>
@@ -697,10 +697,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     }).length;
                   })()}
                 </span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px' }}>SHOWS</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,102,0,0.55)', letterSpacing: '2px' }}>SHOWS</span>
               </div>
               <button onClick={() => { setSelectedEra(''); setSelectedYear(''); setSelectedMonth(''); setSelectedDay(''); setSelectedDow(''); setQuery(''); setCurrentShow(null); setSongs([]); setResults(allShows.slice(0, 20)); }}
-                style={{ background: 'transparent', border: '1px solid rgba(255,80,80,0.45)', color: 'rgba(255,100,100,0.85)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '6px 10px', cursor: 'pointer' }}>
+                style={{ background: 'transparent', border: '1px solid rgba(255,80,80,0.45)', color: 'rgba(255,100,100,0.85)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '6px 10px', cursor: 'pointer' }}>
                 ✕ CLEAR
               </button>
             </div>
@@ -783,7 +783,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     padding: '10px 8px', textAlign: 'center',
                   }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: stat.color, lineHeight: 1, marginBottom: 4, textShadow: `0 0 12px ${stat.color}` }}>{stat.value}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -797,16 +797,16 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   background: 'rgba(0,224,208,0.05)', border: '1px solid rgba(0,224,208,0.2)',
                   padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(0,224,208,0.6)', letterSpacing: '2px' }}>YOUR SCORE</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(0,224,208,0.6)', letterSpacing: '2px' }}>YOUR SCORE</span>
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--cyan)', textShadow: '0 0 16px rgba(0,224,208,0.5)' }}>{overallAvg}</span>
                 </div>
               )}
 
               {/* Links */}
               <div className="show-masthead-links" style={{ gap: 6 }}>
-                <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link" style={{ fontSize: '0.62rem', padding: '7px 10px' }}>{pnetLabel}</a>
+                <a href={pnetUrl} target="_blank" rel="noopener noreferrer" className="show-link pnet-link" style={{ fontSize: '0.66rem', padding: '7px 10px' }}>{pnetLabel}</a>
                 {relistenUrl && (
-                  <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link" style={{ fontSize: '0.62rem', padding: '7px 10px' }}>STREAM ON RELISTEN</a>
+                  <a href={relistenUrl} target="_blank" rel="noopener noreferrer" className="show-link audio-link" style={{ fontSize: '0.66rem', padding: '7px 10px' }}>STREAM ON RELISTEN</a>
                 )}
               </div>
             </div>
@@ -834,7 +834,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               background: 'linear-gradient(135deg, rgba(0,224,208,0.04), rgba(5,18,5,0.98))',
               marginBottom: 12, padding: 14,
             }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.46rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                 ◈ PHRIENDS AT THIS SHOW
                 <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(0,224,208,0.25), transparent)' }} />
               </div>
@@ -849,7 +849,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
                 />
                 <button onClick={handleTagPhriend} disabled={phriendLoading || !phriendInput.trim()}
-                  style={{ background: 'rgba(0,224,208,0.07)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
+                  style={{ background: 'rgba(0,224,208,0.07)', border: '1px solid rgba(0,224,208,0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
                   {phriendLoading ? '...' : '+ TAG'}
                 </button>
               </div>
@@ -859,16 +859,16 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 <div style={{ marginBottom: phriends.also_attended.length ? 10 : 0 }}>
                   {phriends.tagged.map(c => (
                     <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(0,224,208,0.28)', background: 'rgba(0,224,208,0.04)', marginBottom: 6 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--cyan)', flexShrink: 0 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(0,224,208,0.4)', background: 'rgba(0,224,208,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', flexShrink: 0 }}>
                         {c.username.slice(0,2).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--cyan)' }}>{c.username}</div>
                         {c.their_score != null && (
-                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.4rem', color: 'var(--orange)', letterSpacing: '1px', marginTop: 2 }}>★ {c.their_score}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '1px', marginTop: 2 }}>★ {c.their_score}</div>
                         )}
                       </div>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', padding: '2px 5px', border: '1px solid rgba(0,224,208,0.4)', color: 'var(--cyan)', flexShrink: 0 }}>TAGGED</span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '2px 5px', border: '1px solid rgba(0,224,208,0.4)', color: 'var(--cyan)', flexShrink: 0 }}>TAGGED</span>
                       <button onClick={() => handleUntagPhriend(c.user_id)} style={{ background: 'none', border: 'none', color: 'rgba(255,51,51,0.45)', cursor: 'pointer', fontSize: '0.7rem', padding: '0 2px', flexShrink: 0 }} title="Remove tag">✕</button>
                     </div>
                   ))}
@@ -880,20 +880,20 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '10px 0 10px' }}>
                     <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '2px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>ALSO ON PHREEZER</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>ALSO ON PHREEZER</span>
                     <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                   </div>
                   {phriends.also_attended.map(c => (
                     <div key={c.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid rgba(51,255,51,0.15)', background: 'rgba(51,255,51,0.02)', marginBottom: 6 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(51,255,51,0.2)', background: 'rgba(51,255,51,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(51,255,51,0.2)', background: 'rgba(51,255,51,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', flexShrink: 0 }}>
                         {c.username.slice(0,2).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-label)' }}>{c.username}</div>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 2 }}>attended · not yet tagged</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 2 }}>attended · not yet tagged</div>
                       </div>
                       <button onClick={() => handleTagPhriendById(c)}
-                        style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px', padding: '5px 8px', cursor: 'pointer', flexShrink: 0 }}>
+                        style={{ background: 'rgba(51,255,51,0.04)', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 8px', cursor: 'pointer', flexShrink: 0 }}>
                         + TAG
                       </button>
                     </div>
@@ -902,7 +902,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               )}
 
               {phriends.tagged.length === 0 && phriends.also_attended.length === 0 && (
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0' }}>NO OTHER PHREEZERS AT THIS ONE</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0' }}>NO OTHER PHREEZERS AT THIS ONE</div>
               )}
             </div>
           )}
@@ -1047,25 +1047,25 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   <button onClick={() => setVibeExpanded(v => !v)} style={{
                     width: '100%', padding: '10px 14px', background: 'transparent', border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    cursor: 'pointer', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px',
+                    cursor: 'pointer', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>◈ VIBE CHECK</span>
                       {vibeCheck?.structured?.sentiment && (
-                        <span style={{ fontSize: '0.4rem', padding: '2px 7px', border: `1px solid ${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--border)'}`, color: `${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--text-muted)'}` }}>
+                        <span style={{ fontSize: '0.56rem', padding: '2px 7px', border: `1px solid ${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--border)'}`, color: `${{ FIRE: 'var(--orange)', SOLID: 'var(--cyan)', MIXED: 'rgba(51,255,51,0.5)', SLEEPER: 'var(--text-muted)' }[vibeCheck.structured.sentiment] || 'var(--text-muted)'}` }}>
                           {vibeCheck.structured.sentiment}
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: '0.38rem', color: 'var(--text-muted)' }}>
+                    <span style={{ fontSize: '0.56rem', color: 'var(--text-muted)' }}>
                       {loadingVibe ? 'GENERATING...' : vibeError ? 'GENERATION FAILED' : `AI · ${vibeCheck?.reviewCount || vibeCheck?.structured?.reviewCount || ''} PHISH.NET REVIEWS`}
                       {vibeExpanded ? ' ▲' : ' ▼'}
                     </span>
                   </button>
                   {vibeExpanded && vibeError && (
-                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,102,0,0.15)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
+                    <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,102,0,0.15)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '1px', lineHeight: 1.8 }}>
                       Could not synthesize reviews for this show.<br/>
-                      <span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.48rem' }}>Reviews are still available below ↓</span>
+                      <span style={{ color: 'rgba(0,224,208,0.5)', fontSize: '0.6rem' }}>Reviews are still available below ↓</span>
                     </div>
                   )}
                   {vibeExpanded && !vibeError && vibeCheck?.structured && (
@@ -1075,11 +1075,11 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       </div>
                       {vibeCheck.structured.themes?.map((t, i) => (
                         <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < vibeCheck.structured.themes.length - 1 ? '1px solid rgba(51,255,51,0.07)' : 'none' }}>
-                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>{t.label}</div>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>{t.label}</div>
                           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', lineHeight: 1.65 }}>{t.text}</div>
                         </div>
                       ))}
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 10, borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 8 }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 10, borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 8 }}>
                         AI SYNTHESIS OF {vibeCheck.structured.reviewCount} PHISH.NET REVIEWS · {vibeCheck.cached ? 'CACHED' : 'JUST GENERATED'}
                       </div>
                     </div>

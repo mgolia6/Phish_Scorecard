@@ -168,7 +168,8 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ## Entry Animation (WelcomeCelebration / Boot Sequence)
 - Full typewriter effect — char-by-char at 36ms/char with blinking block cursor
 - Rotating inside-joke lines (NOTIFYING WILSON, CONSULTING ICCULUS, etc.)
-- Snowflake: clamp(150px, 40vw, 240px) — large, centered, cyan glow
+- Snowflake: clamp(175px, 46vw, 280px) — large, centered, cyan glow
+- Boot lines: short loading-dot suffixes ("...") + tightened letter-spacing (2px default) so lines never overflow/wrap on mobile
 - Lines: clamp values for responsive sizing
 - DON'T SUCK split across two lines to prevent mobile overflow
 - Snowflake melt: after final line, snowflake dissolves downward (snowflakeDrip), droplets fall (dripFall), a puddle forms (puddleForm), and wake rings cascade outward (rippleWake) — layered "melt stage" in WelcomeCelebration, not a single scaled image (avoid the old "smooshed" look)

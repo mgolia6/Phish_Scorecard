@@ -46,7 +46,7 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
             <div style={{ fontSize: '2.2rem', color, textShadow: `0 0 16px ${color}` }}>{glyph}</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.72rem', color, letterSpacing: '2.5px' }}>{label}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{sub}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color, letterSpacing: '2px', marginTop: 4, opacity: 0.7 }}>{cta}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color, letterSpacing: '2px', marginTop: 4, opacity: 0.7 }}>{cta}</div>
           </div>
         ))}
       </div>

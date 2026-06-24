@@ -24,7 +24,7 @@ const S = {
   close: {
     background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
     color: 'var(--text-muted)', cursor: 'pointer', padding: '4px 10px',
-    fontFamily: 'var(--font-display)', fontSize: '0.55rem', letterSpacing: '2px',
+    fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px',
     borderRadius: 1,
   },
   body: { padding: '0 0 24px' },
@@ -43,7 +43,7 @@ const S = {
     background: 'rgba(255,102,0,0.02)',
   },
   label: {
-    fontFamily: 'var(--font-display)', fontSize: '0.5rem',
+    fontFamily: 'var(--font-display)', fontSize: '0.6rem',
     color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 10,
   },
   p: {

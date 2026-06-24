@@ -71,7 +71,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
             <div style={{ fontFamily: 'var(--font-mono)', fontSize, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 16, fontStyle: 'italic' }}>
               "Ask me about a show. Tell me what you're in the mood for. I'll find something worth your time."
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>TRY ASKING</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 10 }}>TRY ASKING</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {suggestions.map((s, i) => (
                 <button key={i} onClick={() => { setInput(s); inputRef.current?.focus(); }}
@@ -90,7 +90,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
               </div>
             ) : (
               <div style={{ maxWidth: '95%' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize, color: 'var(--white)', lineHeight: 1.7, borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10, whiteSpace: 'pre-wrap' }}>
                   {msg.content}
                 </div>
@@ -100,9 +100,9 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         ))}
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
             <div style={{ borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.5rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
             </div>
           </div>
         )}
@@ -122,7 +122,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           </button>
         </div>
         {history.length > 0 && (
-          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.6)', padding: '5px 12px', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10, fontWeight: 700 }}>↓ EXPORT</button>
+          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.6)', padding: '5px 12px', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10, fontWeight: 700 }}>↓ EXPORT</button>
         )}
       </div>
 
@@ -153,7 +153,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           }}
         >
           <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>❄</span>
-          <span style={{ fontSize: '0.4rem', letterSpacing: '1.5px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.56rem', letterSpacing: '1.5px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
             {loading ? '...' : 'SEND'}
           </span>
         </button>
@@ -199,7 +199,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
         className="ebenezer-float-btn"
       >
         <span style={{ fontSize: '1.2rem' }}>❄</span>
-        <span style={{ fontSize: '0.42rem', letterSpacing: '2px', fontWeight: 700 }}>ASK EBENEZER</span>
+        <span style={{ fontSize: '0.56rem', letterSpacing: '2px', fontWeight: 700 }}>ASK EBENEZER</span>
       </button>
 
       {/* Drawer */}
@@ -212,7 +212,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {history.length > 0 && (
-              <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}>CLEAR</button>
+              <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}>CLEAR</button>
             )}
             <button onClick={() => setOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
           </div>
@@ -272,7 +272,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {history.length > 0 && (
-                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
+                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
                 )}
                 <button onClick={() => setExpanded(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
               </div>
@@ -304,7 +304,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
                 {history.length > 0 && (
-                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
+                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
                 )}
               </div>
             </div>

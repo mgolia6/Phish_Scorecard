@@ -63,7 +63,7 @@ export function OnboardingFlow({ user, onComplete, onStartImport, onGoToScorecar
               LET'S GO
             </button>
             <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-              style={{ width: '100%', padding: '12px', display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px' }}>
+              style={{ width: '100%', padding: '12px', display: 'block', textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px' }}>
               ☕ KEEP THE PHREEZER STOCKED
             </a>
           </div>
@@ -97,8 +97,8 @@ export function ProfileSetupModal({ api, onComplete }) {
   const [saving, setSaving] = useState(false);
 
   const S = {
-    label: { fontFamily: 'var(--font-display)', fontSize: '0.46rem', letterSpacing: '2.5px', color: 'var(--text-label)', marginBottom: 8, display: 'block' },
-    hint: { fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: 5 },
+    label: { fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2.5px', color: 'var(--text-label)', marginBottom: 8, display: 'block' },
+    hint: { fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 5 },
     field: { marginBottom: 18 },
   };
 
@@ -205,7 +205,7 @@ export function ProfileSetupModal({ api, onComplete }) {
           )}
 
           {importError && (
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
               {importError}
             </div>
           )}
@@ -213,13 +213,13 @@ export function ProfileSetupModal({ api, onComplete }) {
           {/* OR divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0 12px' }}>
             <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.44rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(51,255,51,0.25)', letterSpacing: '2px' }}>OR</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(51,255,51,0.08)' }} />
           </div>
 
           {/* skip */}
           <button
-            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'rgba(51,255,51,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}
             onClick={handleSkip}
           >
             I DON'T HAVE A PHISH.NET ACCOUNT
@@ -241,7 +241,7 @@ export function ProfileSetupModal({ api, onComplete }) {
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 900, color: 'var(--cyan)', letterSpacing: '3px', marginBottom: 6, textShadow: '0 0 20px rgba(0,224,208,0.4)' }}>
                 PHROZEN IN.
               </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--green)', letterSpacing: '2px' }}>
                 ✓ {importCount.attendance} SHOWS · {importCount.reviews} REVIEWS
               </div>
             </div>
@@ -293,7 +293,7 @@ export function ProfileSetupModal({ api, onComplete }) {
           </button>
 
           <button
-            style={{ width: '100%', padding: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.48rem', letterSpacing: '2px', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', cursor: 'pointer' }}
             onClick={onComplete}
           >
             SKIP FOR NOW

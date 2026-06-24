@@ -99,7 +99,7 @@ export function ProfileTab({ api, user }) {
 
       <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
         <a href="https://buymeacoffee.com/mpgink" target="_blank" rel="noopener noreferrer"
-          style={{ display: 'block', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--orange)', letterSpacing: '2px', textDecoration: 'none', padding: '12px', border: '1px solid rgba(255,102,0,0.3)' }}>
+          style={{ display: 'block', textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', letterSpacing: '2px', textDecoration: 'none', padding: '12px', border: '1px solid rgba(255,102,0,0.3)' }}>
           ☕ BUY A COFFEE — KEEP PHREEZER RUNNING
         </a>
       </div>

@@ -74,7 +74,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
 
   if (loading) return (
     <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
     </div>
   );
 
@@ -82,7 +82,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
     <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(0,224,208,0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(0,224,208,0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--cyan)', opacity: 0.4 }} />
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.52rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
       </div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phish didn't play today's date in any year.</div>
     </div>
@@ -123,8 +123,8 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       {/* Badge row */}
       {(isAttended || isRated) && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 6, paddingLeft: 2 }}>
-          {isRated && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>}
-          {isAttended && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>}
+          {isRated && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,140,0,0.5)', padding: '2px 8px' }}>◈ PHROZEN</span>}
+          {isAttended && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--green)', border: '1px solid rgba(51,255,51,0.5)', padding: '2px 8px' }}>✓ I WAS THERE</span>}
         </div>
       )}
 
@@ -316,7 +316,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
       {/* ── SECTION C: MY SHOWS ── */}
       <div style={{ padding: '10px' }}>
         {/* ◈ MY SHOWS label */}
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.54rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(51,255,51,0.3)', marginBottom: 10 }}>◈ MY SHOWS</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '3px', color: 'var(--green)', textShadow: '0 0 8px rgba(51,255,51,0.3)', marginBottom: 10 }}>◈ MY SHOWS</div>
 
         {/* Filter + Sort — combined, scrollable row */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
@@ -327,7 +327,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
               border: `1px solid ${filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.3)'}`,
               background: filterBy === k ? 'rgba(255,102,0,0.1)' : 'transparent',
               color: filterBy === k ? 'var(--orange)' : 'rgba(0,224,208,0.65)',
-              fontFamily: 'var(--font-display)', fontSize: '0.58rem', letterSpacing: '1.5px', cursor: 'pointer',
+              fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '1.5px', cursor: 'pointer',
               boxShadow: filterBy === k ? '0 0 8px rgba(255,102,0,0.25)' : 'none',
               whiteSpace: 'nowrap',
             }}>{l}</button>
@@ -344,7 +344,7 @@ export function MyShowsTab({ api, showMessage, showError, onRateShow, openImport
               border: `1px solid ${sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.3)'}`,
               background: sortBy === k ? 'rgba(0,224,208,0.08)' : 'transparent',
               color: sortBy === k ? 'var(--cyan)' : 'rgba(0,224,208,0.65)',
-              fontFamily: 'var(--font-display)', fontSize: '0.52rem', letterSpacing: '1.5px', cursor: 'pointer',
+              fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px', cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}>{l}</button>
           ))}

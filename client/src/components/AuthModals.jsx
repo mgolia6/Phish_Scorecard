@@ -35,7 +35,7 @@ export function TandCModal({ onAccept }) {
           </div>
         </div>
         {!scrolled && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: 'rgba(51,255,51,0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(51,255,51,0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
             ▼ SCROLL TO CONTINUE
           </div>
         )}
@@ -52,7 +52,7 @@ export function TandCModal({ onAccept }) {
             onClick={() => setShowPrivacy(true)}
             style={{
               background: 'transparent', border: 'none', cursor: 'pointer',
-              fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+              fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
               color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', textDecoration: 'underline', padding: 0,
             }}
           >
@@ -104,7 +104,7 @@ function MikeSaidNo({ email, onResent, onBack }) {
 
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: '0.58rem',
+          fontSize: '0.66rem',
           letterSpacing: '2px',
           color: 'var(--text-label)',
           marginBottom: 20,
@@ -128,13 +128,13 @@ function MikeSaidNo({ email, onResent, onBack }) {
         </div>
 
         {err && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
             {err}
           </div>
         )}
 
         {resent ? (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
             ✓ NEW LINK SENT — CHECK YOUR INBOX
           </div>
         ) : (
@@ -145,7 +145,7 @@ function MikeSaidNo({ email, onResent, onBack }) {
               width: '100%',
               padding: '13px',
               fontFamily: 'var(--font-display)',
-              fontSize: '0.6rem',
+              fontSize: '0.66rem',
               letterSpacing: '2.5px',
               background: 'var(--orange)',
               color: '#000',
@@ -166,7 +166,7 @@ function MikeSaidNo({ email, onResent, onBack }) {
             width: '100%',
             padding: '11px',
             fontFamily: 'var(--font-display)',
-            fontSize: '0.55rem',
+            fontSize: '0.62rem',
             letterSpacing: '2px',
             background: 'transparent',
             color: 'var(--text-muted)',
@@ -203,7 +203,7 @@ function MikeSaysNo({ onBack }) {
 
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: '0.58rem',
+          fontSize: '0.66rem',
           letterSpacing: '2px',
           color: 'var(--text-label)',
           marginBottom: 24,
@@ -219,7 +219,7 @@ function MikeSaysNo({ onBack }) {
             width: '100%',
             padding: '11px',
             fontFamily: 'var(--font-display)',
-            fontSize: '0.55rem',
+            fontSize: '0.62rem',
             letterSpacing: '2px',
             background: 'transparent',
             color: 'var(--text-muted)',
@@ -272,7 +272,7 @@ function CheckYourEmail({ email, onBack }) {
 
         <div style={{
           fontFamily: 'var(--font-display)',
-          fontSize: '0.58rem',
+          fontSize: '0.66rem',
           letterSpacing: '1.5px',
           color: 'var(--text-label)',
           marginBottom: 20,
@@ -296,13 +296,13 @@ function CheckYourEmail({ email, onBack }) {
         </div>
 
         {err && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.55rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: '#ff4444', marginBottom: 12, letterSpacing: '1px' }}>
             {err}
           </div>
         )}
 
         {resent ? (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.58rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--green)', letterSpacing: '2px', marginBottom: 16 }}>
             ✓ NEW LINK SENT
           </div>
         ) : (
@@ -313,7 +313,7 @@ function CheckYourEmail({ email, onBack }) {
               width: '100%',
               padding: '11px',
               fontFamily: 'var(--font-display)',
-              fontSize: '0.55rem',
+              fontSize: '0.62rem',
               letterSpacing: '2px',
               background: 'transparent',
               color: 'var(--text-muted)',
@@ -333,7 +333,7 @@ function CheckYourEmail({ email, onBack }) {
             width: '100%',
             padding: '11px',
             fontFamily: 'var(--font-display)',
-            fontSize: '0.55rem',
+            fontSize: '0.62rem',
             letterSpacing: '2px',
             background: 'transparent',
             color: 'var(--text-muted)',

@@ -48,7 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           fontFamily: 'Share Tech Mono, monospace', padding: '2rem', textAlign: 'center',
           cursor: 'pointer',
         }} onClick={resetError}>
-          <div style={{ fontSize: '0.55rem', letterSpacing: '4px', color: 'rgba(255,80,80,0.5)', marginBottom: 16, fontFamily: 'Orbitron, sans-serif' }}>
+          <div style={{ fontSize: '0.62rem', letterSpacing: '4px', color: 'rgba(255,80,80,0.5)', marginBottom: 16, fontFamily: 'Orbitron, sans-serif' }}>
             ⚠ SYSTEM ALERT
           </div>
           <div style={{ fontSize: '2.2rem', letterSpacing: '6px', marginBottom: '0.75rem',
@@ -59,11 +59,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: 8, letterSpacing: '2px' }}>
             {error?.message || 'Something broke. Mike is not sorry about it.'}
           </div>
-          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.18)', marginBottom: '2.5rem', letterSpacing: '2px' }}>
+          <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.18)', marginBottom: '2.5rem', letterSpacing: '2px' }}>
             The error has been logged. Mike does not care.
           </div>
           <div style={{
-            fontSize: '0.5rem', letterSpacing: '3px', color: 'rgba(255,51,51,0.5)',
+            fontSize: '0.6rem', letterSpacing: '3px', color: 'rgba(255,51,51,0.5)',
             fontFamily: 'Orbitron, sans-serif', border: '1px solid rgba(255,51,51,0.2)',
             padding: '8px 20px',
           }}>

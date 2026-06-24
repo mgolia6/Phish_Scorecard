@@ -49,10 +49,14 @@ export default async function handler(req, res) {
       await pool.query('UPDATE users SET email_verified = TRUE WHERE id = $1', [row.user_id]);
       await pool.query('UPDATE email_verification_tokens SET used = TRUE WHERE id = $1', [row.id]);
 
-      // Fire onboarding email — fire and forget
-      triggerOnboardingEmail(row.user_id).catch(err =>
-        console.error('Onboarding email trigger failed:', err)
-      );
+      // Fire onboarding (welcome) email — await it so the send actually
+      // completes before the serverless function freezes. A failure here
+      // shouldn't block verification (the daily cron also backstops it).
+      try {
+        await triggerOnboardingEmail(row.user_id);
+      } catch (err) {
+        console.error('Onboarding email trigger failed:', err);
+      }
 
       return res.status(200).send(successPage());
     } catch (err) {

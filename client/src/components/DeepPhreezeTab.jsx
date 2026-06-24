@@ -99,7 +99,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
   const Section = ({ icon, label, color = D.cyan, children }) => (
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 0 10px' }}>
-        <span style={{ fontFamily: D.disp, fontSize: '0.62rem', color, letterSpacing: '3px', flexShrink: 0 }}>{icon} {label}</span>
+        <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color, letterSpacing: '3px', flexShrink: 0 }}>{icon} {label}</span>
         <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${color}44, transparent)` }} />
       </div>
       {children}
@@ -115,20 +115,20 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
       >
         <div style={{ padding: '16px 14px 12px' }}>
           <div style={{ fontFamily: D.disp, fontSize: '2.8rem', fontWeight: 900, color, textShadow: `0 0 30px ${color}44`, lineHeight: 1, letterSpacing: 1 }}>{value}</div>
-          {unit && <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
+          {unit && <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label, letterSpacing: '2px', marginTop: 4 }}>{unit}</div>}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 6 }}>
             <div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px' }}>{label}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label, letterSpacing: '2px' }}>{label}</div>
               {sub && <div style={{ fontFamily: D.mono, fontSize: '0.68rem', color: D.muted, marginTop: 4 }}>{sub}</div>}
             </div>
-            {factoid && <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 6 }}>{isOpen ? '▲' : '▼'}</div>}
+            {factoid && <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 6 }}>{isOpen ? '▲' : '▼'}</div>}
           </div>
         </div>
         {isOpen && factoid && (
           <div style={{ borderTop: `1px solid ${color}22`, background: `${color}08`, padding: '10px 14px' }}>
             {factoid.map((f, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '4px 0', borderBottom: i < factoid.length - 1 ? `1px solid ${color}11` : 'none' }}>
-                <span style={{ fontFamily: D.disp, fontSize: '0.46rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
+                <span style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
                 <span style={{ fontFamily: D.mono, fontSize: '0.76rem', color: f.color || D.white }}>{f.value}</span>
               </div>
             ))}
@@ -147,16 +147,16 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
         <div style={{ padding: '12px 10px 10px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div style={{ fontFamily: D.disp, fontSize: size, fontWeight: 700, color, textShadow: `0 0 12px ${color}44`, lineHeight: 1, marginBottom: 5 }}>{value}</div>
-            {factoid && id && <div style={{ fontFamily: D.disp, fontSize: '0.44rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</div>}
+            {factoid && id && <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color, opacity: 0.5, letterSpacing: '1px', flexShrink: 0, marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</div>}
           </div>
-          <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
+          <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '1.5px' }}>{label}</div>
           {sub && <div style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.muted, marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
         </div>
         {isOpen && factoid && (
           <div style={{ borderTop: `1px solid ${color}22`, background: `${color}08`, padding: '8px 10px' }}>
             {factoid.map((f, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '3px 0', borderBottom: i < factoid.length - 1 ? `1px solid ${color}11` : 'none' }}>
-                <span style={{ fontFamily: D.disp, fontSize: '0.44rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
+                <span style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '1.5px' }}>{f.label}</span>
                 <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: f.color || D.white }}>{f.value}</span>
               </div>
             ))}
@@ -174,7 +174,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
     const isLink = !!(onClick || href);
     const content_inner = (
       <>
-        <span style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
+        <span style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label, letterSpacing: '1.5px', flexShrink: 0 }}>{label}</span>
         <span style={{ fontFamily: mono ? D.mono : D.disp, fontSize: mono ? '0.8rem' : '0.76rem', color, textAlign: 'right', textDecoration: isLink ? 'underline' : 'none', textDecorationColor: `${color}44` }}>
           {value}{isLink ? ' ▶' : ''}
         </span>
@@ -199,21 +199,21 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
 
   const RankedList = ({ title, items, renderRow, emptyMsg = 'NOT ENOUGH DATA YET' }) => (
     <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
-      <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>{title}</div>
+      <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan }}>{title}</div>
       {items.length ? items.map((item, i) => (
         <div key={i} style={{ padding: '10px 14px', borderBottom: i < items.length - 1 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+          <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
           {renderRow(item, i)}
         </div>
       )) : (
-        <div style={{ padding: '14px', fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '2px' }}>{emptyMsg}</div>
+        <div style={{ padding: '14px', fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '2px' }}>{emptyMsg}</div>
       )}
     </div>
   );
 
   const PlayLink = ({ date, style = {} }) => date ? (
     <a href={`${PHISH_IN}/${date}`} target="_blank" rel="noopener noreferrer"
-      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.5rem', textDecoration: 'none', flexShrink: 0, ...style }}>▶</a>
+      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.35)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.6rem', textDecoration: 'none', flexShrink: 0, ...style }}>▶</a>
   ) : null;
 
   const SongLink = ({ song, children, style = {} }) => song ? (
@@ -235,7 +235,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           Computes your complete Phish lifetime stats.<br/>
           Takes ~30 seconds.
         </div>
-        <button onClick={handleSync} disabled={syncing} style={{ width: '100%', padding: '16px', background: 'rgba(0,224,208,0.08)', border: '1px solid rgba(0,224,208,0.45)', color: D.cyan, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '3px', cursor: syncing ? 'wait' : 'pointer' }}>
+        <button onClick={handleSync} disabled={syncing} style={{ width: '100%', padding: '16px', background: 'rgba(0,224,208,0.08)', border: '1px solid rgba(0,224,208,0.45)', color: D.cyan, fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '3px', cursor: syncing ? 'wait' : 'pointer' }}>
           {syncing ? '◈ SYNCING...' : '❄ RUN DEEP PHREEZE SYNC'}
         </button>
         {syncResult && <div style={{ fontFamily: D.mono, fontSize: '0.74rem', color: syncResult.startsWith('✓') ? D.green : 'var(--red)', marginTop: 14 }}>{syncResult}</div>}
@@ -264,7 +264,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
               background: toggle === k ? 'rgba(0,224,208,0.07)' : 'transparent',
               border: 'none', borderBottom: `2px solid ${toggle === k ? D.cyan : 'transparent'}`,
               color: toggle === k ? D.cyan : D.muted,
-              fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', cursor: 'pointer',
+              fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer',
             }}>{l}</button>
           ))}
         </div>
@@ -277,7 +277,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
             background: syncing ? 'transparent' : 'rgba(51,255,51,0.06)',
             border: `1px solid ${syncing ? D.border : 'rgba(51,255,51,0.3)'}`,
             color: syncing ? D.muted : D.green,
-            fontFamily: D.disp, fontSize: '0.52rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
+            fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer', flexShrink: 0,
             boxShadow: syncing ? 'none' : '0 0 8px rgba(51,255,51,0.1)',
           }}>
           {syncing ? '◈ ...' : '↺ SYNC'}
@@ -436,7 +436,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 const top = DAYS.reduce((a, b) => (s.shows_by_dow[b] || 0) > (s.shows_by_dow[a] || 0) ? b : a);
                 return (
                   <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-                    <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY DAY OF WEEK</div>
+                    <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY DAY OF WEEK</div>
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 60, marginBottom: 8 }}>
                       {DAYS.map(day => {
                         const count = s.shows_by_dow[day] || 0;
@@ -444,9 +444,9 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                         const isTop = day === top;
                         return (
                           <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%', justifyContent: 'flex-end' }}>
-                            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: isTop ? D.orange : D.muted }}>{count || ''}</div>
+                            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: isTop ? D.orange : D.muted }}>{count || ''}</div>
                             <div style={{ width: '100%', height: `${h}%`, background: isTop ? D.orange : D.cyan, opacity: isTop ? 1 : 0.45, borderRadius: '1px 1px 0 0' }} />
-                            <div style={{ fontFamily: D.disp, fontSize: '0.42rem', color: isTop ? D.orange : D.muted }}>{day}</div>
+                            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: isTop ? D.orange : D.muted }}>{day}</div>
                           </div>
                         );
                       })}
@@ -461,7 +461,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                 const top = MONTHS.reduce((a, b) => (s.shows_by_month[b] || 0) > (s.shows_by_month[a] || 0) ? b : a);
                 return (
                   <div style={{ background: D.bg, border: `1px solid ${D.border}`, padding: '12px 14px', marginBottom: 6 }}>
-                    <div style={{ fontFamily: D.disp, fontSize: '0.5rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY MONTH</div>
+                    <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '2px', marginBottom: 10 }}>SHOWS BY MONTH</div>
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 60, marginBottom: 8 }}>
                       {MONTHS.map(mon => {
                         const count = s.shows_by_month[mon] || 0;
@@ -470,7 +470,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                         return (
                           <div key={mon} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, height: '100%', justifyContent: 'flex-end' }}>
                             <div style={{ width: '100%', height: `${h}%`, background: isTop ? D.green : D.cyan, opacity: isTop ? 1 : 0.45, borderRadius: '1px 1px 0 0' }} />
-                            <div style={{ fontFamily: D.disp, fontSize: '0.36rem', color: isTop ? D.green : D.muted }}>{mon}</div>
+                            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: isTop ? D.green : D.muted }}>{mon}</div>
                           </div>
                         );
                       })}
@@ -491,7 +491,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                     padding: '5px 12px', background: longestToggle === k ? 'rgba(0,224,208,0.08)' : 'transparent',
                     border: 'none', borderBottom: `2px solid ${longestToggle === k ? D.cyan : 'transparent'}`,
                     color: longestToggle === k ? D.cyan : D.muted,
-                    fontFamily: D.disp, fontSize: '0.48rem', letterSpacing: '1.5px', cursor: 'pointer',
+                    fontFamily: D.disp, fontSize: '0.6rem', letterSpacing: '1.5px', cursor: 'pointer',
                   }}>{l}</button>
                 ))}
               </div>
@@ -609,7 +609,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── MOST HEARD ── */}
           <Section icon="◉" label="MOST HEARD" color={D.green}>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
-              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>
+              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan }}>
                 SONGS YOU'VE SEEN THE MOST — TAP TO EXPAND
               </div>
               {(s.most_heard_attended || []).slice(0, 10).length ? (s.most_heard_attended || []).slice(0, 10).map((item, i) => {
@@ -620,16 +620,16 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                       onClick={() => setExpandedMostHeard(isOpen ? null : item.song)}
                       style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.06)`, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: isOpen ? 'rgba(0,224,208,0.04)' : 'transparent' }}
                     >
-                      <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                      <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
                       <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {item.song}
                       </div>
                       <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, letterSpacing: 1, flexShrink: 0 }}>{item.count}x</div>
-                      <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
                     </div>
                     {isOpen && (
                       <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(51,255,51,0.06)` }}>
-                        <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.48rem', color: D.muted, letterSpacing: '2px' }}>
+                        <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px' }}>
                           TOP 5 VERSIONS YOU'VE SEEN
                         </div>
                         {(item.versions || []).length > 0 ? item.versions.slice(0, 5).map((v, vi) => (
@@ -641,7 +641,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                             </div>
                             <button
                               onClick={(e) => { e.stopPropagation(); onOpenScorecard && onOpenScorecard(v.date); }}
-                              style={{ padding: '4px 8px', border: `1px solid rgba(0,224,208,0.3)`, background: 'transparent', color: D.cyan, fontFamily: D.disp, fontSize: '0.42rem', letterSpacing: '1px', cursor: 'pointer', flexShrink: 0 }}
+                              style={{ padding: '4px 8px', border: `1px solid rgba(0,224,208,0.3)`, background: 'transparent', color: D.cyan, fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1px', cursor: 'pointer', flexShrink: 0 }}
                             >GO TO SHOW</button>
                           </div>
                         )) : (
@@ -654,7 +654,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                   </div>
                 );
               }) : (
-                <div style={{ padding: '14px', fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '2px' }}>NOT ENOUGH DATA YET</div>
+                <div style={{ padding: '14px', fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '2px' }}>NOT ENOUGH DATA YET</div>
               )}
             </div>
           </Section>
@@ -663,10 +663,10 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {s.most_common_encore?.length > 0 && (
             <Section icon="★" label="ENCORE PATTERNS" color={D.orange}>
               <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
-                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>YOUR MOST COMMON ENCORE SONGS</div>
+                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan }}>YOUR MOST COMMON ENCORE SONGS</div>
                 {(s.most_common_encore || []).slice(0, 5).map((item, i) => (
                   <div key={item.song} style={{ padding: '10px 14px', borderBottom: i < 4 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                    <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         <SongLink song={item.song}>{item.song}</SongLink>
@@ -688,10 +688,10 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {/* ── RAREST CATCHES ── */}
           <Section icon="⬡" label="RAREST CATCHES" color={D.muted}>
             <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
-              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>SONGS YOU'VE ONLY SEEN ONCE</div>
+              <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan }}>SONGS YOU'VE ONLY SEEN ONCE</div>
               {(s.rarest_caught || []).slice(0, 8).map((item, i) => (
                 <div key={item.song} style={{ padding: '10px 14px', borderBottom: i < 7 ? `1px solid rgba(51,255,51,0.06)` : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                  <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color: D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       <SongLink song={item.song}>{item.song}</SongLink>
@@ -702,7 +702,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                       </div>
                     )}
                   </div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.muted, letterSpacing: '1px', flexShrink: 0 }}>ONCE</div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '1px', flexShrink: 0 }}>ONCE</div>
                   {item.date && <PlayLink date={item.date} />}
                 </div>
               ))}
@@ -751,7 +751,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
           {s.highest_song && (
             <Section icon="◈" label="PEAK MOMENT" color={D.orange}>
               <div style={{ background: D.bg, border: `1px solid rgba(255,102,0,0.3)`, borderTop: `3px solid ${D.orange}`, padding: '18px 14px', marginBottom: 6 }}>
-                <div style={{ fontFamily: D.disp, fontSize: '0.52rem', color: D.label, letterSpacing: '2px', marginBottom: 8 }}>HIGHEST SINGLE SONG RATING</div>
+                <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label, letterSpacing: '2px', marginBottom: 8 }}>HIGHEST SINGLE SONG RATING</div>
                 <div style={{ fontFamily: D.disp, fontSize: '3rem', fontWeight: 900, color: D.orange, lineHeight: 1, marginBottom: 8 }}>{s.highest_song.rating}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                   <PlayLink date={s.highest_song.date} />
@@ -778,7 +778,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                         <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end', flex: 1 }}>
                           <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: col }}>{val}</div>
                           <div style={{ width: '60%', height: `${h}%`, background: col, opacity: 0.8, borderRadius: '2px 2px 0 0', boxShadow: `0 0 8px ${col}44` }} />
-                          <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.label }}>{lbl}</div>
+                          <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.label }}>{lbl}</div>
                         </div>
                       );
                     })}
@@ -807,7 +807,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
               </div>
             ) : (
               <div style={{ background: D.bg, border: `1px solid ${D.border}`, marginBottom: 8 }}>
-                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.54rem', letterSpacing: '2px', color: D.cyan }}>
+                <div style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.08)`, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan }}>
                   YOUR MOST RATED SONGS — TAP FOR TOP VERSIONS
                 </div>
                 {(s.most_heard_rated || []).slice(0, 10).map((item, i) => {
@@ -818,15 +818,15 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                         onClick={() => setExpandedSong(isOpen ? null : item.song)}
                         style={{ padding: '10px 14px', borderBottom: `1px solid rgba(51,255,51,0.06)`, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: isOpen ? 'rgba(0,224,208,0.04)' : 'transparent' }}
                       >
-                        <span style={{ fontFamily: D.disp, fontSize: '0.58rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                        <span style={{ fontFamily: D.disp, fontSize: '0.66rem', color: i === 0 ? D.orange : D.muted, width: 22, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
                         <div style={{ flex: 1, fontFamily: D.mono, fontSize: '0.86rem', color: D.white, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.song}</div>
                         <div style={{ fontFamily: D.disp, fontSize: '0.9rem', color: i === 0 ? D.orange : D.cyan, flexShrink: 0 }}>{item.count}x</div>
-                        <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0, minWidth: 38, textAlign: 'right' }}>avg {item.avg}</div>
-                        <div style={{ fontFamily: D.disp, fontSize: '0.54rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
+                        <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, flexShrink: 0, minWidth: 38, textAlign: 'right' }}>avg {item.avg}</div>
+                        <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
                       </div>
                       {isOpen && (
                         <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(51,255,51,0.06)` }}>
-                          <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.48rem', color: D.muted, letterSpacing: '2px' }}>
+                          <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px' }}>
                             YOUR TOP VERSIONS
                           </div>
                           {(item.versions || []).length > 0 ? item.versions.map((v, vi) => (

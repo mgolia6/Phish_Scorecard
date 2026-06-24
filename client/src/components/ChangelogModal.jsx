@@ -70,7 +70,7 @@ export function ChangelogModal({ onDismiss }) {
 
         {/* Header */}
         <div style={{
-          fontFamily: 'var(--font-display)', fontSize: '0.38rem',
+          fontFamily: 'var(--font-display)', fontSize: '0.56rem',
           letterSpacing: '4px', color: 'var(--cyan)', opacity: 0.6,
           textTransform: 'uppercase', marginBottom: 6,
         }}>
@@ -105,7 +105,7 @@ export function ChangelogModal({ onDismiss }) {
                 }}>{c.icon}</span>
                 <div>
                   <div style={{
-                    fontFamily: 'var(--font-display)', fontSize: '0.52rem',
+                    fontFamily: 'var(--font-display)', fontSize: '0.62rem',
                     letterSpacing: '2px', color: 'var(--orange)',
                     textTransform: 'uppercase', marginBottom: 5,
                   }}>{c.title}</div>
@@ -125,13 +125,13 @@ export function ChangelogModal({ onDismiss }) {
         {/* Footer */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+            fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
             color: 'rgba(51,255,51,0.25)', letterSpacing: '1px',
           }}>TAP OUTSIDE TO DISMISS</span>
           <button
             onClick={handleDismiss}
             style={{
-              fontFamily: 'var(--font-display)', fontSize: '0.5rem',
+              fontFamily: 'var(--font-display)', fontSize: '0.6rem',
               letterSpacing: '3px', background: 'transparent',
               border: '1px solid var(--cyan)', color: 'var(--cyan)',
               padding: '10px 20px', cursor: 'pointer',

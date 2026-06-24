@@ -187,6 +187,10 @@
       "destination": "/api/emails/cron"
     },
     {
+      "source": "/api/emails/unsubscribe",
+      "destination": "/api/emails/unsubscribe"
+    },
+    {
       "source": "/api/admin/ai-usage",
       "destination": "/api/admin/ai-usage"
     },

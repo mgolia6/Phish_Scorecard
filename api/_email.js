@@ -4,14 +4,22 @@
 const FROM = 'Phreezer Support <phreezer.support@mpgink.com>';
 const APP_URL = 'https://phreezer.mpgink.com';
 
-export async function sendEmail({ to, subject, html }) {
+export async function sendEmail({ to, subject, html, unsubscribeUrl }) {
+  const payload = { from: FROM, to: [to], subject, html };
+  // One-click unsubscribe for recurring mail (Gmail/Apple bulk-sender friendly)
+  if (unsubscribeUrl) {
+    payload.headers = {
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    };
+  }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.PHREEZER_RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = await res.text();
@@ -23,7 +31,7 @@ export async function sendEmail({ to, subject, html }) {
 // ─────────────────────────────────────────────────────────────
 // SHARED LAYOUT WRAPPER
 // ─────────────────────────────────────────────────────────────
-function layout(body) {
+function layout(body, unsubscribeUrl) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Phreezer</title></head>
@@ -50,7 +58,8 @@ function layout(body) {
           <p style="font-family:monospace;font-size:10px;color:rgba(255,255,255,0.2);line-height:1.9;margin:0;">
             You're receiving this because you have a Phreezer account.<br>
             Questions? Reply to this email or reach us at <a href="mailto:phreezer.support@mpgink.com" style="color:rgba(0,224,208,0.4);text-decoration:none;">phreezer.support@mpgink.com</a><br>
-            <a href="${APP_URL}" style="color:rgba(0,224,208,0.4);text-decoration:none;">phreezer.mpgink.com</a> &nbsp;·&nbsp; Independent fan project. Not affiliated with Phish.
+            <a href="${APP_URL}" style="color:rgba(0,224,208,0.4);text-decoration:none;">phreezer.mpgink.com</a> &nbsp;·&nbsp; Independent fan project. Not affiliated with Phish.${unsubscribeUrl ? `<br>
+            <a href="${unsubscribeUrl}" style="color:rgba(255,255,255,0.3);text-decoration:underline;">Unsubscribe from these reminders</a>` : ''}
           </p>
         </td></tr>
 
@@ -265,4 +274,20 @@ Summer tour starts July 7. Good time to get your rating legs under you before th
     ${body(`— mpgink`)}
   `);
   return { subject: `You\'ve been to ${showsAttended} show${showsAttended === 1 ? '' : 's'}. How were they?`, html };
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7. WEEKLY REMINDER — recurring nudge to keep rating (Tuesdays)
+// ─────────────────────────────────────────────────────────────
+export function weeklyReminderEmail(username, unsubscribeUrl) {
+  const name = username || 'phan';
+  const html = layout(`
+    ${heading('THE WEEKLY PHREEZE.', '#00e0d0')}
+    ${body(`Hey ${name},<br><br>
+Quick weekly nudge from the Phreezer. There\'s always another show worth rating — a night you keep coming back to, or one you\'ve never really sat with.<br><br>
+Pick one. Score it song by song. Two minutes, and it\'s in the community record for good.`)}
+    ${button('RATE A SHOW', APP_URL)}
+    ${body(`Summer tour starts July 7 — the more you phreeze now, the sharper your Deep Phreeze gets when the new shows hit.<br><br>— mpgink`)}
+  `, unsubscribeUrl);
+  return { subject: 'This week in the Phreezer — rate a show.', html };
 }

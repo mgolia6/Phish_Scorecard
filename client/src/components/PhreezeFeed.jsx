@@ -48,11 +48,11 @@ function ReplyRow({ reply }) {
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--green)' }}>{reply.username}</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)' }}>{timeAgo(reply.created_at)}</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)' }}>{timeAgo(reply.created_at)}</span>
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.65 }}>{reply.body}</div>
         <button onClick={() => { setUpped(u => !u); setUpCount(c => upped ? c - 1 : c + 1); }}
-          style={{ marginTop: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', color: upped ? 'var(--green)' : 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          style={{ marginTop: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? 'var(--green)' : 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', gap: 4 }}>
           ▲ {upCount}
         </button>
       </div>
@@ -118,13 +118,13 @@ function PostCard({ post, api, currentUser }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             {post.pinned && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,102,0,0.4)', padding: '2px 8px', background: 'rgba(255,102,0,0.08)' }}>❄ PINNED · UNCLE EBENEZER</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,102,0,0.4)', padding: '2px 8px', background: 'rgba(255,102,0,0.08)' }}>❄ PINNED · UNCLE EBENEZER</span>
               </div>
             )}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: nameColor, fontWeight: post.author_label ? 700 : 400 }}>{name}</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.3rem', letterSpacing: '2px', padding: '2px 6px', border: `1px solid ${color}44`, color }}>{post.category}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', marginLeft: 'auto' }}>{timeAgo(post.created_at)}</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '2px 6px', border: `1px solid ${color}44`, color }}>{post.category}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)', marginLeft: 'auto' }}>{timeAgo(post.created_at)}</span>
             </div>
 
             {/* Body with truncation */}
@@ -134,7 +134,7 @@ function PostCard({ post, api, currentUser }) {
             {isTruncatable && (
               <button onClick={() => setBodyExpanded(b => !b)} style={{
                 background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px',
-                fontFamily: 'var(--font-display)', fontSize: '0.36rem', letterSpacing: '1.5px',
+                fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px',
                 color: color, opacity: 0.75,
               }}>
                 {bodyExpanded ? '▲ SHOW LESS' : '▼ READ MORE'}
@@ -145,9 +145,9 @@ function PostCard({ post, api, currentUser }) {
 
         {/* Action row */}
         <div style={{ display: 'flex', gap: 16, paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.05)', marginLeft: 46 }}>
-          <button onClick={handleReact} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', color: upped ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>▲ {upCount}</button>
-          <button onClick={handleExpand} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', color: expanded ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>◈ {replyCount} {replyCount === 1 ? 'REPLY' : 'REPLIES'}</button>
-          <button onClick={() => { setShowReplyBox(r => !r); if (!expanded) { setExpanded(true); loadReplies(); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.42rem', letterSpacing: '1.5px', color: showReplyBox ? color : 'rgba(255,255,255,0.35)' }}>+ REPLY</button>
+          <button onClick={handleReact} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>▲ {upCount}</button>
+          <button onClick={handleExpand} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: expanded ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>◈ {replyCount} {replyCount === 1 ? 'REPLY' : 'REPLIES'}</button>
+          <button onClick={() => { setShowReplyBox(r => !r); if (!expanded) { setExpanded(true); loadReplies(); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: showReplyBox ? color : 'rgba(255,255,255,0.35)' }}>+ REPLY</button>
         </div>
       </div>
 
@@ -161,8 +161,8 @@ function PostCard({ post, api, currentUser }) {
                 style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}44`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', resize: 'none', outline: 'none', boxSizing: 'border-box' }} />
               <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
                 <button onClick={handleReply} disabled={!replyText.trim() || replySubmitting}
-                  style={{ background: `${color}11`, border: `1px solid ${color}44`, color, fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', padding: '6px 14px', cursor: 'pointer', opacity: (!replyText.trim() || replySubmitting) ? 0.4 : 1 }}>{replySubmitting ? '...' : 'POST'}</button>
-                <button onClick={() => setShowReplyBox(false)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.4rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
+                  style={{ background: `${color}11`, border: `1px solid ${color}44`, color, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 14px', cursor: 'pointer', opacity: (!replyText.trim() || replySubmitting) ? 0.4 : 1 }}>{replySubmitting ? '...' : 'POST'}</button>
+                <button onClick={() => setShowReplyBox(false)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
               </div>
             </div>
           )}
@@ -210,7 +210,7 @@ function NewPostBox({ api, onPosted, currentUser }) {
           border: '1px solid rgba(0,224,208,0.3)',
           background: 'rgba(0,224,208,0.06)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-display)', fontSize: '0.44rem',
+          fontFamily: 'var(--font-display)', fontSize: '0.6rem',
           color: 'var(--cyan)', flexShrink: 0,
         }}>
           {currentUser.username?.slice(0, 2).toUpperCase()}
@@ -218,7 +218,7 @@ function NewPostBox({ api, onPosted, currentUser }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-muted)' }}>
           what's on your mind, phan?
         </span>
-        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.36rem', color: 'rgba(0,224,208,0.35)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
+        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.35)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
       </button>
     );
   }
@@ -228,17 +228,17 @@ function NewPostBox({ api, onPosted, currentUser }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCategory(c)}
-            style={{ fontFamily: 'var(--font-display)', fontSize: '0.34rem', letterSpacing: '1.5px', padding: '3px 8px', border: `1px solid ${c === category ? categoryColor(c) + '88' : 'rgba(255,255,255,0.1)'}`, color: c === category ? categoryColor(c) : 'rgba(255,255,255,0.3)', background: c === category ? `${categoryColor(c)}0d` : 'transparent', cursor: 'pointer' }}>{c}</button>
+            style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '3px 8px', border: `1px solid ${c === category ? categoryColor(c) + '88' : 'rgba(255,255,255,0.1)'}`, color: c === category ? categoryColor(c) : 'rgba(255,255,255,0.3)', background: c === category ? `${categoryColor(c)}0d` : 'transparent', cursor: 'pointer' }}>{c}</button>
         ))}
       </div>
       <textarea value={body} onChange={e => setBody(e.target.value.slice(0, 1000))} placeholder="what's on your mind, phan?" rows={3} autoFocus
         style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}33`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', padding: '10px 12px', resize: 'none', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
       <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)' }}>{body.length}/1000</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>{body.length}/1000</span>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => { setOpen(false); setBody(''); }} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
+          <button onClick={() => { setOpen(false); setBody(''); }} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
           <button onClick={handleSubmit} disabled={!body.trim() || submitting}
-            style={{ background: `${color}11`, border: `1px solid ${color}55`, color, fontFamily: 'var(--font-display)', fontSize: '0.38rem', letterSpacing: '2px', padding: '6px 18px', cursor: 'pointer', opacity: (!body.trim() || submitting) ? 0.4 : 1 }}>{submitting ? '...' : '◈ POST'}</button>
+            style={{ background: `${color}11`, border: `1px solid ${color}55`, color, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 18px', cursor: 'pointer', opacity: (!body.trim() || submitting) ? 0.4 : 1 }}>{submitting ? '...' : '◈ POST'}</button>
         </div>
       </div>
     </div>
@@ -276,7 +276,7 @@ export function PhreezeFeed({ api, currentUser }) {
     <div style={{ maxWidth: 720, paddingBottom: 80 }}>
       <NewPostBox api={api} onPosted={handlePosted} currentUser={currentUser} />
       {posts.length === 0 && !loading && (
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.48rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '32px 0' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '32px 0' }}>
           NO POSTS YET — BE THE FIRST
         </div>
       )}
@@ -285,7 +285,7 @@ export function PhreezeFeed({ api, currentUser }) {
       ))}
       {hasMore && (
         <button onClick={() => loadPosts(page + 1)} disabled={loading}
-          style={{ width: '100%', padding: '12px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.44rem', letterSpacing: '2px', cursor: 'pointer', marginTop: 8, opacity: loading ? 0.4 : 1 }}>
+          style={{ width: '100%', padding: '12px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', cursor: 'pointer', marginTop: 8, opacity: loading ? 0.4 : 1 }}>
           {loading ? 'LOADING...' : 'LOAD MORE'}
         </button>
       )}
