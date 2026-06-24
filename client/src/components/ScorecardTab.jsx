@@ -758,7 +758,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             </div>
 
             {/* Right: data panel — fills dead space on desktop */}
-            <div className="show-masthead-right" style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 240 }}>
+            <div className="show-masthead-right" style={{ flexDirection: 'column', gap: 10, minWidth: 240 }}>
               {/* Quick stats row */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                 {[
@@ -954,11 +954,17 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                               {song.footnote && <span className="badge footnote-badge" title={song.footnote}>*</span>}
                             </div>
                           </div>
-                          <span className="song-transition">
-                            {song.transition === '>' ? <span className="segue-soft">&gt;</span>
-                              : song.transition === '->' ? <span className="segue-hard">--&gt;</span>
-                              : null}
-                          </span>
+                          {(() => {
+                            const t = (song.transition || '').trim();
+                            if (!t || t === ',') return null;
+                            return (
+                              <span className="song-transition">
+                                {t.includes('->') ? <span className="segue-hard">--&gt;</span>
+                                  : t.includes('>') ? <span className="segue-soft">&gt;</span>
+                                  : null}
+                              </span>
+                            );
+                          })()}
                           <div className="song-row-controls">
                             {audio?.mp3_url ? (
                               <button

@@ -3,16 +3,21 @@
 
 import { getPool } from './_db.js';
 
-// Anthropic pricing (per million tokens) — update if pricing changes
+// Anthropic pricing (USD per million tokens) — verified against Claude API
+// pricing reference. Update if pricing changes.
 const PRICING = {
   'claude-sonnet-4-6':          { input: 3.00,  output: 15.00 },
-  'claude-haiku-4-5':           { input: 0.80,  output: 4.00  },
-  'claude-haiku-4-5-20251001':  { input: 0.80,  output: 4.00  },
+  'claude-haiku-4-5':           { input: 1.00,  output: 5.00  },
+  'claude-haiku-4-5-20251001':  { input: 1.00,  output: 5.00  },
 };
 
 function estimateCost(model, inputTokens, outputTokens) {
   const p = PRICING[model];
-  if (!p) return 0;
+  if (!p) {
+    // Unknown model — log so usage isn't silently under-counted at $0.
+    console.warn(`AI usage: no pricing for model "${model}" — cost logged as 0`);
+    return 0;
+  }
   return ((inputTokens / 1_000_000) * p.input) + ((outputTokens / 1_000_000) * p.output);
 }
 
