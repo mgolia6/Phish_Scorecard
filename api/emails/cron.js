@@ -78,26 +78,16 @@ async function fire(pool, user, emailType, emailFn, ...args) {
   return { sent: true, to: user.email, type: emailType };
 }
 
-export default async function handler(req, res) {
-  cors(res, req);
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
-  // Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`.
-  // Also accept the legacy x-cron-secret header and ?secret= for manual runs.
-  const authHeader = req.headers['authorization'] || '';
-  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  const secret = req.headers['x-cron-secret'] || req.query.secret || bearer;
-  if (!secret || secret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  const pool = getPool();
+// Shared lifecycle pass — runnable directly from the cron handler AND the
+// admin "run all" trigger (no internal HTTP, so deployment protection on the
+// per-deployment URL can't silently swallow it). Throws on error.
+export async function runLifecycleEmails(pool) {
   await ensureEmailLog(pool);
   await ensureEmailPrefs(pool);
 
   const results = [];
 
-  try {
+  {
     const usersRes = await pool.query(`
       SELECT
         u.id, u.email, u.username, u.created_at, u.last_login_date,
@@ -213,8 +203,26 @@ export default async function handler(req, res) {
 
     const sent = results.filter(r => r.sent).length;
     const skipped = results.filter(r => r.skipped).length;
-    res.json({ ok: true, sent, skipped, total: results.length, detail: results.filter(r => r.sent) });
+    return { ok: true, sent, skipped, total: results.length, detail: results.filter(r => r.sent) };
+  }
+}
 
+export default async function handler(req, res) {
+  cors(res, req);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // Vercel Cron authenticates with `Authorization: Bearer <CRON_SECRET>`.
+  // Also accept the legacy x-cron-secret header and ?secret= for manual runs.
+  const authHeader = req.headers['authorization'] || '';
+  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const secret = req.headers['x-cron-secret'] || req.query.secret || bearer;
+  if (!secret || secret !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const result = await runLifecycleEmails(getPool());
+    res.json(result);
   } catch (err) {
     console.error('Email cron error:', err);
     res.status(500).json({ error: err.message });

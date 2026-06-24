@@ -6,6 +6,7 @@
 
 import { verifyToken, cors } from '../_auth.js';
 import { getPool } from '../_db.js';
+import { runLifecycleEmails } from '../emails/cron.js';
 import {
   sendEmail,
   onboardingEmail,
@@ -38,14 +39,9 @@ export default async function handler(req, res) {
   const pool = getPool();
 
   try {
-    // ── EN MASSE — run the lifecycle cron for everyone ──
+    // ── EN MASSE — run the lifecycle pass for everyone (direct call) ──
     if (mode === 'all') {
-      const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : APP_URL;
-      const r = await fetch(`${baseUrl}/api/emails/cron`, {
-        headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-      });
-      const result = await r.json().catch(() => ({}));
-      if (!r.ok) return res.status(502).json({ error: 'Cron run failed', detail: result });
+      const result = await runLifecycleEmails(pool);
       return res.json({ ok: true, ran: 'lifecycle-all', ...result });
     }
 
