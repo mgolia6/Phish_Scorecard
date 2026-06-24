@@ -495,7 +495,7 @@ select option { background: var(--bg); color: var(--green); }
 
 /* ── PANELS ──────────────────────────────────────────── */
 .panel { border: 1px solid var(--border); background: var(--bg-panel); padding: 24px; margin-bottom: 24px; position: relative; }
-.panel-title { font-family: var(--font-display); font-size: 0.85rem; color: var(--cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.panel-title { font-family: var(--font-display); font-size: 0.92rem; color: var(--cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
 /* ── NEW: COMPONENT SYSTEM ───────────────────────────── */
 
@@ -887,7 +887,7 @@ select option { background: var(--bg); color: var(--green); }
 .jam-badge        { border-color: var(--cyan);   color: var(--cyan);   }
 .reprise-badge    { border-color: var(--orange);  color: var(--orange); }
 .footnote-badge   { border-color: rgba(51,255,51,0.45); color: rgba(51,255,51,0.65); cursor: help; }
-.song-transition  { font-size: 0.9rem; text-align: center; }
+.song-transition  { font-size: 0.9rem; margin-left: 4px; flex-shrink: 0; align-self: baseline; }
 .segue-soft       { color: var(--orange); font-weight: bold; }
 .segue-hard       { color: var(--red);    font-weight: bold; }
 .song-duration    { font-size: 0.78rem; color: rgba(51,255,51,0.55); letter-spacing: 1px; white-space: nowrap; font-family: var(--font-mono); }
@@ -927,11 +927,11 @@ select option { background: var(--bg); color: var(--green); }
 /* Score summary */
 .score-summary  { margin-top: 24px; padding: 20px; background: var(--bg-elevated); border: 1px solid var(--border); }
 .set-score      { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.set-score-label{ font-size: 0.7rem; color: var(--cyan); letter-spacing: 2px; min-width: 80px; text-transform: uppercase; }
+.set-score-label{ font-size: 0.8rem; color: var(--cyan); letter-spacing: 2px; min-width: 80px; text-transform: uppercase; }
 .set-score-bar  { flex: 1; height: 6px; background: rgba(51,255,51,0.1); border: 1px solid var(--border); }
 .set-score-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); box-shadow: 0 0 8px rgba(51,255,51,0.4); transition: width 0.5s ease; }
-.set-score-val  { font-family: var(--font-display); font-size: 0.9rem; color: var(--cyan); min-width: 36px; text-align: right; }
-.set-score-count{ font-size: 0.7rem; color: var(--text-muted); }
+.set-score-val  { font-family: var(--font-display); font-size: 1.05rem; color: var(--cyan); min-width: 36px; text-align: right; }
+.set-score-count{ font-size: 0.72rem; color: var(--text-label); }
 .overall-score  { display: flex; align-items: center; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 .overall-label  { font-family: var(--font-display); font-size: 0.7rem; color: var(--orange); letter-spacing: 3px; min-width: 80px; }
 .overall-val    { font-family: var(--font-display); font-size: 2rem; color: var(--orange); text-shadow: var(--glow-orange); line-height: 1; }
@@ -1245,7 +1245,7 @@ select option { background: var(--bg); color: var(--green); }
   .song-name-with-num { display: flex; align-items: baseline; gap: 6px; width: 100%; margin-bottom: 6px; }
   .song-name-link   { font-size: 0.96rem; word-break: break-word; text-align: left; }
   .song-meta        { display: none; }
-  .song-transition  { display: none; }
+  .song-transition  { display: inline-block; font-size: 0.95rem; }
   .song-row-controls{ display: flex; flex-direction: row; align-items: center; gap: 8px; width: 100%; }
   .song-row-controls .song-duration-inline { font-family: var(--font-mono); font-size: 0.72rem; color: rgba(51,255,51,0.5); letter-spacing: 1px; flex-shrink: 0; }
   .song-row-controls .song-badges-inline   { display: flex; gap: 4px; flex-shrink: 0; }
@@ -1526,12 +1526,13 @@ select option { background: var(--bg); color: var(--green); }
   .leaderboard-row .leaderboard-user { font-size: 0.92rem !important; }
 }
 
-/* ── SHOW MASTHEAD RIGHT PANEL — desktop only ── */
-.show-masthead-right { display: none; }
+/* ── SHOW MASTHEAD ── */
+/* Mobile: single column (date/venue, then the data panel stacked below).
+   Desktop: date/venue left, data panel fills the dead space on the right. */
+.show-masthead { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+.show-masthead-right { display: flex; }
 @media (min-width: 769px) {
-  .show-masthead-right { display: flex; }
-  /* On mobile, masthead goes single column */
-  .show-masthead { grid-template-columns: 1fr !important; }
+  .show-masthead { grid-template-columns: 1fr auto; gap: 24px; }
 }
 
 @keyframes cursorBlink {

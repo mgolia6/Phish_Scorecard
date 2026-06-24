@@ -35,14 +35,14 @@ export function SaveCelebration({ onDone }) {
 
 // Pool of rotating Phish inside-joke boot lines (one picked per session)
 const JOKE_LINES = [
-  'INITIATING SIREN LOOPS...',
-  'CHILLING THE PHREEZER...',
-  'EXTRACTING THE JAMS...',
-  'READING THE BOOK...',
-  'LOCATING THE LIZARDS...',
-  'NOTIFYING WILSON...',
-  'CONSULTING ICCULUS...',
-  'CALCULATING TUBE TIME...',
+  'INITIATING SIREN LOOPS....',
+  'CHILLING THE PHREEZER.....',
+  'EXTRACTING THE JAMS.......',
+  'READING THE BOOK..........',
+  'LOCATING THE LIZARDS......',
+  'NOTIFYING WILSON..........',
+  'CONSULTING ICCULUS........',
+  'CALCULATING TUBE TIME.....',
 ];
 
 function pickJokeLine() {
@@ -100,16 +100,14 @@ export function WelcomeCelebration({ username, onDone }) {
   const jokeLine = useRef(pickJokeLine()).current;
 
   // Boot sequence:
-  // 1. INITIALIZING — cursor sits 900ms before next line starts
-  // 2. One joke line — cursor sits 700ms after completion
-  // 3. OK — just two chars, then pause 600ms
-  // 4. IDENTITY CONFIRMED
-  // 5. DON'T SUCK
-  // 6. AT PHISH.
+  // 1. INITIALIZING banner
+  // 2. One joke "task" line — dots fill, then OK on the same line (boot-check style)
+  // 3. IDENTITY CONFIRMED
+  // 4. DON'T SUCK
+  // 5. AT PHISH.
   const lines = [
-    { text: 'PHREEZER v2.0 — INITIALIZING...', pauseAfter: 900 },
-    { text: jokeLine,                          pauseAfter: 700 },
-    { text: 'OK',                              pauseAfter: 600, ok: true },
+    { text: 'PHREEZER v2.0 — INITIALIZING...', pauseAfter: 800 },
+    { text: `${jokeLine} OK`,                  pauseAfter: 600 },
     { text: `IDENTITY CONFIRMED: ${(username || 'PHREEK').toUpperCase()}`, pauseAfter: 500, accent: true },
     { text: "DON'T SUCK",                      pauseAfter: 180, big: true },
     { text: 'AT PHISH.',                       pauseAfter: 9999, big: true },
@@ -141,7 +139,7 @@ export function WelcomeCelebration({ username, onDone }) {
           ? 'clamp(1.1rem, 4.5vw, 1.8rem)'
           : isAccent
           ? 'clamp(0.82rem, 2.8vw, 1.15rem)'
-          : 'clamp(0.7rem, 2.4vw, 1rem)',
+          : 'clamp(0.76rem, 2.6vw, 1.04rem)',
         color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : isOk ? 'var(--green)' : 'rgba(51,255,51,0.85)',
         letterSpacing: isBig ? '8px' : isAccent ? '4px' : '2px',
         textShadow: isBig
