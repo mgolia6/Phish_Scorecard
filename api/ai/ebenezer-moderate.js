@@ -1,5 +1,9 @@
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
+import { logAiUsage } from '../_ai_usage.js';
+
+const MOD_MODEL = 'claude-haiku-4-5-20251001';
+
 const MODERATION_PROMPT = `You are a content moderator for a Phish music fan app.
 
 Evaluate the following user message. The app allows:
@@ -18,7 +22,7 @@ Respond with ONLY a JSON object:
 {"allowed": true} if acceptable
 {"allowed": false, "reason": "brief reason"} if it should be blocked`;
 
-export async function moderateMessage(message) {
+export async function moderateMessage(message, userId = null) {
   const lower = message.toLowerCase();
   const hardBlock = ['nigger','nigga','faggot','fag ','kike','spic','chink','tranny','wetback','beaner','gook'];
   for (const word of hardBlock) {
@@ -30,12 +34,21 @@ export async function moderateMessage(message) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: MOD_MODEL,
         max_tokens: 60,
         messages: [{ role: 'user', content: MODERATION_PROMPT + '\n\nMessage: "' + message + '"' }],
       }),
     });
     const data = await res.json();
+    if (data?.usage) {
+      logAiUsage({
+        userId,
+        feature: 'moderation',
+        model: MOD_MODEL,
+        inputTokens: data.usage.input_tokens || 0,
+        outputTokens: data.usage.output_tokens || 0,
+      });
+    }
     const text = data?.content?.[0]?.text?.trim() || '{"allowed": true}';
     return JSON.parse(text.replace(/```json|```/g, '').trim());
   } catch (_) {

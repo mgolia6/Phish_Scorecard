@@ -611,7 +611,7 @@ export default async function handler(req, res) {
   if (!message?.trim()) return res.status(400).json({ error: 'Message required' });
 
   // Content moderation pre-flight
-  const modResult = await moderateMessage(message);
+  const modResult = await moderateMessage(message, user?.id);
   if (!modResult.allowed) {
     logEbenezerConversation({ intent: 'blocked', messageLength: message.length, responseLength: 0, flagged: true });
     return res.json({ reply: "That's not the kind of conversation I'm having. Ask me about music." });

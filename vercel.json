@@ -199,6 +199,10 @@
       "destination": "/api/admin/monitoring"
     },
     {
+      "source": "/api/admin/send-email",
+      "destination": "/api/admin/send-email"
+    },
+    {
       "source": "/api/admin/health",
       "destination": "/api/admin/health"
     },
