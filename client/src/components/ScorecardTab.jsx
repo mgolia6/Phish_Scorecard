@@ -514,7 +514,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
             <div style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', color, letterSpacing:'3px', marginBottom:3 }}>{text}</div>
           );
 
-          const sep = <div style={{ width:1, background:'rgba(255,255,255,0.07)', alignSelf:'stretch', flexShrink:0, margin:'0 4px' }} />;
+          const sep = <div style={{ width:1, background:'var(--hairline)', alignSelf:'stretch', flexShrink:0, margin:'0 4px' }} />;
 
           return (
             <div style={{ marginTop: 8 }}>
@@ -779,7 +779,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   },
                 ].map(stat => (
                   <div key={stat.label} style={{
-                    background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)',
+                    background: 'var(--inset)', border: '1px solid var(--hairline)',
                     padding: '10px 8px', textAlign: 'center',
                   }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: stat.color, lineHeight: 1, marginBottom: 4, textShadow: `0 0 12px ${stat.color}` }}>{stat.value}</div>
@@ -846,7 +846,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   onChange={e => setPhriendInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleTagPhriend()}
                   placeholder="search phreezer username..."
-                  style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
+                  style={{ flex: 1, background: 'var(--inset-strong)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
                 />
                 <button onClick={handleTagPhriend} disabled={phriendLoading || !phriendInput.trim()}
                   style={{ background: 'rgba(var(--cyan-rgb),0.07)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '7px 12px', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phriendLoading ? 0.5 : 1 }}>
@@ -1047,7 +1047,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
               {/* ── VIBE CHECK ── */}
               {(vibeCheck?.structured || loadingVibe || vibeError) && (
-                <div style={{ marginBottom: 16, border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'rgba(0,0,0,0.3)' }}>
+                <div style={{ marginBottom: 16, border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'var(--inset)' }}>
                   <button onClick={() => setVibeExpanded(v => !v)} style={{
                     width: '100%', padding: '10px 14px', background: 'transparent', border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
