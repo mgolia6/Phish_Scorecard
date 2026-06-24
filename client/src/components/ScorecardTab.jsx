@@ -502,9 +502,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
 
           const C = { era:'#ff6600', yr:'#00e0d0', mo:'#33ff33', dy:'#ff6600', dow:'#00e0d0' };
           const btn = (type, active, avail) => ({
-            background: active ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.14)` : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.25)` : 'rgba(255,255,255,0.08)'}`,
-            color: active ? C[type] : avail||!loaded ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)',
+            background: active ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.14)` : 'rgba(var(--ink-rgb),0.03)',
+            border: `1px solid ${active ? C[type] : avail||!loaded ? `rgba(${type==='yr'||type==='dow'?'0,224,208':type==='mo'?'51,255,51':'255,102,0'},0.25)` : 'rgba(var(--ink-rgb),0.08)'}`,
+            color: active ? C[type] : avail||!loaded ? 'rgba(var(--ink-rgb),0.7)' : 'rgba(var(--ink-rgb),0.18)',
             fontFamily: 'var(--font-display)', cursor: 'pointer', textAlign: 'center',
             fontSize: '0.66rem', letterSpacing: '0.5px', padding: '5px 2px',
             boxShadow: active ? `0 0 5px ${C[type]}44` : 'none', transition: 'all 0.1s',
@@ -528,9 +528,9 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                       const active = selectedEra===era.v;
                       return (
                         <button key={era.v} onClick={() => { setSelectedEra(active?'':era.v);setSelectedYear('');setSelectedMonth('');setSelectedDay('');setSelectedDow('');setCurrentShow(null);setSongs([]); }} style={{
-                          background: active?'rgba(var(--orange-rgb),0.14)':'rgba(255,255,255,0.03)',
-                          border:`2px solid ${active?'#ff6600':'rgba(255,255,255,0.1)'}`,
-                          color: active?'#ff6600':'rgba(255,255,255,0.65)',
+                          background: active?'rgba(var(--orange-rgb),0.14)':'rgba(var(--ink-rgb),0.03)',
+                          border:`2px solid ${active?'#ff6600':'rgba(var(--ink-rgb),0.1)'}`,
+                          color: active?'#ff6600':'rgba(var(--ink-rgb),0.65)',
                           fontFamily:'var(--font-display)', cursor:'pointer',
                           padding:'12px 14px', textAlign:'center',
                           boxShadow:active?'0 0 16px rgba(var(--orange-rgb),0.3)':'none',
@@ -783,7 +783,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     padding: '10px 8px', textAlign: 'center',
                   }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: stat.color, lineHeight: 1, marginBottom: 4, textShadow: `0 0 12px ${stat.color}` }}>{stat.value}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--ink-rgb),0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
                   </div>
                 ))}
               </div>

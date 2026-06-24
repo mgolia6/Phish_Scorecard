@@ -628,7 +628,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                       <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
                     </div>
                     {isOpen && (
-                      <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(var(--green-rgb),0.06)` }}>
+                      <div style={{ background: 'var(--inset)', borderBottom: `1px solid rgba(var(--green-rgb),0.06)` }}>
                         <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px' }}>
                           TOP 5 VERSIONS YOU'VE SEEN
                         </div>
@@ -825,7 +825,7 @@ export function DeepPhreezeTab({ api, showMessage, showError, onOpenScorecard })
                         <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, flexShrink: 0 }}>{isOpen ? '▲' : '▼'}</div>
                       </div>
                       {isOpen && (
-                        <div style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid rgba(var(--green-rgb),0.06)` }}>
+                        <div style={{ background: 'var(--inset)', borderBottom: `1px solid rgba(var(--green-rgb),0.06)` }}>
                           <div style={{ padding: '8px 14px 4px', fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px' }}>
                             YOUR TOP VERSIONS
                           </div>

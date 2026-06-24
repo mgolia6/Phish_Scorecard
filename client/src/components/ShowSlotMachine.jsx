@@ -31,8 +31,8 @@ function Reel({ values, spinning, locked, lockedValue, direction = 1, color = 'v
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       overflow: 'hidden', height: 120, position: 'relative',
-      borderLeft: locked ? `2px solid ${color}` : '2px solid rgba(255,255,255,0.06)',
-      borderRight: locked ? `2px solid ${color}` : '2px solid rgba(255,255,255,0.06)',
+      borderLeft: locked ? `2px solid ${color}` : '2px solid rgba(var(--ink-rgb),0.06)',
+      borderRight: locked ? `2px solid ${color}` : '2px solid rgba(var(--ink-rgb),0.06)',
       transition: 'border-color 0.3s',
       flex: 1,
     }}>
@@ -41,12 +41,12 @@ function Reel({ values, spinning, locked, lockedValue, direction = 1, color = 'v
       {/* bottom fade */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 36, background: 'linear-gradient(to top, rgba(0,0,0,0.95), transparent)', zIndex: 2, pointerEvents: 'none' }} />
       {/* center highlight */}
-      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 40, transform: 'translateY(-50%)', background: locked ? `rgba(${color === 'var(--cyan)' ? '0,224,208' : color === 'var(--orange)' ? '255,102,0' : '51,255,51'},0.08)` : 'rgba(255,255,255,0.03)', borderTop: `1px solid ${locked ? color : 'rgba(255,255,255,0.06)'}`, borderBottom: `1px solid ${locked ? color : 'rgba(255,255,255,0.06)'}`, zIndex: 1, pointerEvents: 'none', transition: 'all 0.3s' }} />
+      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 40, transform: 'translateY(-50%)', background: locked ? `rgba(${color === 'var(--cyan)' ? '0,224,208' : color === 'var(--orange)' ? '255,102,0' : '51,255,51'},0.08)` : 'rgba(var(--ink-rgb),0.03)', borderTop: `1px solid ${locked ? color : 'rgba(var(--ink-rgb),0.06)'}`, borderBottom: `1px solid ${locked ? color : 'rgba(var(--ink-rgb),0.06)'}`, zIndex: 1, pointerEvents: 'none', transition: 'all 0.3s' }} />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 0 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)', letterSpacing: '2px', height: 40, display: 'flex', alignItems: 'center' }}>{prev}</div>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: locked ? '1.1rem' : '0.95rem', color: locked ? color : 'rgba(255,255,255,0.55)', letterSpacing: '3px', height: 40, display: 'flex', alignItems: 'center', transition: 'all 0.2s', textShadow: locked ? `0 0 20px ${color}` : 'none' }}>{curr}</div>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)', letterSpacing: '2px', height: 40, display: 'flex', alignItems: 'center' }}>{next}</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'rgba(var(--ink-rgb),0.18)', letterSpacing: '2px', height: 40, display: 'flex', alignItems: 'center' }}>{prev}</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: locked ? '1.1rem' : '0.95rem', color: locked ? color : 'rgba(var(--ink-rgb),0.55)', letterSpacing: '3px', height: 40, display: 'flex', alignItems: 'center', transition: 'all 0.2s', textShadow: locked ? `0 0 20px ${color}` : 'none' }}>{curr}</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'rgba(var(--ink-rgb),0.18)', letterSpacing: '2px', height: 40, display: 'flex', alignItems: 'center' }}>{next}</div>
       </div>
 
       {locked && (
@@ -141,8 +141,8 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
           {/* Reels */}
           <div style={{
             display: 'flex', gap: 0, width: '100%', maxWidth: 400,
-            border: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(0,0,0,0.6)',
+            border: '1px solid rgba(var(--ink-rgb),0.08)',
+            background: 'var(--inset-xstrong)',
             boxShadow: isSpinning ? '0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5)' : '0 0 20px rgba(var(--green-rgb),0.1)',
           }}>
             <Reel
@@ -154,7 +154,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
               color="var(--orange)"
               speed={45}
             />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+            <div style={{ width: 1, background: 'rgba(var(--ink-rgb),0.06)', flexShrink: 0 }} />
             <Reel
               values={MONTHS}
               spinning={isSpinning}
@@ -164,7 +164,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
               color="var(--cyan)"
               speed={55}
             />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+            <div style={{ width: 1, background: 'rgba(var(--ink-rgb),0.06)', flexShrink: 0 }} />
             <Reel
               values={DAYS}
               spinning={isSpinning && phase !== 'year-locked' ? true : phase === 'month-locked' || isSpinning}

@@ -48,7 +48,7 @@ export function Heatmap({ data, title }) {
       <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
         {[['rgba(var(--orange-rgb),0.9)','4.7+'],['rgba(var(--orange-bright-rgb),0.75)','4.4+'],['rgba(0,200,200,0.75)','4.1+'],['rgba(0,180,180,0.45)','3.8+'],['rgba(var(--green-rgb),0.22)','<3.8'],['rgba(var(--green-rgb),0.08)','N/A']].map(([col,lbl]) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 10, height: 10, background: col, border: '1px solid rgba(255,255,255,0.15)' }} />
+            <div style={{ width: 10, height: 10, background: col, border: '1px solid rgba(var(--ink-rgb),0.15)' }} />
             <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-label)', letterSpacing: '1px' }}>{lbl}</span>
           </div>
         ))}

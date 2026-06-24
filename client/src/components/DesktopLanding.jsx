@@ -30,7 +30,7 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
           <div key={label} onClick={action} style={{
             padding: '28px 20px 22px', cursor: 'pointer',
             border: `1px solid ${color === 'var(--orange)' ? 'rgba(var(--orange-rgb),0.2)' : color === 'var(--cyan)' ? 'rgba(var(--cyan-rgb),0.2)' : 'rgba(var(--green-rgb),0.2)'}`,
-            background: 'rgba(255,255,255,0.02)',
+            background: 'rgba(var(--ink-rgb),0.02)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
             transition: 'all 0.2s',
           }}
@@ -39,13 +39,13 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+            e.currentTarget.style.background = 'rgba(var(--ink-rgb),0.02)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
           >
             <div style={{ fontSize: '2.2rem', color, textShadow: `0 0 16px ${color}` }}>{glyph}</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.72rem', color, letterSpacing: '2.5px' }}>{label}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{sub}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'rgba(var(--ink-rgb),0.5)', lineHeight: 1.6 }}>{sub}</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color, letterSpacing: '2px', marginTop: 4, opacity: 0.7 }}>{cta}</div>
           </div>
         ))}

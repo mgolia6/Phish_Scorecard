@@ -94,7 +94,7 @@ export function TourGuide({ onComplete }) {
       <div style={{
         width: '100%', maxWidth: 400,
         background: '#0d0d0d',
-        border: '1px solid rgba(255,255,255,0.07)',
+        border: '1px solid rgba(var(--ink-rgb),0.07)',
         borderTop: `2px solid ${step.glyphColor}`,
         display: 'flex', flexDirection: 'column',
         boxShadow: `0 0 48px ${step.glyphColor}18`,
@@ -106,7 +106,7 @@ export function TourGuide({ onComplete }) {
         <div style={{
           padding: '28px 24px 20px',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          background: 'rgba(0,0,0,0.3)',
+          background: 'var(--inset)',
           borderBottom: `1px solid ${step.glyphColor}22`,
         }}>
           <div style={{
@@ -144,7 +144,7 @@ export function TourGuide({ onComplete }) {
           <p style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '0.76rem',
-            color: 'rgba(255,255,255,0.58)',
+            color: 'rgba(var(--ink-rgb),0.58)',
             lineHeight: 1.85,
             margin: 0,
             whiteSpace: 'pre-line',
@@ -163,7 +163,7 @@ export function TourGuide({ onComplete }) {
               width: i === stepIdx ? 18 : 6,
               height: 6,
               borderRadius: 3,
-              background: i === stepIdx ? step.glyphColor : 'rgba(255,255,255,0.12)',
+              background: i === stepIdx ? step.glyphColor : 'rgba(var(--ink-rgb),0.12)',
               transition: 'all 0.25s',
             }} />
           ))}
@@ -176,8 +176,8 @@ export function TourGuide({ onComplete }) {
               onClick={handleSkip}
               style={{
                 fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px',
-                color: 'rgba(255,255,255,0.18)', background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
+                color: 'rgba(var(--ink-rgb),0.18)', background: 'transparent',
+                border: '1px solid rgba(var(--ink-rgb),0.08)', cursor: 'pointer',
                 padding: '11px 14px', whiteSpace: 'nowrap',
               }}
             >

@@ -27,7 +27,7 @@ export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', 
           {extraStats.length > 0 && (
             <div className="desktop-card-stats">
               {extraStats.map((s, i) => (
-                <div key={i} style={{ textAlign: 'center', padding: '0 12px', borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={i} style={{ textAlign: 'center', padding: '0 12px', borderLeft: '1px solid rgba(var(--ink-rgb),0.06)' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', color: s.color || 'var(--green)', lineHeight: 1 }}>{s.value}</div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{s.label}</div>
                 </div>
@@ -64,7 +64,7 @@ function UserDelta({ userScore, communityAvg, label = 'YOUR SCORE' }) {
   const sign = delta > 0 ? '+' : '';
   const color = delta > 0.2 ? 'var(--orange)' : delta < -0.2 ? 'rgba(255,51,51,0.8)' : 'var(--green)';
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(0,0,0,0.3)', border: `1px solid ${color}33`, marginBottom: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--inset)', border: `1px solid ${color}33`, marginBottom: 10 }}>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>{label}</div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color, letterSpacing: 1 }}>{parseFloat(userScore).toFixed(2)}</div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color, letterSpacing: '1.5px' }}>{sign}{delta} VS COMMUNITY</div>
@@ -191,7 +191,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:400, gap:24, textAlign:'center', padding:'40px 24px' }}>
         <div style={{ fontSize:'4rem', color:'var(--cyan)', textShadow:'0 0 30px rgba(var(--cyan-rgb),0.5)' }}>⚇</div>
         <div style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', color:'var(--cyan)', letterSpacing:'4px', textShadow:'0 0 20px rgba(var(--cyan-rgb),0.4)' }}>PHRIEND OVERLAP</div>
-        <div style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', color:'rgba(255,255,255,0.5)', letterSpacing:'2px', lineHeight:2, maxWidth:420 }}>
+        <div style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', color:'rgba(var(--ink-rgb),0.5)', letterSpacing:'2px', lineHeight:2, maxWidth:420 }}>
           Find out who you shared a setlist with — intentionally or not.<br/>
           40 years of shows. Countless accidental reunions waiting to be discovered.
         </div>
@@ -199,7 +199,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
           <button onClick={() => onLogin('signup')} style={{ fontFamily:'var(--font-display)', fontSize:'0.72rem', letterSpacing:'2.5px', padding:'14px 36px', background:'transparent', border:'1px solid var(--orange)', color:'var(--orange)', cursor:'pointer', boxShadow:'0 0 16px rgba(var(--orange-rgb),0.25)' }}>+ CREATE ACCOUNT</button>
           <button onClick={() => onLogin('login')} style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', letterSpacing:'2px', padding:'12px 24px', background:'transparent', border:'1px solid rgba(var(--green-rgb),0.25)', color:'rgba(var(--green-rgb),0.6)', cursor:'pointer' }}>→ LOGIN</button>
         </div>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:'rgba(255,255,255,0.2)', letterSpacing:'1.5px', marginTop:8 }}>FREE · NO CREDIT CARD · JUST A USERNAME</div>
+        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:'rgba(var(--ink-rgb),0.2)', letterSpacing:'1.5px', marginTop:8 }}>FREE · NO CREDIT CARD · JUST A USERNAME</div>
       </div>
     );
   }
@@ -275,7 +275,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
           <input value={input} onChange={e => handleInputChange(e.target.value)} onFocus={() => setDropdownOpen(true)} onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
             onKeyDown={e => { if (e.key === 'Enter' && input.trim()) { setDropdownOpen(false); runSearch(input.trim()); } if (e.key === 'Escape') setDropdownOpen(false); }}
             placeholder="type a username or tap a phriend below..."
-            style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: dropdownOpen ? '1px solid rgba(var(--orange-bright-rgb),0.6)' : '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '10px 12px', outline: 'none' }} />
+            style={{ flex: 1, background: 'var(--inset-strong)', border: dropdownOpen ? '1px solid rgba(var(--orange-bright-rgb),0.6)' : '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '10px 12px', outline: 'none' }} />
           <button onClick={() => { setDropdownOpen(false); runSearch(input.trim()); }} disabled={loading || !input.trim()}
             style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '10px 14px', cursor: 'pointer', opacity: (loading || !input.trim()) ? 0.4 : 1, background: 'transparent' }}>
             {loading ? '...' : 'SCAN'}
@@ -286,7 +286,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
             {!input.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(var(--orange-bright-rgb),0.45)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
             {dropdownItems.map((item, i) => (
               <div key={item.username} onMouseDown={() => selectUser(item.username)}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(var(--ink-rgb),0.04)' : 'none', cursor: 'pointer' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--orange-bright-rgb),0.07)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{item.username.slice(0, 2).toUpperCase()}</div>
@@ -341,7 +341,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 2px 8px', marginBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 2px 8px', marginBottom: 4, borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
             <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-muted)' }}>SHOW</span>
             <div style={{ display: 'flex', gap: 12 }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', color: 'var(--cyan)' }}>YOU</span>

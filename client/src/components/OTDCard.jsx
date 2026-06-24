@@ -132,7 +132,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
       {/* ── Expanded ── */}
       {expanded && (
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(var(--cyan-rgb),0.1)', background: 'rgba(0,0,0,0.3)' }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(var(--cyan-rgb),0.1)', background: 'var(--inset)' }}>
           {loadingReviews ? (
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '12px 0' }}>
               PULLING REVIEWS...

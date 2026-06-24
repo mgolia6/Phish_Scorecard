@@ -43,16 +43,16 @@ function ReplyRow({ reply }) {
   const [upped, setUpped] = useState(reply.user_reacted);
   const [upCount, setUpCount] = useState(reply.up_count || 0);
   return (
-    <div style={{ display: 'flex', gap: 10, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <div style={{ display: 'flex', gap: 10, padding: '10px 0', borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
       <FeedAvatar initials={reply.username} size={28} color="rgba(var(--green-rgb),0.7)" />
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--green)' }}>{reply.username}</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)' }}>{timeAgo(reply.created_at)}</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.25)' }}>{timeAgo(reply.created_at)}</span>
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1.65 }}>{reply.body}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'rgba(var(--ink-rgb),0.75)', lineHeight: 1.65 }}>{reply.body}</div>
         <button onClick={() => { setUpped(u => !u); setUpCount(c => upped ? c - 1 : c + 1); }}
-          style={{ marginTop: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? 'var(--green)' : 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', gap: 4 }}>
+          style={{ marginTop: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? 'var(--green)' : 'rgba(var(--ink-rgb),0.2)', display: 'flex', alignItems: 'center', gap: 4 }}>
           ▲ {upCount}
         </button>
       </div>
@@ -107,7 +107,7 @@ function PostCard({ post, api, currentUser }) {
 
   return (
     <div style={{
-      border: '1px solid rgba(255,255,255,0.06)',
+      border: '1px solid rgba(var(--ink-rgb),0.06)',
       borderLeft: post.pinned ? '3px solid var(--orange)' : `3px solid ${color}`,
       background: post.pinned ? 'rgba(var(--orange-rgb),0.03)' : 'var(--bg-panel)',
       marginBottom: 10,
@@ -124,11 +124,11 @@ function PostCard({ post, api, currentUser }) {
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: nameColor, fontWeight: post.author_label ? 700 : 400 }}>{name}</span>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '2px 6px', border: `1px solid ${color}44`, color }}>{post.category}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)', marginLeft: 'auto' }}>{timeAgo(post.created_at)}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.25)', marginLeft: 'auto' }}>{timeAgo(post.created_at)}</span>
             </div>
 
             {/* Body with truncation */}
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.7, marginBottom: isTruncatable ? 4 : 12 }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(var(--ink-rgb),0.8)', lineHeight: 1.7, marginBottom: isTruncatable ? 4 : 12 }}>
               {displayBody}
             </div>
             {isTruncatable && (
@@ -144,10 +144,10 @@ function PostCard({ post, api, currentUser }) {
         </div>
 
         {/* Action row */}
-        <div style={{ display: 'flex', gap: 16, paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.05)', marginLeft: 46 }}>
-          <button onClick={handleReact} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>▲ {upCount}</button>
-          <button onClick={handleExpand} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: expanded ? color : 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>◈ {replyCount} {replyCount === 1 ? 'REPLY' : 'REPLIES'}</button>
-          <button onClick={() => { setShowReplyBox(r => !r); if (!expanded) { setExpanded(true); loadReplies(); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: showReplyBox ? color : 'rgba(255,255,255,0.35)' }}>+ REPLY</button>
+        <div style={{ display: 'flex', gap: 16, paddingBottom: 10, borderBottom: '1px solid rgba(var(--ink-rgb),0.05)', marginLeft: 46 }}>
+          <button onClick={handleReact} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: upped ? color : 'rgba(var(--ink-rgb),0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>▲ {upCount}</button>
+          <button onClick={handleExpand} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: expanded ? color : 'rgba(var(--ink-rgb),0.35)', display: 'flex', alignItems: 'center', gap: 5 }}>◈ {replyCount} {replyCount === 1 ? 'REPLY' : 'REPLIES'}</button>
+          <button onClick={() => { setShowReplyBox(r => !r); if (!expanded) { setExpanded(true); loadReplies(); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: showReplyBox ? color : 'rgba(var(--ink-rgb),0.35)' }}>+ REPLY</button>
         </div>
       </div>
 
@@ -158,11 +158,11 @@ function PostCard({ post, api, currentUser }) {
           {showReplyBox && currentUser && (
             <div style={{ padding: '12px 0' }}>
               <textarea value={replyText} onChange={e => setReplyText(e.target.value.slice(0, 500))} placeholder="add a reply..." rows={2} autoFocus
-                style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}44`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', resize: 'none', outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', background: 'var(--inset-strong)', border: `1px solid ${color}44`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', resize: 'none', outline: 'none', boxSizing: 'border-box' }} />
               <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
                 <button onClick={handleReply} disabled={!replyText.trim() || replySubmitting}
                   style={{ background: `${color}11`, border: `1px solid ${color}44`, color, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 14px', cursor: 'pointer', opacity: (!replyText.trim() || replySubmitting) ? 0.4 : 1 }}>{replySubmitting ? '...' : 'POST'}</button>
-                <button onClick={() => setShowReplyBox(false)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
+                <button onClick={() => setShowReplyBox(false)} style={{ background: 'none', border: '1px solid rgba(var(--ink-rgb),0.1)', color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
               </div>
             </div>
           )}
@@ -228,15 +228,15 @@ function NewPostBox({ api, onPosted, currentUser }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCategory(c)}
-            style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '3px 8px', border: `1px solid ${c === category ? categoryColor(c) + '88' : 'rgba(255,255,255,0.1)'}`, color: c === category ? categoryColor(c) : 'rgba(255,255,255,0.3)', background: c === category ? `${categoryColor(c)}0d` : 'transparent', cursor: 'pointer' }}>{c}</button>
+            style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '3px 8px', border: `1px solid ${c === category ? categoryColor(c) + '88' : 'rgba(var(--ink-rgb),0.1)'}`, color: c === category ? categoryColor(c) : 'rgba(var(--ink-rgb),0.3)', background: c === category ? `${categoryColor(c)}0d` : 'transparent', cursor: 'pointer' }}>{c}</button>
         ))}
       </div>
       <textarea value={body} onChange={e => setBody(e.target.value.slice(0, 1000))} placeholder="what's on your mind, phan?" rows={3} autoFocus
-        style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}33`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', padding: '10px 12px', resize: 'none', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
+        style={{ width: '100%', background: 'var(--inset-strong)', border: `1px solid ${color}33`, color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', padding: '10px 12px', resize: 'none', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
       <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>{body.length}/1000</span>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => { setOpen(false); setBody(''); }} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
+          <button onClick={() => { setOpen(false); setBody(''); }} style={{ background: 'none', border: '1px solid rgba(var(--ink-rgb),0.1)', color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer' }}>CANCEL</button>
           <button onClick={handleSubmit} disabled={!body.trim() || submitting}
             style={{ background: `${color}11`, border: `1px solid ${color}55`, color, fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '6px 18px', cursor: 'pointer', opacity: (!body.trim() || submitting) ? 0.4 : 1 }}>{submitting ? '...' : '◈ POST'}</button>
         </div>

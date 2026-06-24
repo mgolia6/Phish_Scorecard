@@ -115,7 +115,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
       </div>
 
       <div style={{ padding: '8px 14px', borderTop: '1px solid rgba(var(--orange-rgb),0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(var(--orange-rgb),0.04)' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(var(--ink-rgb),0.45)', lineHeight: 1.4 }}>
           Conversations logged anonymously.{' '}
           <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'var(--green)' : 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline', fontWeight: optOut ? 700 : 400 }}>
             {optOut ? '✓ Opted out' : 'Opt out'}
@@ -220,7 +220,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
         <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
       </div>
 
-      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'calc(72vh - 72px + 72px)', zIndex: 998, background: 'rgba(0,0,0,0.4)' }} />}
+      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'calc(72vh - 72px + 72px)', zIndex: 998, background: 'var(--inset-md)' }} />}
     </>
   );
 }

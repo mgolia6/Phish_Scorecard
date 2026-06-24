@@ -204,7 +204,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
       {/* ── ACTION BAR — always visible ── */}
       <div style={{ display: 'flex', borderTop: '1px solid rgba(var(--green-rgb),0.08)' }}>
         <button onClick={onFavorite}
-          style={{ padding: '11px 14px', background: show.favorited ? 'rgba(var(--orange-rgb),0.08)' : 'transparent', border: 'none', borderRight: '1px solid rgba(var(--green-rgb),0.08)', color: show.favorited ? 'var(--orange)' : 'rgba(255,255,255,0.4)', fontSize: '1.2rem', lineHeight: 1, cursor: 'pointer', filter: show.favorited ? 'drop-shadow(0 0 6px rgba(var(--orange-rgb),0.7))' : 'none', flexShrink: 0 }}>
+          style={{ padding: '11px 14px', background: show.favorited ? 'rgba(var(--orange-rgb),0.08)' : 'transparent', border: 'none', borderRight: '1px solid rgba(var(--green-rgb),0.08)', color: show.favorited ? 'var(--orange)' : 'rgba(var(--ink-rgb),0.4)', fontSize: '1.2rem', lineHeight: 1, cursor: 'pointer', filter: show.favorited ? 'drop-shadow(0 0 6px rgba(var(--orange-rgb),0.7))' : 'none', flexShrink: 0 }}>
           {show.favorited ? '★' : '☆'}
         </button>
         <button onClick={() => onRateShow(show.show_date)}

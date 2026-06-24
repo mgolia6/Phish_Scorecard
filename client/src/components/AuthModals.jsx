@@ -53,7 +53,7 @@ export function TandCModal({ onAccept }) {
             style={{
               background: 'transparent', border: 'none', cursor: 'pointer',
               fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
-              color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', textDecoration: 'underline', padding: 0,
+              color: 'rgba(var(--ink-rgb),0.2)', letterSpacing: '1px', textDecoration: 'underline', padding: 0,
             }}
           >
             Privacy Policy
