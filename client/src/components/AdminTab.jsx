@@ -634,6 +634,43 @@ function FeedbackTab({ api }) {
 }
 
 // ── Users Tab (existing, extracted) ───────────────────────
+// Per-user quick email send (used inside each user card)
+function UserEmailNudge({ userId, username }) {
+  const [type, setType] = useState('rating_reminder');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(null);
+
+  const send = async () => {
+    setBusy(true); setDone(null);
+    try {
+      const token = localStorage.getItem('phish_token');
+      const r = await fetch('/api/admin/send-email', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'one', userId, type }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Send failed');
+      setDone('ok');
+    } catch (e) { setDone('err:' + e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      <select value={type} onChange={e => setType(e.target.value)} style={{ flex: 1, minWidth: 150, background: 'var(--bg-elevated)', border: '1px solid rgba(51,255,51,0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.74rem', padding: '8px 10px', outline: 'none' }}>
+        {EMAIL_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+      </select>
+      <button onClick={send} disabled={busy}
+        style={{ fontFamily: D.disp, fontSize: '0.64rem', letterSpacing: '1.5px', padding: '9px 14px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.5 : 1 }}>
+        {busy ? '…' : '✉ SEND'}
+      </button>
+      {done === 'ok' && <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.green }}>✓ sent</span>}
+      {done?.startsWith('err') && <span style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.red }}>{done.slice(4)}</span>}
+    </div>
+  );
+}
+
 function UsersTab({ api, showError }) {
   const [expanded, setExpanded] = React.useState(null);
   const [users, setUsers] = useState([]);
@@ -752,19 +789,21 @@ function UsersTab({ api, showError }) {
                   {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(0,224,208,0.4)', padding: '2px 6px' }}>ADMIN</span>}
                 </div>
                 <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.muted, marginTop: 3 }}>{u.email}</div>
-                {/* Mini stat pills — always visible */}
-                <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
-                  {[
-                    { val: u.shows_attended, lbl: 'ATT', col: D.cyan },
-                    { val: u.shows_rated,    lbl: 'RATED', col: D.orange },
-                    { val: u.reviews,        lbl: 'REV', col: D.green },
-                  ].map(({ val, lbl, col }) => (
-                    <span key={lbl} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: col }}>
-                      <span style={{ fontFamily: D.disp, fontSize: '0.9rem' }}>{val}</span>
-                      <span style={{ color: D.muted, fontSize: '0.64rem', marginLeft: 3 }}>{lbl}</span>
-                    </span>
-                  ))}
-                </div>
+                {/* Mini stat pills — collapsed only (full grid shows when expanded) */}
+                {expanded !== u.id && (
+                  <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+                    {[
+                      { val: u.shows_attended, lbl: 'ATT', col: D.cyan },
+                      { val: u.shows_rated,    lbl: 'RATED', col: D.orange },
+                      { val: u.reviews,        lbl: 'REV', col: D.green },
+                    ].map(({ val, lbl, col }) => (
+                      <span key={lbl} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: col }}>
+                        <span style={{ fontFamily: D.disp, fontSize: '0.9rem' }}>{val}</span>
+                        <span style={{ color: D.muted, fontSize: '0.64rem', marginLeft: 3 }}>{lbl}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                 <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{u.joined}</span>
@@ -796,33 +835,28 @@ function UsersTab({ api, showError }) {
                   <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.muted }}>CLAUDE AI COST</span>
                   <span style={{ fontFamily: D.mono, fontSize: '0.85rem', color: D.orange }}>${Number(u.ai_cost_usd || 0).toFixed(4)}</span>
                 </div>
-                {/* Actions */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '12px 16px' }}>
+                {/* Email nudge */}
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(51,255,51,0.08)' }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SEND EMAIL</div>
+                  <UserEmailNudge userId={u.id} username={u.username} />
+                </div>
+                {/* Management actions — tidy 2-col grid, destructive last */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '12px 16px' }}>
                   {[
-                    { label: 'RESET ONBOARDING', action: 'reset-onboarding', col: D.cyan },
-                    { label: 'RESET TOUR',       action: 'reset-tour',       col: D.cyan },
-                    { label: 'RESET PASSWORD',   action: 'reset-password',   col: D.label },
-                    { label: 'CLEAR DATA',       action: 'clear-data',       col: D.orange },
-                  ].map(({ label, action, col }) => (
+                    { label: 'RESET ONBOARDING', action: 'reset-onboarding', col: D.cyan,  confirm: true },
+                    { label: 'RESET TOUR',       action: 'reset-tour',       col: D.cyan,  confirm: false },
+                    { label: 'RESET PASSWORD',   action: 'reset-password',   col: D.label, confirm: false },
+                    ...(!u.email_verified ? [{ label: 'RESEND VERIFY', action: 'resend-verify', col: D.cyan, confirm: false }] : []),
+                    { label: 'CLEAR DATA',       action: 'clear-data',       col: D.orange, confirm: true },
+                    ...(!u.is_admin ? [{ label: 'DELETE USER', action: 'delete', col: D.red, confirm: true }] : []),
+                  ].map(({ label, action, col, confirm }) => (
                     <button key={action}
-                      onClick={() => (action === 'reset-password' || action === 'reset-tour') ? doAction(u.id, action) : setConfirming({ userId: u.id, username: u.username, action })}
+                      onClick={() => confirm ? setConfirming({ userId: u.id, username: u.username, action }) : doAction(u.id, action)}
                       disabled={!!working}
-                      style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: 'pointer' }}>
-                      {working === `${u.id}-${action}` ? 'WORKING...' : label}
+                      style={{ width: '100%', fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '11px 8px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: working ? 'default' : 'pointer', textAlign: 'center' }}>
+                      {working === `${u.id}-${action}` ? '…' : label}
                     </button>
                   ))}
-                  {!u.email_verified && (
-                    <button onClick={() => doAction(u.id, 'resend-verify')} disabled={!!working}
-                      style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>
-                      {working === `${u.id}-resend-verify` ? 'SENDING...' : 'RESEND VERIFY'}
-                    </button>
-                  )}
-                  {!u.is_admin && (
-                    <button onClick={() => setConfirming({ userId: u.id, username: u.username, action: 'delete' })} disabled={!!working}
-                      style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '1.5px', padding: '10px 16px', border: `1px solid ${D.red}55`, background: 'transparent', color: D.red, cursor: 'pointer' }}>
-                      DELETE USER
-                    </button>
-                  )}
                 </div>
               </div>
             )}
