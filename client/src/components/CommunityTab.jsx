@@ -282,8 +282,8 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
           </button>
         </div>
         {showDropdown && (
-          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#0d0d0d', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', borderTop: 'none', zIndex: 100, maxHeight: 260, overflowY: 'auto' }}>
-            {!input.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(var(--orange-bright-rgb),0.45)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-elevated)', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', borderTop: 'none', zIndex: 100, maxHeight: 260, overflowY: 'auto' }}>
+            {!input.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(var(--orange-bright-rgb),0.75)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
             {dropdownItems.map((item, i) => (
               <div key={item.username} onMouseDown={() => selectUser(item.username)}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(var(--ink-rgb),0.04)' : 'none', cursor: 'pointer' }}
@@ -292,7 +292,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
                 <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{item.username.slice(0, 2).toUpperCase()}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.username}</div>
-                  {item.sub && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{item.sub.toUpperCase()}</div>}
+                  {item.sub && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.78)', letterSpacing: '1.5px', marginTop: 2 }}>{item.sub.toUpperCase()}</div>}
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px', flexShrink: 0 }}>▶</div>
               </div>
@@ -303,11 +303,11 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
 
       {!result && !loading && !error && !dropdownOpen && !input.trim() && (
         <div style={{ marginTop: 14 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.35)', letterSpacing: '2px', marginBottom: 10 }}>PHRIENDS WHO WERE THERE</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.75)', letterSpacing: '2px', marginBottom: 10 }}>PHRIENDS WHO WERE THERE</div>
           {suggestionsLoading ? (
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', padding: '16px 0' }}>scanning your shows...</div>
           ) : suggestions.length === 0 ? (
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>NO OTHER USERS SHARE YOUR ATTENDED SHOWS YET<br/><span style={{ color: 'rgba(var(--orange-bright-rgb),0.35)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span></div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>NO OTHER USERS SHARE YOUR ATTENDED SHOWS YET<br/><span style={{ color: 'rgba(var(--orange-bright-rgb),0.65)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span></div>
           ) : (
             suggestions.map(s => (
               <div key={s.username} onClick={() => selectUser(s.username)}
@@ -315,7 +315,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
                 <div style={{ width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{s.username.slice(0, 2).toUpperCase()}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--white)' }}>{s.username}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.8)', letterSpacing: '1.5px', marginTop: 2 }}>{s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}</div>
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px' }}>SCAN ▶</div>
               </div>
