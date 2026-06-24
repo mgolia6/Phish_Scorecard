@@ -3,21 +3,21 @@ import React, { useState, useEffect, useRef } from 'react';
 const SNOWFLAKES = ['❄','❅','❆'];
 
 const BADGE_CONFIG = {
-  phab_phive:  { icon: 'snowflake', glyph: null,  color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.8)',  sub: 'ONE OF THE FIRST FIVE',   pulse: true },
-  early_phreeze:{ icon: 'snowflake', glyph: null,  color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.7)',  sub: 'FOUNDER — TOP 20',         pulse: false },
-  ten:         { icon: 'glyph',     glyph: '◈',   color: 'var(--green)',  shadow: 'rgba(51,255,51,0.8)',  sub: '10 SHOWS ATTENDED',        pulse: false },
-  quarter:     { icon: 'glyph',     glyph: '⬡',   color: 'var(--green)',  shadow: 'rgba(51,255,51,0.8)',  sub: '25 SHOWS ATTENDED',        pulse: false },
-  fifty:       { icon: 'glyph',     glyph: '⬢',   color: 'var(--green)',  shadow: 'rgba(51,255,51,0.9)',  sub: '50 SHOWS ATTENDED',        pulse: true  },
-  century:     { icon: 'emoji',     glyph: '💯',   color: 'var(--orange)', shadow: 'rgba(255,102,0,0.9)',  sub: '100 SHOWS ATTENDED',       pulse: true  },
-  rated_1:     { icon: 'glyph',     glyph: '①',   color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.9)',  sub: 'FIRST SHOW RATED',         pulse: true  },
-  rated_10:    { icon: 'glyph',     glyph: '✦',   color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.8)',  sub: '10 SHOWS RATED',           pulse: false },
-  rated_25:    { icon: 'glyph',     glyph: '◆',   color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.8)',  sub: '25 SHOWS RATED',           pulse: false },
-  rated_50:    { icon: 'glyph',     glyph: '◈',   color: 'var(--cyan)',   shadow: 'rgba(0,224,208,0.9)',  sub: '50 SHOWS RATED',           pulse: true  },
-  rated_100:   { icon: 'glyph',     glyph: '★',   color: 'var(--orange)', shadow: 'rgba(255,102,0,1)',    sub: '100 SHOWS RATED',          pulse: true  },
-  critic:      { icon: 'glyph',     glyph: '✍',   color: 'var(--orange)', shadow: 'rgba(255,102,0,0.8)',  sub: 'PHISH.NET REVIEWER',       pulse: false },
-  streak_7:    { icon: 'glyph',     glyph: '⚡',   color: 'var(--green)',  shadow: 'rgba(51,255,51,0.8)',  sub: '7 DAY LOGIN STREAK',       pulse: false },
-  streak_30:   { icon: 'glyph',     glyph: '⚡',   color: 'var(--orange)', shadow: 'rgba(255,102,0,1)',    sub: '30 DAY LOGIN STREAK',      pulse: true  },
-  first_bug:   { icon: 'emoji',     glyph: '🐛',   color: 'var(--orange)', shadow: 'rgba(255,102,0,0.9)',  sub: 'IT DOES MATTER',           pulse: true  },
+  phab_phive:  { icon: 'snowflake', glyph: null,  color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.8)',  sub: 'ONE OF THE FIRST FIVE',   pulse: true },
+  early_phreeze:{ icon: 'snowflake', glyph: null,  color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.7)',  sub: 'FOUNDER — TOP 20',         pulse: false },
+  ten:         { icon: 'glyph',     glyph: '◈',   color: 'var(--green)',  shadow: 'rgba(var(--green-rgb),0.8)',  sub: '10 SHOWS ATTENDED',        pulse: false },
+  quarter:     { icon: 'glyph',     glyph: '⬡',   color: 'var(--green)',  shadow: 'rgba(var(--green-rgb),0.8)',  sub: '25 SHOWS ATTENDED',        pulse: false },
+  fifty:       { icon: 'glyph',     glyph: '⬢',   color: 'var(--green)',  shadow: 'rgba(var(--green-rgb),0.9)',  sub: '50 SHOWS ATTENDED',        pulse: true  },
+  century:     { icon: 'emoji',     glyph: '💯',   color: 'var(--orange)', shadow: 'rgba(var(--orange-rgb),0.9)',  sub: '100 SHOWS ATTENDED',       pulse: true  },
+  rated_1:     { icon: 'glyph',     glyph: '①',   color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.9)',  sub: 'FIRST SHOW RATED',         pulse: true  },
+  rated_10:    { icon: 'glyph',     glyph: '✦',   color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.8)',  sub: '10 SHOWS RATED',           pulse: false },
+  rated_25:    { icon: 'glyph',     glyph: '◆',   color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.8)',  sub: '25 SHOWS RATED',           pulse: false },
+  rated_50:    { icon: 'glyph',     glyph: '◈',   color: 'var(--cyan)',   shadow: 'rgba(var(--cyan-rgb),0.9)',  sub: '50 SHOWS RATED',           pulse: true  },
+  rated_100:   { icon: 'glyph',     glyph: '★',   color: 'var(--orange)', shadow: 'rgba(var(--orange-rgb),1)',    sub: '100 SHOWS RATED',          pulse: true  },
+  critic:      { icon: 'glyph',     glyph: '✍',   color: 'var(--orange)', shadow: 'rgba(var(--orange-rgb),0.8)',  sub: 'PHISH.NET REVIEWER',       pulse: false },
+  streak_7:    { icon: 'glyph',     glyph: '⚡',   color: 'var(--green)',  shadow: 'rgba(var(--green-rgb),0.8)',  sub: '7 DAY LOGIN STREAK',       pulse: false },
+  streak_30:   { icon: 'glyph',     glyph: '⚡',   color: 'var(--orange)', shadow: 'rgba(var(--orange-rgb),1)',    sub: '30 DAY LOGIN STREAK',      pulse: true  },
+  first_bug:   { icon: 'emoji',     glyph: '🐛',   color: 'var(--orange)', shadow: 'rgba(var(--orange-rgb),0.9)',  sub: 'IT DOES MATTER',           pulse: true  },
 };
 
 function Particles({ color }) {
@@ -171,7 +171,7 @@ export function BadgeCelebration({ badge, onDone }) {
         <div style={{
           position: 'absolute', bottom: 32,
           fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
-          letterSpacing: '2px', color: 'rgba(51,255,51,0.15)',
+          letterSpacing: '2px', color: 'rgba(var(--green-rgb),0.15)',
           animation: 'badgeFadeUp 0.4s 1.2s ease forwards', opacity: 0,
         }}>TAP TO CONTINUE</div>
       </div>

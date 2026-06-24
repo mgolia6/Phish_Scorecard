@@ -45,9 +45,9 @@ export function MySongsTab({ api, showMessage, showError }) {
             <div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>YOUR VERSIONS</div>
               {(s.versions || []).map((v, vi) => (
-                <div key={vi} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: vi < s.versions.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                <div key={vi} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: vi < s.versions.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
                   <a href={`https://phish.in/${v.show_date}`} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>{formatDate(v.show_date)}</div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{v.venue}</div>

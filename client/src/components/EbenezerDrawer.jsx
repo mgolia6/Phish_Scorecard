@@ -75,7 +75,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {suggestions.map((s, i) => (
                 <button key={i} onClick={() => { setInput(s); inputRef.current?.focus(); }}
-                  style={{ textAlign: 'left', padding: '8px 12px', background: 'rgba(0,224,208,0.04)', border: '1px solid rgba(0,224,208,0.2)', color: 'rgba(0,224,208,0.7)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', cursor: 'pointer', lineHeight: 1.4 }}>
+                  style={{ textAlign: 'left', padding: '8px 12px', background: 'rgba(var(--cyan-rgb),0.04)', border: '1px solid rgba(var(--cyan-rgb),0.2)', color: 'rgba(var(--cyan-rgb),0.7)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', cursor: 'pointer', lineHeight: 1.4 }}>
                   {s}
                 </button>
               ))}
@@ -85,13 +85,13 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         {history.map((msg, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
             {msg.role === 'user' ? (
-              <div style={{ maxWidth: '82%', background: 'rgba(51,255,51,0.07)', border: '1px solid rgba(51,255,51,0.2)', padding: '8px 12px', fontFamily: 'var(--font-mono)', fontSize, color: 'var(--green)', lineHeight: 1.55 }}>
+              <div style={{ maxWidth: '82%', background: 'rgba(var(--green-rgb),0.07)', border: '1px solid rgba(var(--green-rgb),0.2)', padding: '8px 12px', fontFamily: 'var(--font-mono)', fontSize, color: 'var(--green)', lineHeight: 1.55 }}>
                 {msg.content}
               </div>
             ) : (
               <div style={{ maxWidth: '95%' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize, color: 'var(--white)', lineHeight: 1.7, borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10, whiteSpace: 'pre-wrap' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize, color: 'var(--white)', lineHeight: 1.7, borderLeft: '2px solid rgba(var(--orange-rgb),0.4)', paddingLeft: 10, whiteSpace: 'pre-wrap' }}>
                   {msg.content}
                 </div>
               </div>
@@ -101,8 +101,8 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
-            <div style={{ borderLeft: '2px solid rgba(255,102,0,0.4)', paddingLeft: 10 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(255,102,0,0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
+            <div style={{ borderLeft: '2px solid rgba(var(--orange-rgb),0.4)', paddingLeft: 10 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-rgb),0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
             </div>
           </div>
         )}
@@ -114,7 +114,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
         <div ref={bottomRef} />
       </div>
 
-      <div style={{ padding: '8px 14px', borderTop: '1px solid rgba(255,102,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(255,102,0,0.04)' }}>
+      <div style={{ padding: '8px 14px', borderTop: '1px solid rgba(var(--orange-rgb),0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(var(--orange-rgb),0.04)' }}>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
           Conversations logged anonymously.{' '}
           <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'var(--green)' : 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline', fontWeight: optOut ? 700 : 400 }}>
@@ -122,12 +122,12 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           </button>
         </div>
         {history.length > 0 && (
-          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.6)', padding: '5px 12px', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10, fontWeight: 700 }}>↓ EXPORT</button>
+          <button onClick={() => exportConversation(history)} style={{ background: 'rgba(var(--orange-rgb),0.15)', border: '1px solid rgba(var(--orange-rgb),0.6)', padding: '5px 12px', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', cursor: 'pointer', marginLeft: 10, fontWeight: 700 }}>↓ EXPORT</button>
         )}
       </div>
 
       {/* Input */}
-      <div style={{ padding: '10px 14px 16px', borderTop: '1px solid rgba(255,102,0,0.15)', display: 'flex', gap: 8, flexShrink: 0, background: 'var(--bg)' }}>
+      <div style={{ padding: '10px 14px 16px', borderTop: '1px solid rgba(var(--orange-rgb),0.15)', display: 'flex', gap: 8, flexShrink: 0, background: 'var(--bg)' }}>
         <textarea
           ref={inputRef}
           value={input}
@@ -135,20 +135,20 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           onKeyDown={handleKey}
           placeholder="Ask Ebenezer..."
           rows={1}
-          style={{ flex: 1, background: 'var(--bg-elevated)', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem', padding: '10px 12px', resize: 'none', outline: 'none', lineHeight: 1.5 }}
+          style={{ flex: 1, background: 'var(--bg-elevated)', border: '1px solid rgba(var(--orange-rgb),0.3)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem', padding: '10px 12px', resize: 'none', outline: 'none', lineHeight: 1.5 }}
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
           style={{
             width: 52, height: 52, borderRadius: '50%',
-            background: loading || !input.trim() ? 'rgba(255,102,0,0.15)' : 'rgba(255,102,0,0.92)',
+            background: loading || !input.trim() ? 'rgba(var(--orange-rgb),0.15)' : 'rgba(var(--orange-rgb),0.92)',
             border: '2px solid var(--orange)',
-            color: loading || !input.trim() ? 'rgba(255,102,0,0.3)' : '#000',
+            color: loading || !input.trim() ? 'rgba(var(--orange-rgb),0.3)' : '#000',
             cursor: loading || !input.trim() ? 'default' : 'pointer',
             flexShrink: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-            boxShadow: loading || !input.trim() ? 'none' : '0 0 16px rgba(255,102,0,0.5)',
+            boxShadow: loading || !input.trim() ? 'none' : '0 0 16px rgba(var(--orange-rgb),0.5)',
             transition: 'all 0.2s',
           }}
         >
@@ -194,7 +194,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
       {/* Floating button */}
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ position: 'fixed', bottom: 88, right: 16, height: 52, width: open ? 52 : 'auto', borderRadius: open ? '50%' : 26, paddingLeft: open ? 0 : 16, paddingRight: open ? 0 : 16, display: open ? 'none' : 'flex', background: 'rgba(255,102,0,0.92)', border: `2px solid ${open ? 'rgba(51,255,51,0.3)' : 'var(--orange)'}`, color: '#000', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 0 24px rgba(255,102,0,0.6), 0 2px 8px rgba(0,0,0,0.4)', zIndex: 1000, transition: 'all 0.2s', fontFamily: 'var(--font-display)' }}
+        style={{ position: 'fixed', bottom: 88, right: 16, height: 52, width: open ? 52 : 'auto', borderRadius: open ? '50%' : 26, paddingLeft: open ? 0 : 16, paddingRight: open ? 0 : 16, display: open ? 'none' : 'flex', background: 'rgba(var(--orange-rgb),0.92)', border: `2px solid ${open ? 'rgba(var(--green-rgb),0.3)' : 'var(--orange)'}`, color: '#000', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxShadow: '0 0 24px rgba(var(--orange-rgb),0.6), 0 2px 8px rgba(0,0,0,0.4)', zIndex: 1000, transition: 'all 0.2s', fontFamily: 'var(--font-display)' }}
         title="Uncle Ebenezer · Jaded Vet"
         className="ebenezer-float-btn"
       >
@@ -203,18 +203,18 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
       </button>
 
       {/* Drawer */}
-      <div style={{ position: 'fixed', bottom: 72, left: 0, right: 0, height: open ? 'calc(72vh - 72px)' : 0, background: 'var(--bg-panel)', borderTop: open ? '2px solid rgba(255,102,0,0.4)' : 'none', zIndex: 999, transition: 'height 0.3s cubic-bezier(0.4,0,0.2,1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'fixed', bottom: 72, left: 0, right: 0, height: open ? 'calc(72vh - 72px)' : 0, background: 'var(--bg-panel)', borderTop: open ? '2px solid rgba(var(--orange-rgb),0.4)' : 'none', zIndex: 999, transition: 'height 0.3s cubic-bezier(0.4,0,0.2,1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
-        <div style={{ padding: '12px 18px 10px', borderBottom: '1px solid rgba(255,102,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(255,102,0,0.05)' }}>
+        <div style={{ padding: '12px 18px 10px', borderBottom: '1px solid rgba(var(--orange-rgb),0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(var(--orange-rgb),0.05)' }}>
           <div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: 'var(--orange)', letterSpacing: '3px', fontWeight: 700 }}>UNCLE EBENEZER</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>jaded vet · show analyst · discovery engine</div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {history.length > 0 && (
-              <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}>CLEAR</button>
+              <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '4px 10px', cursor: 'pointer' }}>CLEAR</button>
             )}
-            <button onClick={() => setOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
+            <button onClick={() => setOpen(false)} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.3)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
           </div>
         </div>
         <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
@@ -263,18 +263,18 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
       {/* Expanded modal overlay */}
       {expanded && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 8000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }} onClick={e => { if (e.target === e.currentTarget) setExpanded(false); }}>
-          <div style={{ width: 'min(860px, 90vw)', height: 'min(700px, 85vh)', background: 'var(--bg-panel)', border: '2px solid rgba(255,102,0,0.5)', display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(255,102,0,0.2)' }}>
+          <div style={{ width: 'min(860px, 90vw)', height: 'min(700px, 85vh)', background: 'var(--bg-panel)', border: '2px solid rgba(var(--orange-rgb),0.5)', display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(var(--orange-rgb),0.2)' }}>
             {/* Modal header */}
-            <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(255,102,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,102,0,0.06)', flexShrink: 0 }}>
+            <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(var(--orange-rgb),0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(var(--orange-rgb),0.06)', flexShrink: 0 }}>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(255,102,0,0.5)' }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(255,102,0,0.5)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)' }}>UNCLE EBENEZER</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--orange-rgb),0.5)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {history.length > 0 && (
-                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
+                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer' }}>CLEAR</button>
                 )}
-                <button onClick={() => setExpanded(false)} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
+                <button onClick={() => setExpanded(false)} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.9rem', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
               </div>
             </div>
             <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={expandInputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
@@ -298,13 +298,13 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             {/* Header */}
             <div className="ebenezer-rail-header">
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(255,102,0,0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,102,0,0.55)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--orange-rgb),0.55)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
+                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
                 {history.length > 0 && (
-                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(255,102,0,0.25)', color: 'rgba(255,102,0,0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
+                  <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
                 )}
               </div>
             </div>

@@ -35,7 +35,7 @@ export function TandCModal({ onAccept }) {
           </div>
         </div>
         {!scrolled && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(51,255,51,0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--green-rgb),0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
             ▼ SCROLL TO CONTINUE
           </div>
         )}
@@ -96,7 +96,7 @@ function MikeSaidNo({ email, onResent, onBack }) {
           fontWeight: 900,
           letterSpacing: '4px',
           color: 'var(--orange)',
-          textShadow: '0 0 20px rgba(255,102,0,0.6)',
+          textShadow: '0 0 20px rgba(var(--orange-rgb),0.6)',
           marginBottom: 8,
         }}>
           MIKE SAID NO.
@@ -117,9 +117,9 @@ function MikeSaidNo({ email, onResent, onBack }) {
         <div style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.7rem',
-          color: 'rgba(0,224,208,0.6)',
-          background: 'rgba(0,224,208,0.06)',
-          border: '1px solid rgba(0,224,208,0.15)',
+          color: 'rgba(var(--cyan-rgb),0.6)',
+          background: 'rgba(var(--cyan-rgb),0.06)',
+          border: '1px solid rgba(var(--cyan-rgb),0.15)',
           padding: '10px 16px',
           marginBottom: 24,
           wordBreak: 'break-all',
@@ -195,7 +195,7 @@ function MikeSaysNo({ onBack }) {
           fontWeight: 900,
           letterSpacing: '4px',
           color: 'var(--orange)',
-          textShadow: '0 0 20px rgba(255,102,0,0.6)',
+          textShadow: '0 0 20px rgba(var(--orange-rgb),0.6)',
           marginBottom: 8,
         }}>
           MIKE SAYS NO.
@@ -264,7 +264,7 @@ function CheckYourEmail({ email, onBack }) {
           fontWeight: 900,
           letterSpacing: '4px',
           color: 'var(--cyan)',
-          textShadow: '0 0 16px rgba(0,224,208,0.5)',
+          textShadow: '0 0 16px rgba(var(--cyan-rgb),0.5)',
           marginBottom: 8,
         }}>
           CHECK YOUR EMAIL
@@ -285,9 +285,9 @@ function CheckYourEmail({ email, onBack }) {
         <div style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.7rem',
-          color: 'rgba(0,224,208,0.6)',
-          background: 'rgba(0,224,208,0.06)',
-          border: '1px solid rgba(0,224,208,0.15)',
+          color: 'rgba(var(--cyan-rgb),0.6)',
+          background: 'rgba(var(--cyan-rgb),0.06)',
+          border: '1px solid rgba(var(--cyan-rgb),0.15)',
           padding: '10px 16px',
           marginBottom: 24,
           wordBreak: 'break-all',

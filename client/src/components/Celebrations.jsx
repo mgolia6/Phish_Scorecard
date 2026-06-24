@@ -140,15 +140,15 @@ export function WelcomeCelebration({ username, onDone }) {
           : isAccent
           ? 'clamp(0.82rem, 2.8vw, 1.15rem)'
           : 'clamp(0.76rem, 2.6vw, 1.04rem)',
-        color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : isOk ? 'var(--green)' : 'rgba(51,255,51,0.85)',
+        color: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : isOk ? 'var(--green)' : 'rgba(var(--green-rgb),0.85)',
         letterSpacing: isBig ? '8px' : isAccent ? '4px' : '2px',
         textShadow: isBig
-          ? '0 0 40px rgba(255,102,0,0.7)'
+          ? '0 0 40px rgba(var(--orange-rgb),0.7)'
           : isAccent
-          ? '0 0 24px rgba(0,224,208,0.7)'
+          ? '0 0 24px rgba(var(--cyan-rgb),0.7)'
           : isOk
-          ? '0 0 16px rgba(51,255,51,0.9)'
-          : '0 0 10px rgba(51,255,51,0.3)',
+          ? '0 0 16px rgba(var(--green-rgb),0.9)'
+          : '0 0 10px rgba(var(--green-rgb),0.3)',
         textAlign: 'center',
         lineHeight: 1.5,
         whiteSpace: 'nowrap',
@@ -158,7 +158,7 @@ export function WelcomeCelebration({ username, onDone }) {
           <span style={{
             display: 'inline-block',
             width: '0.6em',
-            background: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : 'rgba(51,255,51,0.85)',
+            background: isBig ? 'var(--orange)' : isAccent ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.85)',
             marginLeft: 2,
             verticalAlign: 'middle',
             height: '1em',
@@ -215,7 +215,7 @@ export function WelcomeCelebration({ username, onDone }) {
               height: '100%',
               objectFit: 'contain',
               transformOrigin: 'bottom center',
-              filter: 'drop-shadow(0 0 24px rgba(0,224,208,0.65))',
+              filter: 'drop-shadow(0 0 24px rgba(var(--cyan-rgb),0.65))',
               animation: melting ? 'snowflakeDrip 0.9s ease-in forwards' : 'none',
             }}
           />
@@ -228,8 +228,8 @@ export function WelcomeCelebration({ username, onDone }) {
               width: d.size,
               height: Math.round(d.size * 1.5),
               borderRadius: '50% 50% 50% 50% / 60% 60% 42% 42%',
-              background: 'radial-gradient(circle at 50% 32%, rgba(120,245,235,0.95), rgba(0,224,208,0.5))',
-              boxShadow: '0 0 8px rgba(0,224,208,0.7)',
+              background: 'radial-gradient(circle at 50% 32%, rgba(120,245,235,0.95), rgba(var(--cyan-rgb),0.5))',
+              boxShadow: '0 0 8px rgba(var(--cyan-rgb),0.7)',
               '--drip-dist': d.dist,
               animation: `dripFall 0.75s ${d.delay}s ease-in forwards`,
               opacity: 0,
@@ -244,8 +244,8 @@ export function WelcomeCelebration({ username, onDone }) {
               width: '72%',
               height: '15%',
               borderRadius: '50%',
-              background: 'radial-gradient(ellipse at center, rgba(0,224,208,0.55), rgba(0,224,208,0.12) 68%, transparent)',
-              boxShadow: '0 0 24px rgba(0,224,208,0.5)',
+              background: 'radial-gradient(ellipse at center, rgba(var(--cyan-rgb),0.55), rgba(var(--cyan-rgb),0.12) 68%, transparent)',
+              boxShadow: '0 0 24px rgba(var(--cyan-rgb),0.5)',
               transformOrigin: 'center',
               animation: 'puddleForm 0.55s 0.4s ease-out forwards',
               opacity: 0,
@@ -260,7 +260,7 @@ export function WelcomeCelebration({ username, onDone }) {
               width: '64%',
               height: '13%',
               borderRadius: '50%',
-              border: '2px solid rgba(0,224,208,0.5)',
+              border: '2px solid rgba(var(--cyan-rgb),0.5)',
               transformOrigin: 'center',
               animation: `rippleWake 1.15s ${(0.55 + delay).toFixed(2)}s ease-out forwards`,
               opacity: 0,

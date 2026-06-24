@@ -26,10 +26,10 @@ export function MyPhriends({ api, showMessage, showError }) {
           onChange={e => setSearchInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSearch()}
           placeholder="enter phreezer username..."
-          style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
+          style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
         />
         <button onClick={handleSearch} disabled={loading}
-          style={{ border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+          style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
           {loading ? '...' : 'SEARCH'}
         </button>
       </div>
@@ -37,8 +37,8 @@ export function MyPhriends({ api, showMessage, showError }) {
       {result && (
         <>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), rgba(5,18,5,0.98))' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>
               {result.target.username.slice(0,2).toUpperCase()}
             </div>
             <div>
@@ -56,9 +56,9 @@ export function MyPhriends({ api, showMessage, showError }) {
               { v: result.unique_venues, l: 'VENUES' },
               { v: result.unique_years, l: 'YEARS' },
             ].map(({ v, l }) => (
-              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(255,140,0,0.2)', background: 'rgba(255,140,0,0.04)' }}>
+              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(var(--orange-bright-rgb),0.2)', background: 'rgba(var(--orange-bright-rgb),0.04)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', lineHeight: 1, marginBottom: 5 }}>{v}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(255,140,0,0.5)' }}>{l}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(var(--orange-bright-rgb),0.5)' }}>{l}</div>
               </div>
             ))}
           </div>
@@ -84,10 +84,10 @@ export function MyPhriends({ api, showMessage, showError }) {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '2px 6px', border: '1px solid rgba(0,224,208,0.3)', color: 'var(--cyan)', minWidth: 32, textAlign: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '2px 6px', border: '1px solid rgba(var(--cyan-rgb),0.3)', color: 'var(--cyan)', minWidth: 32, textAlign: 'center' }}>
                       {s.my_score || '—'}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '2px 6px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 32, textAlign: 'center' }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', padding: '2px 6px', border: '1px solid rgba(var(--orange-bright-rgb),0.3)', color: 'var(--orange)', minWidth: 32, textAlign: 'center' }}>
                       {s.their_score || '—'}
                     </span>
                   </div>
@@ -103,7 +103,7 @@ export function MyPhriends({ api, showMessage, showError }) {
       {!result && !loading && (
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
           SEARCH A PHREEZER USERNAME TO SEE<br/>
-          <span style={{ color: 'rgba(255,140,0,0.4)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
+          <span style={{ color: 'rgba(var(--orange-bright-rgb),0.4)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
         </div>
       )}
     </div>

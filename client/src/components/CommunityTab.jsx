@@ -40,13 +40,13 @@ export function CommExpandCard({ name, sub, avg, count, countLabel = 'RATINGS', 
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', color: scoreColor, textShadow: `0 0 12px ${scoreColor}55`, letterSpacing: 1, lineHeight: 1 }}>{avg}</div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', marginTop: 3 }}>{count} {countLabel}</div>
             </div>
-            <button onClick={() => setOpen(o => !o)} style={{ background: 'transparent', border: '1px solid rgba(51,255,51,0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>
+            <button onClick={() => setOpen(o => !o)} style={{ background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'var(--text-label)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>
               {open ? '▲' : '▼'}
             </button>
           </div>
         </div>
         {open && (
-          <div style={{ borderTop: '1px solid rgba(51,255,51,0.07)', padding: '12px 14px', background: 'var(--bg-elevated)' }}>
+          <div style={{ borderTop: '1px solid rgba(var(--green-rgb),0.07)', padding: '12px 14px', background: 'var(--bg-elevated)' }}>
             {children}
           </div>
         )}
@@ -80,9 +80,9 @@ export function CommShowRows({ shows, label = 'TOP SHOWS' }) {
     <div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {shows.map((s, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shows.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shows.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
           <a href={`https://phish.in/${s.show_date}`} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-label)', flex: 1 }}>{formatDate(s.show_date)}</span>
           {s.day_of_week && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1px' }}>{s.day_of_week.toUpperCase()}</span>}
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(s.avg_score) >= 4.9 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.avg_score}</span>
@@ -97,9 +97,9 @@ export function CommVersionRows({ versions, label = 'TOP VERSIONS' }) {
     <div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {versions.map((v, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < versions.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < versions.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
           <a href={`https://phish.in/${v.show_date}`} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontSize: '0.62rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--white)' }}>{formatDate(v.show_date)}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
@@ -119,7 +119,7 @@ export function CommSongRows({ songs, label = 'TOP SONGS IN THIS SHOW' }) {
     <div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {songs.map((s, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < songs.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < songs.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
           {s.set_number && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1px', minWidth: 20, flexShrink: 0 }}>S{s.set_number.toUpperCase()}</span>}
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', flex: 1 }}>{s.song_name}</span>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.84rem', color: parseFloat(s.avg_score) >= 4.9 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{s.avg_score}</span>
@@ -152,13 +152,13 @@ export function CommStateRows({ states, label = 'STATE RANKINGS' }) {
     <div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 9 }}>{label}</div>
       {states.map((s, i) => (
-        <div key={s.state} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < states.length - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+        <div key={s.state} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < states.length - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', minWidth: 22 }}>{i + 1}.</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: 'var(--white)', letterSpacing: '2px', marginBottom: 2 }}>{s.state}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)' }}>Top: {s.top_venue} · {s.show_count} shows</div>
           </div>
-          <div style={{ width: 50, height: 3, background: 'rgba(51,255,51,0.07)', borderRadius: 2 }}>
+          <div style={{ width: 50, height: 3, background: 'rgba(var(--green-rgb),0.07)', borderRadius: 2 }}>
             <div style={{ width: `${Math.min(((parseFloat(s.avg_score) - 3) / 2) * 100, 100)}%`, height: '100%', background: i === 0 ? 'var(--orange)' : 'var(--cyan)', borderRadius: 2 }} />
           </div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.88rem', color: i === 0 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1, textAlign: 'right', minWidth: 36 }}>{s.avg_score}</div>
@@ -189,15 +189,15 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
   if (!user) {
     return (
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:400, gap:24, textAlign:'center', padding:'40px 24px' }}>
-        <div style={{ fontSize:'4rem', color:'var(--cyan)', textShadow:'0 0 30px rgba(0,224,208,0.5)' }}>⚇</div>
-        <div style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', color:'var(--cyan)', letterSpacing:'4px', textShadow:'0 0 20px rgba(0,224,208,0.4)' }}>PHRIEND OVERLAP</div>
+        <div style={{ fontSize:'4rem', color:'var(--cyan)', textShadow:'0 0 30px rgba(var(--cyan-rgb),0.5)' }}>⚇</div>
+        <div style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', color:'var(--cyan)', letterSpacing:'4px', textShadow:'0 0 20px rgba(var(--cyan-rgb),0.4)' }}>PHRIEND OVERLAP</div>
         <div style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', color:'rgba(255,255,255,0.5)', letterSpacing:'2px', lineHeight:2, maxWidth:420 }}>
           Find out who you shared a setlist with — intentionally or not.<br/>
           40 years of shows. Countless accidental reunions waiting to be discovered.
         </div>
         <div style={{ display:'flex', gap:16 }}>
-          <button onClick={() => onLogin('signup')} style={{ fontFamily:'var(--font-display)', fontSize:'0.72rem', letterSpacing:'2.5px', padding:'14px 36px', background:'transparent', border:'1px solid var(--orange)', color:'var(--orange)', cursor:'pointer', boxShadow:'0 0 16px rgba(255,102,0,0.25)' }}>+ CREATE ACCOUNT</button>
-          <button onClick={() => onLogin('login')} style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', letterSpacing:'2px', padding:'12px 24px', background:'transparent', border:'1px solid rgba(51,255,51,0.25)', color:'rgba(51,255,51,0.6)', cursor:'pointer' }}>→ LOGIN</button>
+          <button onClick={() => onLogin('signup')} style={{ fontFamily:'var(--font-display)', fontSize:'0.72rem', letterSpacing:'2.5px', padding:'14px 36px', background:'transparent', border:'1px solid var(--orange)', color:'var(--orange)', cursor:'pointer', boxShadow:'0 0 16px rgba(var(--orange-rgb),0.25)' }}>+ CREATE ACCOUNT</button>
+          <button onClick={() => onLogin('login')} style={{ fontFamily:'var(--font-display)', fontSize:'0.65rem', letterSpacing:'2px', padding:'12px 24px', background:'transparent', border:'1px solid rgba(var(--green-rgb),0.25)', color:'rgba(var(--green-rgb),0.6)', cursor:'pointer' }}>→ LOGIN</button>
         </div>
         <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:'rgba(255,255,255,0.2)', letterSpacing:'1.5px', marginTop:8 }}>FREE · NO CREDIT CARD · JUST A USERNAME</div>
       </div>
@@ -275,26 +275,26 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
           <input value={input} onChange={e => handleInputChange(e.target.value)} onFocus={() => setDropdownOpen(true)} onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
             onKeyDown={e => { if (e.key === 'Enter' && input.trim()) { setDropdownOpen(false); runSearch(input.trim()); } if (e.key === 'Escape') setDropdownOpen(false); }}
             placeholder="type a username or tap a phriend below..."
-            style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: dropdownOpen ? '1px solid rgba(255,140,0,0.6)' : '1px solid rgba(255,140,0,0.35)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '10px 12px', outline: 'none' }} />
+            style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: dropdownOpen ? '1px solid rgba(var(--orange-bright-rgb),0.6)' : '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '10px 12px', outline: 'none' }} />
           <button onClick={() => { setDropdownOpen(false); runSearch(input.trim()); }} disabled={loading || !input.trim()}
-            style={{ border: '1px solid rgba(255,140,0,0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '10px 14px', cursor: 'pointer', opacity: (loading || !input.trim()) ? 0.4 : 1, background: 'transparent' }}>
+            style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '10px 14px', cursor: 'pointer', opacity: (loading || !input.trim()) ? 0.4 : 1, background: 'transparent' }}>
             {loading ? '...' : 'SCAN'}
           </button>
         </div>
         {showDropdown && (
-          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#0d0d0d', border: '1px solid rgba(255,140,0,0.35)', borderTop: 'none', zIndex: 100, maxHeight: 260, overflowY: 'auto' }}>
-            {!input.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(255,140,0,0.45)', borderBottom: '1px solid rgba(255,140,0,0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#0d0d0d', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', borderTop: 'none', zIndex: 100, maxHeight: 260, overflowY: 'auto' }}>
+            {!input.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(var(--orange-bright-rgb),0.45)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
             {dropdownItems.map((item, i) => (
               <div key={item.username} onMouseDown={() => selectUser(item.username)}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,140,0,0.07)'}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--orange-bright-rgb),0.07)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.4)', background: 'rgba(255,140,0,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{item.username.slice(0, 2).toUpperCase()}</div>
+                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{item.username.slice(0, 2).toUpperCase()}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.username}</div>
-                  {item.sub && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,140,0,0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{item.sub.toUpperCase()}</div>}
+                  {item.sub && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{item.sub.toUpperCase()}</div>}
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px', flexShrink: 0 }}>▶</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px', flexShrink: 0 }}>▶</div>
               </div>
             ))}
           </div>
@@ -303,21 +303,21 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
 
       {!result && !loading && !error && !dropdownOpen && !input.trim() && (
         <div style={{ marginTop: 14 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(255,140,0,0.35)', letterSpacing: '2px', marginBottom: 10 }}>PHRIENDS WHO WERE THERE</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.35)', letterSpacing: '2px', marginBottom: 10 }}>PHRIENDS WHO WERE THERE</div>
           {suggestionsLoading ? (
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', padding: '16px 0' }}>scanning your shows...</div>
           ) : suggestions.length === 0 ? (
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>NO OTHER USERS SHARE YOUR ATTENDED SHOWS YET<br/><span style={{ color: 'rgba(255,140,0,0.35)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span></div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>NO OTHER USERS SHARE YOUR ATTENDED SHOWS YET<br/><span style={{ color: 'rgba(var(--orange-bright-rgb),0.35)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span></div>
           ) : (
             suggestions.map(s => (
               <div key={s.username} onClick={() => selectUser(s.username)}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', border: '1px solid rgba(255,140,0,0.15)', borderLeft: '3px solid rgba(255,140,0,0.4)', background: 'rgba(255,140,0,0.03)', marginBottom: 6, cursor: 'pointer' }}>
-                <div style={{ width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.4)', background: 'rgba(255,140,0,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{s.username.slice(0, 2).toUpperCase()}</div>
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', border: '1px solid rgba(var(--orange-bright-rgb),0.15)', borderLeft: '3px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.03)', marginBottom: 6, cursor: 'pointer' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{s.username.slice(0, 2).toUpperCase()}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--white)' }}>{s.username}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,140,0,0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.5)', letterSpacing: '1.5px', marginTop: 2 }}>{s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}</div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>SCAN ▶</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px' }}>SCAN ▶</div>
               </div>
             ))
           )}
@@ -328,16 +328,16 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
 
       {result && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(255,140,0,0.25)', background: 'linear-gradient(135deg, rgba(255,140,0,0.05), rgba(5,18,5,0.98))' }}>
-            <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(255,140,0,0.45)', background: 'rgba(255,140,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>{result.target.username.slice(0,2).toUpperCase()}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), rgba(5,18,5,0.98))' }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>{result.target.username.slice(0,2).toUpperCase()}</div>
             <div style={{ flex: 1 }}><div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div></div>
-            <button onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }} style={{ background: 'transparent', border: '1px solid rgba(255,140,0,0.25)', color: 'rgba(255,140,0,0.5)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>X CLEAR</button>
+            <button onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', color: 'rgba(var(--orange-bright-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>X CLEAR</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 12 }}>
             {[{ v: result.total_shared, l: 'SHOWS TOGETHER' }, { v: result.unique_venues, l: 'VENUES' }, { v: result.unique_years, l: 'YEARS' }].map(({ v, l }) => (
-              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(255,140,0,0.2)', background: 'rgba(255,140,0,0.04)' }}>
+              <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(var(--orange-bright-rgb),0.2)', background: 'rgba(var(--orange-bright-rgb),0.04)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--orange)', lineHeight: 1, marginBottom: 4 }}>{v}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(255,140,0,0.5)' }}>{l}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(var(--orange-bright-rgb),0.5)' }}>{l}</div>
               </div>
             ))}
           </div>
@@ -353,22 +353,22 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
             const iMarked = cs.i_marked;
             const mutual = cs.mutual;
             return (
-              <div key={i} style={{ padding: '12px 12px', border: mutual ? '1px solid rgba(51,255,51,0.5)' : '1px solid var(--border)', borderLeft: mutual ? '3px solid var(--green)' : iMarked ? '3px solid rgba(0,224,208,0.5)' : '3px solid transparent', background: mutual ? 'rgba(51,255,51,0.04)' : 'rgba(0,0,0,0.3)', marginBottom: 6 }}>
+              <div key={i} style={{ padding: '12px 12px', border: mutual ? '1px solid rgba(var(--green-rgb),0.5)' : '1px solid var(--border)', borderLeft: mutual ? '3px solid var(--green)' : iMarked ? '3px solid rgba(var(--cyan-rgb),0.5)' : '3px solid transparent', background: mutual ? 'rgba(var(--green-rgb),0.04)' : 'rgba(0,0,0,0.3)', marginBottom: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '1.5px' }}>
                     {(() => { const [y,m,dd]=s.show_date.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return `${mn[+m-1]} ${+dd}, ${y}`; })()}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => onRateShow && onRateShow(s.show_date)} title={s.my_score ? 'View / edit your rating' : 'Rate this show'}
-                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', padding: '3px 8px', border: '1px solid rgba(0,224,208,0.4)', color: s.my_score ? 'var(--cyan)' : 'rgba(0,224,208,0.4)', minWidth: 36, textAlign: 'center', background: 'transparent', cursor: 'pointer' }}>{s.my_score || '+'}</button>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', padding: '3px 8px', border: '1px solid rgba(255,140,0,0.3)', color: 'var(--orange)', minWidth: 36, textAlign: 'center' }}>{s.their_score || '—'}</span>
+                      style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', padding: '3px 8px', border: '1px solid rgba(var(--cyan-rgb),0.4)', color: s.my_score ? 'var(--cyan)' : 'rgba(var(--cyan-rgb),0.4)', minWidth: 36, textAlign: 'center', background: 'transparent', cursor: 'pointer' }}>{s.my_score || '+'}</button>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', padding: '3px 8px', border: '1px solid rgba(var(--orange-bright-rgb),0.3)', color: 'var(--orange)', minWidth: 36, textAlign: 'center' }}>{s.their_score || '—'}</span>
                   </div>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--green)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.venue ? `${s.venue}${s.city ? ` — ${s.city}` : ''}` : '—'}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   {mutual ? <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--green)', letterSpacing: '2px' }}>❄ MUTUAL COMPANION</span> : <span />}
                   <button onClick={() => toggleCompanion(s.show_date)}
-                    style={{ background: iMarked ? 'rgba(51,255,51,0.1)' : 'rgba(0,224,208,0.05)', border: `1px solid ${iMarked ? 'rgba(51,255,51,0.6)' : 'rgba(0,224,208,0.4)'}`, color: iMarked ? 'var(--green)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', padding: '6px 14px', cursor: 'pointer' }}>
+                    style={{ background: iMarked ? 'rgba(var(--green-rgb),0.1)' : 'rgba(var(--cyan-rgb),0.05)', border: `1px solid ${iMarked ? 'rgba(var(--green-rgb),0.6)' : 'rgba(var(--cyan-rgb),0.4)'}`, color: iMarked ? 'var(--green)' : 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', padding: '6px 14px', cursor: 'pointer' }}>
                     {iMarked ? '◈ COMPANION' : '+ COMPANION'}
                   </button>
                 </div>
@@ -419,7 +419,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {leaderboard.map(row => (
               <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
-                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto auto auto', alignItems: 'center', gap: '8px', padding: '11px 14px', borderBottom: '1px solid rgba(51,255,51,0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(0,255,255,0.025)' : 'transparent' }}>
+                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto auto auto', alignItems: 'center', gap: '8px', padding: '11px 14px', borderBottom: '1px solid rgba(var(--green-rgb),0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(var(--cyan-bright-rgb),0.025)' : 'transparent' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>{row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}</span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}</span>
                 <span title="Shows rated" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.shows_rated}</span>
@@ -471,7 +471,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
               )}
               <div style={{ marginTop: 12 }}>
                 <a href={`https://phish.in/${show.show_date}`} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none' }}>▶</a>
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontSize: '0.65rem', textDecoration: 'none' }}>▶</a>
               </div>
             </CommExpandCard>
           );
@@ -551,7 +551,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
             <CommExpandCard key={venue.venue} name={venue.venue}
               sub={`${venue.city ? `${venue.city}, ` : ''}${venue.state || ''} · ${venue.show_count} shows · ${venue.unique_raters} rater${venue.unique_raters !== 1 ? 's' : ''}`}
               avg={venue.avg_score} count={venue.show_count} countLabel="SHOWS"
-              accent={i === 0 ? 'var(--orange)' : i === 1 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)'}
+              accent={i === 0 ? 'var(--orange)' : i === 1 ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.4)'}
               badge={userBadge}
               extraStats={[
                 { value: venue.show_count, label: 'SHOWS', color: 'var(--cyan)' },
@@ -560,7 +560,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
                 ...(dowLabel ? [{ value: dowLabel, label: 'DOW', color: 'var(--orange)' }] : []),
               ]}>
               {dowLabel && (
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,140,0,0.6)', letterSpacing: '1.5px', marginBottom: 10 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.6)', letterSpacing: '1.5px', marginBottom: 10 }}>
                   WEEKEND SHOWS: {dowLabel}
                 </div>
               )}
@@ -586,7 +586,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
         ]} />
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 9 }}>STATE RANKINGS — TAP TO EXPAND</div>
         {states.map((st, i) => {
-          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(51,255,51,0.4)';
+          const accent = i === 0 ? 'var(--orange)' : i < 3 ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.4)';
           const covPct = st.coverage_pct || 0;
           return (
             <CommExpandCard key={st.state} name={st.state}
@@ -606,7 +606,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>PHREEZER COVERAGE</div>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: accent, letterSpacing: '1px' }}>{st.show_count} / {st.total_shows_in_state || '?'} SHOWS</div>
                   </div>
-                  <div style={{ height: 4, background: 'rgba(51,255,51,0.07)' }}>
+                  <div style={{ height: 4, background: 'rgba(var(--green-rgb),0.07)' }}>
                     <div style={{ width: `${Math.min(covPct, 100)}%`, height: '100%', background: accent, boxShadow: `0 0 6px ${accent}` }} />
                   </div>
                 </div>
@@ -619,7 +619,7 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 4 }}>HIGHEST RATED SHOW</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <a href={`https://phish.in/${st.top_show.show_date}`} target="_blank" rel="noopener noreferrer"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.05)', color: 'var(--cyan)', fontSize: '0.6rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontSize: '0.6rem', textDecoration: 'none', flexShrink: 0 }}>▶</a>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)' }}>{formatDate(st.top_show.show_date)}</div>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.82rem', color: parseFloat(st.top_show.avg_score) >= 4.7 ? 'var(--orange)' : 'var(--cyan)', letterSpacing: 1 }}>{st.top_show.avg_score}</div>
                     </div>

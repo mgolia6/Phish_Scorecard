@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 const SENTIMENT_COLORS = {
   FIRE: 'var(--orange)',
   SOLID: 'var(--cyan)',
-  MIXED: 'rgba(51,255,51,0.5)',
+  MIXED: 'rgba(var(--green-rgb),0.5)',
   SLEEPER: 'var(--text-muted)',
 };
 
@@ -72,8 +72,8 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
   return (
     <div style={{
-      background: cardBackground || 'linear-gradient(135deg, rgba(0,224,208,0.07) 0%, rgba(5,18,5,0.98) 100%)',
-      border: cardBorder || '1px solid rgba(0,224,208,0.3)',
+      background: cardBackground || 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.07) 0%, rgba(5,18,5,0.98) 100%)',
+      border: cardBorder || '1px solid rgba(var(--cyan-rgb),0.3)',
       borderLeft: cardBorderLeft || '3px solid var(--cyan)',
       boxShadow: cardGlow || 'none',
     }}>
@@ -107,14 +107,14 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>MY SCORE</span>
               </div>
             ) : (
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(0,224,208,0.4)', letterSpacing: '2px' }}>NOT YET RATED</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '2px' }}>NOT YET RATED</span>
             )}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <a href={`https://phish.in/${otdShow.show_date}`} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,255,255,0.4)', background: 'rgba(0,255,255,0.06)', color: 'var(--cyan)', fontSize: '0.8rem', textDecoration: 'none', paddingLeft: 2, boxShadow: '0 0 10px rgba(0,224,208,0.2)' }}>▶</a>
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(var(--cyan-bright-rgb),0.4)', background: 'rgba(var(--cyan-bright-rgb),0.06)', color: 'var(--cyan)', fontSize: '0.8rem', textDecoration: 'none', paddingLeft: 2, boxShadow: '0 0 10px rgba(var(--cyan-rgb),0.2)' }}>▶</a>
             <button onClick={() => onRateShow(otdShow.show_date)}
-              style={{ height: 40, padding: '0 16px', border: '1px solid rgba(255,140,0,0.5)', color: 'var(--orange)', background: 'rgba(255,140,0,0.08)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px', cursor: 'pointer', boxShadow: '0 0 10px rgba(255,140,0,0.2)' }}>
+              style={{ height: 40, padding: '0 16px', border: '1px solid rgba(var(--orange-bright-rgb),0.5)', color: 'var(--orange)', background: 'rgba(var(--orange-bright-rgb),0.08)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '1.5px', cursor: 'pointer', boxShadow: '0 0 10px rgba(var(--orange-bright-rgb),0.2)' }}>
               ◈ RATE
             </button>
           </div>
@@ -123,8 +123,8 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
       {/* ── Toggle ── */}
       <button onClick={handleExpand} style={{
-        width: '100%', padding: '10px 16px', background: 'rgba(0,224,208,0.04)', border: 'none',
-        borderTop: '1px solid rgba(0,224,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: '100%', padding: '10px 16px', background: 'rgba(var(--cyan-rgb),0.04)', border: 'none',
+        borderTop: '1px solid rgba(var(--cyan-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: 8, cursor: 'pointer', color: 'var(--cyan)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px',
       }}>
         {expanded ? '▲ HIDE VIBE CHECK' : '▼ VIBE CHECK — WHAT DID THE PHANS SAY?'}
@@ -132,7 +132,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
       {/* ── Expanded ── */}
       {expanded && (
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(0,224,208,0.1)', background: 'rgba(0,0,0,0.3)' }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(var(--cyan-rgb),0.1)', background: 'rgba(0,0,0,0.3)' }}>
           {loadingReviews ? (
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '12px 0' }}>
               PULLING REVIEWS...
@@ -154,7 +154,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                       }}>{structured.sentiment}</span>
                     )}
                   </div>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(255,140,0,0.4)', letterSpacing: '1px' }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px' }}>
                     AI · {structured?.reviewCount || reviews.length} PHISH.NET REVIEWS
                   </span>
                 </div>
@@ -166,13 +166,13 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                 ) : structured ? (
                   <div>
                     {/* Overall verdict */}
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 14, borderLeft: '2px solid rgba(255,140,0,0.5)', paddingLeft: 12 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--white)', lineHeight: 1.7, marginBottom: 14, borderLeft: '2px solid rgba(var(--orange-bright-rgb),0.5)', paddingLeft: 12 }}>
                       {structured.overall}
                     </div>
 
                     {/* Themes */}
                     {structured.themes && structured.themes.map((theme, i) => (
-                      <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < structured.themes.length - 1 ? '1px solid rgba(51,255,51,0.07)' : 'none' }}>
+                      <div key={i} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: i < structured.themes.length - 1 ? '1px solid rgba(var(--green-rgb),0.07)' : 'none' }}>
                         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 5 }}>
                           {theme.label}
                         </div>
@@ -183,12 +183,12 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                     ))}
 
                     {/* Attribution */}
-                    <div style={{ marginTop: 12, fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', borderTop: '1px solid rgba(51,255,51,0.06)', paddingTop: 10 }}>
+                    <div style={{ marginTop: 12, fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-muted)', letterSpacing: '1.5px', borderTop: '1px solid rgba(var(--green-rgb),0.06)', paddingTop: 10 }}>
                       AI SYNTHESIS OF {structured.reviewCount} PHISH.NET REVIEWS · NOT A SUBSTITUTE FOR READING THEM
                     </div>
                   </div>
                 ) : fallbackSummary ? (
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.65, borderLeft: '2px solid rgba(255,140,0,0.4)', paddingLeft: 10 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', lineHeight: 1.65, borderLeft: '2px solid rgba(var(--orange-bright-rgb),0.4)', paddingLeft: 10 }}>
                     {fallbackSummary}
                   </div>
                 ) : (
@@ -199,12 +199,12 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
               </div>
 
               {/* ── Raw reviews ── */}
-              <div style={{ borderTop: '1px solid rgba(51,255,51,0.08)', paddingTop: 14 }}>
+              <div style={{ borderTop: '1px solid rgba(var(--green-rgb),0.08)', paddingTop: 14 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', marginBottom: 12 }}>
                   PHISH.NET REVIEWS ({reviews.length})
                 </div>
                 {reviews.slice(0, 4).map((r, i) => (
-                  <div key={i} style={{ marginBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, paddingBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, borderBottom: i < Math.min(reviews.length, 4) - 1 ? '1px solid rgba(51,255,51,0.06)' : 'none' }}>
+                  <div key={i} style={{ marginBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, paddingBottom: i < Math.min(reviews.length, 4) - 1 ? 14 : 0, borderBottom: i < Math.min(reviews.length, 4) - 1 ? '1px solid rgba(var(--green-rgb),0.06)' : 'none' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '1px' }}>{r.author}</span>
                       {r.posted && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)' }}>{r.posted}</span>}

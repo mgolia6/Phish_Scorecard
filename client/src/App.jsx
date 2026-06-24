@@ -408,7 +408,7 @@ export default function App() {
                     className={`avatar-btn${profileTapped ? '' : ' avatar-pulse'}`}
                     onClick={() => { setShowProfileModal(true); setProfileTapped(true); }}
                     aria-label="Profile"
-                    style={{ background: 'transparent', border: '1.5px solid rgba(0,224,208,0.4)', borderRadius: '50%', width: 44, height: 44, padding: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(0,224,208,0.2)' }}
+                    style={{ background: 'transparent', border: '1.5px solid rgba(var(--cyan-rgb),0.4)', borderRadius: '50%', width: 44, height: 44, padding: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(var(--cyan-rgb),0.2)' }}
                   >
                     <PhreezerAvatar seed={user.avatar_icon || 'phreeze'} size={34} color="#00ffff" />
                   </button>
@@ -495,11 +495,11 @@ export default function App() {
           {/* Back bar */}
           <div style={{
             position: 'sticky', top: 0, zIndex: 10,
-            background: 'var(--bg)', borderBottom: '1px solid rgba(51,255,51,0.15)',
+            background: 'var(--bg)', borderBottom: '1px solid rgba(var(--green-rgb),0.15)',
             padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <button onClick={closeScorecardOverlay} style={{
-              background: 'transparent', border: '1px solid rgba(51,255,51,0.25)',
+              background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.25)',
               color: 'var(--green)', fontFamily: 'var(--font-display)', fontSize: '0.6rem',
               letterSpacing: '2px', padding: '6px 12px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
@@ -546,7 +546,7 @@ export default function App() {
           <div className="modal" style={{ maxWidth: 400, textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>❄</div>
             <div className="modal-title" style={{ fontSize: '1rem', letterSpacing: '3px' }}>LET'S GO BACKWARDS</div>
-            <p style={{ fontSize: '0.78rem', color: 'rgba(51,255,51,0.65)', lineHeight: 1.7, margin: '16px 0 24px', letterSpacing: '0.5px' }}>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(var(--green-rgb),0.65)', lineHeight: 1.7, margin: '16px 0 24px', letterSpacing: '0.5px' }}>
               Take a trip down memory lane. Rate the first show you ever attended — then keep going backwards down the number line.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

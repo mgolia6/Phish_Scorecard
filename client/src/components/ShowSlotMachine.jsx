@@ -121,14 +121,14 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
           {/* Big arrow pointing up */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 28, animation: 'bounce 1.8s ease-in-out infinite' }}>
             <style>{`@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', color: 'var(--orange)', lineHeight: 1, textShadow: '0 0 30px rgba(255,102,0,0.7)', animation: 'none' }}>↑</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', letterSpacing: '3px', textShadow: '0 0 15px rgba(255,102,0,0.5)' }}>HIT THAT BUTTON</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', color: 'var(--orange)', lineHeight: 1, textShadow: '0 0 30px rgba(var(--orange-rgb),0.7)', animation: 'none' }}>↑</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', letterSpacing: '3px', textShadow: '0 0 15px rgba(var(--orange-rgb),0.5)' }}>HIT THAT BUTTON</div>
           </div>
 
           {/* Dare copy */}
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(51,255,51,0.45)', letterSpacing: '2px', textAlign: 'center', lineHeight: 1.8, maxWidth: 400 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(var(--green-rgb),0.45)', letterSpacing: '2px', textAlign: 'center', lineHeight: 1.8, maxWidth: 400 }}>
             40+ years of shows.<br/>
-            <span style={{ color: 'rgba(51,255,51,0.7)' }}>Dare to let fate pick one.</span>
+            <span style={{ color: 'rgba(var(--green-rgb),0.7)' }}>Dare to let fate pick one.</span>
           </div>
         </>
       ) : (
@@ -143,7 +143,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
             display: 'flex', gap: 0, width: '100%', maxWidth: 400,
             border: '1px solid rgba(255,255,255,0.08)',
             background: 'rgba(0,0,0,0.6)',
-            boxShadow: isSpinning ? '0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5)' : '0 0 20px rgba(51,255,51,0.1)',
+            boxShadow: isSpinning ? '0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5)' : '0 0 20px rgba(var(--green-rgb),0.1)',
           }}>
             <Reel
               values={YEARS}

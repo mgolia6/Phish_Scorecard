@@ -16,11 +16,11 @@ export function DonationCard() {
   return (
     <div style={{
       background: 'rgba(0,0,0,0.35)',
-      border: '1px solid rgba(51,255,51,0.15)',
+      border: '1px solid rgba(var(--green-rgb),0.15)',
       borderLeft: '3px solid var(--green)',
       padding: '14px 16px',
     }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', color: 'rgba(51,255,51,0.6)', marginBottom: 10 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '3px', color: 'rgba(var(--green-rgb),0.6)', marginBottom: 10 }}>
         ◈ MOCKINGBIRD FOUNDATION
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -32,7 +32,7 @@ export function DonationCard() {
             donated · {items} item{items !== 1 ? 's' : ''} sold
           </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(51,255,51,0.4)', textAlign: 'right', lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.4)', textAlign: 'right', lineHeight: 1.6 }}>
           $1.00 per item<br />
           supports music education
         </div>

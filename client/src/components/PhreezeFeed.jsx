@@ -44,7 +44,7 @@ function ReplyRow({ reply }) {
   const [upCount, setUpCount] = useState(reply.up_count || 0);
   return (
     <div style={{ display: 'flex', gap: 10, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-      <FeedAvatar initials={reply.username} size={28} color="rgba(51,255,51,0.7)" />
+      <FeedAvatar initials={reply.username} size={28} color="rgba(var(--green-rgb),0.7)" />
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--green)' }}>{reply.username}</span>
@@ -109,7 +109,7 @@ function PostCard({ post, api, currentUser }) {
     <div style={{
       border: '1px solid rgba(255,255,255,0.06)',
       borderLeft: post.pinned ? '3px solid var(--orange)' : `3px solid ${color}`,
-      background: post.pinned ? 'rgba(255,102,0,0.03)' : 'var(--bg-panel)',
+      background: post.pinned ? 'rgba(var(--orange-rgb),0.03)' : 'var(--bg-panel)',
       marginBottom: 10,
     }}>
       <div style={{ padding: '12px 14px 0' }}>
@@ -118,7 +118,7 @@ function PostCard({ post, api, currentUser }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             {post.pinned && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(255,102,0,0.4)', padding: '2px 8px', background: 'rgba(255,102,0,0.08)' }}>❄ PINNED · UNCLE EBENEZER</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'var(--orange)', border: '1px solid rgba(var(--orange-rgb),0.4)', padding: '2px 8px', background: 'rgba(var(--orange-rgb),0.08)' }}>❄ PINNED · UNCLE EBENEZER</span>
               </div>
             )}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}>
@@ -201,14 +201,14 @@ function NewPostBox({ api, onPosted, currentUser }) {
           padding: '10px 14px', marginBottom: 12,
           background: 'var(--bg-panel)',
           border: '1px solid var(--border)',
-          borderLeft: '3px solid rgba(0,224,208,0.3)',
+          borderLeft: '3px solid rgba(var(--cyan-rgb),0.3)',
           cursor: 'pointer', textAlign: 'left',
         }}
       >
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
-          border: '1px solid rgba(0,224,208,0.3)',
-          background: 'rgba(0,224,208,0.06)',
+          border: '1px solid rgba(var(--cyan-rgb),0.3)',
+          background: 'rgba(var(--cyan-rgb),0.06)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'var(--font-display)', fontSize: '0.6rem',
           color: 'var(--cyan)', flexShrink: 0,
@@ -218,7 +218,7 @@ function NewPostBox({ api, onPosted, currentUser }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-muted)' }}>
           what's on your mind, phan?
         </span>
-        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(0,224,208,0.35)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
+        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.35)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
       </button>
     );
   }

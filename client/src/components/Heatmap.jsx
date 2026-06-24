@@ -12,13 +12,13 @@ const HEATMAP_POS = {
 };
 
 const hmColor = s => {
-  if (!s) return 'rgba(51,255,51,0.08)';
+  if (!s) return 'rgba(var(--green-rgb),0.08)';
   const n = parseFloat(s);
-  if (n >= 4.7) return 'rgba(255,102,0,0.9)';
-  if (n >= 4.4) return 'rgba(255,140,0,0.75)';
+  if (n >= 4.7) return 'rgba(var(--orange-rgb),0.9)';
+  if (n >= 4.4) return 'rgba(var(--orange-bright-rgb),0.75)';
   if (n >= 4.1) return 'rgba(0,200,200,0.75)';
   if (n >= 3.8) return 'rgba(0,180,180,0.45)';
-  return 'rgba(51,255,51,0.22)';
+  return 'rgba(var(--green-rgb),0.22)';
 };
 
 export function Heatmap({ data, title }) {
@@ -37,7 +37,7 @@ export function Heatmap({ data, title }) {
         <div style={{ display: 'grid', gridTemplateRows: `repeat(${rows},28px)`, gridTemplateColumns: `repeat(${cols},1fr)`, gap: 2, minWidth: 300 }}>
           {cells.flat().map((cell, i) => (
             <div key={i}
-              style={{ background: cell ? hmColor(cell.score) : 'transparent', border: cell ? (hov === cell.abbr ? '1px solid var(--cyan)' : '1px solid rgba(51,255,51,0.15)') : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: cell ? 'pointer' : 'default', transition: 'all 0.12s' }}
+              style={{ background: cell ? hmColor(cell.score) : 'transparent', border: cell ? (hov === cell.abbr ? '1px solid var(--cyan)' : '1px solid rgba(var(--green-rgb),0.15)') : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: cell ? 'pointer' : 'default', transition: 'all 0.12s' }}
               onMouseEnter={() => cell && setHov(cell.abbr)}
               onMouseLeave={() => setHov(null)}>
               {cell && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: '#ffffff', fontWeight: 900, textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>{cell.abbr}</span>}
@@ -46,7 +46,7 @@ export function Heatmap({ data, title }) {
         </div>
       </div>
       <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-        {[['rgba(255,102,0,0.9)','4.7+'],['rgba(255,140,0,0.75)','4.4+'],['rgba(0,200,200,0.75)','4.1+'],['rgba(0,180,180,0.45)','3.8+'],['rgba(51,255,51,0.22)','<3.8'],['rgba(51,255,51,0.08)','N/A']].map(([col,lbl]) => (
+        {[['rgba(var(--orange-rgb),0.9)','4.7+'],['rgba(var(--orange-bright-rgb),0.75)','4.4+'],['rgba(0,200,200,0.75)','4.1+'],['rgba(0,180,180,0.45)','3.8+'],['rgba(var(--green-rgb),0.22)','<3.8'],['rgba(var(--green-rgb),0.08)','N/A']].map(([col,lbl]) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ width: 10, height: 10, background: col, border: '1px solid rgba(255,255,255,0.15)' }} />
             <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--text-label)', letterSpacing: '1px' }}>{lbl}</span>
