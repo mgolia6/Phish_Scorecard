@@ -106,13 +106,17 @@
 
 /* ── BASE ───────────────────────────────────────────── */
 html, body {
-  background: var(--bg);
   color: var(--green);
   font-family: var(--font-mono);
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
+  /* Stop iOS rubber-band overscroll from revealing background above the fixed header */
+  overscroll-behavior-y: none;
 }
+body { background: var(--bg); }
+/* Root paints the header surface so any top-overscroll reveal is seamless, not a light strip */
+html { background: var(--bg-elevated); }
 
 /* Scanlines */
 body::before {
