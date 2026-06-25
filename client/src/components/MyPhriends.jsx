@@ -26,6 +26,17 @@ export function MyPhriends({ api, showMessage, showError }) {
           onChange={e => setSearchInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSearch()}
           placeholder="enter phreezer username..."
+          type="text"
+          name="phriend-search"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          inputMode="text"
+          enterKeyHint="search"
+          data-1p-ignore
+          data-lpignore="true"
+          data-form-type="other"
           style={{ flex: 1, background: 'var(--inset-strong)', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
         />
         <button onClick={handleSearch} disabled={loading}
@@ -37,7 +48,7 @@ export function MyPhriends({ api, showMessage, showError }) {
       {result && (
         <>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), rgba(5,18,5,0.98))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.08), var(--bg-elevated))' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>
               {result.target.username.slice(0,2).toUpperCase()}
             </div>

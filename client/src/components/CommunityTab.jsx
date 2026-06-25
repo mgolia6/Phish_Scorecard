@@ -275,6 +275,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
           <input value={input} onChange={e => handleInputChange(e.target.value)} onFocus={() => setDropdownOpen(true)} onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
             onKeyDown={e => { if (e.key === 'Enter' && input.trim()) { setDropdownOpen(false); runSearch(input.trim()); } if (e.key === 'Escape') setDropdownOpen(false); }}
             placeholder="type a username or tap a phriend below..."
+            type="text" name="phriend-search" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} inputMode="text" enterKeyHint="search" data-1p-ignore data-lpignore="true" data-form-type="other"
             style={{ flex: 1, background: 'var(--inset-strong)', border: dropdownOpen ? '1px solid rgba(var(--orange-bright-rgb),0.6)' : '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '10px 12px', outline: 'none' }} />
           <button onClick={() => { setDropdownOpen(false); runSearch(input.trim()); }} disabled={loading || !input.trim()}
             style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '10px 14px', cursor: 'pointer', opacity: (loading || !input.trim()) ? 0.4 : 1, background: 'transparent' }}>
