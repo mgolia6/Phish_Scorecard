@@ -14,7 +14,9 @@
 - **Desktop UAT pass** — Matthew to do full recorded walkthrough. Known issues: font sizes, visual polish, scorecard overlay goes full-screen hiding sidebar/rail (needs proper fix during UAT pass). Blocking beta.
 
 ### P1 — Pre-beta
-- **iOS Safari UAT** — not yet confirmed complete
+- **iOS Safari UAT** — not yet confirmed complete (mobile chrome/safe-area pass done 2026-06-25)
+- **Light mode — release** — fully polished but **admin-gated**. Remove the `is_admin` gate on the APPEARANCE toggle (ProfileModal) when signed off. Outstanding before un-gating: light-mode logo/tagline asset; final sweep of any stray hardcoded hex literals.
+- **Light-mode logo asset** — the tagline under the PHREEZER wordmark is baked into the (light-colored) logo PNG and washes out on light. Need a dark-ink logo for light theme, or render wordmark+tagline as live text.
 - **GoDaddy DNS** — phreezer.mpgink.com subdomain in Resend (polish, not blocking)
 - **Sentry DSN fix** — malformed org ID in Vercel env var, Matthew to correct
 
@@ -51,6 +53,18 @@
 ---
 
 ## ✅ COMPLETED
+
+### 2026-06-25
+- **Light mode** — full theme system (admin-gated sandbox): theme.js + `[data-theme="light"]` token overrides; Phases 2a–2e (RGB hue tokens, inset/hairline tokens, `--ink-rgb` dimmed-white text, low-alpha colored-text 0.7 floor sweep); readability passes (`--card-deep` cards, `#fff`→`--white`, darker text tokens, AI/Shop ink lifts, avatar tiles, SHOW NOTES, masthead labels). Dark mode byte-identical.
+- **My Phriends dropdown** — pick a phriend from the overlap-suggestions list / typeahead instead of recalling a username
+- **Email admin triggers** — `/api/admin/send-email` (en masse + per-user); fixed lifecycle emails not sending (cron Bearer auth + direct `runLifecycleEmails`); weekly reminders (Tuesdays, ISO-week-stamped); RFC-8058 one-click unsubscribe (`/api/emails/unsubscribe`); per-user Claude cost; Haiku pricing fix; moderation-call logging
+- **Admin user cards** — dedupe, button grid, per-user email nudge; admin fonts bumped; AI-usage dates formatted
+- **Scorecard** — "ANOTHER RANDOM SHOW" re-roll on loaded show; phriend-tag input autofill hardening
+- **PHAN ROLL** — Leaderboard renamed (non-competitive) + bigger fonts
+- **Mobile chrome** — `viewport-fit=cover` (activated all safe-area insets); bottom-nav label-clipping fix; header bottom-up gradient + notch fill; top-overscroll reveal fix
+- **Cache** — no-cache headers on index.html (vercel.json) — fixes recurring stale-bundle
+- **Boot/loader** — bigger melt→puddle→cascading-wake snowflake before glitch; loading-line "TASK..... OK" on one line; FullPageLoader snowflake enlarged
+- **Font audit** — too-small subtext bumped app-wide (KPIs left as-is)
 
 ### 2026-06-18
 - Tweezerfest dedupe fix — Deep Phreeze MOST HEARD now counts shows, not raw setlist rows
@@ -95,3 +109,7 @@
 - Phish.net v5 API: no show ratings endpoint confirmed
 - Jamchart cron: Monday 6am UTC
 - reviewer badge key deprecated — use critic
+- Theme: `[data-theme="light"]` on `<html>` via theme.js; tokens flip, dark values == originals. Toggle admin-gated until release.
+- `viewport-fit=cover` is required for `env(safe-area-inset-*)` to be non-zero — header/modal/bottom-nav safe-area handling depends on it
+- vercel.json sets `Cache-Control: no-cache` on `/` and `/index.html` (SPA HTML always revalidates; hashed assets stay cached)
+- Weekly reminder email type: `weekly_YYYY-Www` (ISO week) — dedup via email_log unique (user_id, email_type)

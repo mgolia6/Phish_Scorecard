@@ -293,3 +293,49 @@ Desktop-only right panel on show masthead.
 - Right: label (0.62rem Orbitron, color) + description (0.72rem mono, dimmed)
 - Border-left: 3px solid badge color
 - Background: badge color at 8% opacity
+
+---
+
+## Theme System — Light Mode (2026-06-25)
+
+Light mode is `[data-theme="light"]` on `<html>` (set by `client/src/theme.js`, persisted in localStorage, applied in main.jsx before first paint). The toggle lives in ProfileModal → MY PHISH → APPEARANCE and is **admin-only** until release.
+
+**Core rule:** dark is the baseline. Every token's **dark value equals the original literal** it replaced, so dark mode renders byte-identical. Only light values (or the shared invariant) change. Never hardcode a color in a component — use a token so both themes flip.
+
+### Theme token families
+- **RGB hue components** — so any alpha shade flips with the theme:
+  `--green-rgb`, `--cyan-rgb`, `--cyan-bright-rgb`, `--orange-rgb`, `--orange-bright-rgb`.
+  Always write colored shades as `rgba(var(--cyan-rgb), 0.4)` — never `rgba(0,255,255,0.4)`.
+- **`--ink-rgb`** — "dimmed-white" text/borders. Dark = `255,255,255`, light = `20,33,26`. Use `rgba(var(--ink-rgb), a)` for any text/border that was previously `rgba(255,255,255, a)`. (Exception: always-dark overlays — boot, MIKE SAYS NO, badge celebration — keep literal white.)
+- **Inset fills** — recessed backgrounds. `--inset-soft / --inset / --inset-md / --inset-strong / --inset-xstrong` (dark = black-alpha 0.2–0.6; light = faint green tints). High-alpha scrims (≥0.75, modals/overlays) stay literal dark.
+- **`--hairline`** — faint dividers/borders (`rgba(var(--ink-rgb),0.07)` dark / `rgba(0,0,0,0.10)` light).
+- **`--card-deep`** — the deep base of tinted **gradient cards** (OTD, My Shows, Community result, Scorecard phriends). Dark = `rgba(5,18,5,0.98)`, light = `#f3f6ef`. Write gradient cards as `linear-gradient(135deg, rgba(var(--HUE-rgb),0.07), var(--card-deep))`.
+- **Text tokens (light values darkened for contrast):** `--text-label` .92, `--text-muted` .74, `--text-dim` .66.
+
+### Low-alpha colored text — readable floor
+Colored text glows on black but washes out on white. **Inline `color: rgba(var(--HUE-rgb), a)` text uses a 0.7 alpha floor** — anything below reads as invisible on light. (Backgrounds/borders are exempt; always-dark overlays exempt.)
+
+### `--white` token
+Dark = `#f0fff0`, light = `#14211a`. Use `var(--white)` for "bright body text" — never `#fff` (which vanishes on light; this caused the My Shows "disappearing day").
+
+---
+
+## New Patterns — 2026-06-25
+
+### Mobile safe-area / fixed chrome
+- Viewport meta **must** include `viewport-fit=cover` or `env(safe-area-inset-*)` is 0 and all safe-area handling is inert.
+- Fixed header: `padding-top: env(safe-area-inset-top)` fills the notch.
+- Bottom nav: `height: calc(72px + env(safe-area-inset-bottom))` (NOT `72px` + padding — with `box-sizing: border-box` the padding eats the content height and clips labels).
+- Top overscroll: `html,body { overscroll-behavior-y: none }` + `html { background: var(--bg-elevated) }` so iOS rubber-band can't reveal a light strip above the fixed header.
+
+### Header gradient
+`.app-header` background is bottom-up: `linear-gradient(0deg, rgba(var(--cyan-rgb),0.26) 0%, rgba(var(--cyan-rgb),0.11) 45%, var(--bg-panel) 82%)` — tint rises from the bottom to back the wordmark/tagline.
+
+### Save-confirmation flash
+Auto-save UIs (ProfileModal prefs) show a transient `✓ SAVED` pill (green, fades out ~1.8s) in the header rather than a Save button.
+
+### Inputs that must not trigger password managers
+Username search/tag inputs add: `type="text" name="…-search" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} data-1p-ignore data-lpignore="true" data-form-type="other"`.
+
+### Vocabulary addition
+- **PHAN ROLL** — the community member board (renamed from "Leaderboard"; deliberately non-competitive). Still `leaderboard` in code/API.

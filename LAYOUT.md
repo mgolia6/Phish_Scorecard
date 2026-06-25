@@ -1,5 +1,5 @@
 # Phreezer — Layout & Design State
-**Last updated:** 2026-06-17
+**Last updated:** 2026-06-25
 
 ---
 
@@ -15,6 +15,11 @@
 
 ### Aesthetic
 Retro terminal / synthwave. Dark background, glow effects, scanlines. This is the identity — do not deviate.
+
+### Light Mode (admin-gated — added 2026-06-25)
+- Toggle in ProfileModal → MY PHISH → APPEARANCE, **rendered only for `is_admin`**. Regular users only ever see dark. Do not remove the gate until release.
+- Implemented as `[data-theme="light"]` on `<html>` (theme.js, persisted in localStorage). Every design token is overridden; **dark token values are byte-identical to the original literals**, so dark mode is unchanged — only edit light values or shared tokens with that invariant in mind.
+- See STYLE_GUIDE.md for the full token list (RGB hue tokens, `--ink-rgb`, `--inset-*`, `--card-deep`, `--hairline`).
 
 ### Colors
 - `--green`: `#33ff33` — primary accent, section labels
@@ -38,6 +43,13 @@ Retro terminal / synthwave. Dark background, glow effects, scanlines. This is th
 ### Bottom Tab Nav
 4 tabs: **MY PHREEZER · COMMUNITY · SCORECARD**
 - Shop and About live in ProfileModal — NOT in tab nav
+- Height: `calc(72px + env(safe-area-inset-bottom))` — keeps a full 72px of content **above** the home-indicator zone (border-box would otherwise let the safe-area padding clip the labels — caused "MY PHREEZER" to cut off). Icon 1.5rem, label 0.64rem.
+
+### Header (mobile, fixed)
+- `.mobile-sticky-header` is `position: fixed; top:0` with `padding-top: env(safe-area-inset-top)` to fill the notch (opaque, no content peeks above).
+- `.app-header` background is a **bottom-up gradient** (cyan tint rising from the bottom) so the wordmark/tagline gets a darker backing.
+- Top overscroll: `overscroll-behavior-y: none` + `html { background: var(--bg-elevated) }` so iOS rubber-band can't reveal a light strip above the header.
+- **Requires `viewport-fit=cover`** in the viewport meta — without it `env(safe-area-inset-*)` is 0 and all of the above is inert.
 
 ### Mobile Filter (Scorecard)
 4 independent dropdowns: YEAR / MONTH / DAY / DAY OF WEEK
@@ -66,7 +78,7 @@ Three columns:
 ```
 FEED (first)
 PHRIEND OVERLAP (second — moved up from last)
-LEADERBOARD
+PHAN ROLL  (renamed from LEADERBOARD 2026-06-25 — non-competitive)
 TOP SHOWS
 TOP SONGS
 TOP VENUES
@@ -108,10 +120,11 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ## Community Tab
 
 ### Subtab order (mobile + desktop) — CONFIRMED
-**FEED · PHRIEND OVERLAP · LEADERBOARD · TOP SHOWS · TOP SONGS · TOP VENUES · TOP STATES**
+**FEED · PHRIEND OVERLAP · PHAN ROLL · TOP SHOWS · TOP SONGS · TOP VENUES · TOP STATES**
 
 - FEED is default landing — do not revert
 - PHRIEND OVERLAP is second — do not revert (was last)
+- **PHAN ROLL** = renamed from LEADERBOARD (2026-06-25), deliberately non-competitive. Still `subTab="leaderboard"` / `/api/community/leaderboard` under the hood — only the label + panel title changed. Row fonts enlarged.
 
 ### Feed
 - Pinned posts sort first, orange left border, ❄ PINNED · UNCLE EBENEZER badge
@@ -125,14 +138,20 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ### Phriend Overlap
 - Logged-out gate: ⚇ icon + description + CREATE ACCOUNT/LOGIN CTAs
 - Companion marking: + COMPANION → ◈ COMPANION → ❄ MUTUAL
+- **Pick-a-phriend dropdown** (2026-06-25): on focus, lists phreezers who share your shows (`/community/overlap-suggestions`, with shared-show counts); typing runs typeahead (`/community/user-search`); same list also renders below the bar. The **My Phriends** tab (ProfileModal/sub-tab) now uses the identical picker — no more typing a username from memory; it keeps the YOU/THEM per-show score table + a CLEAR button.
+- All phriend-search/tag inputs are hardened against password-manager autofill (type/name + autoComplete off + 1Password/LastPass/Dashlane ignore attrs).
 
 ---
 
 ## ProfileModal
 5 tabs: **MY PHISH · BADGES · ABOUT · AI · SHOP**
-- AI tab added this session — between ABOUT and SHOP
+- AI tab between ABOUT and SHOP
 - BADGES tab: shows founder badges (PHAB PHIVE, EARLY PHREEZE) and milestone badges
 - Desktop width: 820px
+- **APPEARANCE** section (MY PHISH tab) — DARK / LIGHT theme toggle, **admin-only** (added 2026-06-25)
+- **✓ SAVED** confirmation flash in the modal header — fires on every profile preference change (sit/era/side/avatar all auto-save)
+- Avatar selector tiles use themed inset backgrounds (not the old `rgba(0,0,0,.3)` dark fill) so they read in light mode
+- Modal inner has `padding-top: env(safe-area-inset-top)` so the page can't peek above the modal header on notched devices
 
 ---
 
@@ -157,6 +176,8 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - Show loads 2400ms after button press (animation completes)
 - RANDOM SHOW button sits below all filters
 - Default show list HIDDEN — arrow shows immediately below RANDOM SHOW
+- **Re-roll** (2026-06-25): once a show is loaded, an "⚄ ANOTHER RANDOM SHOW" button appears in the masthead (was previously only on the empty state)
+- SHOW NOTES toggle: filled, full-cyan, prominent (was a faint outline that disappeared on light)
 
 ### Show Masthead (Desktop)
 - Left: date, venue, location, tour, audio badge
@@ -176,7 +197,7 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - Glitch exit: RGB split, hue rotation, clip-path tears → fades to black into app (melt at +80ms, glitch at +1700ms, done at +2900ms)
 - TAP TO SKIP visible after 2nd line
 - Boot sequence z-index: 2000 — always above FullPageLoader (z-index: 1000)
-- FullPageLoader: restored spinner for all other loading states (admin, community tabs, etc.)
+- FullPageLoader: spinner for all other loading states (admin, community tabs, etc.); snowflake enlarged to clamp(220px,56vw,340px) with a brighter LOADING label (2026-06-25)
 - Do NOT revert to left-aligned, instant-pop, or particle animation
 
 ---
@@ -223,11 +244,17 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - **Logged-out desktop:** home tab with DesktopLanding — not scorecard
 - **New post box:** collapsed single row — do not revert to always-expanded
 - **ProfileModal tabs:** MY PHISH · BADGES · ABOUT · AI · SHOP — do not reorder
+- **Light mode:** admin-gated sandbox — do not remove the `is_admin` gate on the APPEARANCE toggle until release
+- **Dark mode is the baseline:** light tokens override; dark token values must stay == their original literals so dark renders unchanged
+- **PHAN ROLL** is the Leaderboard label — non-competitive framing, do not revert to "LEADERBOARD"
+- **viewport-fit=cover** must stay in the viewport meta — the header/modal/bottom-nav safe-area handling all depends on it
+- **index.html is no-cache** (vercel.json) — keeps the SPA from serving stale bundles; do not remove
 
 ---
 
 ## What's Explicitly NOT There Yet
-- Desktop UAT pass — full walkthrough not done. Known issues: font sizes too small in places (causes squinting), visual polish needed. Scorecard overlay fixed (keeps sidebar/rail on desktop) but broader desktop pass pending Matthew's recorded UAT session.
+- **Light mode public release** — fully built but admin-gated. Before un-gating: light-mode logo/tagline asset (tagline is baked into the light-colored logo PNG, washes out on light — needs a dark-ink logo or live-text wordmark), and a final sweep for stray hardcoded hex literals.
+- Desktop UAT pass — full walkthrough not done. Mobile chrome/safe-area pass done 2026-06-25. Known issues: font sizes too small in places (causes squinting), visual polish needed. Scorecard overlay fixed (keeps sidebar/rail on desktop) but broader desktop pass pending Matthew's recorded UAT session.
 - Feed reply notifications
 - Feed moderation in admin panel
 - Phish Phreeze community subtab (band-level stats)

@@ -120,6 +120,8 @@ At the start of every session, before anything else:
 - Built to scale — make space for features as we grow
 - Matthew's name is Matthew
 - Always read STYLE_GUIDE.md before touching any UI component
+- **Theme:** dark is the baseline; light is `[data-theme="light"]` (admin-gated). When editing a token, keep its dark value == the original literal so dark mode never shifts. Don't introduce hardcoded colors — use tokens so both themes flip.
+- **Safe-area:** the app uses `viewport-fit=cover`; honor `env(safe-area-inset-*)` on any fixed top/bottom chrome.
 
 ## Session Wrap Protocol (REQUIRED — do not skip)
 
@@ -157,7 +159,7 @@ Update if any of the following changed this session:
 - New DB tables or schema changes → update Database Access section
 - New conventions established → add to Standing Preferences or Security Notes
 - New files added to /api or /client/src/components → update Architecture
-This session: `RESEND_API_KEY` → `PHREEZER_RESEND_API_KEY`, new `api/admin/health.js` endpoint added.
+2026-06-25: new endpoints `api/admin/send-email.js` (en-masse + per-user lifecycle/template sends), `api/emails/unsubscribe.js` (RFC-8058 one-click), per-user cost in `api/admin/ai-usage.js`; `api/emails/cron.js` exports `runLifecycleEmails(pool)` + accepts `Authorization: Bearer <CRON_SECRET>` + weekly-reminder pass; new client file `client/src/theme.js` (theme get/set/apply); `vercel.json` now has a `headers` block (no-cache on index.html). DB: lazy-added `email_opt_out` / `unsubscribe_token` columns on users.
 
 ### Step 5 — STYLE_GUIDE.md
 Update if any of the following changed:
