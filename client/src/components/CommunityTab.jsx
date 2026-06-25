@@ -329,7 +329,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
 
       {result && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), rgba(5,18,5,0.98))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), var(--card-deep))' }}>
             <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>{result.target.username.slice(0,2).toUpperCase()}</div>
             <div style={{ flex: 1 }}><div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div></div>
             <button onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', color: 'rgba(var(--orange-bright-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>X CLEAR</button>
@@ -413,21 +413,21 @@ export function CommunityTab({ api, subTab = 'leaderboard', onRateShow, user, on
   if (subTab === 'leaderboard') {
     return (
       <div className="panel">
-        <div className="panel-title">LEADERBOARD</div>
+        <div className="panel-title">PHAN ROLL</div>
         {!leaderboard.length ? (
           <div className="lb-empty">NO DATA YET — RATE SOME SHOWS</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {leaderboard.map(row => (
               <div key={row.username} className={`leaderboard-row ${row.is_me ? 'is-me' : ''}`}
-                style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto auto auto auto auto', alignItems: 'center', gap: '8px', padding: '11px 14px', borderBottom: '1px solid rgba(var(--green-rgb),0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(var(--cyan-bright-rgb),0.025)' : 'transparent' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>{row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}</span>
-                <span title="Shows rated" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.shows_rated}</span>
-                <span title="Avg score" style={{ fontFamily: 'var(--font-display)', fontSize: '0.76rem', color: 'var(--orange)', letterSpacing: 1, textAlign: 'right' }}>{row.avg_score ?? '—'}</span>
-                <span title="Login streak" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
-                <span title="Feedback submitted" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: row.feedback_count > 0 ? 'var(--green)' : 'var(--text-muted)', textAlign: 'right' }}>{row.feedback_count > 0 ? `◈${row.feedback_count}` : '—'}</span>
-                <span title="Bugs reported" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: row.bugs_reported > 0 ? 'var(--orange)' : 'var(--text-muted)', textAlign: 'right' }}>{row.bugs_reported > 0 ? `⚠${row.bugs_reported}` : '—'}</span>
+                style={{ display: 'grid', gridTemplateColumns: '32px 1fr auto auto auto auto auto', alignItems: 'center', gap: '8px', padding: '13px 14px', borderBottom: '1px solid rgba(var(--green-rgb),0.06)', borderLeft: row.is_me ? '2px solid var(--cyan)' : 'none', background: row.is_me ? 'rgba(var(--cyan-bright-rgb),0.025)' : 'transparent' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: row.rank === 1 ? 'var(--orange)' : row.rank === 2 ? 'var(--cyan)' : row.rank === 3 ? 'var(--green)' : 'var(--text-muted)' }}>{row.rank === 1 ? '★' : row.rank === 2 ? '◈' : row.rank === 3 ? '◉' : row.rank}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: row.is_me ? 'var(--cyan)' : 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.username}{row.is_me && <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', marginLeft: 6, letterSpacing: '1px', opacity: 0.7 }}> ◈ YOU</span>}</span>
+                <span title="Shows rated" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.shows_rated}</span>
+                <span title="Avg score" style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--orange)', letterSpacing: 1, textAlign: 'right' }}>{row.avg_score ?? '—'}</span>
+                <span title="Login streak" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-label)', textAlign: 'right' }}>{row.login_streak > 1 ? `⚡${row.login_streak}` : '—'}</span>
+                <span title="Feedback submitted" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: row.feedback_count > 0 ? 'var(--green)' : 'var(--text-muted)', textAlign: 'right' }}>{row.feedback_count > 0 ? `◈${row.feedback_count}` : '—'}</span>
+                <span title="Bugs reported" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: row.bugs_reported > 0 ? 'var(--orange)' : 'var(--text-muted)', textAlign: 'right' }}>{row.bugs_reported > 0 ? `⚠${row.bugs_reported}` : '—'}</span>
               </div>
             ))}
           </div>

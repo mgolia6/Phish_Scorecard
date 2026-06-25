@@ -72,7 +72,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
 
   return (
     <div style={{
-      background: cardBackground || 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.07) 0%, rgba(5,18,5,0.98) 100%)',
+      background: cardBackground || 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.07) 0%, var(--card-deep) 100%)',
       border: cardBorder || '1px solid rgba(var(--cyan-rgb),0.3)',
       borderLeft: cardBorderLeft || '3px solid var(--cyan)',
       boxShadow: cardGlow || 'none',
@@ -87,7 +87,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--cyan)', letterSpacing: '2.5px' }}>{yearsAgo} YRS AGO</span>
         </div>
 
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.9rem', fontWeight: 900, color: '#fff', letterSpacing: '2px', lineHeight: 1.1, marginBottom: 6 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.9rem', fontWeight: 900, color: 'var(--white)', letterSpacing: '2px', lineHeight: 1.1, marginBottom: 6 }}>
           {fullDate}
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--cyan)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

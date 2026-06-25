@@ -432,7 +432,7 @@ export default function App() {
             <div className="sub-tab-nav">
               <button className={`sub-tab-btn ${tab === 'feed'         ? 'active' : ''}`} onClick={() => setTab('feed')}>FEED</button>
               <button className={`sub-tab-btn ${tab === 'phriend-overlap' ? 'active' : ''}`} onClick={() => setTab('phriend-overlap')}>PHRIEND OVERLAP</button>
-              <button className={`sub-tab-btn ${tab === 'community'   ? 'active' : ''}`} onClick={() => setTab('community')}>LEADERBOARD</button>
+              <button className={`sub-tab-btn ${tab === 'community'   ? 'active' : ''}`} onClick={() => setTab('community')}>PHAN ROLL</button>
               <button className={`sub-tab-btn ${tab === 'top-shows'   ? 'active' : ''}`} onClick={() => setTab('top-shows')}>TOP SHOWS</button>
               <button className={`sub-tab-btn ${tab === 'top-songs'   ? 'active' : ''}`} onClick={() => setTab('top-songs')}>TOP SONGS</button>
               <button className={`sub-tab-btn ${tab === 'top-venues'  ? 'active' : ''}`} onClick={() => setTab('top-venues')}>TOP VENUES</button>

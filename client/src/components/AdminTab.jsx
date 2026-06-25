@@ -24,13 +24,13 @@ const SectionLabel = ({ color = D.cyan, children }) => (
 const StatBox = ({ val, label, color = D.cyan }) => (
   <div style={{ textAlign: 'center', padding: '12px 6px', background: 'var(--inset-soft)', border: `1px solid ${color}22` }}>
     <div style={{ fontFamily: D.disp, fontSize: '1.6rem', color, lineHeight: 1 }}>{val}</div>
-    <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.muted, letterSpacing: '1.5px', marginTop: 4 }}>{label}</div>
+    <div style={{ fontFamily: D.disp, fontSize: '0.69rem', color: D.muted, letterSpacing: '1.5px', marginTop: 4 }}>{label}</div>
   </div>
 );
 
 const TabBtn = ({ active, color, onClick, children }) => (
   <button onClick={onClick} style={{
-    fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px',
+    fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px',
     padding: '10px 14px', border: `1px solid ${active ? color : 'rgba(var(--green-rgb),0.15)'}`,
     background: active ? `${color}18` : 'transparent',
     color: active ? color : D.muted, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
@@ -109,9 +109,9 @@ function ApiHealthTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <SectionLabel color={D.green}>◈ API HEALTH</SectionLabel>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
+          {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
           <button onClick={runProbes} disabled={running} style={{
-            fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '8px 14px',
+            fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', padding: '8px 14px',
             border: `1px solid ${D.green}`, background: 'transparent', color: D.green, cursor: 'pointer',
           }}>{running ? 'PROBING...' : '↺ REFRESH'}</button>
         </div>
@@ -138,7 +138,7 @@ function ApiHealthTab() {
                 {statusIcon(r.status)}
               </span>
               <div>
-                <div style={{ fontFamily: D.disp, fontSize: '0.66rem', color: D.label, letterSpacing: '1.5px' }}>{r.name}</div>
+                <div style={{ fontFamily: D.disp, fontSize: '0.73rem', color: D.label, letterSpacing: '1.5px' }}>{r.name}</div>
                 <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, marginTop: 1 }}>{r.path}</div>
               </div>
             </div>
@@ -219,16 +219,16 @@ function ErrorLogTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <SectionLabel color={D.red}>◈ ERROR LOG</SectionLabel>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={refresh} style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
-          <button onClick={copyAll} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>COPY JSON</button>
-          <button onClick={exportText} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer' }}>EXPORT .TXT</button>
-          <button onClick={clearLog} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.red}`, background: 'transparent', color: D.red, cursor: 'pointer' }}>CLEAR</button>
+          <button onClick={refresh} style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
+          <button onClick={copyAll} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.cyan}`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}>COPY JSON</button>
+          <button onClick={exportText} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer' }}>EXPORT .TXT</button>
+          <button onClick={clearLog} disabled={!log.length} style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '7px 12px', border: `1px solid ${D.red}`, background: 'transparent', color: D.red, cursor: 'pointer' }}>CLEAR</button>
         </div>
       </div>
 
       {!log.length ? (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color: D.green, letterSpacing: '2px', marginBottom: 8 }}>✓ NO ERRORS</div>
+          <div style={{ fontFamily: D.disp, fontSize: '0.69rem', color: D.green, letterSpacing: '2px', marginBottom: 8 }}>✓ NO ERRORS</div>
           <div style={{ fontFamily: D.mono, fontSize: '0.75rem', color: D.muted }}>Errors from console.error, uncaught exceptions, and unhandled promise rejections will appear here.</div>
         </div>
       ) : (
@@ -245,7 +245,7 @@ function ErrorLogTab() {
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: typeColor(e.type), border: `1px solid ${typeColor(e.type)}55`, padding: '1px 6px', flexShrink: 0 }}>
+                    <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', color: typeColor(e.type), border: `1px solid ${typeColor(e.type)}55`, padding: '1px 6px', flexShrink: 0 }}>
                       {e.type.toUpperCase()}
                     </span>
                     <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, flexShrink: 0 }}>
@@ -269,13 +269,13 @@ function ErrorLogTab() {
                     </div>
                   )}
                   {e.stack && (
-                    <pre style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, marginTop: 8, whiteSpace: 'pre-wrap', wordBreak: 'break-all', background: 'var(--inset)', padding: 10, maxHeight: 200, overflowY: 'auto' }}>
+                    <pre style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted, marginTop: 8, whiteSpace: 'pre-wrap', wordBreak: 'break-all', background: 'var(--inset)', padding: 10, maxHeight: 200, overflowY: 'auto' }}>
                       {e.stack}
                     </pre>
                   )}
                   <button
                     onClick={() => navigator.clipboard.writeText(JSON.stringify(e, null, 2))}
-                    style={{ marginTop: 8, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '6px 12px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}
+                    style={{ marginTop: 8, fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '6px 12px', border: `1px solid ${D.cyan}55`, background: 'transparent', color: D.cyan, cursor: 'pointer' }}
                   >
                     COPY THIS ERROR
                   </button>
@@ -450,7 +450,7 @@ function SystemTab({ api, showMessage }) {
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
                     <span style={{ color: r.status === 'ok' ? D.green : D.red, fontFamily: D.disp, fontSize: '0.7rem' }}>{r.status === 'ok' ? '✓' : '✗'}</span>
                     <span style={{ fontFamily: D.mono, fontSize: '0.7rem', color: r.status === 'ok' ? 'rgba(var(--green-rgb),0.7)' : D.red }}>{r.migration}</span>
-                    {r.error && <span style={{ fontSize: '0.66rem', color: D.red, opacity: 0.7 }}>{r.error}</span>}
+                    {r.error && <span style={{ fontSize: '0.73rem', color: D.red, opacity: 0.7 }}>{r.error}</span>}
                   </div>
                 ))}
               </div>
@@ -490,7 +490,7 @@ function SystemTab({ api, showMessage }) {
           </div>
           <div style={{ fontFamily: D.mono, fontSize: '0.74rem', color: D.muted, marginBottom: 20 }}>
             Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
-            <button onClick={loadStats} style={{ marginLeft: 10, fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '4px 10px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
+            <button onClick={loadStats} style={{ marginLeft: 10, fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '4px 10px', border: `1px solid ${D.muted}`, background: 'transparent', color: D.muted, cursor: 'pointer' }}>↺</button>
           </div>
         </>
       )}
@@ -498,7 +498,7 @@ function SystemTab({ api, showMessage }) {
       {ACTIONS.map(group => (
         <div key={group.group} style={{ marginBottom: 28 }}>
           <div style={{
-            fontFamily: D.disp, fontSize: '0.62rem', color: group.color,
+            fontFamily: D.disp, fontSize: '0.69rem', color: group.color,
             letterSpacing: '3px', marginBottom: 12, opacity: 0.85,
             borderBottom: `1px solid ${group.color}22`, paddingBottom: 8,
           }}>
@@ -525,7 +525,7 @@ function SystemTab({ api, showMessage }) {
                   onClick={item.action}
                   disabled={!!working}
                   style={{
-                    fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px',
+                    fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px',
                     padding: '12px 16px',
                     background: 'transparent', border: 'none',
                     color: !!working && working !== item.key ? `${group.color}33` : group.color,
@@ -534,7 +534,7 @@ function SystemTab({ api, showMessage }) {
                     display: 'flex', alignItems: 'center', gap: 10,
                   }}
                 >
-                  <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>{working === item.key ? '◌' : '▶'}</span>
+                  <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>{working === item.key ? '◌' : '▶'}</span>
                   {working === item.key ? '◈ WORKING...' : item.label}
                 </button>
               </div>
@@ -576,7 +576,7 @@ function FeedbackTab({ api }) {
 
       {data.section_summary?.length > 0 && (
         <div style={{ marginBottom: 18 }}>
-          <div style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SECTIONS (PASSIVE)</div>
+          <div style={{ fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SECTIONS (PASSIVE)</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {data.section_summary.map(s => (
               <span key={s.section} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.cyan, border: `1px solid ${D.cyan}33`, padding: '3px 8px' }}>
@@ -595,7 +595,7 @@ function FeedbackTab({ api }) {
         ))}
       </div>
 
-      <div style={{ fontFamily: D.disp, fontSize: '0.66rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>
+      <div style={{ fontFamily: D.disp, fontSize: '0.73rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>
         {filtered.length} RESPONSES
       </div>
 
@@ -605,10 +605,10 @@ function FeedbackTab({ api }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span style={{ fontFamily: D.mono, fontSize: '0.84rem', color: D.label }}>{r.phishnet_username || r.email}</span>
-                <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(var(--orange-bright-rgb),0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
-                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.35)', padding: '1px 6px' }}>{r.section}</span>}
+                <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', color: D.orange, border: '1px solid rgba(var(--orange-bright-rgb),0.35)', padding: '1px 6px' }}>{r.trigger_type}</span>
+                {r.section && <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.35)', padding: '1px 6px' }}>{r.section}</span>}
               </div>
-              <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, flexShrink: 0 }}>
+              <span style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted, flexShrink: 0 }}>
                 {new Date(r.created_at).toLocaleDateString()}
               </span>
             </div>
@@ -620,7 +620,7 @@ function FeedbackTab({ api }) {
             {r.answers && Object.keys(r.answers).length > 0 && (
               <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {Object.entries(r.answers).map(([k, v]) => (
-                  <span key={k} style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>
+                  <span key={k} style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>
                     <span style={{ color: D.label }}>{k}:</span> {String(v)}
                   </span>
                 ))}
@@ -662,11 +662,11 @@ function UserEmailNudge({ userId, username }) {
         {EMAIL_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>
       <button onClick={send} disabled={busy}
-        style={{ fontFamily: D.disp, fontSize: '0.64rem', letterSpacing: '1.5px', padding: '9px 14px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.5 : 1 }}>
+        style={{ fontFamily: D.disp, fontSize: '0.71rem', letterSpacing: '1.5px', padding: '9px 14px', border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.5 : 1 }}>
         {busy ? '…' : '✉ SEND'}
       </button>
       {done === 'ok' && <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.green }}>✓ sent</span>}
-      {done?.startsWith('err') && <span style={{ fontFamily: D.mono, fontSize: '0.64rem', color: D.red }}>{done.slice(4)}</span>}
+      {done?.startsWith('err') && <span style={{ fontFamily: D.mono, fontSize: '0.71rem', color: D.red }}>{done.slice(4)}</span>}
     </div>
   );
 }
@@ -764,7 +764,7 @@ function UsersTab({ api, showError }) {
             ].map(({ val, lbl, col }) => (
               <div key={lbl} style={{ padding: '10px 4px', background: 'var(--inset-md)', borderTop: `2px solid ${col}`, textAlign: 'center' }}>
                 <div style={{ fontFamily: D.disp, fontSize: '1.4rem', color: col, lineHeight: 1 }}>{val}</div>
-                <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
+                <div style={{ fontFamily: D.disp, fontSize: '0.67rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
               </div>
             ))}
           </div>
@@ -786,7 +786,7 @@ function UsersTab({ api, showError }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontFamily: D.mono, fontSize: '1.05rem', color: 'var(--white)' }}>{u.username}</span>
-                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.4)', padding: '2px 6px' }}>ADMIN</span>}
+                  {u.is_admin && <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '2px', color: D.cyan, border: '1px solid rgba(var(--cyan-rgb),0.4)', padding: '2px 6px' }}>ADMIN</span>}
                 </div>
                 <div style={{ fontFamily: D.mono, fontSize: '0.8rem', color: D.muted, marginTop: 3 }}>{u.email}</div>
                 {/* Mini stat pills — collapsed only (full grid shows when expanded) */}
@@ -799,7 +799,7 @@ function UsersTab({ api, showError }) {
                     ].map(({ val, lbl, col }) => (
                       <span key={lbl} style={{ fontFamily: D.mono, fontSize: '0.78rem', color: col }}>
                         <span style={{ fontFamily: D.disp, fontSize: '0.9rem' }}>{val}</span>
-                        <span style={{ color: D.muted, fontSize: '0.64rem', marginLeft: 3 }}>{lbl}</span>
+                        <span style={{ color: D.muted, fontSize: '0.71rem', marginLeft: 3 }}>{lbl}</span>
                       </span>
                     ))}
                   </div>
@@ -826,18 +826,18 @@ function UsersTab({ api, showError }) {
                   ].map(({ val, lbl, col }) => (
                     <div key={lbl} style={{ padding: '12px 4px', textAlign: 'center', borderRight: '1px solid rgba(var(--green-rgb),0.06)' }}>
                       <div style={{ fontFamily: D.disp, fontSize: '1.3rem', color: col, lineHeight: 1 }}>{val}</div>
-                      <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
+                      <div style={{ fontFamily: D.disp, fontSize: '0.67rem', color: D.muted, letterSpacing: '1.5px', marginTop: 5 }}>{lbl}</div>
                     </div>
                   ))}
                 </div>
                 {/* AI cost */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', borderBottom: '1px solid rgba(var(--green-rgb),0.08)' }}>
-                  <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.muted }}>CLAUDE AI COST</span>
+                  <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '2px', color: D.muted }}>CLAUDE AI COST</span>
                   <span style={{ fontFamily: D.mono, fontSize: '0.85rem', color: D.orange }}>${Number(u.ai_cost_usd || 0).toFixed(4)}</span>
                 </div>
                 {/* Email nudge */}
                 <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(var(--green-rgb),0.08)' }}>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.58rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SEND EMAIL</div>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.65rem', letterSpacing: '2px', color: D.muted, marginBottom: 8 }}>SEND EMAIL</div>
                   <UserEmailNudge userId={u.id} username={u.username} />
                 </div>
                 {/* Management actions — tidy 2-col grid, destructive last */}
@@ -853,7 +853,7 @@ function UsersTab({ api, showError }) {
                     <button key={action}
                       onClick={() => confirm ? setConfirming({ userId: u.id, username: u.username, action }) : doAction(u.id, action)}
                       disabled={!!working}
-                      style={{ width: '100%', fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '1.5px', padding: '11px 8px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: working ? 'default' : 'pointer', textAlign: 'center' }}>
+                      style={{ width: '100%', fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '1.5px', padding: '11px 8px', border: `1px solid ${col}55`, background: 'transparent', color: col, cursor: working ? 'default' : 'pointer', textAlign: 'center' }}>
                       {working === `${u.id}-${action}` ? '…' : label}
                     </button>
                   ))}
@@ -939,9 +939,9 @@ function ExternalApiHealthTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <SectionLabel color={D.orange}>◈ EXTERNAL API STATUS</SectionLabel>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
+          {lastRun && <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{lastRun.toLocaleTimeString()}</span>}
           <button onClick={runProbes} disabled={running} style={{
-            fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '8px 14px',
+            fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', padding: '8px 14px',
             border: `1px solid ${D.orange}`, background: 'transparent', color: D.orange, cursor: 'pointer',
           }}>{running ? 'CHECKING...' : '↺ RECHECK'}</button>
         </div>
@@ -957,16 +957,16 @@ function ExternalApiHealthTab() {
               <span style={{ fontFamily: D.mono, fontSize: '0.9rem', color: statusColor(r.status) }}>
                 {statusIcon(r.status)}
               </span>
-              <span style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', color: D.label }}>
+              <span style={{ fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', color: D.label }}>
                 {r.name}
               </span>
             </div>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               {r.statusCode && (
-                <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{r.statusCode}</span>
+                <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{r.statusCode}</span>
               )}
               {r.ms !== null && (
-                <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: statusColor(r.status) }}>{r.ms}ms</span>
+                <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: statusColor(r.status) }}>{r.ms}ms</span>
               )}
             </div>
           </div>
@@ -1015,7 +1015,7 @@ function AiUsageTab({ api }) {
         ].map(s => (
           <div key={s.label} style={{ padding: '12px 10px', background: 'var(--inset-md)', borderTop: `2px solid ${s.color}`, textAlign: 'center' }}>
             <div style={{ fontFamily: D.mono, fontSize: '1rem', color: s.color, fontWeight: 700 }}>{s.val}</div>
-            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -1025,11 +1025,11 @@ function AiUsageTab({ api }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
         {byFeature.map(f => (
           <div key={f.feature} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--inset)', borderLeft: `3px solid ${D.cyan}` }}>
-            <span style={{ fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', color: D.label }}>{f.feature.toUpperCase()}</span>
+            <span style={{ fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', color: D.label }}>{f.feature.toUpperCase()}</span>
             <div style={{ display: 'flex', gap: 16 }}>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{fmt(f.calls)} calls</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{fmt(parseInt(f.input_tokens) + parseInt(f.output_tokens))} tokens</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(f.cost_usd)}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.cyan }}>{fmt(f.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{fmt(parseInt(f.input_tokens) + parseInt(f.output_tokens))} tokens</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.orange }}>{fmtCost(f.cost_usd)}</span>
             </div>
           </div>
         ))}
@@ -1041,10 +1041,10 @@ function AiUsageTab({ api }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
         {byModel.map(m => (
           <div key={m.model} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--inset)', borderLeft: `3px solid ${D.green}` }}>
-            <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.label }}>{m.model}</span>
+            <span style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.label }}>{m.model}</span>
             <div style={{ display: 'flex', gap: 16 }}>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.green }}>{fmt(m.calls)} calls</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(m.cost_usd)}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.green }}>{fmt(m.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.orange }}>{fmtCost(m.cost_usd)}</span>
             </div>
           </div>
         ))}
@@ -1057,9 +1057,9 @@ function AiUsageTab({ api }) {
           <div key={u.user_id ?? 'system'} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--inset)', borderLeft: `3px solid ${D.orange}` }}>
             <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.label }}>{u.username}</span>
             <div style={{ display: 'flex', gap: 16 }}>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{fmt(u.calls)} calls</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{fmt(parseInt(u.input_tokens) + parseInt(u.output_tokens))} tok</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(u.cost_usd)}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.cyan }}>{fmt(u.calls)} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted }}>{fmt(parseInt(u.input_tokens) + parseInt(u.output_tokens))} tok</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.orange }}>{fmtCost(u.cost_usd)}</span>
             </div>
           </div>
         ))}
@@ -1071,10 +1071,10 @@ function AiUsageTab({ api }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 24 }}>
         {byDay.slice(0, 14).map(d => (
           <div key={d.day} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', background: 'var(--inset-soft)' }}>
-            <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted }}>{d.day}</span>
+            <span style={{ fontFamily: D.mono, fontSize: '0.74rem', color: D.muted }}>{(() => { const s = String(d.day).slice(0,10); const [y,m,dd] = s.split('-'); const mn=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return (m && dd) ? `${mn[+m-1]} ${+dd}, ${y}` : s; })()}</span>
             <div style={{ display: 'flex', gap: 16 }}>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.cyan }}>{d.calls} calls</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.orange }}>{fmtCost(d.cost_usd)}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.cyan }}>{d.calls} calls</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.orange }}>{fmtCost(d.cost_usd)}</span>
             </div>
           </div>
         ))}
@@ -1087,12 +1087,12 @@ function AiUsageTab({ api }) {
         {recent.map(r => (
           <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', background: 'var(--inset-soft)' }}>
             <div>
-              <span style={{ fontFamily: D.disp, fontSize: '0.62rem', letterSpacing: '2px', color: D.orange, marginRight: 10 }}>{r.feature}</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>{r.username || 'system'}</span>
+              <span style={{ fontFamily: D.disp, fontSize: '0.69rem', letterSpacing: '2px', color: D.orange, marginRight: 10 }}>{r.feature}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>{r.username || 'system'}</span>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
-              <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>{r.input_tokens}+{r.output_tokens}tok</span>
-              <span style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.orange }}>{fmtCost(r.cost_usd)}</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>{r.input_tokens}+{r.output_tokens}tok</span>
+              <span style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.orange }}>{fmtCost(r.cost_usd)}</span>
             </div>
           </div>
         ))}
@@ -1161,7 +1161,7 @@ function DonationsTab({ api, showMessage, showError }) {
         ].map(s => (
           <div key={s.label} style={{ padding: '12px 10px', background: 'var(--inset-md)', borderTop: `2px solid ${s.color}`, textAlign: 'center' }}>
             <div style={{ fontFamily: D.mono, fontSize: '1.2rem', color: s.color, fontWeight: 700 }}>{s.val}</div>
-            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '2px', marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -1182,7 +1182,7 @@ function DonationsTab({ api, showMessage, showError }) {
         <button
           onClick={save} disabled={saving}
           style={{
-            padding: '12px 20px', fontFamily: D.disp, fontSize: '0.62rem',
+            padding: '12px 20px', fontFamily: D.disp, fontSize: '0.69rem',
             letterSpacing: '2px', background: D.green, color: '#000',
             border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700,
             opacity: saving ? 0.6 : 1, whiteSpace: 'nowrap',
@@ -1191,7 +1191,7 @@ function DonationsTab({ api, showMessage, showError }) {
           {saving ? 'SAVING...' : 'SAVE'}
         </button>
       </div>
-      <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>
+      <div style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>
         This is a cumulative total — enter the all-time number of items sold.
       </div>
     </div>
@@ -1212,7 +1212,7 @@ function MonitoringTab({ api }) {
       .catch(e => { setError(e.message); setLoading(false); });
   }, []);
 
-  if (loading) return <div style={{ fontFamily: D.disp, fontSize: '0.66rem', color: D.muted, letterSpacing: '2px', padding: 24 }}>LOADING...</div>;
+  if (loading) return <div style={{ fontFamily: D.disp, fontSize: '0.73rem', color: D.muted, letterSpacing: '2px', padding: 24 }}>LOADING...</div>;
   if (error)   return <div style={{ fontFamily: D.mono, fontSize: '0.75rem', color: D.red, padding: 24 }}>Error: {error}</div>;
   if (!data)   return null;
 
@@ -1234,7 +1234,7 @@ function MonitoringTab({ api }) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, boxShadow: on && built ? `0 0 6px ${color}` : 'none', flexShrink: 0 }} />
-        <span style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '2px', color }}>{label}</span>
+        <span style={{ fontFamily: D.disp, fontSize: '0.63rem', letterSpacing: '2px', color }}>{label}</span>
       </div>
     );
   };
@@ -1244,17 +1244,17 @@ function MonitoringTab({ api }) {
 
   const Row = ({ label, val, sub, color = D.label }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
-      <span style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.muted, letterSpacing: '2px' }}>{label}</span>
+      <span style={{ fontFamily: D.disp, fontSize: '0.67rem', color: D.muted, letterSpacing: '2px' }}>{label}</span>
       <div style={{ textAlign: 'right' }}>
         <span style={{ fontFamily: D.mono, fontSize: '0.82rem', color }}>{val}</span>
-        {sub && <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>{sub}</div>}
+        {sub && <div style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>{sub}</div>}
       </div>
     </div>
   );
 
   const Panel = ({ title, color = D.cyan, children }) => (
     <div style={{ background: 'var(--inset)', border: `1px solid ${color}22`, borderTop: `2px solid ${color}55`, padding: '14px 16px', marginBottom: 14 }}>
-      <div style={{ fontFamily: D.disp, fontSize: '0.62rem', color, letterSpacing: '3px', marginBottom: 12 }}>{title}</div>
+      <div style={{ fontFamily: D.disp, fontSize: '0.69rem', color, letterSpacing: '3px', marginBottom: 12 }}>{title}</div>
       {children}
     </div>
   );
@@ -1267,12 +1267,12 @@ function MonitoringTab({ api }) {
         {SERVICE_DEFS.map(s => (
           <div key={s.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
             <div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: D.label, letterSpacing: '1.5px' }}>{s.label}</div>
-              {!activation[s.key] && <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: D.muted, marginTop: 2 }}>{s.desc}</div>}
+              <div style={{ fontFamily: D.disp, fontSize: '0.67rem', color: D.label, letterSpacing: '1.5px' }}>{s.label}</div>
+              {!activation[s.key] && <div style={{ fontFamily: D.mono, fontSize: '0.73rem', color: D.muted, marginTop: 2 }}>{s.desc}</div>}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               {activation[s.key] && s.url && (
-                <a href={s.url} target='_blank' rel='noopener noreferrer' style={{ fontFamily: D.disp, fontSize: '0.56rem', letterSpacing: '1.5px', color: D.cyan, textDecoration: 'none', opacity: 0.7 }}>OPEN →</a>
+                <a href={s.url} target='_blank' rel='noopener noreferrer' style={{ fontFamily: D.disp, fontSize: '0.63rem', letterSpacing: '1.5px', color: D.cyan, textDecoration: 'none', opacity: 0.7 }}>OPEN →</a>
               )}
               <StatusDot on={activation[s.key]} built={s.built} />
             </div>
@@ -1291,7 +1291,7 @@ function MonitoringTab({ api }) {
           ].map(s => (
             <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'var(--inset-soft)', border: '1px solid rgba(var(--cyan-rgb),0.1)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.cyan, lineHeight: 1 }}>{s.val}</div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -1307,7 +1307,7 @@ function MonitoringTab({ api }) {
           ].map(s => (
             <div key={s.label} style={{ textAlign: 'center', padding: '10px 4px', background: 'var(--inset-soft)', border: '1px solid rgba(var(--green-rgb),0.1)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1.2rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -1318,7 +1318,7 @@ function MonitoringTab({ api }) {
           ].map(s => (
             <div key={s.label} style={{ textAlign: 'center', padding: '8px 4px', background: 'var(--inset-soft)', border: '1px solid rgba(var(--green-rgb),0.08)' }}>
               <div style={{ fontFamily: D.disp, fontSize: '1rem', color: D.green, lineHeight: 1 }}>{s.val}</div>
-              <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
+              <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '1px', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -1330,7 +1330,7 @@ function MonitoringTab({ api }) {
         <Row label="CALLS · 30 DAYS" val={fmtNum(ai?.thirty_day?.calls)} sub={fmtCost(ai?.thirty_day?.cost)} color={D.orange} />
         {(ai?.today || []).length > 0 && (
           <div style={{ marginTop: 8 }}>
-            <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>TODAY BY FEATURE</div>
+            <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '2px', marginBottom: 6 }}>TODAY BY FEATURE</div>
             {ai.today.map(r => (
               <Row key={r.feature} label={r.feature.toUpperCase()} val={`${fmtNum(r.calls)} calls`} sub={fmtCost(r.cost)} />
             ))}
@@ -1369,19 +1369,19 @@ function MonitoringTab({ api }) {
                 padding: '10px 0', borderBottom: '1px solid rgba(var(--ink-rgb),0.04)',
               }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.6rem', color: seeded ? D.orange : D.muted, letterSpacing: '1.5px' }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.67rem', color: seeded ? D.orange : D.muted, letterSpacing: '1.5px' }}>
                     {kb.label?.toUpperCase() || key.toUpperCase()}
                   </div>
-                  <div style={{ fontFamily: D.mono, fontSize: '0.65rem', color: D.muted, marginTop: 3, lineHeight: 1.4 }}>
+                  <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: D.muted, marginTop: 3, lineHeight: 1.4 }}>
                     {kb.desc}
                   </div>
                   {lastUpdated && (
-                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: needsRefresh ? D.red : 'rgba(var(--ink-rgb),0.2)', marginTop: 3 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.73rem', color: needsRefresh ? D.red : 'rgba(var(--ink-rgb),0.2)', marginTop: 3 }}>
                       Last seeded: {lastUpdated.toLocaleDateString()}{needsRefresh ? ' — REFRESH RECOMMENDED' : ''}
                     </div>
                   )}
                   {kb.with_rating !== undefined && (
-                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 2 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.73rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 2 }}>
                       {kb.with_rating} shows have Phish.net community rating
                     </div>
                   )}
@@ -1390,7 +1390,7 @@ function MonitoringTab({ api }) {
                   <div style={{ fontFamily: D.disp, fontSize: '1.1rem', color: seeded ? D.orange : D.muted, lineHeight: 1 }}>
                     {count > 0 ? count.toLocaleString() : '—'}
                   </div>
-                  <div style={{ fontFamily: D.disp, fontSize: '0.56rem', color: D.muted, letterSpacing: '1px', marginTop: 3 }}>
+                  <div style={{ fontFamily: D.disp, fontSize: '0.63rem', color: D.muted, letterSpacing: '1px', marginTop: 3 }}>
                     {seeded ? 'RECORDS' : 'NOT SEEDED'}
                   </div>
                 </div>
@@ -1446,7 +1446,7 @@ function EmailsTab({ api, showMessage, showError }) {
   }, []);
 
   const selStyle = { background: 'var(--bg-elevated)', border: '1px solid rgba(var(--green-rgb),0.25)', color: D.green, fontFamily: D.mono, fontSize: '0.8rem', padding: '10px 12px', outline: 'none', width: '100%' };
-  const btn = (c) => ({ background: 'transparent', border: `1px solid ${c}`, color: c, fontFamily: D.disp, fontSize: '0.66rem', letterSpacing: '2px', padding: '12px 16px', cursor: busy ? 'default' : 'pointer', width: '100%', opacity: busy ? 0.5 : 1 });
+  const btn = (c) => ({ background: 'transparent', border: `1px solid ${c}`, color: c, fontFamily: D.disp, fontSize: '0.73rem', letterSpacing: '2px', padding: '12px 16px', cursor: busy ? 'default' : 'pointer', width: '100%', opacity: busy ? 0.5 : 1 });
 
   const runAll = async () => {
     if (!window.confirm('Run the full lifecycle email pass for ALL users now? This sends real emails.')) return;
@@ -1484,7 +1484,7 @@ function EmailsTab({ api, showMessage, showError }) {
         </select>
         <button onClick={sendOne} disabled={busy || !selUser} style={btn(D.cyan)}>{busy ? 'SENDING…' : '✉ SEND EMAIL'}</button>
       </div>
-      <div style={{ marginTop: 10, fontFamily: D.mono, fontSize: '0.66rem', color: D.muted }}>Manual sends bypass the dedupe — you can resend the same email.</div>
+      <div style={{ marginTop: 10, fontFamily: D.mono, fontSize: '0.73rem', color: D.muted }}>Manual sends bypass the dedupe — you can resend the same email.</div>
 
       {result && <div style={{ marginTop: 16, fontFamily: D.mono, fontSize: '0.74rem', color: D.green }}>✓ {result}</div>}
     </div>

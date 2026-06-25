@@ -34,7 +34,7 @@ export function ShopTab() {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '4px', color: 'rgba(var(--green-rgb),0.7)', marginBottom: 8 }}>
           ◈ PHREEZER MERCH
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.7 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.7)', lineHeight: 1.7 }}>
           Represent at lot. Every purchase supports an independent fan project.<br />
           Ships via Etsy · Fulfilled by Printify
         </div>
@@ -82,7 +82,7 @@ export function ShopTab() {
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', letterSpacing: '2.5px', color: p.color, fontWeight: 700, marginBottom: 3 }}>
                       {p.name}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.35)' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.7)' }}>
                       {p.sub}
                     </div>
                   </div>
@@ -91,12 +91,12 @@ export function ShopTab() {
                   </div>
                 </div>
 
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--ink-rgb),0.45)', lineHeight: 1.7, marginBottom: 14 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--ink-rgb),0.7)', lineHeight: 1.7, marginBottom: 14 }}>
                   {p.desc}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'rgba(var(--ink-rgb),0.2)', border: `1px solid rgba(var(--ink-rgb),0.1)`, padding: '3px 8px' }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', color: 'rgba(var(--ink-rgb),0.7)', border: `1px solid rgba(var(--ink-rgb),0.1)`, padding: '3px 8px' }}>
                     {p.tag}
                   </span>
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', color: p.color }}>
@@ -110,7 +110,7 @@ export function ShopTab() {
       </div>
 
       {/* Footer */}
-      <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(var(--green-rgb),0.08)', fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.2)', lineHeight: 1.8, textAlign: 'center' }}>
+      <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(var(--green-rgb),0.08)', fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.7)', lineHeight: 1.8, textAlign: 'center' }}>
         All products sold via Etsy.<br />
         Questions? <a href="mailto:phreezer.support@mpgink.com" style={{ color: 'rgba(var(--cyan-rgb),0.7)', textDecoration: 'none' }}>phreezer.support@mpgink.com</a>
       </div>
