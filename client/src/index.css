@@ -40,6 +40,7 @@
   --inset-xstrong: rgba(0,0,0,0.6);
   --hairline:      rgba(var(--ink-rgb),0.07);  /* faint dividers/borders */
   --ink-rgb:       255,255,255;             /* dimmed-white text/borders → dark ink on light */
+  --card-deep:     rgba(5,18,5,0.98);       /* deep base of tinted gradient cards → light surface on light */
 
   /* Contrast-safe text opacities — nothing below 0.42 */
   --text-label:    rgba(var(--green-rgb),0.58);
@@ -90,6 +91,7 @@
   --inset-xstrong: rgba(20,50,25,0.12);
   --hairline:      rgba(0,0,0,0.10);
   --ink-rgb:       20,33,26;
+  --card-deep:     #f3f6ef;   /* tinted gradient cards bottom out on soft light, not near-black */
 
   /* Neon glows read as blur on light — drop them for Phase 1 */
   --glow-green:    none;
@@ -362,7 +364,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-panel);
+  background: linear-gradient(180deg, rgba(var(--cyan-rgb),0.07) 0%, var(--bg-panel) 78%);
   position: relative;
   gap: 12px;
 }
@@ -854,7 +856,7 @@ select option { background: var(--bg); color: var(--green); }
 .profile-modal-tabs { display: flex; background: var(--bg); border-bottom: 1px solid rgba(var(--green-rgb),0.1); flex-shrink: 0; }
 .profile-modal-tab { flex: 1; padding: 10px 0; font-family: var(--font-display); font-size: 0.58rem; letter-spacing: 2px; color: var(--text-label); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
 .profile-modal-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
-.profile-modal-inner { display: flex; flex-direction: column; height: 100%; background: var(--bg); }
+.profile-modal-inner { display: flex; flex-direction: column; height: 100%; background: var(--bg); padding-top: env(safe-area-inset-top, 0px); }
 .profile-modal-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 0 40px; }
 
 /* Leaderboard */
@@ -1220,7 +1222,9 @@ select option { background: var(--bg); color: var(--green); }
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 200;
-    background: var(--bg);
+    background: var(--bg-elevated);
+    /* Fill the notch/status-bar inset so page content can't peek above the header */
+    padding-top: env(safe-area-inset-top, 0px);
   }
   .mobile-scroll-body {
     padding-top: 100px;  /* fallback — overridden by JS ResizeObserver */

@@ -62,10 +62,10 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
       : 'rgba(var(--orange-bright-rgb),0.13)';
     return {
       background: isRated
-        ? 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.08) 0%, rgba(5,18,5,0.98) 100%)'
+        ? 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.08) 0%, var(--card-deep) 100%)'
         : isAttended
-          ? 'linear-gradient(135deg, rgba(var(--green-rgb),0.07) 0%, rgba(5,18,5,0.98) 100%)'
-          : `linear-gradient(135deg, ${tint} 0%, rgba(5,18,5,0.98) 100%)`,
+          ? 'linear-gradient(135deg, rgba(var(--green-rgb),0.07) 0%, var(--card-deep) 100%)'
+          : `linear-gradient(135deg, ${tint} 0%, var(--card-deep) 100%)`,
       border: isRated ? '1px solid rgba(var(--orange-bright-rgb),0.5)' : isAttended ? '1px solid rgba(var(--green-rgb),0.5)' : '1px solid rgba(var(--cyan-rgb),0.3)',
       borderLeft: isRated ? '3px solid var(--orange)' : isAttended ? '3px solid var(--green)' : '3px solid var(--cyan)',
       boxShadow: isRated ? '0 0 18px rgba(var(--orange-bright-rgb),0.12)' : isAttended ? '0 0 18px rgba(var(--green-rgb),0.12)' : 'none',

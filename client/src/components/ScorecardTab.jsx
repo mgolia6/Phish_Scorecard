@@ -755,6 +755,10 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
               </div>
               {currentShow.tour_name && <div className="show-tour">◈ {currentShow.tour_name}</div>}
               {hasAudio && <div className="audio-badge">◉ AUDIO AVAILABLE VIA PHISH.IN</div>}
+              <button onClick={handleRandom} disabled={randomizing || loadingShow}
+                style={{ marginTop: 12, padding: '8px 14px', border: '1px dashed rgba(var(--cyan-bright-rgb),0.45)', background: 'rgba(var(--cyan-bright-rgb),0.05)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', cursor: (randomizing || loadingShow) ? 'default' : 'pointer', opacity: (randomizing || loadingShow) ? 0.5 : 1 }}>
+                {randomizing ? '◈ SUMMONING...' : '⚄ ANOTHER RANDOM SHOW'}
+              </button>
             </div>
 
             {/* Right: data panel — fills dead space on desktop */}
@@ -783,7 +787,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                     padding: '10px 8px', textAlign: 'center',
                   }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: stat.color, lineHeight: 1, marginBottom: 4, textShadow: `0 0 12px ${stat.color}` }}>{stat.value}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--ink-rgb),0.3)', letterSpacing: '1.5px' }}>{stat.label}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--ink-rgb),0.55)', letterSpacing: '1.5px' }}>{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -831,7 +835,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
           {(attendanceType === 'attended' || phriends.tagged.length > 0) && (
             <div style={{
               border: '1px solid rgba(var(--cyan-rgb),0.28)',
-              background: 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.04), rgba(5,18,5,0.98))',
+              background: 'linear-gradient(135deg, rgba(var(--cyan-rgb),0.04), var(--card-deep))',
               marginBottom: 12, padding: 14,
             }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--cyan)', letterSpacing: '2.5px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -846,6 +850,7 @@ export function ScorecardTab({ api, showMessage, showError, onAuthRequired, init
                   onChange={e => setPhriendInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleTagPhriend()}
                   placeholder="search phreezer username..."
+                  type="text" name="phriend-tag-search" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} inputMode="text" enterKeyHint="search" data-1p-ignore data-lpignore="true" data-form-type="other"
                   style={{ flex: 1, background: 'var(--inset-strong)', border: '1px solid rgba(var(--cyan-rgb),0.35)', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '7px 10px', outline: 'none' }}
                 />
                 <button onClick={handleTagPhriend} disabled={phriendLoading || !phriendInput.trim()}

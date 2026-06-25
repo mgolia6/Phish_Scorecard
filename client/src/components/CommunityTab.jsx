@@ -329,7 +329,7 @@ export function PhriendOverlapCommunity({ api, onRateShow, user, onLogin }) {
 
       {result && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), rgba(5,18,5,0.98))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, marginTop: 14, padding: '12px 14px', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', background: 'linear-gradient(135deg, rgba(var(--orange-bright-rgb),0.05), var(--card-deep))' }}>
             <div style={{ width: 38, height: 38, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>{result.target.username.slice(0,2).toUpperCase()}</div>
             <div style={{ flex: 1 }}><div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)' }}>{result.target.username}</div></div>
             <button onClick={() => { setResult(null); setInput(''); setSelectedUser(null); }} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', color: 'rgba(var(--orange-bright-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer' }}>X CLEAR</button>

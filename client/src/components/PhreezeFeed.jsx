@@ -73,7 +73,7 @@ function PostCard({ post, api, currentUser }) {
   const [loadingReplies, setLoadingReplies] = useState(false);
   const color = categoryColor(post.category);
   const name = displayName(post);
-  const nameColor = displayColor(post, '#ffffff');
+  const nameColor = displayColor(post, 'var(--white)');
 
   const body = post.body || '';
   const isTruncatable = body.length > BODY_TRUNCATE;

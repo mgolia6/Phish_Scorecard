@@ -77,13 +77,13 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
         {/* Date */}
         <div style={{ flexShrink: 0, minWidth: 44, textAlign: 'center' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactMonth}</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: '#fff', lineHeight: 1, margin: '2px 0' }}>{compactDay}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--white)', lineHeight: 1, margin: '2px 0' }}>{compactDay}</div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--text-muted)', letterSpacing: '2px', lineHeight: 1 }}>{compactYear}</div>
         </div>
 
         {/* Venue + city */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', WebkitTextDecoration: 'none', textDecoration: 'none' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--white)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', WebkitTextDecoration: 'none', textDecoration: 'none' }}>
             {show.venue}
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cyan)', marginTop: 2, WebkitTextDecoration: 'none', textDecoration: 'none' }}>
