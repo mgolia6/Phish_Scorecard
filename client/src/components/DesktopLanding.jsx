@@ -74,7 +74,7 @@ export function DesktopLanding({ onLogin, onGoToScorecard }) {
 
       <div onClick={onGoToScorecard} style={{
         fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-        color: 'rgba(var(--green-rgb),0.28)', letterSpacing: '2px', cursor: 'pointer',
+        color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px', cursor: 'pointer',
       }}>OR BROWSE SETLISTS + COMMUNITY WITHOUT AN ACCOUNT →</div>
     </div>
   );

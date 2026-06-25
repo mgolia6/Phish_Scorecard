@@ -49,7 +49,7 @@ export function FeedbackModal({ type, api, onClose }) {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900, padding: '16px' },
     modal: { background: 'var(--bg-elevated)', border: '1px solid rgba(var(--green-rgb),0.2)', padding: '28px 24px', maxWidth: 520, width: '100%', maxHeight: '90vh', overflowY: 'auto' },
     title: { fontFamily: 'var(--font-display)', fontSize: '0.82rem', letterSpacing: '3px', color: 'var(--cyan)', marginBottom: 20 },
-    qLabel: { fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(var(--green-rgb),0.55)', marginBottom: 8, display: 'block' },
+    qLabel: { fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(var(--green-rgb),0.7)', marginBottom: 8, display: 'block' },
     textarea: { width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--white)', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', padding: '10px 12px', resize: 'vertical', minHeight: 80, boxSizing: 'border-box', marginBottom: 18 },
     select: { width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', padding: '10px 12px', marginBottom: 18, appearance: 'none' },
   };

@@ -126,7 +126,7 @@ export function ShowSlotMachine({ onRandomClick, randomizing, targetDate }) {
           </div>
 
           {/* Dare copy */}
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(var(--green-rgb),0.45)', letterSpacing: '2px', textAlign: 'center', lineHeight: 1.8, maxWidth: 400 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px', textAlign: 'center', lineHeight: 1.8, maxWidth: 400 }}>
             40+ years of shows.<br/>
             <span style={{ color: 'rgba(var(--green-rgb),0.7)' }}>Dare to let fate pick one.</span>
           </div>

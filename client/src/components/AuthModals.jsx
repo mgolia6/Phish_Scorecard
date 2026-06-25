@@ -35,7 +35,7 @@ export function TandCModal({ onAccept }) {
           </div>
         </div>
         {!scrolled && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--green-rgb),0.35)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px', textAlign: 'center', padding: '10px 0 4px', animation: 'blink 1.5s step-end infinite' }}>
             ▼ SCROLL TO CONTINUE
           </div>
         )}

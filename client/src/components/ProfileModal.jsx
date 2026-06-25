@@ -325,7 +325,7 @@ function AITab() {
           ['PHISH.NET PUBLIC DATA', 'Setlists, community reviews, jamchart entries, and song histories pulled in real time when you ask about a specific show or song. This is what the broader Phish community has documented and chosen to make public.'],
         ].map(([label, desc]) => (
           <div key={label} style={{ marginBottom: 10 }}>
-            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.5)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
+            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
             <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.3)', lineHeight: 1.7 }}>{desc}</div>
           </div>
         ))}
@@ -463,7 +463,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     </div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.25)', marginTop: 8 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.7)', marginTop: 8 }}>
                   Edit via phish.net import ↗
                 </div>
               </div>
@@ -650,7 +650,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(var(--green-rgb),0.2)', marginTop: 4 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(var(--green-rgb),0.7)', marginTop: 4 }}>
                   Independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
                 </div>
               </div>

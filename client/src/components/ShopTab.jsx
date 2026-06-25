@@ -31,7 +31,7 @@ export function ShopTab() {
 
       {/* Header */}
       <div style={{ marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid rgba(var(--green-rgb),0.1)' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '4px', color: 'rgba(var(--green-rgb),0.5)', marginBottom: 8 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '4px', color: 'rgba(var(--green-rgb),0.7)', marginBottom: 8 }}>
           ◈ PHREEZER MERCH
         </div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.7 }}>
@@ -112,7 +112,7 @@ export function ShopTab() {
       {/* Footer */}
       <div style={{ marginTop: 32, paddingTop: 16, borderTop: '1px solid rgba(var(--green-rgb),0.08)', fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.2)', lineHeight: 1.8, textAlign: 'center' }}>
         All products sold via Etsy.<br />
-        Questions? <a href="mailto:phreezer.support@mpgink.com" style={{ color: 'rgba(var(--cyan-rgb),0.4)', textDecoration: 'none' }}>phreezer.support@mpgink.com</a>
+        Questions? <a href="mailto:phreezer.support@mpgink.com" style={{ color: 'rgba(var(--cyan-rgb),0.7)', textDecoration: 'none' }}>phreezer.support@mpgink.com</a>
       </div>
     </div>
   );

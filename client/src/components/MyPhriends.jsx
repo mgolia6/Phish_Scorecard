@@ -58,7 +58,7 @@ export function MyPhriends({ api, showMessage, showError }) {
             ].map(({ v, l }) => (
               <div key={l} style={{ textAlign: 'center', padding: '10px 4px', border: '1px solid rgba(var(--orange-bright-rgb),0.2)', background: 'rgba(var(--orange-bright-rgb),0.04)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', lineHeight: 1, marginBottom: 5 }}>{v}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(var(--orange-bright-rgb),0.5)' }}>{l}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', color: 'rgba(var(--orange-bright-rgb),0.7)' }}>{l}</div>
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export function MyPhriends({ api, showMessage, showError }) {
       {!result && !loading && (
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
           SEARCH A PHREEZER USERNAME TO SEE<br/>
-          <span style={{ color: 'rgba(var(--orange-bright-rgb),0.4)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
+          <span style={{ color: 'rgba(var(--orange-bright-rgb),0.7)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
         </div>
       )}
     </div>

@@ -32,7 +32,7 @@ export function DonationCard() {
             donated · {items} item{items !== 1 ? 's' : ''} sold
           </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.4)', textAlign: 'right', lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.7)', textAlign: 'right', lineHeight: 1.6 }}>
           $1.00 per item<br />
           supports music education
         </div>

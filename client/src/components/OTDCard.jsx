@@ -107,7 +107,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '2px' }}>MY SCORE</span>
               </div>
             ) : (
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '2px' }}>NOT YET RATED</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '2px' }}>NOT YET RATED</span>
             )}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -154,7 +154,7 @@ export function OTDCard({ otdShow, fullDate, yearsAgo, scoreColor, onRateShow, a
                       }}>{structured.sentiment}</span>
                     )}
                   </div>
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.4)', letterSpacing: '1px' }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.7)', letterSpacing: '1px' }}>
                     AI · {structured?.reviewCount || reviews.length} PHISH.NET REVIEWS
                   </span>
                 </div>

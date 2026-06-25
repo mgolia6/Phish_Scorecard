@@ -218,7 +218,7 @@ function NewPostBox({ api, onPosted, currentUser }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--text-muted)' }}>
           what's on your mind, phan?
         </span>
-        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.35)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
+        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '1.5px', flexShrink: 0 }}>+ POST</span>
       </button>
     );
   }

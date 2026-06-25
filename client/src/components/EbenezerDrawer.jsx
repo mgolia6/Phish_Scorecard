@@ -102,7 +102,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
             <div style={{ borderLeft: '2px solid rgba(var(--orange-rgb),0.4)', paddingLeft: 10 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-rgb),0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-rgb),0.7)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
             </div>
           </div>
         )}
@@ -268,7 +268,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(var(--orange-rgb),0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(var(--orange-rgb),0.06)', flexShrink: 0 }}>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)' }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--orange-rgb),0.5)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {history.length > 0 && (
@@ -299,10 +299,10 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             <div className="ebenezer-rail-header">
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--orange-rgb),0.55)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
+                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
                 {history.length > 0 && (
                   <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
                 )}

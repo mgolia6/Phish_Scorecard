@@ -1381,7 +1381,7 @@ function MonitoringTab({ api }) {
                     </div>
                   )}
                   {kb.with_rating !== undefined && (
-                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: 'rgba(var(--orange-rgb),0.4)', marginTop: 2 }}>
+                    <div style={{ fontFamily: D.mono, fontSize: '0.66rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 2 }}>
                       {kb.with_rating} shows have Phish.net community rating
                     </div>
                   )}
