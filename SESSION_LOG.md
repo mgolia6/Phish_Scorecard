@@ -1,3 +1,62 @@
+## Session: 2026-06-25
+
+### Shipped
+
+**Light Mode — full theme system (admin-gated sandbox)**
+- `client/src/theme.js` (new) — get/set/apply/toggle theme, persisted in localStorage (`phreezer_theme`). Applied in `main.jsx` before first paint (no flash).
+- `index.css` — `[data-theme="light"]` overrides every design token. Technique: dark token values stay byte-identical to the original literals, so dark mode renders unchanged while light flips.
+- ProfileModal MY PHISH tab — APPEARANCE section (DARK / LIGHT toggle), **gated `{user?.is_admin}`** so only admins see it in production. Light mode stays sandboxed until fully polished — DO NOT remove the gate until release.
+- Phase 2a: RGB-component hue tokens (`--green-rgb/--cyan-rgb/--cyan-bright-rgb/--orange-rgb/--orange-bright-rgb`); ~695 hardcoded `rgba()` hue shades converted to `rgba(var(--x-rgb), a)`.
+- Phase 2b: `--inset-soft/--inset/--inset-md/--inset-strong/--inset-xstrong` + `--hairline` tokens (dark = original black-alpha fills; light = faint green tints). Scrims ≥0.75 stay dark.
+- Phase 2c: `--ink-rgb` token (dark=255,255,255 / light=20,33,26) — converted 111 dimmed-white `rgba(255,255,255,a)` text/borders app-wide; reverted on always-dark overlays (boot, MIKE SAYS NO, badge celebration).
+- Phase 2d/2e: FullPageLoader snowflake 80px → clamp(220px,56vw,340px); app-wide sweep raising inline low-alpha colored text (`rgba(var(--HUE-rgb), <0.6)`) to a 0.7 readable floor (45 spots / 21 files).
+- Readability passes: `--card-deep` token (dark=rgba(5,18,5,.98) / light=#f3f6ef) themes the OTD / My Shows / Community-result / Scorecard-phriends gradient cards; `#fff`→`var(--white)` on ShowCard day+venue and OTD date (the "disappearing day"); light text tokens darkened (label .82→.92, muted .58→.74, dim .55→.66); AI-tab + Shop ink subtext raised to ~0.7; avatar tiles themed; SHOW NOTES toggle made prominent; masthead stat labels ink .3→.55.
+
+**My Phriends — dropdown picker (no name recall)**
+- `MyPhriends.jsx` rewritten to mirror the Community overlap picker: on focus a dropdown lists phreezers who share your shows (via `/community/overlap-suggestions`) with shared-show counts; typing runs live typeahead (`/community/user-search`); same list renders below the bar before any search; CLEAR button. Keeps the YOU/THEM per-show score comparison.
+
+**Email system**
+- `api/admin/send-email.js` (new) — admin endpoint: `mode:'all'` runs the lifecycle pass for everyone (calls `runLifecycleEmails(pool)` directly — no internal VERCEL_URL fetch, which deployment protection was intercepting → 0 sends); `mode:'one'` sends a specific template to one user.
+- `api/emails/cron.js` — extracted `runLifecycleEmails(pool)`; cron auth now accepts `Authorization: Bearer <CRON_SECRET>`; added weekly-reminder pass (Tuesdays, ISO-week-stamped `weekly_YYYY-Www`, one-click unsubscribe URL), `email_opt_out` filter.
+- `api/emails/unsubscribe.js` (new) — RFC 8058 one-click unsubscribe (POST) + GET confirmation/resubscribe page; lazy-migrates `email_opt_out`/`unsubscribe_token`.
+- `api/_email.js` — `sendEmail` sets `List-Unsubscribe`/`List-Unsubscribe-Post` headers; `weeklyReminderEmail()` template.
+- `api/_ai_usage.js` — Haiku 4.5 pricing corrected to $1.00/$5.00 per MTok; warn on unknown models. `ebenezer-moderate.js`/`ebenezer.js` now log moderation calls (feature 'moderation'). `admin/ai-usage.js` adds per-user cost (byUser); AdminTab AI-usage "LAST 30 DAYS" ISO dates formatted (e.g. JUN 24, 2026).
+
+**Admin**
+- User cards: removed duplicated stats, 2-col button grid, per-user email nudge. 77 small admin font sizes bumped ~+0.07rem.
+
+**Scorecard**
+- Re-roll: "⚄ ANOTHER RANDOM SHOW" button now on the loaded show (was only on the empty state).
+- Phriend-tag input hardened against password-manager autofill (type/name + autoComplete off + 1Password/LastPass/Dashlane ignore attrs) — same treatment on both Phriend search inputs.
+
+**PHAN ROLL** — the "LEADERBOARD" sub-tab + panel title renamed (non-competitive), row fonts enlarged.
+
+**Mobile chrome / safe-area / cache**
+- `client/index.html` — added `viewport-fit=cover`. The safe-area padding already written was inert without it (iOS reports insets as 0). This activated: header notch-fill, modal top inset, bottom-nav height.
+- `.mobile-bottom-nav` height → `calc(72px + env(safe-area-inset-bottom))` (border-box was eating the content height and clipping "MY PHREEZER"); larger icon/label.
+- Header: bottom-up gradient (catches the wordmark/tagline), safe-area top fill.
+- Top overscroll: `overscroll-behavior-y: none` + `html { background: var(--bg-elevated) }` so iOS rubber-band can't reveal a light strip above the fixed header.
+- `vercel.json` — `Cache-Control: no-cache` on `/` and `/index.html`. Root cause of the recurring "stale OTD card / old bundle" reports: the SPA HTML was being cached, so new content-hashed assets weren't picked up. Hashed JS/CSS stay long-cached.
+
+### Decisions Made
+- **Light mode ships behind an admin gate** and stays there until fully polished — regular production users still see dark only. Chosen approach: "full polished light theme," built in phases.
+- Dark mode preserved byte-identical via the token technique (every dark token value == the original literal it replaced).
+- Weekly reminders: all users, Tuesdays, with proper RFC-8058 one-click unsubscribe (chosen over a softer opt-out).
+- Leaderboard reframed as **PHAN ROLL** — deliberately non-competitive.
+- All of the above merged to production (#16–#24) — safe because light mode is admin-gated and dark mode is unchanged.
+
+### Known Issues / Debt Introduced
+- **Light-mode admin gate** must be removed at release (search `is_admin` on the APPEARANCE toggle in ProfileModal).
+- **Tagline under the PHREEZER wordmark** is baked into the logo PNG (light-colored) — the bottom-up header gradient backs it but it may still be weak on light. Real fix: a dark-ink logo asset for light mode, or render the wordmark+tagline as live text. Flagged to Matthew, not yet done.
+- `overscroll-behavior-y: none` needs iOS 16+; on older iOS the `html` bg-elevated fallback covers the reveal.
+- Light-mode Phase 2 may still have a few stray hardcoded hex literals not yet tokenized — sweep as spotted.
+
+### Open / Next Session
+- Confirm top-overscroll fix on device; remove the light-mode admin gate when polish is signed off; light-mode logo/tagline asset; continue desktop UAT.
+- See ROADMAP.md
+
+---
+
 ## Session: 2026-06-18
 
 ### Shipped
