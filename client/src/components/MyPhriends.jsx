@@ -5,45 +5,126 @@ export function MyPhriends({ api, showMessage, showError }) {
   const [searchInput, setSearchInput] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(true);
+  const [autocomplete, setAutocomplete] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const debounceRef = React.useRef(null);
 
-  const handleSearch = async () => {
-    if (!searchInput.trim()) return;
+  // People who share your attended shows — so you can pick instead of recalling a name.
+  React.useEffect(() => {
+    api.get('/community/overlap-suggestions')
+      .then(d => setSuggestions(d.suggestions || []))
+      .catch(() => setSuggestions([]))
+      .finally(() => setSuggestionsLoading(false));
+  }, []);
+
+  const handleInputChange = (val) => {
+    setSearchInput(val); setSelectedUser(null);
+    clearTimeout(debounceRef.current);
+    if (!val.trim()) { setAutocomplete([]); setDropdownOpen(true); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const d = await api.get(`/community/user-search?q=${encodeURIComponent(val.trim())}`);
+        setAutocomplete(d.users || []); setDropdownOpen(true);
+      } catch { setAutocomplete([]); }
+    }, 250);
+  };
+
+  const runSearch = async (username) => {
+    const u = (username ?? searchInput).trim();
+    if (!u) return;
+    setDropdownOpen(false);
     setLoading(true);
     setResult(null);
     try {
-      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(searchInput.trim())}`);
+      const data = await api.get(`/community/phriend-overlap?username=${encodeURIComponent(u)}`);
       setResult(data);
     } catch (e) { showError(e.message || 'User not found'); }
     finally { setLoading(false); }
   };
 
+  const selectUser = (username) => { setSearchInput(username); setSelectedUser(username); setDropdownOpen(false); setAutocomplete([]); runSearch(username); };
+
+  const dropdownItems = searchInput.trim()
+    ? autocomplete.map(u => ({ username: u, sub: null }))
+    : suggestions.map(s => ({ username: s.username, sub: `${s.shared_count} shared show${s.shared_count !== 1 ? 's' : ''}` }));
+  const showDropdown = dropdownOpen && !selectedUser && dropdownItems.length > 0;
+
   return (
     <div style={{ padding: '0 0 20px' }}>
-      {/* Search bar */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          placeholder="enter phreezer username..."
-          type="text"
-          name="phriend-search"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          inputMode="text"
-          enterKeyHint="search"
-          data-1p-ignore
-          data-lpignore="true"
-          data-form-type="other"
-          style={{ flex: 1, background: 'var(--inset-strong)', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
-        />
-        <button onClick={handleSearch} disabled={loading}
-          style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: loading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
-          {loading ? '...' : 'SEARCH'}
-        </button>
+      {/* Search bar — pick a phriend from the list or type to find one */}
+      <div style={{ position: 'relative', marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            value={searchInput}
+            onChange={e => handleInputChange(e.target.value)}
+            onFocus={() => setDropdownOpen(true)}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+            onKeyDown={e => { if (e.key === 'Enter' && searchInput.trim()) runSearch(); if (e.key === 'Escape') setDropdownOpen(false); }}
+            placeholder="tap a phriend below or type a username..."
+            type="text"
+            name="phriend-search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            inputMode="text"
+            enterKeyHint="search"
+            data-1p-ignore
+            data-lpignore="true"
+            data-form-type="other"
+            style={{ flex: 1, background: 'var(--inset-strong)', border: dropdownOpen ? '1px solid rgba(var(--orange-bright-rgb),0.6)' : '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '9px 10px', outline: 'none' }}
+          />
+          <button onClick={() => runSearch()} disabled={loading || !searchInput.trim()}
+            style={{ border: '1px solid rgba(var(--orange-bright-rgb),0.35)', color: 'var(--orange)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2px', padding: '9px 14px', cursor: 'pointer', opacity: (loading || !searchInput.trim()) ? 0.4 : 1, whiteSpace: 'nowrap', background: 'transparent' }}>
+            {loading ? '...' : 'SEARCH'}
+          </button>
+        </div>
+        {showDropdown && (
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-elevated)', border: '1px solid rgba(var(--orange-bright-rgb),0.35)', borderTop: 'none', zIndex: 100, maxHeight: 260, overflowY: 'auto' }}>
+            {!searchInput.trim() && <div style={{ padding: '7px 12px 5px', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '2.5px', color: 'rgba(var(--orange-bright-rgb),0.75)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)' }}>{suggestionsLoading ? 'SCANNING YOUR SHOWS...' : 'PHRIENDS WHO WERE THERE'}</div>}
+            {dropdownItems.map((item, i) => (
+              <div key={item.username} onMouseDown={() => selectUser(item.username)}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: i < dropdownItems.length - 1 ? '1px solid rgba(var(--ink-rgb),0.04)' : 'none', cursor: 'pointer' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--orange-bright-rgb),0.07)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{item.username.slice(0, 2).toUpperCase()}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.username}</div>
+                  {item.sub && <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.78)', letterSpacing: '1.5px', marginTop: 2 }}>{item.sub.toUpperCase()}</div>}
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.7)', letterSpacing: '1px', flexShrink: 0 }}>▶</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Suggestion list below — visible before any search, so you never need a name */}
+      {!result && !loading && !dropdownOpen && !searchInput.trim() && (
+        <div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.75)', letterSpacing: '2px', marginBottom: 10 }}>PHRIENDS WHO WERE THERE</div>
+          {suggestionsLoading ? (
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', padding: '16px 0' }}>scanning your shows...</div>
+          ) : suggestions.length === 0 ? (
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0', border: '1px solid var(--border)' }}>NO OTHER PHREEZERS SHARE YOUR ATTENDED SHOWS YET<br/><span style={{ color: 'rgba(var(--orange-bright-rgb),0.65)', marginTop: 6, display: 'block' }}>CHECK BACK AS THE COMMUNITY GROWS</span></div>
+          ) : (
+            suggestions.map(s => (
+              <div key={s.username} onClick={() => selectUser(s.username)}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', border: '1px solid rgba(var(--orange-bright-rgb),0.15)', borderLeft: '3px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.03)', marginBottom: 6, cursor: 'pointer' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.4)', background: 'rgba(var(--orange-bright-rgb),0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--orange)', flexShrink: 0 }}>{s.username.slice(0, 2).toUpperCase()}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.username}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'rgba(var(--orange-bright-rgb),0.8)', letterSpacing: '1.5px', marginTop: 2 }}>{s.shared_count} SHARED SHOW{s.shared_count !== 1 ? 'S' : ''}</div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-bright-rgb),0.7)', letterSpacing: '1px', flexShrink: 0 }}>SEARCH ▶</div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {result && (
         <>
@@ -52,12 +133,14 @@ export function MyPhriends({ api, showMessage, showError }) {
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(var(--orange-bright-rgb),0.45)', background: 'rgba(var(--orange-bright-rgb),0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: 'var(--orange)', flexShrink: 0 }}>
               {result.target.username.slice(0,2).toUpperCase()}
             </div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--white)' }}>{result.target.username}</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 2 }}>
                 {result.total_shared} shows together · {result.unique_venues} venues · {result.unique_years} years
               </div>
             </div>
+            <button onClick={() => { setResult(null); setSearchInput(''); setSelectedUser(null); setAutocomplete([]); }}
+              style={{ background: 'transparent', border: '1px solid rgba(var(--orange-bright-rgb),0.25)', color: 'rgba(var(--orange-bright-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.56rem', letterSpacing: '1.5px', padding: '5px 9px', cursor: 'pointer', flexShrink: 0 }}>X CLEAR</button>
           </div>
 
           {/* Stats */}
@@ -109,13 +192,6 @@ export function MyPhriends({ api, showMessage, showError }) {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '20px 0' }}>NO SHARED SHOWS FOUND</div>
           )}
         </>
-      )}
-
-      {!result && !loading && (
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '2px', textAlign: 'center', padding: '24px 0', border: '1px solid var(--border)' }}>
-          SEARCH A PHREEZER USERNAME TO SEE<br/>
-          <span style={{ color: 'rgba(var(--orange-bright-rgb),0.7)', marginTop: 6, display: 'block' }}>SHOWS YOU BOTH ATTENDED</span>
-        </div>
       )}
     </div>
   );
