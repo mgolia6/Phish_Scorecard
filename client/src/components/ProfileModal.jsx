@@ -197,7 +197,7 @@ function BadgesTab({ api, user }) {
     <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
       <div style={{ fontSize: '2.5rem', opacity: 0.2 }}>⬡</div>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px' }}>NO BADGES YET</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)', lineHeight: 1.7 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.25)', lineHeight: 1.7 }}>
         Rate shows, stay active, and badges will find you.
       </div>
     </div>
@@ -232,7 +232,7 @@ function BadgesTab({ api, user }) {
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: meta.color, letterSpacing: '2.5px', marginBottom: 4 }}>
                 {meta.label}
               </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.55)', lineHeight: 1.6 }}>
                 {meta.desc}
               </div>
             </div>
@@ -263,7 +263,7 @@ function AITab() {
         </p>
       </div>
 
-      <div style={{ borderLeft: `3px solid ${D.orange}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--orange-rgb),0.03)' }}>
+      <div style={{ borderLeft: `3px solid ${D.orange}`, borderBottom: '1px solid rgba(var(--ink-rgb),0.05)', padding: '20px 16px', background: 'rgba(var(--orange-rgb),0.03)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.orange, textShadow: '0 0 16px rgba(var(--orange-rgb),0.5)' }}>{'◈'}</span>
           <div>
@@ -277,12 +277,12 @@ function AITab() {
         <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
           He will recommend shows if you ask. That is a conversation — not a system making decisions about your taste without your input.
         </p>
-        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: 0 }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.75, margin: 0 }}>
           He never touches your ratings, never acts without you asking, and never sees another user{'\''}s data.
         </p>
       </div>
 
-      <div style={{ borderLeft: `3px solid ${D.cyan}`, borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--cyan-rgb),0.02)' }}>
+      <div style={{ borderLeft: `3px solid ${D.cyan}`, borderBottom: '1px solid rgba(var(--ink-rgb),0.05)', padding: '20px 16px', background: 'rgba(var(--cyan-rgb),0.02)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <span style={{ fontFamily: D.display, fontSize: '1.1rem', color: D.cyan, textShadow: '0 0 16px rgba(var(--cyan-rgb),0.5)' }}>{'✦'}</span>
           <div>
@@ -293,12 +293,12 @@ function AITab() {
         <p style={{ fontFamily: D.mono, fontSize: '0.78rem', color: D.label, lineHeight: 1.8, margin: '0 0 12px' }}>
           Pulls publicly available Phish.net community reviews for a show and summarizes what the community said — what stood out, what the consensus was, what the room felt like. You request it. First time generates and caches. Every visit after that uses the cached version.
         </p>
-        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: 0 }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.74rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.75, margin: 0 }}>
           The source is public community reviews — not your ratings, not our data. You see it. You form your own opinion. Then you rate.
         </p>
       </div>
 
-      <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '20px 16px', background: 'rgba(var(--green-rgb),0.02)' }}>
+      <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.4)', borderBottom: '1px solid rgba(var(--ink-rgb),0.05)', padding: '20px 16px', background: 'rgba(var(--green-rgb),0.02)' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.62rem', color: D.muted, letterSpacing: '3px', marginBottom: 14 }}>{'◈ ON RESPONSIBILITY'}</div>
         {[
           'Every rating in this app came from a human. AI commentary is available when you want it and stays out of the way when you do not.',
@@ -314,9 +314,9 @@ function AITab() {
         ))}
       </div>
 
-      <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)' }}>
+      <div style={{ padding: '16px', background: 'var(--inset-soft)' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>MODEL</div>
-        <p style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.75, margin: '0 0 12px' }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.75, margin: '0 0 12px' }}>
           Powered by Claude (Anthropic). Ebenezer works from three layers of data:
         </p>
         {[
@@ -325,11 +325,11 @@ function AITab() {
           ['PHISH.NET PUBLIC DATA', 'Setlists, community reviews, jamchart entries, and song histories pulled in real time when you ask about a specific show or song. This is what the broader Phish community has documented and chosen to make public.'],
         ].map(([label, desc]) => (
           <div key={label} style={{ marginBottom: 10 }}>
-            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.5)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
-            <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', lineHeight: 1.7 }}>{desc}</div>
+            <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
+            <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.3)', lineHeight: 1.7 }}>{desc}</div>
           </div>
         ))}
-        <p style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', lineHeight: 1.75, margin: '10px 0 0' }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.25)', lineHeight: 1.75, margin: '10px 0 0' }}>
           He is not answering from memory. He is speaking back what the community has already documented — with personality. No session data is used to train any model.
         </p>
       </div>
@@ -463,7 +463,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     </div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.25)', marginTop: 8 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.7)', marginTop: 8 }}>
                   Edit via phish.net import ↗
                 </div>
               </div>
@@ -532,7 +532,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   ]
                 },
               ].map(({ label, field, options }) => (
-                <div key={field} style={{ borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px', background: 'rgba(0,0,0,0.2)' }}>
+                <div key={field} style={{ borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px', background: 'var(--inset-soft)' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '2.5px', marginBottom: 12 }}>◈ {label}</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {options.map(opt => {
@@ -604,7 +604,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 </p>
               </div>
 
-              <div style={{ borderLeft: '3px solid var(--orange)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ borderLeft: '3px solid var(--orange)', borderBottom: '1px solid rgba(var(--orange-bright-rgb),0.1)', padding: '20px 16px', background: 'var(--inset-soft)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ WHAT THIS IS</div>
                 {[
                   ['RATE', 'Score every song 1–5. Build a record of how you actually hear the music.'],
@@ -635,7 +635,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 </a>
               </div>
 
-              <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.3)', padding: '20px 16px', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ borderLeft: '3px solid rgba(var(--green-rgb),0.3)', padding: '20px 16px', background: 'var(--inset-soft)' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 16 }}>◈ STANDING ON SHOULDERS</div>
                 {[
                   ['PHISH.NET', 'Setlists, show data, reviews, and decades of community documentation.', 'https://phish.net'],
@@ -650,19 +650,19 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
                   </div>
                 ))}
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(var(--green-rgb),0.2)', marginTop: 4 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'rgba(var(--green-rgb),0.7)', marginTop: 4 }}>
                   Independent fan project. Not affiliated with Phish, Phish.net, or Phish.in.
                 </div>
               </div>
 
               {/* Privacy link */}
-              <div style={{ padding: '16px 20px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              <div style={{ padding: '16px 20px', textAlign: 'center', borderTop: '1px solid rgba(var(--ink-rgb),0.04)' }}>
                 <button
                   onClick={() => setShowPrivacy(true)}
                   style={{
                     background: 'transparent', border: 'none', cursor: 'pointer',
                     fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-                    color: 'rgba(255,255,255,0.25)', letterSpacing: '1px',
+                    color: 'rgba(var(--ink-rgb),0.25)', letterSpacing: '1px',
                     textDecoration: 'underline', padding: 0,
                   }}
                 >
@@ -681,7 +681,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
               {/* Mockingbird donation tracker */}
               <DonationCard />
 
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, padding: '0 4px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--ink-rgb),0.35)', lineHeight: 1.7, padding: '0 4px' }}>
                 Represent at lot. Every purchase supports an independent fan project.
               </div>
 
@@ -715,7 +715,7 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                 },
               ].map(p => (
                 <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                  <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderTop: `2px solid ${p.color}`, overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--inset-md)', border: '1px solid rgba(var(--ink-rgb),0.06)', borderTop: `2px solid ${p.color}`, overflow: 'hidden' }}>
                     <div style={{ width: '100%', height: 200, overflow: 'hidden', background: '#111' }}>
                       <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
@@ -723,18 +723,18 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                         <div>
                           <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', color: p.color, fontWeight: 700, marginBottom: 2 }}>{p.name}</div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.3)' }}>{p.sub}</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.3)' }}>{p.sub}</div>
                         </div>
                         <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.66rem', color: p.color, whiteSpace: 'nowrap', marginLeft: 10 }}>{p.price}</div>
                       </div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 12 }}>{p.desc}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.6, marginBottom: 12 }}>{p.desc}</div>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: p.color }}>SHOP ON ETSY →</div>
                     </div>
                   </div>
                 </a>
               ))}
 
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.15)', lineHeight: 1.8, textAlign: 'center', paddingTop: 8 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.15)', lineHeight: 1.8, textAlign: 'center', paddingTop: 8 }}>
                 Sold via Etsy · Fulfilled by Printify<br />
                 Questions? phreezer.support@mpgink.com
               </div>

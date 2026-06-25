@@ -22,7 +22,7 @@ const S = {
     color: 'var(--cyan)', letterSpacing: '4px',
   },
   close: {
-    background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
+    background: 'transparent', border: '1px solid rgba(var(--ink-rgb),0.1)',
     color: 'var(--text-muted)', cursor: 'pointer', padding: '4px 10px',
     fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px',
     borderRadius: 1,
@@ -30,16 +30,16 @@ const S = {
   body: { padding: '0 0 24px' },
   section: {
     borderLeft: '3px solid var(--cyan)', padding: '16px 20px',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
+    borderBottom: '1px solid rgba(var(--ink-rgb),0.04)',
     background: 'rgba(var(--cyan-rgb),0.02)',
   },
   sectionAlt: {
     borderLeft: '3px solid var(--green)', padding: '16px 20px',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
+    borderBottom: '1px solid rgba(var(--ink-rgb),0.04)',
   },
   sectionWarn: {
     borderLeft: '3px solid var(--orange)', padding: '16px 20px',
-    borderBottom: '1px solid rgba(255,255,255,0.04)',
+    borderBottom: '1px solid rgba(var(--ink-rgb),0.04)',
     background: 'rgba(var(--orange-rgb),0.02)',
   },
   label: {
@@ -48,11 +48,11 @@ const S = {
   },
   p: {
     fontFamily: 'var(--font-mono)', fontSize: '0.76rem',
-    color: 'rgba(255,255,255,0.65)', lineHeight: 1.8, margin: '0 0 10px',
+    color: 'rgba(var(--ink-rgb),0.65)', lineHeight: 1.8, margin: '0 0 10px',
   },
   li: {
     fontFamily: 'var(--font-mono)', fontSize: '0.76rem',
-    color: 'rgba(255,255,255,0.65)', lineHeight: 1.8,
+    color: 'rgba(var(--ink-rgb),0.65)', lineHeight: 1.8,
     display: 'flex', gap: 8, marginBottom: 6,
   },
   dot: { color: 'var(--cyan)', flexShrink: 0 },
@@ -60,7 +60,7 @@ const S = {
   updated: {
     fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
     color: 'var(--text-muted)', padding: '12px 20px 0',
-    borderTop: '1px solid rgba(255,255,255,0.04)', marginTop: 8,
+    borderTop: '1px solid rgba(var(--ink-rgb),0.04)', marginTop: 8,
     textAlign: 'center',
   },
 };
@@ -120,13 +120,13 @@ export function PrivacyModal({ onClose }) {
           <div style={S.sectionAlt}>
             <div style={S.label}>◈ THIRD-PARTY SERVICES</div>
             <p style={S.p}>Phreezer uses the following external services:</p>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Phish.net</strong> — show and setlist data, optional import of your attendance history</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Phish.in</strong> — live recording audio, streamed via a server-side proxy</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Anthropic</strong> — powers Uncle Ebenezer (Claude) and Vibe Check. Session context only, not used for training</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Resend</strong> — transactional email delivery</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Sentry</strong> — anonymous error reporting to help us catch bugs</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Posthog</strong> — anonymous product analytics (feature usage, tab visits). No personal data in events</Item>
-            <Item><strong style={{ color: 'rgba(255,255,255,0.8)' }}>Etsy / Printify</strong> — merch fulfillment. Purchases go through Etsy's platform directly</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Phish.net</strong> — show and setlist data, optional import of your attendance history</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Phish.in</strong> — live recording audio, streamed via a server-side proxy</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Anthropic</strong> — powers Uncle Ebenezer (Claude) and Vibe Check. Session context only, not used for training</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Resend</strong> — transactional email delivery</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Sentry</strong> — anonymous error reporting to help us catch bugs</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Posthog</strong> — anonymous product analytics (feature usage, tab visits). No personal data in events</Item>
+            <Item><strong style={{ color: 'rgba(var(--ink-rgb),0.8)' }}>Etsy / Printify</strong> — merch fulfillment. Purchases go through Etsy's platform directly</Item>
           </div>
 
           {/* Data retention */}

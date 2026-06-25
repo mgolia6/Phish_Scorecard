@@ -73,7 +73,7 @@ export function InlineAudioPlayer({ track, onClose }) {
 
   return (
     <div style={{
-      background: 'rgba(0,0,0,0.5)',
+      background: 'var(--inset-strong)',
       borderTop: '1px solid rgba(var(--cyan-rgb),0.15)',
       padding: '10px 12px',
       animation: 'fadeIn 0.18s ease',
@@ -94,7 +94,7 @@ export function InlineAudioPlayer({ track, onClose }) {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '2px', color: 'rgba(var(--cyan-rgb),0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
               {loading ? 'LOADING...' : `◉ ${track.title?.toUpperCase()}`}
             </div>
-            <button onClick={onClose} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 0 0 12px', flexShrink: 0 }}>
+            <button onClick={onClose} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.25)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 0 0 12px', flexShrink: 0 }}>
               ✕
             </button>
           </div>
@@ -118,14 +118,14 @@ export function InlineAudioPlayer({ track, onClose }) {
             </button>
 
             {/* Time */}
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.35)', flexShrink: 0, minWidth: 32 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.35)', flexShrink: 0, minWidth: 32 }}>
               {fmt(current)}
             </span>
 
             {/* Scrubber */}
             <div
               onClick={seek}
-              style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, cursor: 'pointer', position: 'relative' }}
+              style={{ flex: 1, height: 4, background: 'rgba(var(--ink-rgb),0.1)', borderRadius: 2, cursor: 'pointer', position: 'relative' }}
             >
               <div style={{
                 position: 'absolute', left: 0, top: 0, height: '100%',
@@ -142,13 +142,13 @@ export function InlineAudioPlayer({ track, onClose }) {
             </div>
 
             {/* Duration */}
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.25)', flexShrink: 0, minWidth: 32, textAlign: 'right' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.25)', flexShrink: 0, minWidth: 32, textAlign: 'right' }}>
               {fmt(duration)}
             </span>
           </div>
 
           {/* Phish.in attribution */}
-          <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.15)', textAlign: 'right' }}>
+          <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(var(--ink-rgb),0.15)', textAlign: 'right' }}>
             via phish.in
           </div>
         </>

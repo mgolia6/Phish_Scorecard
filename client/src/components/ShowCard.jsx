@@ -125,7 +125,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
           {phreezerScore == null ? (
             /* ── Placeholder for unrated shows ── */
             <div style={{ textAlign: 'center', padding: '8px 0' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--green-rgb),0.3)', letterSpacing: '2px', marginBottom: 8 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px', marginBottom: 8 }}>
                 NOT RATED YET
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -172,7 +172,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
                 <div style={{ marginTop: 12, padding: '10px 12px', background: 'var(--bg)', border: '1px solid rgba(var(--green-rgb),0.1)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>
                   {cardData.ratingsList.filter(r => r.notes).slice(0,3).map((r, i) => (
                     <div key={i} style={{ marginBottom: i < 2 ? 6 : 0 }}>
-                      <span style={{ color: 'rgba(var(--green-rgb),0.4)', fontSize: '0.65rem' }}>{r.song_name}: </span>"{r.notes}"
+                      <span style={{ color: 'rgba(var(--green-rgb),0.7)', fontSize: '0.65rem' }}>{r.song_name}: </span>"{r.notes}"
                     </div>
                   ))}
                 </div>
@@ -204,7 +204,7 @@ export function ShowCard({ show, phreezerScore, scoreColor, cardAccent, hasRevie
       {/* ── ACTION BAR — always visible ── */}
       <div style={{ display: 'flex', borderTop: '1px solid rgba(var(--green-rgb),0.08)' }}>
         <button onClick={onFavorite}
-          style={{ padding: '11px 14px', background: show.favorited ? 'rgba(var(--orange-rgb),0.08)' : 'transparent', border: 'none', borderRight: '1px solid rgba(var(--green-rgb),0.08)', color: show.favorited ? 'var(--orange)' : 'rgba(255,255,255,0.4)', fontSize: '1.2rem', lineHeight: 1, cursor: 'pointer', filter: show.favorited ? 'drop-shadow(0 0 6px rgba(var(--orange-rgb),0.7))' : 'none', flexShrink: 0 }}>
+          style={{ padding: '11px 14px', background: show.favorited ? 'rgba(var(--orange-rgb),0.08)' : 'transparent', border: 'none', borderRight: '1px solid rgba(var(--green-rgb),0.08)', color: show.favorited ? 'var(--orange)' : 'rgba(var(--ink-rgb),0.4)', fontSize: '1.2rem', lineHeight: 1, cursor: 'pointer', filter: show.favorited ? 'drop-shadow(0 0 6px rgba(var(--orange-rgb),0.7))' : 'none', flexShrink: 0 }}>
           {show.favorited ? '★' : '☆'}
         </button>
         <button onClick={() => onRateShow(show.show_date)}

@@ -46,7 +46,7 @@ export function ProfileTab({ api, user }) {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--cyan)', letterSpacing: '2px' }}>
           {user.username}
         </div>
-        <div style={{ fontSize: '0.65rem', color: 'rgba(var(--green-rgb),0.35)', marginTop: 4, letterSpacing: '1px' }}>
+        <div style={{ fontSize: '0.65rem', color: 'rgba(var(--green-rgb),0.7)', marginTop: 4, letterSpacing: '1px' }}>
           {user.email}
         </div>
       </div>

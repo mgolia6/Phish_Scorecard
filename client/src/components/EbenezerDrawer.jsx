@@ -102,7 +102,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: 'var(--orange)', letterSpacing: '2px', marginBottom: 5 }}>UNCLE EBENEZER</div>
             <div style={{ borderLeft: '2px solid rgba(var(--orange-rgb),0.4)', paddingLeft: 10 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-rgb),0.5)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--orange-rgb),0.7)', letterSpacing: '2px', animation: 'pulse 1.5s infinite' }}>THINKING...</span>
             </div>
           </div>
         )}
@@ -115,7 +115,7 @@ export function EbenezerChat({ history, setHistory, loading, setLoading, error, 
       </div>
 
       <div style={{ padding: '8px 14px', borderTop: '1px solid rgba(var(--orange-rgb),0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, background: 'rgba(var(--orange-rgb),0.04)' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'rgba(var(--ink-rgb),0.45)', lineHeight: 1.4 }}>
           Conversations logged anonymously.{' '}
           <button onClick={onToggleOptOut} style={{ background: 'none', border: 'none', padding: 0, color: optOut ? 'var(--green)' : 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', cursor: 'pointer', textDecoration: 'underline', fontWeight: optOut ? 700 : 400 }}>
             {optOut ? '✓ Opted out' : 'Opt out'}
@@ -220,7 +220,7 @@ export function EbenezerDrawer({ history, setHistory, loading, setLoading, error
         <EbenezerChat history={history} setHistory={setHistory} loading={loading} setLoading={setLoading} error={error} setError={setError} input={input} setInput={setInput} inputRef={inputRef} optOut={optOut} onToggleOptOut={handleToggleOptOut} />
       </div>
 
-      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'calc(72vh - 72px + 72px)', zIndex: 998, background: 'rgba(0,0,0,0.4)' }} />}
+      {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'calc(72vh - 72px + 72px)', zIndex: 998, background: 'var(--inset-md)' }} />}
     </>
   );
 }
@@ -268,7 +268,7 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(var(--orange-rgb),0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(var(--orange-rgb),0.06)', flexShrink: 0 }}>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)' }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--orange-rgb),0.5)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 4, letterSpacing: '1px' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {history.length > 0 && (
@@ -299,10 +299,10 @@ export function EbenezerRail({ history, setHistory, loading, setLoading, error, 
             <div className="ebenezer-rail-header">
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--orange)', letterSpacing: '4px', fontWeight: 900, textShadow: '0 0 20px rgba(var(--orange-rgb),0.5)', lineHeight: 1 }}>UNCLE EBENEZER</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--orange-rgb),0.55)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--orange-rgb),0.7)', marginTop: 6, letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>JADED VET · SHOW ANALYST · DISCOVERY ENGINE</div>
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
+                <button onClick={() => setExpanded(true)} title="Expand to full screen" style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.7rem', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>⛶</button>
                 {history.length > 0 && (
                   <button onClick={() => setHistory([])} style={{ background: 'transparent', border: '1px solid rgba(var(--orange-rgb),0.25)', color: 'rgba(var(--orange-rgb),0.6)', fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '1.5px', padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>CLEAR</button>
                 )}

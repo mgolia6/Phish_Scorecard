@@ -15,7 +15,7 @@ export function DonationCard() {
 
   return (
     <div style={{
-      background: 'rgba(0,0,0,0.35)',
+      background: 'var(--inset)',
       border: '1px solid rgba(var(--green-rgb),0.15)',
       borderLeft: '3px solid var(--green)',
       padding: '14px 16px',
@@ -28,11 +28,11 @@ export function DonationCard() {
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--green)', letterSpacing: '1px', lineHeight: 1 }}>
             {total}
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--ink-rgb),0.3)', marginTop: 4 }}>
             donated · {items} item{items !== 1 ? 's' : ''} sold
           </div>
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.4)', textAlign: 'right', lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'rgba(var(--green-rgb),0.7)', textAlign: 'right', lineHeight: 1.6 }}>
           $1.00 per item<br />
           supports music education
         </div>

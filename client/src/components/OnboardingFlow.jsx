@@ -163,7 +163,7 @@ export function ProfileSetupModal({ api, onComplete }) {
       <div className="modal-overlay" style={{ zIndex: 850 }}>
         <div className="modal" style={{ maxWidth: 480 }}>
           <div className="modal-title">SET UP YOUR PROFILE</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--green-rgb),0.5)', marginBottom: 24, lineHeight: 1.6 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(var(--green-rgb),0.7)', marginBottom: 24, lineHeight: 1.6 }}>
             Import your history from phish.net to unlock your stats and Deep Phreeze.
           </div>
 
@@ -213,13 +213,13 @@ export function ProfileSetupModal({ api, onComplete }) {
           {/* OR divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0 12px' }}>
             <div style={{ flex: 1, height: 1, background: 'rgba(var(--green-rgb),0.08)' }} />
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--green-rgb),0.25)', letterSpacing: '2px' }}>OR</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px' }}>OR</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(var(--green-rgb),0.08)' }} />
           </div>
 
           {/* skip */}
           <button
-            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'rgba(var(--green-rgb),0.5)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '13px', background: 'transparent', border: '1px solid rgba(var(--green-rgb),0.2)', color: 'rgba(var(--green-rgb),0.7)', fontFamily: 'var(--font-display)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer' }}
             onClick={handleSkip}
           >
             I DON'T HAVE A PHISH.NET ACCOUNT

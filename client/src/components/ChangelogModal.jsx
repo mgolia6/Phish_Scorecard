@@ -86,7 +86,7 @@ export function ChangelogModal({ onDismiss }) {
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-          color: 'rgba(var(--green-rgb),0.4)', letterSpacing: '2px',
+          color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '2px',
           marginBottom: 24, paddingBottom: 16,
           borderBottom: '1px solid rgba(var(--green-rgb),0.12)',
         }}>
@@ -126,7 +126,7 @@ export function ChangelogModal({ onDismiss }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{
             fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
-            color: 'rgba(var(--green-rgb),0.25)', letterSpacing: '1px',
+            color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '1px',
           }}>TAP OUTSIDE TO DISMISS</span>
           <button
             onClick={handleDismiss}

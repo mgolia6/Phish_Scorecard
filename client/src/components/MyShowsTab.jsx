@@ -74,7 +74,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
 
   if (loading) return (
     <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(var(--cyan-rgb),0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(var(--cyan-rgb),0.03)' }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '2px', textAlign: 'center' }}>LOADING ON THIS DAY...</div>
     </div>
   );
 
@@ -82,7 +82,7 @@ function OTDCarousel({ attended, ratedShows, onRateShow, api }) {
     <div style={{ margin: '10px', padding: '20px 16px', border: '1px solid rgba(var(--cyan-rgb),0.2)', borderLeft: '3px solid var(--cyan)', background: 'rgba(var(--cyan-rgb),0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--cyan)', opacity: 0.4 }} />
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--cyan-rgb),0.4)', letterSpacing: '3px' }}>ON THIS DAY</span>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '3px' }}>ON THIS DAY</span>
       </div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Phish didn't play today's date in any year.</div>
     </div>
