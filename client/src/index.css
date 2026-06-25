@@ -364,7 +364,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(0deg, rgba(var(--cyan-rgb),0.16) 0%, rgba(var(--cyan-rgb),0.06) 45%, var(--bg-panel) 80%);
+  background: linear-gradient(0deg, rgba(var(--cyan-rgb),0.26) 0%, rgba(var(--cyan-rgb),0.11) 45%, var(--bg-panel) 82%);
   position: relative;
   gap: 12px;
 }
@@ -1244,9 +1244,10 @@ select option { background: var(--bg); color: var(--green); }
     z-index: 200;
     background: var(--bg);
     border-top: 1px solid rgba(var(--green-rgb),0.25);
-    height: 72px;
+    /* keep a full 72px of content height ABOVE the home-indicator safe area
+       (border-box would otherwise let the safe-area padding clip the labels) */
+    height: calc(72px + env(safe-area-inset-bottom, 0px));
     align-items: stretch;
-    /* safe area for iPhone home indicator */
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .bottom-nav-btn {
@@ -1274,15 +1275,16 @@ select option { background: var(--bg); color: var(--green); }
     background: rgba(var(--green-rgb),0.04);
   }
   .bottom-nav-icon {
-    font-size: 1.65rem;
+    font-size: 1.5rem;
     line-height: 1;
   }
   .bottom-nav-label {
     font-family: var(--font-display);
-    font-size: 0.66rem;
+    font-size: 0.64rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     white-space: nowrap;
+    line-height: 1.2;
   }
 }
 
