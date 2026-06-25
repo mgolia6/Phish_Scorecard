@@ -72,9 +72,9 @@
   --border:        rgba(15,90,25,0.18);
   --border-mid:    rgba(15,90,25,0.30);
 
-  --text-label:    rgba(16,70,24,0.82);
-  --text-muted:    rgba(16,70,24,0.58);
-  --text-dim:      rgba(0,0,0,0.55);
+  --text-label:    rgba(16,70,24,0.92);
+  --text-muted:    rgba(16,70,24,0.74);
+  --text-dim:      rgba(0,0,0,0.66);
 
   /* Light-ink RGB hue components — every rgba(var(--x-rgb), a) shade flips here */
   --green-rgb:        15,138,30;
@@ -364,7 +364,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(180deg, rgba(var(--cyan-rgb),0.07) 0%, var(--bg-panel) 78%);
+  background: linear-gradient(0deg, rgba(var(--cyan-rgb),0.16) 0%, rgba(var(--cyan-rgb),0.06) 45%, var(--bg-panel) 80%);
   position: relative;
   gap: 12px;
 }
@@ -929,7 +929,7 @@ select option { background: var(--bg); color: var(--green); }
 .soundcheck-bar   { padding: 10px 16px; background: rgba(var(--orange-rgb),0.06); border: 1px solid rgba(var(--orange-rgb),0.2); font-size: 0.82rem; color: rgba(var(--green-rgb),0.85); margin-bottom: 12px; }
 .soundcheck-label { color: var(--orange); font-size: 0.7rem; letter-spacing: 2px; margin-right: 8px; }
 .notes-collapsible { margin-bottom: 12px; }
-.notes-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border: 1px solid rgba(var(--cyan-bright-rgb),0.2); background: transparent; color: rgba(var(--cyan-bright-rgb),0.65); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-align: left; }
+.notes-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 9px 16px; border: 1px solid rgba(var(--cyan-bright-rgb),0.35); background: rgba(var(--cyan-bright-rgb),0.04); color: var(--cyan); font-size: 0.74rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-align: left; }
 .notes-toggle:hover { background: rgba(var(--cyan-bright-rgb),0.04); box-shadow: none; color: var(--cyan); }
 .setlist-notes { padding: 12px 16px; background: rgba(var(--cyan-bright-rgb),0.04); border: 1px solid rgba(var(--cyan-bright-rgb),0.15); font-size: 0.82rem; color: rgba(var(--green-rgb),0.8); line-height: 1.6; }
 .setlist-notes a { color: var(--cyan); }
@@ -1258,7 +1258,7 @@ select option { background: var(--bg); color: var(--green); }
     gap: 5px;
     background: transparent;
     border: none;
-    color: rgba(var(--green-rgb),0.35);
+    color: rgba(var(--green-rgb),0.62);
     cursor: pointer;
     padding: 10px 4px;
     transition: color 0.15s;
@@ -1274,12 +1274,12 @@ select option { background: var(--bg); color: var(--green); }
     background: rgba(var(--green-rgb),0.04);
   }
   .bottom-nav-icon {
-    font-size: 1.4rem;
+    font-size: 1.65rem;
     line-height: 1;
   }
   .bottom-nav-label {
     font-family: var(--font-display);
-    font-size: 0.58rem;
+    font-size: 0.66rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     white-space: nowrap;

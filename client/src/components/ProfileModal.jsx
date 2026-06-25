@@ -316,7 +316,7 @@ function AITab() {
 
       <div style={{ padding: '16px', background: 'var(--inset-soft)' }}>
         <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: D.muted, letterSpacing: '2px', marginBottom: 10 }}>MODEL</div>
-        <p style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.4)', lineHeight: 1.75, margin: '0 0 12px' }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.72)', lineHeight: 1.75, margin: '0 0 12px' }}>
           Powered by Claude (Anthropic). Ebenezer works from three layers of data:
         </p>
         {[
@@ -326,10 +326,10 @@ function AITab() {
         ].map(([label, desc]) => (
           <div key={label} style={{ marginBottom: 10 }}>
             <div style={{ fontFamily: D.display, fontSize: '0.56rem', color: 'rgba(var(--cyan-rgb),0.7)', letterSpacing: '1.5px', marginBottom: 3 }}>{label}</div>
-            <div style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.3)', lineHeight: 1.7 }}>{desc}</div>
+            <div style={{ fontFamily: D.mono, fontSize: '0.72rem', color: 'rgba(var(--ink-rgb),0.68)', lineHeight: 1.7 }}>{desc}</div>
           </div>
         ))}
-        <p style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.25)', lineHeight: 1.75, margin: '10px 0 0' }}>
+        <p style={{ fontFamily: D.mono, fontSize: '0.7rem', color: 'rgba(var(--ink-rgb),0.6)', lineHeight: 1.75, margin: '10px 0 0' }}>
           He is not answering from memory. He is speaking back what the community has already documented — with personality. No session data is used to train any model.
         </p>
       </div>
@@ -345,6 +345,8 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
   const [profile, setProfile] = React.useState(null);
   const [selectedIcon, setSelectedIcon] = React.useState(user?.avatar_icon || null);
   const [savingIcon, setSavingIcon] = React.useState(false);
+  const [savedFlash, setSavedFlash] = React.useState(false);
+  const savedTimerRef = React.useRef(null);
 
   React.useEffect(() => {
     api.get('/user/profile').then(d => {
@@ -369,6 +371,9 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
         stage_side: updated.stage_side || null,
         show_vibe: updated.show_vibe || null,
       });
+      setSavedFlash(true);
+      clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSavedFlash(false), 1800);
     } catch (e) {}
   };
 
@@ -388,7 +393,10 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
       <div className="profile-modal-inner" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="profile-modal-header">
-          <div style={{ fontFamily:'var(--font-display)', fontSize:'0.66rem', color:'var(--cyan)', letterSpacing:'3px' }}>◈ PROFILE</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontFamily:'var(--font-display)', fontSize:'0.66rem', color:'var(--cyan)', letterSpacing:'3px' }}>◈ PROFILE</div>
+            <span style={{ fontFamily:'var(--font-display)', fontSize:'0.56rem', letterSpacing:'1.5px', color:'var(--green)', border:'1px solid rgba(var(--green-rgb),0.5)', background:'rgba(var(--green-rgb),0.08)', padding:'2px 8px', opacity: savedFlash ? 1 : 0, transition:'opacity 0.2s' }}>✓ SAVED</span>
+          </div>
           <button onClick={onClose} style={{ background:'transparent', border:'1px solid rgba(var(--green-rgb),0.25)', color:'var(--text-label)', fontFamily:'var(--font-display)', fontSize:'0.62rem', letterSpacing:'2px', padding:'5px 10px', cursor:'pointer' }}>
             ✕ CLOSE
           </button>
@@ -478,12 +486,12 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                     <button key={opt.id} onClick={() => handleSaveIcon(opt.id)} style={{
                       aspectRatio: '1',
                       border: `2px solid ${selectedIcon === opt.id ? 'var(--cyan)' : 'rgba(var(--green-rgb),0.12)'}`,
-                      background: selectedIcon === opt.id ? 'rgba(var(--cyan-rgb),0.1)' : 'rgba(0,0,0,0.3)',
+                      background: selectedIcon === opt.id ? 'rgba(var(--cyan-rgb),0.1)' : 'var(--inset-md)',
                       cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: 8,
                       boxShadow: selectedIcon === opt.id ? '0 0 14px rgba(var(--cyan-rgb),0.3)' : 'none',
                       transition: 'all 0.15s',
                     }}>
-                      <PhreezerAvatar seed={opt.id} size={40} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(var(--cyan-rgb),0.4)'} />
+                      <PhreezerAvatar seed={opt.id} size={40} color={selectedIcon === opt.id ? '#00ffff' : 'rgba(var(--cyan-rgb),0.7)'} />
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.56rem', color: selectedIcon === opt.id ? 'var(--cyan)' : 'var(--text-muted)', letterSpacing: '1px' }}>{opt.label}</span>
                     </button>
                   ))}
