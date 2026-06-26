@@ -234,4 +234,4 @@ Cron fires daily via `api/emails/cron.js`. Protected by `CRON_SECRET`.
 
 `CHANGELOG_VERSION` in `ChangelogModal.jsx` — bump with every user-facing release. Users see the modal once per version key via localStorage.
 
-Current version: `2.1`
+Current version: `2.2`

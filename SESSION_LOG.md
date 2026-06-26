@@ -31,6 +31,8 @@
 
 **PHAN ROLL** — the "LEADERBOARD" sub-tab + panel title renamed (non-competitive), row fonts enlarged.
 
+**Light mode released + changelog v2.2** — removed the admin gate (APPEARANCE toggle now visible to all users; opt-in, defaults to dark). Bumped `CHANGELOG_VERSION` → 2.2 (shows once per version on login to everyone): announces light mode + My Phriends dropdown + a **SHARE FEEDBACK** CTA that opens the general feedback form (`setFeedbackModal('passive')`).
+
 **Mobile chrome / safe-area / cache**
 - `client/index.html` — added `viewport-fit=cover`. The safe-area padding already written was inert without it (iOS reports insets as 0). This activated: header notch-fill, modal top inset, bottom-nav height.
 - `.mobile-bottom-nav` height → `calc(72px + env(safe-area-inset-bottom))` (border-box was eating the content height and clipping "MY PHREEZER"); larger icon/label.

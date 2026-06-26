@@ -2,19 +2,24 @@ import React from 'react';
 
 // Bump this version string with every release that has user-facing changes.
 // Modal shows once per version via localStorage key.
-const CHANGELOG_VERSION = '2.1';
+const CHANGELOG_VERSION = '2.2';
 const STORAGE_KEY = `phreezer_changelog_seen_${CHANGELOG_VERSION}`;
 
 const CHANGES = [
   {
-    icon: '◉',
-    title: 'Nav moved to the bottom',
-    desc: 'MY PHREEZER, COMMUNITY, and SCORECARD now live at the bottom of the screen where your thumbs actually are.',
+    icon: '◐',
+    title: 'Light mode is here',
+    desc: 'Prefer a brighter look? Profile → MY PHISH → APPEARANCE and flip to LIGHT. Dark stays the default — your eyes, your call.',
   },
   {
     icon: '❄',
-    title: 'Deep Phreeze promoted',
-    desc: 'Deep Phreeze moves to second in MY PHREEZER — right after MY SHOWS. Stop burying the good stuff.',
+    title: 'Find your phriends faster',
+    desc: 'No more typing usernames from memory — tap a phriend from the list to see every show you both caught.',
+  },
+  {
+    icon: '◈',
+    title: 'We want your take',
+    desc: 'Phreezer is still in beta and built by one phan. Tell us what rules, what breaks, what you wish it did — hit SHARE FEEDBACK below.',
   },
 ];
 
@@ -32,10 +37,15 @@ export function markChangelogSeen() {
   } catch {}
 }
 
-export function ChangelogModal({ onDismiss }) {
+export function ChangelogModal({ onDismiss, onFeedback }) {
   const handleDismiss = () => {
     markChangelogSeen();
     onDismiss?.();
+  };
+  const handleFeedback = () => {
+    markChangelogSeen();
+    onDismiss?.();
+    onFeedback?.();
   };
 
   return (
@@ -90,7 +100,7 @@ export function ChangelogModal({ onDismiss }) {
           marginBottom: 24, paddingBottom: 16,
           borderBottom: '1px solid rgba(var(--green-rgb),0.12)',
         }}>
-          v{CHANGELOG_VERSION} — Jun 17, 2026
+          v{CHANGELOG_VERSION} — Jun 25, 2026
         </div>
 
         {/* Changes */}
@@ -123,23 +133,34 @@ export function ChangelogModal({ onDismiss }) {
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)', fontSize: '0.66rem',
-            color: 'rgba(var(--green-rgb),0.7)', letterSpacing: '1px',
-          }}>TAP OUTSIDE TO DISMISS</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
-            onClick={handleDismiss}
+            onClick={handleFeedback}
             style={{
+              flex: 1,
               fontFamily: 'var(--font-display)', fontSize: '0.6rem',
-              letterSpacing: '3px', background: 'transparent',
-              border: '1px solid var(--cyan)', color: 'var(--cyan)',
-              padding: '10px 20px', cursor: 'pointer',
+              letterSpacing: '2px', background: 'rgba(var(--orange-bright-rgb),0.1)',
+              border: '1px solid var(--orange)', color: 'var(--orange)',
+              padding: '11px 14px', cursor: 'pointer',
               textTransform: 'uppercase', whiteSpace: 'nowrap',
               transition: 'all 0.15s',
             }}
           >
-            GOT IT ◈
+            ◈ SHARE FEEDBACK
+          </button>
+          <button
+            onClick={handleDismiss}
+            style={{
+              flexShrink: 0,
+              fontFamily: 'var(--font-display)', fontSize: '0.6rem',
+              letterSpacing: '3px', background: 'transparent',
+              border: '1px solid var(--cyan)', color: 'var(--cyan)',
+              padding: '11px 18px', cursor: 'pointer',
+              textTransform: 'uppercase', whiteSpace: 'nowrap',
+              transition: 'all 0.15s',
+            }}
+          >
+            GOT IT
           </button>
         </div>
       </div>
