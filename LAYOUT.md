@@ -16,10 +16,11 @@
 ### Aesthetic
 Retro terminal / synthwave. Dark background, glow effects, scanlines. This is the identity — do not deviate.
 
-### Light Mode (admin-gated — added 2026-06-25)
-- Toggle in ProfileModal → MY PHISH → APPEARANCE, **rendered only for `is_admin`**. Regular users only ever see dark. Do not remove the gate until release.
-- Implemented as `[data-theme="light"]` on `<html>` (theme.js, persisted in localStorage). Every design token is overridden; **dark token values are byte-identical to the original literals**, so dark mode is unchanged — only edit light values or shared tokens with that invariant in mind.
+### Light Mode (RELEASED to all users — 2026-06-25)
+- Toggle in ProfileModal → MY PHISH → APPEARANCE (DARK / LIGHT), visible to **all users**. Defaults to dark; opt-in, persisted per-device in localStorage — removing the gate did not flip anyone.
+- Implemented as `[data-theme="light"]` on `<html>` (theme.js). Every design token is overridden; **dark token values are byte-identical to the original literals**, so dark mode is unchanged — only edit light values or shared tokens with that invariant in mind.
 - See STYLE_GUIDE.md for the full token list (RGB hue tokens, `--ink-rgb`, `--inset-*`, `--card-deep`, `--hairline`).
+- Known cosmetic follow-up: the tagline under the wordmark is baked into the (light-colored) logo PNG and is weak on light — needs a dark-ink logo asset or live-text wordmark.
 
 ### Colors
 - `--green`: `#33ff33` — primary accent, section labels
@@ -244,7 +245,7 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 - **Logged-out desktop:** home tab with DesktopLanding — not scorecard
 - **New post box:** collapsed single row — do not revert to always-expanded
 - **ProfileModal tabs:** MY PHISH · BADGES · ABOUT · AI · SHOP — do not reorder
-- **Light mode:** admin-gated sandbox — do not remove the `is_admin` gate on the APPEARANCE toggle until release
+- **Light mode:** RELEASED to all users (2026-06-25) — APPEARANCE toggle, opt-in, defaults to dark
 - **Dark mode is the baseline:** light tokens override; dark token values must stay == their original literals so dark renders unchanged
 - **PHAN ROLL** is the Leaderboard label — non-competitive framing, do not revert to "LEADERBOARD"
 - **viewport-fit=cover** must stay in the viewport meta — the header/modal/bottom-nav safe-area handling all depends on it
@@ -253,7 +254,7 @@ One horizontal row: ERA | YEAR | MONTH | DAY | DOW | match box
 ---
 
 ## What's Explicitly NOT There Yet
-- **Light mode public release** — fully built but admin-gated. Before un-gating: light-mode logo/tagline asset (tagline is baked into the light-colored logo PNG, washes out on light — needs a dark-ink logo or live-text wordmark), and a final sweep for stray hardcoded hex literals.
+- **Light-mode logo/tagline asset** — light mode is released, but the tagline baked into the light-colored logo PNG washes out on light. Needs a dark-ink logo or live-text wordmark. Also watch for any stray hardcoded hex literals that don't flip.
 - Desktop UAT pass — full walkthrough not done. Mobile chrome/safe-area pass done 2026-06-25. Known issues: font sizes too small in places (causes squinting), visual polish needed. Scorecard overlay fixed (keeps sidebar/rail on desktop) but broader desktop pass pending Matthew's recorded UAT session.
 - Feed reply notifications
 - Feed moderation in admin panel

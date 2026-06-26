@@ -434,10 +434,9 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
           {sec === 'phish' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-              {/* Appearance / theme — ADMIN-ONLY while light mode is in beta (sandboxed) */}
-              {user?.is_admin && (
+              {/* Appearance / theme */}
               <div style={{ background: 'rgba(var(--cyan-rgb),0.03)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.1)', padding: '16px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ APPEARANCE <span style={{ color: 'var(--orange)', fontSize: '0.5rem', marginLeft: 6 }}>ADMIN BETA</span></div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '3px', marginBottom: 12 }}>◈ APPEARANCE</div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   {[['dark', '◑ DARK'], ['light', '◐ LIGHT']].map(([val, label]) => (
                     <button key={val} onClick={() => { setTheme(val); setThemeState(val); }} style={{
@@ -450,10 +449,9 @@ export function ProfileModal({ user, api, onClose, onAvatarChange, onLogout, ini
                   ))}
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                  Admin-only while in beta — not visible to users until light mode is finished.
+                  Saved on this device.
                 </div>
               </div>
-              )}
 
               {/* Identity block */}
               <div style={{ background: 'rgba(var(--cyan-rgb),0.04)', borderLeft: '3px solid var(--cyan)', borderBottom: '1px solid rgba(var(--cyan-rgb),0.15)', padding: '16px 14px' }}>
