@@ -473,7 +473,7 @@ export default function App() {
       </div>
 
       {showAuth && <AuthModal mode={authMode} setMode={setAuthMode} onSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />}
-      {showChangelog && <ChangelogModal onDismiss={() => setShowChangelog(false)} />}
+      {showChangelog && <ChangelogModal onDismiss={() => setShowChangelog(false)} onFeedback={() => setFeedbackModal('passive')} />}
       {pendingBadges.length > 0 && (
         <BadgeQueue
           badges={pendingBadges}
