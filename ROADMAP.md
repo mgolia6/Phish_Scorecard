@@ -15,8 +15,7 @@
 
 ### P1 — Pre-beta
 - **iOS Safari UAT** — not yet confirmed complete (mobile chrome/safe-area pass done 2026-06-25)
-- **Light mode — release** — fully polished but **admin-gated**. Remove the `is_admin` gate on the APPEARANCE toggle (ProfileModal) when signed off. Outstanding before un-gating: light-mode logo/tagline asset; final sweep of any stray hardcoded hex literals.
-- **Light-mode logo asset** — the tagline under the PHREEZER wordmark is baked into the (light-colored) logo PNG and washes out on light. Need a dark-ink logo for light theme, or render wordmark+tagline as live text.
+- **Light-mode logo asset** — light mode is RELEASED (gate removed 2026-06-25). Remaining: the tagline under the PHREEZER wordmark is baked into the (light-colored) logo PNG and washes out on light. Need a dark-ink logo for light theme, or render wordmark+tagline as live text. Plus a final sweep for stray hardcoded hex literals.
 - **GoDaddy DNS** — phreezer.mpgink.com subdomain in Resend (polish, not blocking)
 - **Sentry DSN fix** — malformed org ID in Vercel env var, Matthew to correct
 
